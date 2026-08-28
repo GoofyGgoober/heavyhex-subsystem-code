@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "quantum-surface-code"
 version = "0.1.0"
-description = "A small, dependency-free rotated surface-code simulator"
+description = "Distance-3 rotated planar surface code (built from scratch)"
 requires-python = ">=3.10"
 
 [tool.pytest.ini_options]

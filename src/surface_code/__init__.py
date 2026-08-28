@@ -1,6 +1,3 @@
-"""Rotated planar surface-code primitives."""
+from .qubits import DATA_QUBITS, DISTANCE, data_qubit
 
-from .code import PauliError, RotatedSurfaceCode, Stabilizer
-
-__all__ = ["PauliError", "RotatedSurfaceCode", "Stabilizer"]
-
+__all__ = ["DATA_QUBITS", "DISTANCE", "data_qubit"]
