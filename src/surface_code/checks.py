@@ -7,6 +7,7 @@
 Z-checks catch X errors. X-checks catch Z errors.
 """
 
+from .pauli import Pauli
 from .qubits import data_qubit
 
 # 4 Z tiles: two fat interior squares, two skinny boundary pairs.
@@ -24,3 +25,7 @@ X_CHECKS = (
     frozenset({data_qubit(0, 0), data_qubit(0, 1)}),  # top    0,1
     frozenset({data_qubit(2, 1), data_qubit(2, 2)}),  # bottom 7,8
 )
+
+Z_STABILIZERS = tuple(Pauli.z_on(support) for support in Z_CHECKS)
+X_STABILIZERS = tuple(Pauli.x_on(support) for support in X_CHECKS)
+STABILIZERS = X_STABILIZERS + Z_STABILIZERS
