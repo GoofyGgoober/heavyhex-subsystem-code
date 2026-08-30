@@ -1,5 +1,6 @@
 from .ancillas import ANCILLAS, X_ANCILLAS, Z_ANCILLAS
 from .checks import STABILIZERS, X_CHECKS, X_STABILIZERS, Z_CHECKS, Z_STABILIZERS
+from .decoder import decode
 from .logicals import LOGICAL_X, LOGICAL_Z
 from .parameters import is_logical, parameters
 from .pauli import Pauli
@@ -23,6 +24,7 @@ __all__ = [
     "Pauli",
     "abstract_syndrome",
     "data_qubit",
+    "decode",
     "extract_syndrome",
     "is_logical",
     "parameters",
