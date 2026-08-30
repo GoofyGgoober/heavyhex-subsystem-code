@@ -1,5 +1,5 @@
 from surface_code import DATA_QUBITS, LOGICAL_X, LOGICAL_Z, Pauli, decode, extract_syndrome, z_basis_success
-from surface_code.parameters import in_stabilizer_group
+from surface_code.patches.parameters import in_stabilizer_group
 
 
 def _single_qubit_errors() -> list[Pauli]:

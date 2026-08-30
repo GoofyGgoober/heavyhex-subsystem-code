@@ -4,17 +4,16 @@ All zeros is I. Otherwise the first single-qubit X/Y/Z with that syndrome.
 No match → None.
 """
 
-from .logicals import LOGICAL_Z
-from .pauli import Pauli
-from .qubits import DATA_QUBITS
-from .syndrome import extract_syndrome
+from ..circuits import extract_syndrome
+from ..core import Pauli
+from ..patches import PATCH
 
 Syndrome = tuple[int, ...]
 
 
 def _single_qubit_errors() -> tuple[Pauli, ...]:
     errors: list[Pauli] = []
-    for qubit in DATA_QUBITS:
+    for qubit in PATCH.data_qubits:
         x = Pauli.x_on((qubit,))
         z = Pauli.z_on((qubit,))
         errors.extend((x, z, x * z))
@@ -22,9 +21,9 @@ def _single_qubit_errors() -> tuple[Pauli, ...]:
 
 
 def decode(syndrome: Syndrome) -> Pauli | None:
-    if len(syndrome) != 8 or any(bit not in (0, 1) for bit in syndrome):
-        raise ValueError(f"syndrome must be 8 bits, got {syndrome!r}")
-    if syndrome == (0, 0, 0, 0, 0, 0, 0, 0):
+    if len(syndrome) != PATCH.code.syndrome_size or any(bit not in (0, 1) for bit in syndrome):
+        raise ValueError(f"syndrome must be {PATCH.code.syndrome_size} bits, got {syndrome!r}")
+    if syndrome == (0,) * PATCH.code.syndrome_size:
         return Pauli()
     for error in _single_qubit_errors():
         if extract_syndrome(error) == syndrome:
@@ -38,4 +37,4 @@ def z_basis_success(error: Pauli) -> int | None:
     if correction is None:
         return None
     leftover = correction * error
-    return int(leftover.commutes(LOGICAL_Z))
+    return int(leftover.commutes(PATCH.logical_z))

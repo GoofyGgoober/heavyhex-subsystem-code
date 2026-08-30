@@ -1,5 +1,7 @@
 from itertools import combinations
 
+import pytest
+
 from surface_code import (
     LOGICAL_X,
     LOGICAL_Z,
@@ -10,6 +12,7 @@ from surface_code import (
     is_logical,
     parameters,
 )
+from surface_code.patches import PATCH
 
 
 def test_stabilizers_are_the_eight_css_generators():
@@ -41,3 +44,14 @@ def test_logicals_are_nontrivial():
 
 def test_parameters_are_nine_one_three():
     assert parameters() == (9, 1, 3)
+
+
+def test_compatibility_names_are_derived_from_the_patch():
+    assert STABILIZERS == PATCH.stabilizers
+    assert LOGICAL_X == PATCH.logical_x
+    assert LOGICAL_Z == PATCH.logical_z
+
+
+def test_code_operations_reject_ancilla_paulis():
+    with pytest.raises(ValueError, match="outside the data qubits"):
+        is_logical(Pauli.x_on((PATCH.ancillas[0],)))

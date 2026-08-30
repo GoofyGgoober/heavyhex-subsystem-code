@@ -8,40 +8,22 @@ No IBM layout. Ancillas are fully connected to their tiles.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
-from .ancillas import ANCILLAS, X_ANCILLAS, Z_ANCILLAS
-from .checks import STABILIZERS, X_CHECKS, Z_CHECKS
-from .pauli import Pauli
-
-
-@dataclass(frozen=True)
-class H:
-    qubit: int
-
-
-@dataclass(frozen=True)
-class CX:
-    control: int
-    target: int
-
-
-@dataclass(frozen=True)
-class MeasureZ:
-    qubit: int
+from ..core import Pauli
+from ..patches import PATCH
+from .operations import CX, H, MeasureZ
 
 
 def _syndrome_circuit() -> tuple[H | CX | MeasureZ, ...]:
     ops: list[H | CX | MeasureZ] = []
-    for ancilla, support in zip(Z_ANCILLAS, Z_CHECKS):
+    for ancilla, support in zip(PATCH.z_ancillas, PATCH.z_checks):
         for data in sorted(support):
             ops.append(CX(data, ancilla))
-    for ancilla, support in zip(X_ANCILLAS, X_CHECKS):
+    for ancilla, support in zip(PATCH.x_ancillas, PATCH.x_checks):
         ops.append(H(ancilla))
         for data in sorted(support):
             ops.append(CX(ancilla, data))
         ops.append(H(ancilla))
-    for ancilla in ANCILLAS:
+    for ancilla in PATCH.ancillas:
         ops.append(MeasureZ(ancilla))
     return tuple(ops)
 
@@ -75,11 +57,12 @@ def _conjugate_cx(pauli: Pauli, control: int, target: int) -> Pauli:
 
 def abstract_syndrome(error: Pauli) -> tuple[int, ...]:
     """Syndrome from commutation: 1 iff the error anticommutes with that stabilizer."""
-    return tuple(0 if error.commutes(stab) else 1 for stab in STABILIZERS)
+    return PATCH.code.syndrome(error)
 
 
 def extract_syndrome(error: Pauli) -> tuple[int, ...]:
     """Push a data error through the circuit and read the 8 ancilla bits."""
+    PATCH.code.validate_data_pauli(error, name="error")
     pauli = error
     bits: list[int] = []
     for op in SYNDROME_CIRCUIT:

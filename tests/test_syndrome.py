@@ -8,7 +8,7 @@ from surface_code import (
     abstract_syndrome,
     extract_syndrome,
 )
-from surface_code.syndrome import CX, H, MeasureZ, SYNDROME_CIRCUIT
+from surface_code.circuits import CX, H, MeasureZ, SYNDROME_CIRCUIT
 
 
 def test_one_ancilla_per_stabilizer():
