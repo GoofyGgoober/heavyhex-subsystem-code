@@ -1,5 +1,4 @@
-from surface_code import DATA_QUBITS, Pauli, decode, extract_syndrome
-from surface_code.decoder import LOOKUP
+from surface_code import DATA_QUBITS, LOGICAL_X, LOGICAL_Z, Pauli, decode, extract_syndrome, z_basis_success
 from surface_code.parameters import in_stabilizer_group
 
 
@@ -20,19 +19,24 @@ def test_weight1_errors_are_corrected_up_to_a_stabilizer():
     for error in _single_qubit_errors():
         correction = decode(extract_syndrome(error))
         assert correction is not None
+        assert correction.weight() <= 1
         assert in_stabilizer_group(correction * error)
 
 
-def test_table_only_has_identity_and_weight1_rows():
-    assert LOOKUP[(0, 0, 0, 0, 0, 0, 0, 0)] == Pauli()
-    assert all(pauli.weight() <= 1 for pauli in LOOKUP.values())
-    assert len(LOOKUP) < 256
-
-
 def test_unknown_syndrome_is_none():
+    known = {extract_syndrome(error) for error in _single_qubit_errors()}
+    known.add((0, 0, 0, 0, 0, 0, 0, 0))
     missing = next(
         bits
         for n in range(256)
-        if (bits := tuple((n >> i) & 1 for i in range(8))) not in LOOKUP
+        if (bits := tuple((n >> i) & 1 for i in range(8))) not in known
     )
     assert decode(missing) is None
+
+
+def test_z_basis_success():
+    assert z_basis_success(Pauli()) == 1
+    assert all(z_basis_success(Pauli.x_on((q,))) == 1 for q in DATA_QUBITS)
+    assert extract_syndrome(LOGICAL_X) == (0,) * 8
+    assert z_basis_success(LOGICAL_X) == 0
+    assert z_basis_success(LOGICAL_Z) == 1
