@@ -17,6 +17,28 @@ def _all_syndromes() -> list[tuple[int, ...]]:
     return [tuple((n >> i) & 1 for i in range(width)) for n in range(1 << width)]
 
 
+def _syndrome_xor(left: tuple[int, ...], right: tuple[int, ...]) -> tuple[int, ...]:
+    return tuple(a ^ b for a, b in zip(left, right))
+
+
+def _minimum_weights_by_syndrome() -> dict[tuple[int, ...], int]:
+    """Independent shortest-path oracle using weight-1 syndrome transitions."""
+    zero = (0,) * PATCH.code.syndrome_size
+    steps = {extract_syndrome(error) for error in _single_qubit_errors()}
+    weights = {zero: 0}
+    frontier = {zero}
+    while frontier:
+        next_frontier: set[tuple[int, ...]] = set()
+        for syndrome in frontier:
+            for step in steps:
+                candidate = _syndrome_xor(syndrome, step)
+                if candidate not in weights:
+                    weights[candidate] = weights[syndrome] + 1
+                    next_frontier.add(candidate)
+        frontier = next_frontier
+    return weights
+
+
 def test_trivial_syndrome_is_identity():
     assert decode((0, 0, 0, 0, 0, 0, 0, 0)) == Pauli()
 
@@ -29,18 +51,13 @@ def test_weight1_errors_are_corrected_up_to_a_stabilizer():
 
 
 def test_every_syndrome_has_a_min_weight_correction():
-    lightest: dict[tuple[int, ...], int] = {}
-    for error in _single_qubit_errors():
-        lightest.setdefault(extract_syndrome(error), 1)
-    lightest.setdefault((0,) * PATCH.code.syndrome_size, 0)
+    minimum_weights = _minimum_weights_by_syndrome()
+    assert set(minimum_weights) == set(_all_syndromes())
 
     for syndrome in _all_syndromes():
         correction = decode(syndrome)
         assert extract_syndrome(correction) == syndrome
-        if syndrome in lightest:
-            assert correction.weight() == lightest[syndrome]
-        else:
-            assert correction.weight() >= 2
+        assert correction.weight() == minimum_weights[syndrome]
 
 
 def test_two_errors_on_logical_x_decode_the_other_end():
