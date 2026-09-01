@@ -8,6 +8,9 @@ version = "0.1.0"
 description = "Distance-3 rotated planar surface code (built from scratch)"
 requires-python = ">=3.10"
 
+[project.optional-dependencies]
+sim = ["qiskit>=2", "qiskit-aer>=0.15", "pytest"]
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 
