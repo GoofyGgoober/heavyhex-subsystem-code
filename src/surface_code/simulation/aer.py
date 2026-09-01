@@ -108,11 +108,9 @@ def run_aer(
     return tallies
 
 
-def shot_z_success(syndrome: tuple[int, ...], data_bits: tuple[int, ...]) -> int | None:
+def shot_z_success(syndrome: tuple[int, ...], data_bits: tuple[int, ...]) -> int:
     """Hardware-shaped Z success: correct the data bits, then test Z_L == 0."""
     correction = decode(syndrome)
-    if correction is None:
-        return None
     bits = list(data_bits)
     for qubit in correction.x:
         bits[qubit] ^= 1
