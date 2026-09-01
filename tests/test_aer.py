@@ -35,3 +35,18 @@ def test_logical_x_is_a_z_failure_on_aer():
     (syndrome, data_bits), _ = next(iter(shots.items()))
     assert syndrome == (0,) * 8
     assert shot_z_success(syndrome, data_bits) == 0
+
+
+def test_seeded_aer_runs_are_reproducible():
+    assert run_aer(Pauli(), shots=32, seed=7) == run_aer(Pauli(), shots=32, seed=7)
+
+
+@pytest.mark.parametrize("shots", [0, -1, 1.5, True])
+def test_aer_rejects_invalid_shot_counts(shots):
+    with pytest.raises(ValueError, match="positive integer"):
+        run_aer(Pauli(), shots=shots)
+
+
+def test_aer_rejects_seed_above_signed_64_bit_range():
+    with pytest.raises(ValueError, match="seed must be an integer"):
+        run_aer(Pauli(), shots=1, seed=1 << 63)

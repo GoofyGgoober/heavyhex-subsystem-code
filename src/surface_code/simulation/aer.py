@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from qiskit import QuantumCircuit
 
 NUM_QUBITS = max(PATCH.data_qubits + PATCH.ancillas) + 1
+MAX_SEED = (1 << 63) - 1
 
 
 def _pauli_label(pauli: Pauli, n: int) -> str:
@@ -95,12 +96,26 @@ def run_aer(
     error: Pauli | None = None,
     *,
     shots: int = 1024,
+    seed: int | None = None,
 ) -> dict[tuple[tuple[int, ...], tuple[int, ...]], int]:
     """Return {(syndrome, data_bits): count} from a noiseless stabilizer sim."""
+    if not isinstance(shots, int) or isinstance(shots, bool) or shots <= 0:
+        raise ValueError(f"shots must be a positive integer, got {shots!r}")
+    if seed is not None and (
+        not isinstance(seed, int)
+        or isinstance(seed, bool)
+        or seed < 0
+        or seed > MAX_SEED
+    ):
+        raise ValueError(f"seed must be an integer from 0 to {MAX_SEED}, or None, got {seed!r}")
+
     from qiskit_aer import AerSimulator
 
     circuit = to_qiskit(error)
-    result = AerSimulator(method="stabilizer").run(circuit, shots=shots).result()
+    run_options: dict[str, int] = {"shots": shots}
+    if seed is not None:
+        run_options["seed_simulator"] = seed
+    result = AerSimulator(method="stabilizer").run(circuit, **run_options).result()
     tallies: dict[tuple[tuple[int, ...], tuple[int, ...]], int] = {}
     for key, count in result.get_counts().items():
         parsed = _parse_shot(key)
