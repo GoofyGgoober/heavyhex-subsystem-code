@@ -15,7 +15,7 @@ from ..decoders import decode
 from ..patches import PATCH
 
 if TYPE_CHECKING:
-    from qiskit import QuantumCircuit
+    from qiskit import ClassicalRegister, QuantumCircuit
 
 NUM_QUBITS = max(PATCH.data_qubits + PATCH.ancillas) + 1
 MAX_SEED = (1 << 63) - 1
@@ -51,6 +51,18 @@ def _apply_error(circuit: QuantumCircuit, error: Pauli) -> None:
         circuit.y(qubit)
 
 
+def _append_syndrome_round(circuit: QuantumCircuit, syn: ClassicalRegister) -> None:
+    """Append one check-extraction round into the supplied classical register."""
+    ancilla_bit = {ancilla: i for i, ancilla in enumerate(PATCH.ancillas)}
+    for op in SYNDROME_CIRCUIT:
+        if isinstance(op, H):
+            circuit.h(op.qubit)
+        elif isinstance(op, CX):
+            circuit.cx(op.control, op.target)
+        else:
+            circuit.measure(op.qubit, syn[ancilla_bit[op.qubit]])
+
+
 def to_qiskit(error: Pauli | None = None) -> QuantumCircuit:
     """Syndrome round, then Z-measure the 9 data qubits."""
     from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
@@ -63,14 +75,7 @@ def to_qiskit(error: Pauli | None = None) -> QuantumCircuit:
     if error is not None:
         _apply_error(circuit, error)
 
-    ancilla_bit = {ancilla: i for i, ancilla in enumerate(PATCH.ancillas)}
-    for op in SYNDROME_CIRCUIT:
-        if isinstance(op, H):
-            circuit.h(op.qubit)
-        elif isinstance(op, CX):
-            circuit.cx(op.control, op.target)
-        else:
-            circuit.measure(op.qubit, syn[ancilla_bit[op.qubit]])
+    _append_syndrome_round(circuit, syn)
 
     # Data is still entangled with the ancillas until those measures finish.
     circuit.barrier()
@@ -92,13 +97,7 @@ def _parse_shot(key: str) -> tuple[tuple[int, ...], tuple[int, ...]]:
     return _bits_le(syn_str), _bits_le(data_str)
 
 
-def run_aer(
-    error: Pauli | None = None,
-    *,
-    shots: int = 1024,
-    seed: int | None = None,
-) -> dict[tuple[tuple[int, ...], tuple[int, ...]], int]:
-    """Return {(syndrome, data_bits): count} from a noiseless stabilizer sim."""
+def _validate_aer_options(shots: int, seed: int | None) -> None:
     if not isinstance(shots, int) or isinstance(shots, bool) or shots <= 0:
         raise ValueError(f"shots must be a positive integer, got {shots!r}")
     if seed is not None and (
@@ -108,6 +107,16 @@ def run_aer(
         or seed > MAX_SEED
     ):
         raise ValueError(f"seed must be an integer from 0 to {MAX_SEED}, or None, got {seed!r}")
+
+
+def run_aer(
+    error: Pauli | None = None,
+    *,
+    shots: int = 1024,
+    seed: int | None = None,
+) -> dict[tuple[tuple[int, ...], tuple[int, ...]], int]:
+    """Return {(syndrome, data_bits): count} from a noiseless stabilizer sim."""
+    _validate_aer_options(shots, seed)
 
     from qiskit_aer import AerSimulator
 

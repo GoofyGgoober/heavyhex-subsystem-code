@@ -15,10 +15,26 @@ from ..core import Pauli
 from ..decoders import decode, z_basis_success
 from ..patches import PATCH
 from .aer import MAX_SEED, run_aer, shot_z_success, to_qiskit
+from .memory import (
+    BASELINE_NOISE,
+    CircuitNoise,
+    run_memory,
+    summarize_memory,
+    to_memory_circuit,
+)
 from .noise import depolarizing_error
 
 DEFAULT_SHOTS = 64
-_COMMANDS = {"run", "interactive", "syndrome", "decode", "sweep", "circuit", "info"}
+_COMMANDS = {
+    "run",
+    "interactive",
+    "syndrome",
+    "decode",
+    "sweep",
+    "memory",
+    "circuit",
+    "info",
+}
 _TOKEN = re.compile(r"([XYZ])(_?L|\d+)", re.IGNORECASE)
 _LOGICAL_WORD = re.compile(r"LOGICAL[\s_-]*([XYZ])", re.IGNORECASE)
 _SEPARATORS = re.compile(r"[\s,*]+")
@@ -371,6 +387,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  surface-code X4 --shots 128 --seed 7\n"
             "  surface-code syndrome 'X0 Z3'\n"
             "  surface-code decode '0000 1100'\n"
+            "  surface-code memory --rounds 8 --two-qubit-error 0.01\n"
             "  surface-code sweep --weight 2 --failures-only\n"
             "  surface-code circuit XL"
         ),
@@ -425,8 +442,36 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sweep.add_argument("--json", action="store_true")
 
+    memory = subparsers.add_parser(
+        "memory",
+        help="run repeated ancilla measurement/reset rounds",
+        description=(
+            "Run a repeated logical-zero memory circuit in Aer with a vendor-neutral "
+            "baseline noise model."
+        ),
+    )
+    memory.add_argument("--rounds", type=_nonnegative_int, default=4)
+    memory.add_argument("-s", "--shots", type=_positive_int, default=DEFAULT_SHOTS)
+    memory.add_argument("--seed", type=_seed)
+    memory.add_argument("-e", "--error", type=_pauli_argument, default=Pauli(), metavar="PAULI")
+    memory.add_argument("--single-qubit-error", type=_probability, metavar="P")
+    memory.add_argument("--two-qubit-error", type=_probability, metavar="P")
+    memory.add_argument("--readout-error", type=_probability, metavar="P")
+    memory.add_argument("--reset-error", type=_probability, metavar="P")
+    memory.add_argument(
+        "--ideal",
+        action="store_true",
+        help="start from zero noise (explicit error-rate options still override it)",
+    )
+    memory.add_argument("--json", action="store_true")
+
     circuit = subparsers.add_parser("circuit", help="draw the generated Qiskit circuit")
     circuit.add_argument("error", nargs="?", type=_pauli_argument, default=Pauli(), metavar="PAULI")
+    circuit.add_argument(
+        "--rounds",
+        type=_nonnegative_int,
+        help="draw a repeated-round memory circuit instead of the one-round circuit",
+    )
 
     info = subparsers.add_parser("info", help="show patch geometry, checks, and logical operators")
     info.add_argument("--json", action="store_true")
@@ -582,6 +627,102 @@ def _sweep_command(args: argparse.Namespace) -> int:
     return 0
 
 
+def _memory_noise(args: argparse.Namespace) -> CircuitNoise:
+    base = CircuitNoise.ideal() if args.ideal else BASELINE_NOISE
+    return CircuitNoise(
+        single_qubit=(
+            base.single_qubit
+            if args.single_qubit_error is None
+            else args.single_qubit_error
+        ),
+        two_qubit=(
+            base.two_qubit if args.two_qubit_error is None else args.two_qubit_error
+        ),
+        readout=base.readout if args.readout_error is None else args.readout_error,
+        reset=base.reset if args.reset_error is None else args.reset_error,
+    )
+
+
+def _memory_command(args: argparse.Namespace) -> int:
+    noise = _memory_noise(args)
+    has_overrides = any(
+        value is not None
+        for value in (
+            args.single_qubit_error,
+            args.two_qubit_error,
+            args.readout_error,
+            args.reset_error,
+        )
+    )
+    if has_overrides:
+        profile_name = "custom"
+    else:
+        profile_name = "ideal" if args.ideal else "baseline"
+    tallies = run_memory(
+        args.rounds,
+        shots=args.shots,
+        seed=args.seed,
+        error=args.error,
+        noise=noise,
+    )
+    summary = summarize_memory(tallies)
+    round_rows = [
+        {
+            "round": round_index + 1,
+            "syndrome_trigger_rate": summary.syndrome_trigger_rate[round_index],
+            "detection_event_rate": summary.detection_event_rate[round_index],
+        }
+        for round_index in range(summary.rounds)
+    ]
+    payload = {
+        "backend": "aer_stabilizer",
+        "experiment": "repeated_logical_zero_memory",
+        "rounds": summary.rounds,
+        "shots": summary.shots,
+        "injected_error": _plain_pauli(args.error),
+        "noise_profile": profile_name,
+        "noise": {
+            "single_qubit": noise.single_qubit,
+            "two_qubit": noise.two_qubit,
+            "readout": noise.readout,
+            "reset": noise.reset,
+        },
+        "round_data": round_rows,
+        "raw_z_success_rate": summary.raw_z_success_rate,
+        "last_round_only_z_success_rate": summary.last_round_z_success_rate,
+        "space_time_decoded": False,
+        "preparation": "synthesized_clifford_not_fault_tolerant",
+        "unique_histories": len(tallies),
+    }
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+
+    print("Repeated logical-zero memory experiment")
+    print("Backend:        Aer stabilizer")
+    profile = profile_name
+    print(f"Noise profile:  {profile}")
+    print("Preparation:    synthesized Clifford (not fault-tolerant)")
+    print(f"Rounds:         {summary.rounds}")
+    print(f"Shots:          {summary.shots}")
+    print(f"Injected error: {format_pauli(args.error)}")
+    if round_rows:
+        print("\nround  nontrivial syndrome  detection-event bits")
+        for row in round_rows:
+            print(
+                f"{row['round']:5d}  {row['syndrome_trigger_rate']:19.3%}  "
+                f"{row['detection_event_rate']:20.3%}"
+            )
+    print(f"\nRaw final Z_L +1:       {summary.raw_z_success_rate:.3%}")
+    if summary.last_round_z_success_rate is not None:
+        print(
+            "Last-round-only decode: "
+            f"{summary.last_round_z_success_rate:.3%}"
+        )
+    print("Space-time decode:       not implemented yet")
+    return 0
+
+
 def _info_payload() -> dict[str, Any]:
     grid = [
         list(PATCH.data_qubits[row * PATCH.distance : (row + 1) * PATCH.distance])
@@ -637,7 +778,12 @@ def _info_command(args: argparse.Namespace) -> int:
 
 
 def _circuit_command(args: argparse.Namespace) -> int:
-    print(to_qiskit(args.error).draw(output="text"))
+    circuit = (
+        to_qiskit(args.error)
+        if args.rounds is None
+        else to_memory_circuit(args.rounds, args.error)
+    )
+    print(circuit.draw(output="text"))
     return 0
 
 
@@ -864,6 +1010,7 @@ def main(argv: list[str] | None = None, *, lines: Sequence[str] | None = None) -
         "syndrome": _syndrome_command,
         "decode": _decode_command,
         "sweep": _sweep_command,
+        "memory": _memory_command,
         "circuit": _circuit_command,
         "info": _info_command,
     }

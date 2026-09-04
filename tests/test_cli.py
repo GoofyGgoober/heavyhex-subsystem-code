@@ -1,6 +1,7 @@
 import json
 import subprocess
 import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -243,6 +244,75 @@ def test_circuit_command_uses_requested_error(monkeypatch, capsys):
     assert main(["circuit", "Z2"]) == 0
     assert seen == [Pauli.z_on((2,))]
     assert "fake circuit" in capsys.readouterr().out
+
+
+def test_circuit_command_can_draw_repeated_rounds(monkeypatch, capsys):
+    class FakeCircuit:
+        def draw(self, *, output):
+            return "memory circuit"
+
+    seen = []
+
+    def fake_memory_circuit(rounds, error):
+        seen.append((rounds, error))
+        return FakeCircuit()
+
+    monkeypatch.setattr("surface_code.simulation.cli.to_memory_circuit", fake_memory_circuit)
+    assert main(["circuit", "X4", "--rounds", "3"]) == 0
+    assert seen == [(3, Pauli.x_on((4,)))]
+    assert "memory circuit" in capsys.readouterr().out
+
+
+def test_memory_command_reports_hardware_shaped_rounds(monkeypatch, capsys):
+    seen = []
+
+    def fake_run(rounds, **kwargs):
+        seen.append((rounds, kwargs))
+        return {"history": kwargs["shots"]}
+
+    summary = SimpleNamespace(
+        rounds=2,
+        shots=10,
+        syndrome_trigger_rate=(0.1, 0.2),
+        detection_event_rate=(0.05, 0.15),
+        raw_z_success_rate=0.9,
+        last_round_z_success_rate=0.8,
+    )
+    monkeypatch.setattr("surface_code.simulation.cli.run_memory", fake_run)
+    monkeypatch.setattr("surface_code.simulation.cli.summarize_memory", lambda _: summary)
+
+    assert main(["memory", "--rounds", "2", "--shots", "10", "--json"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["rounds"] == 2
+    assert payload["space_time_decoded"] is False
+    assert payload["round_data"][1]["detection_event_rate"] == 0.15
+    assert seen[0][0] == 2
+    assert payload["noise_profile"] == "baseline"
+    assert not seen[0][1]["noise"].is_ideal
+
+
+def test_memory_command_has_explicit_ideal_mode(monkeypatch, capsys):
+    seen = []
+
+    def fake_run(rounds, **kwargs):
+        seen.append(kwargs["noise"])
+        return {"history": kwargs["shots"]}
+
+    summary = SimpleNamespace(
+        rounds=0,
+        shots=4,
+        syndrome_trigger_rate=(),
+        detection_event_rate=(),
+        raw_z_success_rate=1.0,
+        last_round_z_success_rate=None,
+    )
+    monkeypatch.setattr("surface_code.simulation.cli.run_memory", fake_run)
+    monkeypatch.setattr("surface_code.simulation.cli.summarize_memory", lambda _: summary)
+
+    assert main(["memory", "--rounds", "0", "--shots", "4", "--ideal", "--json"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["noise_profile"] == "ideal"
+    assert seen[0].is_ideal
 
 
 def test_interactive_edits_do_not_measure_until_requested(monkeypatch, capsys):
