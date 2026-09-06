@@ -393,7 +393,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--profile", choices=sorted(PROFILES), default="baseline")
     parser.add_argument("--prep", choices=PREPARATIONS, default="encoder")
-    parser.add_argument("--shots", type=parse_positive_int, default=5000)
+    parser.add_argument(
+        "--shots",
+        type=parse_positive_int,
+        default=500,
+        help="shots per point (default: %(default)s)",
+    )
     parser.add_argument("--workers", type=parse_positive_int, default=8)
     parser.add_argument("--seed", type=parse_seed, default=2026090600)
     parser.add_argument(

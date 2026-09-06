@@ -67,6 +67,14 @@ def test_resume_rejects_corrupt_measurement_counts(script, checkpoint):
         script.resume_data(checkpoint, script._settings(checkpoint["metadata"]))
 
 
+def test_resume_rejects_changed_shot_count(script, checkpoint):
+    checkpoint["metadata"]["shots_per_point"] = 5000
+    checkpoint["points"][0].update(shots=5000, logical_failures=500)
+    requested = {**script._settings(checkpoint["metadata"]), "shots_per_point": 500}
+    with pytest.raises(ValueError, match="different settings or source"):
+        script.resume_data(checkpoint, requested)
+
+
 def test_source_override_preserves_per_point_provenance(script, checkpoint):
     requested = {**script._settings(checkpoint["metadata"]), "source_digest": "new-source"}
     with pytest.raises(ValueError, match="different settings or source"):
