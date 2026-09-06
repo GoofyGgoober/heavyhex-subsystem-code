@@ -9,7 +9,8 @@ classical result for every round.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import exp
+from math import expm1
+from typing import TYPE_CHECKING
 
 from .._validation import validate_binary_bits, validate_nonnegative_number, validate_probability
 from ..core import Pauli
@@ -24,6 +25,10 @@ from .aer import (
     _validate_aer_options,
     shot_z_success,
 )
+
+if TYPE_CHECKING:
+    from qiskit import QuantumCircuit
+    from qiskit_aer.noise import NoiseModel
 
 Syndrome = tuple[int, ...]
 DataBits = tuple[int, ...]
@@ -109,21 +114,24 @@ class IdleNoise:
     def pauli_probabilities(self, duration_us: float) -> tuple[float, float, float, float]:
         """Return exact (I, X, Y, Z) probabilities after a Poisson interval."""
         validate_nonnegative_number("duration_us", duration_us)
-        x_character = exp(-2 * (self.x_rate + self.y_rate) * duration_us)
-        z_character = exp(-2 * (self.z_rate + self.y_rate) * duration_us)
-        y_character = exp(-2 * (self.x_rate + self.z_rate) * duration_us)
-        probability_i = (1 + x_character + z_character + y_character) / 4
-        probability_x = (1 - x_character + z_character - y_character) / 4
-        probability_z = (1 + x_character - z_character - y_character) / 4
-        probability_y = (1 - x_character - z_character + y_character) / 4
+        # An even number of identical Pauli events cancels. expm1 preserves
+        # tiny odd-event probabilities without subtracting nearly equal numbers.
+        odd_x, odd_y, odd_z = (
+            -expm1(-2 * (rate * duration_us)) / 2
+            for rate in (self.x_rate, self.y_rate, self.z_rate)
+        )
+        even_x, even_y, even_z = 1 - odd_x, 1 - odd_y, 1 - odd_z
+        # XYZ = I up to phase, so each net Pauli has two parity patterns.
+        probability_i = even_x * even_y * even_z + odd_x * odd_y * odd_z
+        probability_x = odd_x * even_y * even_z + even_x * odd_y * odd_z
+        probability_y = even_x * odd_y * even_z + odd_x * even_y * odd_z
+        probability_z = even_x * even_y * odd_z + odd_x * odd_y * even_z
         return probability_i, probability_x, probability_y, probability_z
 
     def relevant_bit_probability(self, basis: str, duration_us: float) -> float:
         """Probability of the error component visible in an X or Z readout."""
         checked_basis = normalize_measurement_basis(basis)
-        _, probability_x, probability_y, probability_z = self.pauli_probabilities(
-            duration_us
-        )
+        _, probability_x, probability_y, probability_z = self.pauli_probabilities(duration_us)
         if checked_basis == "Z":
             return probability_x + probability_y
         return probability_z + probability_y
@@ -171,9 +179,7 @@ def _validate_rounds(rounds: int) -> None:
         raise ValueError(f"rounds must be a non-negative integer, got {rounds!r}")
 
 
-def idle_duration_per_round(
-    total_time_us: float, rounds: int, round_duration_us: float
-) -> float:
+def idle_duration_per_round(total_time_us: float, rounds: int, round_duration_us: float) -> float:
     """Return free-evolution time in each slice of a fixed storage window."""
     validate_nonnegative_number("total_time_us", total_time_us)
     validate_nonnegative_number("round_duration_us", round_duration_us)
@@ -183,8 +189,7 @@ def idle_duration_per_round(
     interval = total_time_us / rounds
     if round_duration_us > interval:
         raise ValueError(
-            f"{rounds} rounds of {round_duration_us:g} us do not fit in "
-            f"{total_time_us:g} us"
+            f"{rounds} rounds of {round_duration_us:g} us do not fit in {total_time_us:g} us"
         )
     return interval - round_duration_us
 
@@ -196,7 +201,7 @@ def _build_memory_circuit(
     basis: str,
     idle_duration_us: float | None,
     preparation: str,
-):
+) -> QuantumCircuit:
     from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 
     _validate_rounds(rounds)
@@ -239,7 +244,7 @@ def to_memory_circuit(
     *,
     basis: str = "Z",
     preparation: str = "encoder",
-):
+) -> QuantumCircuit:
     """Prepare a logical +1 state, extract syndromes, then measure its basis."""
     return _build_memory_circuit(
         rounds,
@@ -258,11 +263,9 @@ def to_timed_memory_circuit(
     basis: str = "Z",
     error: Pauli | None = None,
     preparation: str = "encoder",
-):
+) -> QuantumCircuit:
     """Build a fixed-duration memory circuit with equally spaced check rounds."""
-    idle_duration_us = idle_duration_per_round(
-        total_time_us, rounds, round_duration_us
-    )
+    idle_duration_us = idle_duration_per_round(total_time_us, rounds, round_duration_us)
     return _build_memory_circuit(
         rounds,
         error,
@@ -277,7 +280,7 @@ def _noise_model(
     *,
     idle_noise: IdleNoise | None = None,
     idle_duration_us: float = 0.0,
-):
+) -> NoiseModel:
     from qiskit_aer.noise import NoiseModel, ReadoutError, depolarizing_error, pauli_error
 
     model = NoiseModel()
@@ -301,8 +304,8 @@ def _noise_model(
         reset_error = pauli_error((("X", noise.reset), ("I", 1 - noise.reset)))
         model.add_all_qubit_quantum_error(reset_error, ("reset",))
     if idle_noise is not None and idle_duration_us:
-        probability_i, probability_x, probability_y, probability_z = (
-            idle_noise.pauli_probabilities(idle_duration_us)
+        probability_i, probability_x, probability_y, probability_z = idle_noise.pauli_probabilities(
+            idle_duration_us
         )
         idle_error = pauli_error(
             (
@@ -368,13 +371,9 @@ def run_timed_memory(
     if not isinstance(circuit_noise, CircuitNoise):
         raise TypeError(f"noise must be CircuitNoise, got {type(circuit_noise).__name__}")
     if not isinstance(storage_noise, IdleNoise):
-        raise TypeError(
-            f"idle_noise must be IdleNoise, got {type(storage_noise).__name__}"
-        )
+        raise TypeError(f"idle_noise must be IdleNoise, got {type(storage_noise).__name__}")
 
-    idle_duration_us = idle_duration_per_round(
-        total_time_us, rounds, round_duration_us
-    )
+    idle_duration_us = idle_duration_per_round(total_time_us, rounds, round_duration_us)
     circuit = _build_memory_circuit(
         rounds,
         error,
@@ -386,12 +385,21 @@ def run_timed_memory(
     model = (
         None
         if circuit_noise.is_ideal and storage_noise.is_ideal
-        else _noise_model(circuit_noise, idle_noise=storage_noise, idle_duration_us=idle_duration_us)
+        else _noise_model(
+            circuit_noise, idle_noise=storage_noise, idle_duration_us=idle_duration_us
+        )
     )
     return _execute(circuit, model, rounds=rounds, shots=shots, seed=seed)
 
 
-def _execute(circuit, noise_model, *, rounds: int, shots: int, seed: int | None) -> dict[MemoryShot, int]:
+def _execute(
+    circuit: QuantumCircuit,
+    noise_model: NoiseModel | None,
+    *,
+    rounds: int,
+    shots: int,
+    seed: int | None,
+) -> dict[MemoryShot, int]:
     """Run one memory circuit on the Aer stabilizer backend and tally shot histories."""
     from qiskit_aer import AerSimulator
 
@@ -443,9 +451,7 @@ def summarize_memory(tallies: dict[MemoryShot, int], *, basis: str = "Z") -> Mem
             sum(shot.data_bits[qubit] for qubit in PATCH.logical_z.z) % 2 == 0
         )
         if rounds:
-            last_round_successes += count * shot_z_success(
-                shot.syndromes[-1], shot.data_bits
-            )
+            last_round_successes += count * shot_z_success(shot.syndromes[-1], shot.data_bits)
 
     return MemorySummary(
         rounds=rounds,

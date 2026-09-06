@@ -16,7 +16,7 @@ surface-code = "surface_code.simulation.cli:main"
 sim = ["qiskit>=2", "qiskit-aer>=0.15"]
 plot = ["matplotlib>=3.8"]
 test = ["pytest", "quantum-surface-code[sim]"]
-dev = ["quantum-surface-code[sim,plot,test]"]
+dev = ["quantum-surface-code[sim,plot,test]", "ruff>=0.16,<0.17"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -27,3 +27,16 @@ pythonpath = ["src"]
 [tool.pyright]
 extraPaths = ["src"]
 include = ["src", "tests", "scripts"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+# Optional simulator imports deliberately follow pytest.importorskip.
+"tests/test_aer.py" = ["E402"]
+"tests/test_record_shots.py" = ["E402"]
+"tests/test_sweep_n.py" = ["E402"]

@@ -3,11 +3,11 @@ from .core import Pauli
 from .decoders import decode, z_basis_success
 from .patches import (
     ANCILLAS,
-    PATCH,
     DATA_QUBITS,
     DISTANCE,
     LOGICAL_X,
     LOGICAL_Z,
+    PATCH,
     STABILIZERS,
     X_ANCILLAS,
     X_CHECKS,

@@ -10,11 +10,11 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from functools import cache
+from functools import lru_cache
 from typing import Literal, TypeAlias, cast
 
 from .._validation import validate_binary_bits, validate_probability
-from ..patches import PATCH
+from ..patches import PATCH, Check
 
 LogicalBasis: TypeAlias = Literal["X", "Z"]
 Syndrome: TypeAlias = tuple[int, ...]
@@ -68,9 +68,7 @@ def predict_logical_flip_from_history(
     # Include errors after the last ancilla round, including final data readout.
     final_errors = _build_data_error_table(terminal_bit_error, measurement_basis)
     B = _predict_after_data_errors(A, final_errors)
-    final_syndrome = _syndrome_to_index(
-        syndrome_from_data_readout(data_bits, measurement_basis)
-    )
+    final_syndrome = _syndrome_to_index(syndrome_from_data_readout(data_bits, measurement_basis))
     # At the final syndrome, compare the no-flip and flip alternatives.
     logical_probabilities = (
         B[final_syndrome],
@@ -115,14 +113,12 @@ def normalize_measurement_basis(basis: str) -> LogicalBasis:
     return cast(LogicalBasis, normalized)
 
 
-def _checks_of_type(check_type: LogicalBasis):
+def _checks_of_type(check_type: LogicalBasis) -> tuple[Check, ...]:
     return tuple(check for check in PATCH.checks if check.basis == check_type)
 
 
 def _check_indices_of_type(check_type: str) -> tuple[int, ...]:
-    return tuple(
-        index for index, check in enumerate(PATCH.checks) if check.basis == check_type
-    )
+    return tuple(index for index, check in enumerate(PATCH.checks) if check.basis == check_type)
 
 
 def _syndrome_to_index(syndrome: Sequence[int]) -> int:
@@ -136,9 +132,7 @@ def select_check_results(syndrome: Syndrome, *, check_type: str) -> tuple[int, .
     if normalized_check_type not in {"X", "Z"}:
         raise ValueError(f"check_type must be 'X' or 'Z', got {check_type!r}")
     validate_binary_bits("syndrome", syndrome, len(PATCH.checks))
-    return tuple(
-        syndrome[index] for index in _check_indices_of_type(normalized_check_type)
-    )
+    return tuple(syndrome[index] for index in _check_indices_of_type(normalized_check_type))
 
 
 def syndrome_from_data_readout(data_bits: DataBits, basis: str) -> tuple[int, ...]:
@@ -160,7 +154,7 @@ def logical_bit_from_data_readout(data_bits: DataBits, basis: str) -> int:
     return sum(data_bits[qubit] for qubit in support) % 2
 
 
-@cache
+@lru_cache(maxsize=256)
 def _build_data_error_table(bit_error: float, basis: LogicalBasis) -> tuple[float, ...]:
     """Build W: probabilities of new data errors, grouped into 32 error classes."""
     validate_probability("bit_error", bit_error)
@@ -206,13 +200,13 @@ def _update_from_ancilla_readout(
     for error_class, probability in enumerate(B):
         true_syndrome = error_class % _NUM_SYNDROMES
         mismatched_bits = (true_syndrome ^ observed_syndrome).bit_count()
-        L = (
-            readout_error**mismatched_bits
-            * (1 - readout_error) ** (_NUM_SYNDROME_BITS - mismatched_bits)
+        L = readout_error**mismatched_bits * (1 - readout_error) ** (
+            _NUM_SYNDROME_BITS - mismatched_bits
         )
         A_next[error_class] = probability * L
     normalization = sum(A_next)
-    if normalization:
-        for error_class in range(_NUM_ERROR_CLASSES):
-            A_next[error_class] /= normalization
+    if not normalization:
+        raise ValueError("observations have zero probability under the decoder model")
+    for error_class in range(_NUM_ERROR_CLASSES):
+        A_next[error_class] /= normalization
     return A_next

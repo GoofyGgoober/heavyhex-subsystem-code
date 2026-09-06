@@ -22,5 +22,5 @@ def validate_nonnegative_number(name: str, value: float) -> None:
 
 
 def validate_binary_bits(name: str, bits: Sequence[int], width: int) -> None:
-    if len(bits) != width or any(bit not in (0, 1) for bit in bits):
+    if len(bits) != width or any(not isinstance(bit, int) or bit not in (0, 1) for bit in bits):
         raise ValueError(f"{name} must be {width} binary bits, got {tuple(bits)!r}")

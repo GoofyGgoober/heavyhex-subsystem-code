@@ -1,4 +1,15 @@
-from surface_code import DATA_QUBITS, LOGICAL_X, LOGICAL_Z, Pauli, decode, extract_syndrome, z_basis_success
+import pytest
+
+from surface_code import (
+    DATA_QUBITS,
+    LOGICAL_X,
+    LOGICAL_Z,
+    Pauli,
+    decode,
+    extract_syndrome,
+    z_basis_success,
+)
+from surface_code.core import StabilizerCode
 from surface_code.patches import PATCH
 from surface_code.patches.parameters import in_stabilizer_group
 
@@ -72,3 +83,18 @@ def test_z_basis_success():
     assert extract_syndrome(LOGICAL_X) == (0,) * 8
     assert z_basis_success(LOGICAL_X) == 0
     assert z_basis_success(LOGICAL_Z) == 1
+
+
+def test_decoder_handles_redundant_stabilizer_checks():
+    code = StabilizerCode(
+        data_qubits=(0, 1, 2),
+        stabilizers=(Pauli.z_on((0, 1)), Pauli.z_on((1, 2)), Pauli.z_on((0, 2))),
+        logical_x=Pauli.x_on((0, 1, 2)),
+        logical_z=Pauli.z_on((0,)),
+    )
+    for qubit in code.data_qubits:
+        error = Pauli.x_on((qubit,))
+        assert decode(code.syndrome(error), code) == error
+    # The third syndrome bit is the XOR of the first two.
+    with pytest.raises(ValueError, match="inconsistent with the stabilizers"):
+        decode((0, 0, 1), code)

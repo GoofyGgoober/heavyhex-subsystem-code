@@ -1,8 +1,8 @@
 """Concrete surface-code patch definitions and their shared models."""
 
 from .base import Check, CheckBasis, SurfaceCodePatch
-from .rotated_d3 import PATCH
 from .parameters import is_logical, parameters
+from .rotated_d3 import PATCH
 
 DISTANCE = PATCH.distance
 DATA_QUBITS = PATCH.data_qubits

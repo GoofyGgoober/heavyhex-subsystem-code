@@ -1,3 +1,5 @@
+from math import exp
+
 import pytest
 
 from surface_code import Pauli
@@ -122,6 +124,34 @@ def test_idle_noise_is_a_normalized_continuous_time_channel():
     assert noise.pauli_probabilities(0) == pytest.approx((1.0, 0.0, 0.0, 0.0))
 
 
+def test_idle_probabilities_preserve_very_rare_errors():
+    identity, x, y, z = IdleNoise(x_rate=0.01).pauli_probabilities(1e-18)
+    assert x == pytest.approx(1e-20, rel=1e-12, abs=0)
+    assert (identity, y, z) == (1.0, 0.0, 0.0)
+
+
+def test_zero_duration_has_no_noise_even_at_large_finite_rates():
+    noise = IdleNoise(x_rate=1e308, y_rate=1e308)
+    assert noise.pauli_probabilities(0) == (1, 0, 0, 0)
+    assert noise.pauli_probabilities(1) == (0.25, 0.25, 0.25, 0.25)
+
+
+def test_idle_probabilities_match_the_pauli_walk_solution():
+    noise = IdleNoise(x_rate=0.01, y_rate=0.02, z_rate=0.03)
+    duration = 5
+    a = exp(-2 * (noise.x_rate + noise.y_rate) * duration)
+    b = exp(-2 * (noise.z_rate + noise.y_rate) * duration)
+    c = exp(-2 * (noise.x_rate + noise.z_rate) * duration)
+    assert noise.pauli_probabilities(duration) == pytest.approx(
+        ((1 + a + b + c) / 4, (1 - a + b - c) / 4, (1 - a - b + c) / 4, (1 + a - b - c) / 4)
+    )
+
+
+def test_memory_shot_rejects_float_bits_before_xor():
+    with pytest.raises(ValueError, match="binary bits"):
+        MemoryShot(((0.0,) * 8,), (0,) * 9)
+
+
 def test_timing_rejects_more_syndrome_time_than_total_time():
     assert idle_duration_per_round(10, 2, 1) == 4
     with pytest.raises(ValueError, match="do not fit"):
@@ -196,8 +226,15 @@ def test_x_basis_product_preparation_starts_in_plus():
 @pytest.mark.parametrize("basis", ["Z", "X"])
 def test_product_preparation_fixes_the_measured_checks_and_logical(basis):
     tallies = run_timed_memory(
-        4, 2, round_duration_us=1, shots=64, seed=3, basis=basis, preparation="product",
-        noise=CircuitNoise.ideal(), idle_noise=IdleNoise.ideal(),
+        4,
+        2,
+        round_duration_us=1,
+        shots=64,
+        seed=3,
+        basis=basis,
+        preparation="product",
+        noise=CircuitNoise.ideal(),
+        idle_noise=IdleNoise.ideal(),
     )
     other = "X" if basis == "Z" else "Z"
     first_round_frames = set()

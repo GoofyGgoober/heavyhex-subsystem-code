@@ -1,6 +1,5 @@
 """Surface-code decoder implementations."""
 
-from .min_weight import Syndrome, decode, z_basis_success
 from .infer_logical import (
     LogicalFlipPrediction,
     logical_bit_from_data_readout,
@@ -10,6 +9,7 @@ from .infer_logical import (
     select_check_results,
     syndrome_from_data_readout,
 )
+from .min_weight import Syndrome, decode, z_basis_success
 
 __all__ = [
     "LogicalFlipPrediction",

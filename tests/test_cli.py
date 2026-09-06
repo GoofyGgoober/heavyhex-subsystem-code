@@ -23,7 +23,6 @@ from surface_code.simulation.profiles import IBM_HERON_PROFILE
 from surface_code.simulation.record_shots import MemorySummary
 from surface_code.simulation.sweep_n import CadenceExperiment, CadencePoint
 
-
 ZERO_SYNDROME = (0,) * 8
 ZERO_DATA = (0,) * 9
 
@@ -368,6 +367,24 @@ def test_cadence_command_reports_infeasible_timing(monkeypatch, capsys):
     assert "rounds do not fit" in capsys.readouterr().err
 
 
+def test_interactive_accepts_tabs_between_command_and_argument(capsys):
+    assert main(lines=["shots\t12", "quit"]) == 0
+    captured = capsys.readouterr()
+    assert "Shots: 12" in captured.out
+    assert not captured.err
+
+
+def test_x_cadence_describes_plus_product_preparation(monkeypatch, capsys):
+    _capture_cadence(monkeypatch, [])
+    assert main(["cadence", "--basis", "X", "--preparation", "product"]) == 0
+    assert "every data qubit in |+>" in capsys.readouterr().out
+
+
+def test_format_report_rejects_boolean_counts():
+    with pytest.raises(ValueError, match="positive integer"):
+        format_report(_fake_tallies(True), Pauli())
+
+
 @pytest.mark.parametrize("confidence", ["0", "1", "nope"])
 def test_cadence_rejects_invalid_confidence(confidence, capsys):
     assert main(["cadence", "--confidence", confidence]) == 2
@@ -522,10 +539,18 @@ def test_module_entry_point_shows_help():
 
 def _cadence_point(rounds: int = 2) -> CadencePoint:
     return CadencePoint(
-        rounds=rounds, interval_us=2.0, idle_per_round_us=1.0, shots=10, logical_failures=1,
-        logical_failure_rate=0.1, confidence_low=0.02, confidence_high=0.3,
-        raw_logical_failure_rate=0.2, mean_detection_events=0.5,
-        decoder_interval_bit_error=0.01, decoder_syndrome_bit_error=0.02,
+        rounds=rounds,
+        interval_us=2.0,
+        idle_per_round_us=1.0,
+        shots=10,
+        logical_failures=1,
+        logical_failure_rate=0.1,
+        confidence_low=0.02,
+        confidence_high=0.3,
+        raw_logical_failure_rate=0.2,
+        mean_detection_events=0.5,
+        decoder_interval_bit_error=0.01,
+        decoder_syndrome_bit_error=0.02,
         decoder_terminal_bit_error=0.03,
     )
 
@@ -534,9 +559,12 @@ def _capture_cadence(monkeypatch, seen):
     def fake(time_us, rounds, **options):
         seen.append(options)
         return CadenceExperiment(
-            basis=options["basis"], total_time_us=time_us,
-            round_duration_us=options["round_duration_us"], confidence=options["confidence"],
-            bare_qubit_failure_rate=0.04, points=(_cadence_point(),),
+            basis=options["basis"],
+            total_time_us=time_us,
+            round_duration_us=options["round_duration_us"],
+            confidence=options["confidence"],
+            bare_qubit_failure_rate=0.04,
+            points=(_cadence_point(),),
             preparation=options["preparation"],
         )
 
@@ -546,9 +574,21 @@ def _capture_cadence(monkeypatch, seen):
 def test_cadence_profile_supplies_noise_rates_and_round_duration(monkeypatch, capsys):
     seen = []
     _capture_cadence(monkeypatch, seen)
-    assert main([
-        "cadence", "--basis", "Z", "--profile", "ibm-heron", "--preparation", "product", "--json",
-    ]) == 0
+    assert (
+        main(
+            [
+                "cadence",
+                "--basis",
+                "Z",
+                "--profile",
+                "ibm-heron",
+                "--preparation",
+                "product",
+                "--json",
+            ]
+        )
+        == 0
+    )
     (options,) = seen
     assert options["circuit_noise"] == IBM_HERON_PROFILE.circuit_noise
     assert options["idle_noise"] == IBM_HERON_PROFILE.idle_noise
@@ -562,10 +602,24 @@ def test_cadence_profile_supplies_noise_rates_and_round_duration(monkeypatch, ca
 def test_cadence_explicit_rates_override_the_profile(monkeypatch, capsys):
     seen = []
     _capture_cadence(monkeypatch, seen)
-    assert main([
-        "cadence", "--basis", "Z", "--profile", "ibm-heron", "--two-qubit-error", "0.02",
-        "--idle-x-rate", "0", "--round-duration-us", "3",
-    ]) == 0
+    assert (
+        main(
+            [
+                "cadence",
+                "--basis",
+                "Z",
+                "--profile",
+                "ibm-heron",
+                "--two-qubit-error",
+                "0.02",
+                "--idle-x-rate",
+                "0",
+                "--round-duration-us",
+                "3",
+            ]
+        )
+        == 0
+    )
     (options,) = seen
     assert options["circuit_noise"].two_qubit == 0.02
     assert options["circuit_noise"].readout == IBM_HERON_PROFILE.circuit_noise.readout
@@ -580,10 +634,22 @@ def test_cadence_explicit_rates_override_the_profile(monkeypatch, capsys):
 def test_cadence_ideal_flags_zero_the_base_before_overrides(monkeypatch, capsys):
     seen = []
     _capture_cadence(monkeypatch, seen)
-    assert main([
-        "cadence", "--basis", "Z", "--ideal-circuit", "--ideal-idle",
-        "--idle-z-rate", "0.003", "--readout-error", "0.05",
-    ]) == 0
+    assert (
+        main(
+            [
+                "cadence",
+                "--basis",
+                "Z",
+                "--ideal-circuit",
+                "--ideal-idle",
+                "--idle-z-rate",
+                "0.003",
+                "--readout-error",
+                "0.05",
+            ]
+        )
+        == 0
+    )
     (options,) = seen
     noise = options["circuit_noise"]
     assert (noise.single_qubit, noise.two_qubit, noise.readout, noise.reset) == (0, 0, 0.05, 0)
@@ -604,8 +670,12 @@ def test_memory_command_forwards_profile_and_preparation(monkeypatch, capsys):
         return {"history": 1}
 
     summary = MemorySummary(
-        rounds=1, shots=10, syndrome_trigger_rate=(0.1,), detection_event_rate=(0.05,),
-        raw_z_success_rate=0.9, last_round_z_success_rate=0.8,
+        rounds=1,
+        shots=10,
+        syndrome_trigger_rate=(0.1,),
+        detection_event_rate=(0.05,),
+        raw_z_success_rate=0.9,
+        last_round_z_success_rate=0.8,
     )
     monkeypatch.setattr("surface_code.simulation.cli.run_memory", fake_run)
     monkeypatch.setattr("surface_code.simulation.cli.summarize_memory", lambda _: summary)

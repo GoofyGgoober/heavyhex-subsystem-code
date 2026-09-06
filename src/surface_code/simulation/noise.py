@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import random
 
+from .._validation import validate_probability
 from ..core import Pauli
 
 
@@ -13,8 +14,7 @@ def depolarizing_error(
     rng: random.Random | None = None,
 ) -> Pauli:
     """Each qubit: I with probability 1-p, else X, Y, or Z with probability p/3."""
-    if not 0 <= p <= 1:
-        raise ValueError(f"p must be in [0, 1], got {p!r}")
+    validate_probability("p", p)
     if p == 0:
         return Pauli()
     rng = random.Random() if rng is None else rng

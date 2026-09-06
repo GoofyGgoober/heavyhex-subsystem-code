@@ -17,18 +17,19 @@ Results are resumable: rerunning with a larger grid only simulates new points.
 from __future__ import annotations
 
 import argparse
-from concurrent.futures import ProcessPoolExecutor, as_completed
 import csv
-from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
 import hashlib
-from importlib.metadata import version
 import json
 import math
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from dataclasses import asdict
+from datetime import datetime, timezone
+from importlib.metadata import version
 from pathlib import Path
 
 from surface_code.simulation import PREPARATIONS, PROFILES, get_profile, run_cadence_experiment
-
+from surface_code.simulation.aer import MAX_SEED
+from surface_code.simulation.cli_arguments import parse_positive_int, parse_seed
 
 ROOT = Path(__file__).resolve().parents[1]
 TIMES_US = (10, 16, 20, 30, 40, 50, 65, 80, 100, 125, 150, 175, 200)
@@ -99,7 +100,8 @@ def save_data(path: Path, metadata: dict, rows: list[dict]) -> None:
     temporary.replace(path)
 
 
-def validate_data(metadata: dict, rows: list[dict]) -> None:
+def validate_data(metadata: dict, rows: list[dict], *, require_complete: bool = True) -> None:
+    """Reject corrupt checkpoints before resuming; require the full grid before plotting."""
     expected = {
         (time, rounds)
         for time in metadata["times_us"]
@@ -107,7 +109,9 @@ def validate_data(metadata: dict, rows: list[dict]) -> None:
         if time >= rounds * metadata["round_duration_us"]
     }
     actual = {(row["total_time_us"], row["rounds"]) for row in rows}
-    if len(rows) != len(actual) or actual != expected:
+    if len(rows) != len(actual) or not actual <= expected:
+        raise ValueError("saved results contain duplicate or out-of-grid points")
+    if require_complete and actual != expected:
         raise ValueError("saved results do not cover the grid exactly once")
     for row in rows:
         rate = row["logical_failure_rate"]
@@ -141,10 +145,19 @@ def _draw_series(ax, rows: list[dict], rounds: int, *, fidelity: bool) -> tuple[
     times = [row["total_time_us"] for row in points]
     values = _values(points, "logical_failure_rate", fidelity=fidelity)
     ax.plot(
-        times, values, label=f"n = {rounds}", color=color, linewidth=2.25,
-        solid_joinstyle="round", solid_capstyle="round", marker=marker,
-        markersize=6, markerfacecolor=color, markeredgecolor=SURFACE,
-        markeredgewidth=1.5, zorder=3,
+        times,
+        values,
+        label=f"n = {rounds}",
+        color=color,
+        linewidth=2.25,
+        solid_joinstyle="round",
+        solid_capstyle="round",
+        marker=marker,
+        markersize=6,
+        markerfacecolor=color,
+        markeredgecolor=SURFACE,
+        markeredgewidth=1.5,
+        zorder=3,
     )
     return times[-1], values[-1]
 
@@ -155,8 +168,14 @@ def _draw_reference(ax, rows: list[dict], *, fidelity: bool) -> tuple[float, flo
     times = [row["total_time_us"] for row in points]
     values = _values(points, "bare_qubit_failure_rate", fidelity=fidelity)
     ax.plot(
-        times, values, label="Unencoded qubit (analytic)", color=REFERENCE,
-        linewidth=1.6, linestyle=(0, (6, 3)), dash_capstyle="round", zorder=2,
+        times,
+        values,
+        label="Unencoded qubit (analytic)",
+        color=REFERENCE,
+        linewidth=1.6,
+        linestyle=(0, (6, 3)),
+        dash_capstyle="round",
+        zorder=2,
     )
     return times[-1], values[-1]
 
@@ -176,11 +195,22 @@ def _label_line_ends(ax, ends: list[tuple[str, str, float, float]], *, x_text: f
     drift = sum(positions) / len(positions) - sum(end[3] for end in ordered) / len(ordered)
     for (label, color, x_end, y_end), y_text in zip(ordered, positions):
         ax.annotate(
-            label, xy=(x_end, y_end), xytext=(x_text, y_text - drift),
-            textcoords="data", va="center", ha="left", fontsize=10.5,
-            color=INK_SECONDARY, annotation_clip=False,
-            arrowprops={"arrowstyle": "-", "color": color,
-                        "linewidth": 0.8, "shrinkA": 0, "shrinkB": 4},
+            label,
+            xy=(x_end, y_end),
+            xytext=(x_text, y_text - drift),
+            textcoords="data",
+            va="center",
+            ha="left",
+            fontsize=10.5,
+            color=INK_SECONDARY,
+            annotation_clip=False,
+            arrowprops={
+                "arrowstyle": "-",
+                "color": color,
+                "linewidth": 0.8,
+                "shrinkA": 0,
+                "shrinkB": 4,
+            },
         )
 
 
@@ -213,8 +243,14 @@ def _finish_axes(ax, *, x_max: float, y_lim: tuple[float, float], y_step: float,
     ax.tick_params(color=AXIS, labelcolor=INK_SECONDARY, labelsize=11)
     # Two legend rows: the reference alone on top, every n on one row below.
     handles, labels = ax.get_legend_handles_labels()
-    style = {"frameon": False, "fontsize": 10.5, "handlelength": 2.6,
-             "columnspacing": 1.5, "labelcolor": INK_SECONDARY, "loc": "lower left"}
+    style = {
+        "frameon": False,
+        "fontsize": 10.5,
+        "handlelength": 2.6,
+        "columnspacing": 1.5,
+        "labelcolor": INK_SECONDARY,
+        "loc": "lower left",
+    }
     reference = ax.legend(handles[:1], labels[:1], bbox_to_anchor=(-0.005, 1.10), **style)
     ax.add_artist(reference)
     ax.legend(handles[1:], labels[1:], bbox_to_anchor=(-0.005, 1.03), ncol=len(labels) - 1, **style)
@@ -237,16 +273,18 @@ def plot(metadata: dict, rows: list[dict], output: Path) -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    plt.rcParams.update({
-        "font.family": "DejaVu Sans",
-        "font.size": 11,
-        "axes.labelsize": 12.5,
-        "text.color": INK,
-        "axes.labelcolor": INK,
-        "xtick.color": INK_SECONDARY,
-        "ytick.color": INK_SECONDARY,
-        "svg.fonttype": "none",
-    })
+    plt.rcParams.update(
+        {
+            "font.family": "DejaVu Sans",
+            "font.size": 11,
+            "axes.labelsize": 12.5,
+            "text.color": INK,
+            "axes.labelcolor": INK,
+            "xtick.color": INK_SECONDARY,
+            "ytick.color": INK_SECONDARY,
+            "svg.fonttype": "none",
+        }
+    )
     profile = get_profile(metadata["profile"])
     shots = f"{metadata['shots_per_point']:,}"
     times = metadata["times_us"]
@@ -267,7 +305,8 @@ def plot(metadata: dict, rows: list[dict], output: Path) -> None:
     ends = [("Unencoded", REFERENCE, *_draw_reference(ax, rows, fidelity=True))]
     ends += [
         (f"n = {rounds}", SERIES[rounds][0], *_draw_series(ax, rows, rounds, fidelity=True))
-        for rounds in FIDELITY_ROUNDS if rounds in metadata["rounds"]
+        for rounds in FIDELITY_ROUNDS
+        if rounds in metadata["rounds"]
     ]
     lowest = min(
         1 - row["logical_failure_rate"] for row in rows if row["rounds"] in FIDELITY_ROUNDS
@@ -289,7 +328,10 @@ def plot(metadata: dict, rows: list[dict], output: Path) -> None:
     ]
     top = math.ceil((max(row["logical_failure_rate"] for row in rows) + 0.03) / 0.05) * 0.05
     _finish_axes(
-        ax, x_max=x_max, y_lim=(0, top), y_step=0.05,
+        ax,
+        x_max=x_max,
+        y_lim=(0, top),
+        y_step=0.05,
         y_label="Decoded logical-Z failure probability",
     )
     _label_line_ends(ax, ends, x_text=x_text)
@@ -317,29 +359,53 @@ def _settings(saved: dict) -> dict:
     return settings
 
 
+def resume_data(
+    saved: dict, requested: dict, *, ignore_source_change: bool = False
+) -> tuple[dict, list[dict]]:
+    """Check compatibility and retain the actual source digest of each saved point."""
+    old = _settings(saved["metadata"])
+    validate_data(old, saved["points"], require_complete=False)
+    ignored = set(GRID_KEYS) | ({"source_digest"} if ignore_source_change else set())
+    old_settings = {key: value for key, value in old.items() if key not in ignored}
+    new_settings = {key: value for key, value in requested.items() if key not in ignored}
+    if old_settings != new_settings:
+        raise ValueError(
+            "Saved results have different settings or source; use a new output directory"
+        )
+    if any(not set(old[key]) <= set(requested[key]) for key in GRID_KEYS):
+        raise ValueError(
+            "Saved results cover points outside the current grid; use a new output directory"
+        )
+    metadata = {**requested, "created_utc": saved["metadata"]["created_utc"]}
+    rows = [
+        {**row, "source_digest": row.get("source_digest", old["source_digest"])}
+        for row in saved["points"]
+    ]
+    return metadata, rows
+
+
 def _point_seed(base_seed: int, time: float, rounds: int) -> int:
     """Unique per grid point, stable when the grid is extended later."""
-    return base_seed + 1000 * ROUNDS.index(rounds) + TIMES_US.index(time)
+    return (base_seed + 1000 * ROUNDS.index(rounds) + TIMES_US.index(time)) % (MAX_SEED + 1)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--profile", choices=sorted(PROFILES), default="baseline")
     parser.add_argument("--prep", choices=PREPARATIONS, default="encoder")
-    parser.add_argument("--shots", type=int, default=5000)
-    parser.add_argument("--workers", type=int, default=8)
-    parser.add_argument("--seed", type=int, default=2026090600)
+    parser.add_argument("--shots", type=parse_positive_int, default=5000)
+    parser.add_argument("--workers", type=parse_positive_int, default=8)
+    parser.add_argument("--seed", type=parse_seed, default=2026090600)
     parser.add_argument(
         "--output-dir", type=Path, help="default: artifacts/memory-by-time[-profile-prep]"
     )
     parser.add_argument("--plot-only", action="store_true", help="redraw existing saved data")
     parser.add_argument(
-        "--ignore-source-change", action="store_true",
+        "--ignore-source-change",
+        action="store_true",
         help="extend saved data even though the library source hashes changed",
     )
     args = parser.parse_args()
-    if args.shots <= 0 or args.workers <= 0:
-        parser.error("shots and workers must be positive")
     profile = get_profile(args.profile)
     output = args.output_dir
     if output is None:
@@ -353,10 +419,15 @@ def main() -> None:
         metadata, rows = _settings(saved["metadata"]), saved["points"]
     else:
         metadata = {
-            "profile": args.profile, "prep": args.prep,
-            "basis": "Z", "times_us": list(TIMES_US), "rounds": list(ROUNDS),
-            "round_duration_us": profile.round_duration_us, "shots_per_point": args.shots,
-            "confidence": 0.95, "base_seed": args.seed,
+            "profile": args.profile,
+            "prep": args.prep,
+            "basis": "Z",
+            "times_us": list(TIMES_US),
+            "rounds": list(ROUNDS),
+            "round_duration_us": profile.round_duration_us,
+            "shots_per_point": args.shots,
+            "confidence": 0.95,
+            "base_seed": args.seed,
             "circuit_noise": asdict(profile.circuit_noise),
             "idle_noise_per_us": asdict(profile.idle_noise),
             "versions": {name: version(name) for name in ("qiskit", "qiskit-aer", "matplotlib")},
@@ -365,38 +436,31 @@ def main() -> None:
         rows = []
         if data_path.exists():
             saved = json.loads(data_path.read_text())
-            old = _settings(saved["metadata"])
-            ignored = set(GRID_KEYS) | ({"source_digest"} if args.ignore_source_change else set())
-            old_settings = {key: value for key, value in old.items() if key not in ignored}
-            new_settings = {key: value for key, value in metadata.items() if key not in ignored}
-            if old_settings != new_settings:
-                parser.error(
-                    "Saved results have different settings or source; use a new output directory"
+            try:
+                metadata, rows = resume_data(
+                    saved, metadata, ignore_source_change=args.ignore_source_change
                 )
-            if any(not set(old[key]) <= set(metadata[key]) for key in GRID_KEYS):
-                parser.error(
-                    "Saved results cover points outside the current grid; "
-                    "use a new output directory"
-                )
-            if old.get("source_digest") != metadata["source_digest"]:
+            except ValueError as error:
+                parser.error(str(error))
+            if saved["metadata"].get("source_digest") != metadata["source_digest"]:
                 print("warning: extending data computed from different library source", flush=True)
-            metadata = {
-                **old,
-                "created_utc": saved["metadata"]["created_utc"],
-                **{key: metadata[key] for key in GRID_KEYS},
-            }
-            rows = saved["points"]
         else:
             metadata["created_utc"] = datetime.now(timezone.utc).isoformat()
         grid = [
-            (time, rounds) for time in TIMES_US for rounds in ROUNDS
+            (time, rounds)
+            for time in TIMES_US
+            for rounds in ROUNDS
             if time >= rounds * profile.round_duration_us
         ]
         completed = {(row["total_time_us"], row["rounds"]) for row in rows}
         jobs = [
             (
-                time, rounds, args.shots, _point_seed(args.seed, time, rounds),
-                args.profile, args.prep,
+                time,
+                rounds,
+                args.shots,
+                _point_seed(args.seed, time, rounds),
+                args.profile,
+                args.prep,
             )
             for time, rounds in grid
             if (time, rounds) not in completed
@@ -405,6 +469,7 @@ def main() -> None:
             futures = [pool.submit(run_point, job) for job in jobs]
             for future in as_completed(futures):
                 row = future.result()
+                row["source_digest"] = metadata["source_digest"]
                 rows.append(row)
                 save_data(data_path, metadata, rows)
                 print(

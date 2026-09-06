@@ -6,6 +6,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from statistics import NormalDist
 
+from .._validation import validate_probability
 from ..decoders.infer_logical import (
     logical_bit_from_data_readout,
     logical_readout_success,
@@ -13,7 +14,7 @@ from ..decoders.infer_logical import (
     select_check_results,
 )
 from ..patches import PATCH
-from .aer import MAX_SEED
+from .aer import MAX_SEED, _validate_aer_options
 from .record_shots import (
     BASELINE_IDLE_NOISE,
     BASELINE_NOISE,
@@ -25,10 +26,11 @@ from .record_shots import (
 
 
 def _odd_parity_probability(probabilities: Sequence[float]) -> float:
-    parity_bias = 1.0
+    """Probability of an odd number of independent flips, including very rare ones."""
+    odd = 0.0
     for probability in probabilities:
-        parity_bias *= 1 - 2 * probability
-    return (1 - parity_bias) / 2
+        odd = odd * (1 - probability) + (1 - odd) * probability
+    return odd
 
 
 def _round_data_probability(noise: CircuitNoise) -> float:
@@ -65,22 +67,23 @@ def _terminal_probability(noise: CircuitNoise, basis: str) -> float:
 
 
 def _wilson_interval(failures: int, shots: int, confidence: float) -> tuple[float, float]:
+    """Binomial confidence interval, with exact bounds at zero or all failures."""
+    validate_probability("confidence", confidence)
     if not 0 < confidence < 1:
         raise ValueError(f"confidence must be between 0 and 1, got {confidence!r}")
-    z_score = NormalDist().inv_cdf((1 + confidence) / 2)
+    # Use the lower tail: (1 + confidence) / 2 can round to exactly 1.
+    z_score = -NormalDist().inv_cdf((1 - confidence) / 2)
     estimate = failures / shots
     denominator = 1 + z_score**2 / shots
     center = (estimate + z_score**2 / (2 * shots)) / denominator
     radius = (
         z_score
-        * (
-            estimate * (1 - estimate) / shots
-            + z_score**2 / (4 * shots**2)
-        )
-        ** 0.5
+        * (estimate * (1 - estimate) / shots + z_score**2 / (4 * shots**2)) ** 0.5
         / denominator
     )
-    return center - radius, center + radius
+    low = 0.0 if failures == 0 else max(0.0, center - radius)
+    high = 1.0 if failures == shots else min(1.0, center + radius)
+    return low, high
 
 
 @dataclass(frozen=True)
@@ -116,6 +119,7 @@ class CadenceExperiment:
 
     @property
     def optimum_rounds(self) -> int:
+        """Best sampled round count; ties favor fewer rounds, not statistical significance."""
         return min(
             self.points,
             key=lambda point: (point.logical_failure_rate, point.rounds),
@@ -134,9 +138,7 @@ def _decoder_probabilities(
     terminal = _terminal_probability(circuit_noise, basis)
     if rounds == 0:
         return 0.0, 0.0, _odd_parity_probability((idle_bit_error, terminal))
-    interval = _odd_parity_probability(
-        (idle_bit_error, _round_data_probability(circuit_noise))
-    )
+    interval = _odd_parity_probability((idle_bit_error, _round_data_probability(circuit_noise)))
     syndrome = _syndrome_bit_probability(circuit_noise, basis)
     return interval, syndrome, terminal
 
@@ -173,29 +175,28 @@ def run_cadence_experiment(
     reads (Z checks for a Z-basis test), so it is comparable across preparations.
     """
     checked_basis = normalize_measurement_basis(basis)
-    selected_rounds = tuple(sorted(set(rounds)))
-    if not selected_rounds:
+    if not rounds:
         raise ValueError("rounds must contain at least one value")
-    if any(
-        not isinstance(value, int) or isinstance(value, bool) or value < 0
-        for value in selected_rounds
-    ):
+    if any(not isinstance(value, int) or isinstance(value, bool) or value < 0 for value in rounds):
         raise ValueError(f"rounds must contain non-negative integers, got {rounds!r}")
-    if not isinstance(shots, int) or isinstance(shots, bool) or shots <= 0:
-        raise ValueError(f"shots must be a positive integer, got {shots!r}")
+    # Validate before deduplicating or offsetting: True == 1, and modulo would
+    # silently turn an invalid seed into a valid one.
+    selected_rounds = tuple(sorted(set(rounds)))
+    _validate_aer_options(shots, seed)
+    validate_probability("confidence", confidence)
     if not 0 < confidence < 1:
         raise ValueError(f"confidence must be between 0 and 1, got {confidence!r}")
 
     gate_noise = BASELINE_NOISE if circuit_noise is None else circuit_noise
     storage_noise = BASELINE_IDLE_NOISE if idle_noise is None else idle_noise
+    # Check the entire grid before spending any time on simulation.
+    idle_times = tuple(
+        idle_duration_per_round(total_time_us, count, round_duration_us)
+        for count in selected_rounds
+    )
     points: list[CadencePoint] = []
 
-    for point_index, round_count in enumerate(selected_rounds):
-        idle_us = idle_duration_per_round(
-            total_time_us,
-            round_count,
-            round_duration_us,
-        )
+    for point_index, (round_count, idle_us) in enumerate(zip(selected_rounds, idle_times)):
         point_seed = None if seed is None else (seed + point_index) % (MAX_SEED + 1)
         tallies = run_timed_memory(
             total_time_us,
@@ -221,9 +222,7 @@ def run_cadence_experiment(
         observed_shots = 0
         for shot, count in tallies.items():
             observed_shots += count
-            raw_failures += count * logical_bit_from_data_readout(
-                shot.data_bits, checked_basis
-            )
+            raw_failures += count * logical_bit_from_data_readout(shot.data_bits, checked_basis)
             success = logical_readout_success(
                 shot.syndromes,
                 shot.data_bits,
@@ -239,9 +238,7 @@ def run_cadence_experiment(
             )
         if observed_shots != shots:
             raise ValueError(f"expected {shots} outcomes, received {observed_shots}")
-        confidence_low, confidence_high = _wilson_interval(
-            logical_failures, shots, confidence
-        )
+        confidence_low, confidence_high = _wilson_interval(logical_failures, shots, confidence)
         interval_us = total_time_us if round_count == 0 else total_time_us / round_count
         points.append(
             CadencePoint(

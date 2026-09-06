@@ -10,7 +10,7 @@ from surface_code import (
     abstract_syndrome,
     extract_syndrome,
 )
-from surface_code.circuits import CX, H, MeasureZ, SYNDROME_CIRCUIT
+from surface_code.circuits import CX, SYNDROME_CIRCUIT, H, MeasureZ
 
 
 def test_one_ancilla_per_stabilizer():
@@ -54,7 +54,9 @@ def _cnot_order_by_ancilla() -> dict[int, list[int]]:
     order: dict[int, list[int]] = {}
     for op in SYNDROME_CIRCUIT:
         if isinstance(op, CX):
-            ancilla, data = (op.target, op.control) if op.target in ANCILLAS else (op.control, op.target)
+            ancilla, data = (
+                (op.target, op.control) if op.target in ANCILLAS else (op.control, op.target)
+            )
             order.setdefault(ancilla, []).append(data)
     return order
 

@@ -2,6 +2,9 @@ import pytest
 
 from surface_code import Pauli
 from surface_code.decoders.infer_logical import (
+    _build_data_error_table,
+    _predict_after_data_errors,
+    _update_from_ancilla_readout,
     logical_bit_from_data_readout,
     logical_readout_success,
     predict_logical_flip_from_history,
@@ -25,14 +28,17 @@ def test_history_separates_two_errors_that_defeat_final_only_decode():
     data_bits = _x_readout(final_error)
 
     assert shot_z_success(syndromes[-1], data_bits) == 0
-    assert logical_readout_success(
-        syndromes,
-        data_bits,
-        basis="Z",
-        interval_bit_error=0.01,
-        syndrome_bit_error=0.01,
-        terminal_bit_error=0.0,
-    ) == 1
+    assert (
+        logical_readout_success(
+            syndromes,
+            data_bits,
+            basis="Z",
+            interval_bit_error=0.01,
+            syndrome_bit_error=0.01,
+            terminal_bit_error=0.0,
+        )
+        == 1
+    )
 
 
 def test_one_round_syndrome_glitch_is_not_decoded_as_data_error():
@@ -69,14 +75,17 @@ def test_decoder_does_not_use_the_logical_measurement_to_choose_correction():
 
 def test_terminal_boundary_recovers_a_final_readout_error():
     data_bits = _x_readout(Pauli.x_on((0,)))
-    assert logical_readout_success(
-        (),
-        data_bits,
-        basis="Z",
-        interval_bit_error=0.0,
-        syndrome_bit_error=0.0,
-        terminal_bit_error=0.05,
-    ) == 1
+    assert (
+        logical_readout_success(
+            (),
+            data_bits,
+            basis="Z",
+            interval_bit_error=0.0,
+            syndrome_bit_error=0.0,
+            terminal_bit_error=0.05,
+        )
+        == 1
+    )
 
 
 @pytest.mark.parametrize("basis", ["", "Y", "both"])
@@ -90,3 +99,22 @@ def test_decoder_rejects_unknown_basis(basis):
             syndrome_bit_error=0.0,
             terminal_bit_error=0.0,
         )
+
+
+@pytest.mark.parametrize("basis", ["X", "Z"])
+def test_prediction_and_measurement_preserve_probability_mass(basis):
+    W = _build_data_error_table(0.02, basis)
+    assert len(W) == 32
+    assert sum(W) == pytest.approx(1)
+    A = [1.0] + [0.0] * 31
+    for observed_syndrome in range(16):
+        B = _predict_after_data_errors(A, W)
+        assert sum(B) == pytest.approx(1)
+        A = _update_from_ancilla_readout(B, observed_syndrome, 0.03)
+        assert sum(A) == pytest.approx(1)
+        assert all(0 <= probability <= 1 for probability in A)
+
+
+def test_impossible_ancilla_readout_is_rejected_at_that_tick():
+    with pytest.raises(ValueError, match="zero probability"):
+        _update_from_ancilla_readout([1.0] + [0.0] * 31, 1, 0.0)
