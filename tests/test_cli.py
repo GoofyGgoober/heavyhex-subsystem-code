@@ -1,6 +1,8 @@
 import json
+import os
 import subprocess
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -17,6 +19,9 @@ from surface_code.simulation.cli import (
     parse_error,
     parse_syndrome,
 )
+from surface_code.simulation.profiles import IBM_HERON_PROFILE
+from surface_code.simulation.record_shots import MemorySummary
+from surface_code.simulation.sweep_n import CadenceExperiment, CadencePoint
 
 
 ZERO_SYNDROME = (0,) * 8
@@ -253,13 +258,13 @@ def test_circuit_command_can_draw_repeated_rounds(monkeypatch, capsys):
 
     seen = []
 
-    def fake_memory_circuit(rounds, error):
-        seen.append((rounds, error))
+    def fake_memory_circuit(rounds, error, **options):
+        seen.append((rounds, error, options))
         return FakeCircuit()
 
     monkeypatch.setattr("surface_code.simulation.cli.to_memory_circuit", fake_memory_circuit)
-    assert main(["circuit", "X4", "--rounds", "3"]) == 0
-    assert seen == [(3, Pauli.x_on((4,)))]
+    assert main(["circuit", "X4", "--rounds", "3", "--preparation", "product"]) == 0
+    assert seen == [(3, Pauli.x_on((4,)), {"preparation": "product"})]
     assert "memory circuit" in capsys.readouterr().out
 
 
@@ -284,7 +289,7 @@ def test_memory_command_reports_hardware_shaped_rounds(monkeypatch, capsys):
     assert main(["memory", "--rounds", "2", "--shots", "10", "--json"]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["rounds"] == 2
-    assert payload["space_time_decoded"] is False
+    assert payload["history_decoded"] is False
     assert payload["round_data"][1]["detection_event_rate"] == 0.15
     assert seen[0][0] == 2
     assert payload["noise_profile"] == "baseline"
@@ -313,6 +318,60 @@ def test_memory_command_has_explicit_ideal_mode(monkeypatch, capsys):
     payload = json.loads(capsys.readouterr().out)
     assert payload["noise_profile"] == "ideal"
     assert seen[0].is_ideal
+
+
+def test_cadence_command_reports_both_bases_as_json(monkeypatch, capsys):
+    point = CadencePoint(
+        rounds=2,
+        interval_us=2.0,
+        idle_per_round_us=1.0,
+        shots=10,
+        logical_failures=1,
+        logical_failure_rate=0.1,
+        confidence_low=0.02,
+        confidence_high=0.3,
+        raw_logical_failure_rate=0.2,
+        mean_detection_events=0.5,
+        decoder_interval_bit_error=0.01,
+        decoder_syndrome_bit_error=0.02,
+        decoder_terminal_bit_error=0.03,
+    )
+
+    def experiment(basis):
+        return CadenceExperiment(
+            basis=basis,
+            total_time_us=4.0,
+            round_duration_us=1.0,
+            confidence=0.95,
+            bare_qubit_failure_rate=0.04,
+            points=(point,),
+        )
+
+    monkeypatch.setattr(
+        "surface_code.simulation.cli.run_full_cadence_experiment",
+        lambda *args, **kwargs: (experiment("Z"), experiment("X")),
+    )
+    assert main(["cadence", "--time-us", "4", "--rounds", "2", "--json"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["experiment"] == "fixed_duration_syndrome_cadence"
+    assert set(payload["results"]) == {"X", "Z"}
+    assert payload["results"]["Z"]["optimum_rounds"] == 2
+    assert payload["results"]["X"]["points"][0]["logical_failures"] == 1
+
+
+def test_cadence_command_reports_infeasible_timing(monkeypatch, capsys):
+    def fail(*args, **kwargs):
+        raise ValueError("rounds do not fit")
+
+    monkeypatch.setattr("surface_code.simulation.cli.run_cadence_experiment", fail)
+    assert main(["cadence", "--basis", "Z"]) == 2
+    assert "rounds do not fit" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("confidence", ["0", "1", "nope"])
+def test_cadence_rejects_invalid_confidence(confidence, capsys):
+    assert main(["cadence", "--confidence", confidence]) == 2
+    assert "confidence" in capsys.readouterr().err
 
 
 def test_interactive_edits_do_not_measure_until_requested(monkeypatch, capsys):
@@ -449,11 +508,120 @@ def test_malformed_pauli_shorthand_gets_a_pauli_error(capsys):
 
 
 def test_module_entry_point_shows_help():
+    # The subprocess does not inherit pytest's pythonpath, so point it at src/ explicitly.
     result = subprocess.run(
         [sys.executable, "-m", "surface_code", "--help"],
         check=False,
         capture_output=True,
         text=True,
+        env={**os.environ, "PYTHONPATH": str(Path(__file__).resolve().parents[1] / "src")},
     )
     assert result.returncode == 0
     assert "surface-code" in result.stdout
+
+
+def _cadence_point(rounds: int = 2) -> CadencePoint:
+    return CadencePoint(
+        rounds=rounds, interval_us=2.0, idle_per_round_us=1.0, shots=10, logical_failures=1,
+        logical_failure_rate=0.1, confidence_low=0.02, confidence_high=0.3,
+        raw_logical_failure_rate=0.2, mean_detection_events=0.5,
+        decoder_interval_bit_error=0.01, decoder_syndrome_bit_error=0.02,
+        decoder_terminal_bit_error=0.03,
+    )
+
+
+def _capture_cadence(monkeypatch, seen):
+    def fake(time_us, rounds, **options):
+        seen.append(options)
+        return CadenceExperiment(
+            basis=options["basis"], total_time_us=time_us,
+            round_duration_us=options["round_duration_us"], confidence=options["confidence"],
+            bare_qubit_failure_rate=0.04, points=(_cadence_point(),),
+            preparation=options["preparation"],
+        )
+
+    monkeypatch.setattr("surface_code.simulation.cli.run_cadence_experiment", fake)
+
+
+def test_cadence_profile_supplies_noise_rates_and_round_duration(monkeypatch, capsys):
+    seen = []
+    _capture_cadence(monkeypatch, seen)
+    assert main([
+        "cadence", "--basis", "Z", "--profile", "ibm-heron", "--preparation", "product", "--json",
+    ]) == 0
+    (options,) = seen
+    assert options["circuit_noise"] == IBM_HERON_PROFILE.circuit_noise
+    assert options["idle_noise"] == IBM_HERON_PROFILE.idle_noise
+    assert options["round_duration_us"] == IBM_HERON_PROFILE.round_duration_us
+    assert options["preparation"] == "product"
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["noise_profile"] == "ibm-heron"
+    assert payload["preparation"] == "product"
+
+
+def test_cadence_explicit_rates_override_the_profile(monkeypatch, capsys):
+    seen = []
+    _capture_cadence(monkeypatch, seen)
+    assert main([
+        "cadence", "--basis", "Z", "--profile", "ibm-heron", "--two-qubit-error", "0.02",
+        "--idle-x-rate", "0", "--round-duration-us", "3",
+    ]) == 0
+    (options,) = seen
+    assert options["circuit_noise"].two_qubit == 0.02
+    assert options["circuit_noise"].readout == IBM_HERON_PROFILE.circuit_noise.readout
+    assert options["idle_noise"].x_rate == 0
+    assert options["idle_noise"].y_rate == IBM_HERON_PROFILE.idle_noise.y_rate
+    assert options["round_duration_us"] == 3
+    out = capsys.readouterr().out
+    assert "Noise profile:      ibm-heron" in out
+    assert "product" not in out and "encoder" in out
+
+
+def test_cadence_ideal_flags_zero_the_base_before_overrides(monkeypatch, capsys):
+    seen = []
+    _capture_cadence(monkeypatch, seen)
+    assert main([
+        "cadence", "--basis", "Z", "--ideal-circuit", "--ideal-idle",
+        "--idle-z-rate", "0.003", "--readout-error", "0.05",
+    ]) == 0
+    (options,) = seen
+    noise = options["circuit_noise"]
+    assert (noise.single_qubit, noise.two_qubit, noise.readout, noise.reset) == (0, 0, 0.05, 0)
+    idle = options["idle_noise"]
+    assert (idle.x_rate, idle.y_rate, idle.z_rate) == (0, 0, 0.003)
+
+
+def test_unknown_profile_is_rejected_by_the_parser(capsys):
+    assert main(["cadence", "--profile", "nope"]) == 2
+    assert "invalid choice" in capsys.readouterr().err
+
+
+def test_memory_command_forwards_profile_and_preparation(monkeypatch, capsys):
+    seen = []
+
+    def fake_run(rounds, **options):
+        seen.append(options)
+        return {"history": 1}
+
+    summary = MemorySummary(
+        rounds=1, shots=10, syndrome_trigger_rate=(0.1,), detection_event_rate=(0.05,),
+        raw_z_success_rate=0.9, last_round_z_success_rate=0.8,
+    )
+    monkeypatch.setattr("surface_code.simulation.cli.run_memory", fake_run)
+    monkeypatch.setattr("surface_code.simulation.cli.summarize_memory", lambda _: summary)
+    assert main(["memory", "--profile", "ibm-heron", "--preparation", "product", "--json"]) == 0
+    (options,) = seen
+    assert options["noise"] == IBM_HERON_PROFILE.circuit_noise
+    assert options["preparation"] == "product"
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["noise_profile"] == "ibm-heron"
+    assert payload["preparation"] == "product"
+
+
+def test_library_value_errors_become_exit_code_2(monkeypatch, capsys):
+    def fail(*args, **kwargs):
+        raise ValueError("rounds do not fit")
+
+    monkeypatch.setattr("surface_code.simulation.cli.run_memory", fail)
+    assert main(["memory", "--rounds", "3"]) == 2
+    assert "rounds do not fit" in capsys.readouterr().err

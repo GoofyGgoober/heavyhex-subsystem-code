@@ -32,12 +32,16 @@ def _pauli_label(pauli: Pauli, n: int) -> str:
     return "".join(reversed(chars))
 
 
-def _logical_zero_circuit():
-    """Clifford that takes |0>^9 to |0>_L (stabilizers and Z_L all +1)."""
+def _logical_state_circuit(basis: str = "Z"):
+    """Prepare the +1 logical eigenstate for ``basis`` from ``|0>^9``."""
     from qiskit.quantum_info import StabilizerState
 
+    basis = basis.upper()
+    if basis not in {"X", "Z"}:
+        raise ValueError(f"basis must be 'X' or 'Z', got {basis!r}")
     generators = [_pauli_label(s, len(PATCH.data_qubits)) for s in PATCH.stabilizers]
-    generators.append(_pauli_label(PATCH.logical_z, len(PATCH.data_qubits)))
+    logical = PATCH.logical_x if basis == "X" else PATCH.logical_z
+    generators.append(_pauli_label(logical, len(PATCH.data_qubits)))
     return StabilizerState.from_stabilizer_list(generators).clifford.to_circuit()
 
 
@@ -71,7 +75,7 @@ def to_qiskit(error: Pauli | None = None) -> QuantumCircuit:
     syn = ClassicalRegister(len(PATCH.ancillas), "syn")
     data = ClassicalRegister(len(PATCH.data_qubits), "data")
     circuit = QuantumCircuit(qubits, syn, data)
-    circuit.compose(_logical_zero_circuit(), PATCH.data_qubits, inplace=True)
+    circuit.compose(_logical_state_circuit("Z"), PATCH.data_qubits, inplace=True)
     if error is not None:
         _apply_error(circuit, error)
 

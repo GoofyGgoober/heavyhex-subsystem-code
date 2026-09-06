@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "quantum-surface-code"
 version = "0.1.0"
 description = "Distance-3 rotated planar surface code (built from scratch)"
+readme = "README.md"
 requires-python = ">=3.10"
 
 [project.scripts]
@@ -13,11 +14,16 @@ surface-code = "surface_code.simulation.cli:main"
 
 [project.optional-dependencies]
 sim = ["qiskit>=2", "qiskit-aer>=0.15"]
-test = ["pytest"]
+plot = ["matplotlib>=3.8"]
+test = ["pytest", "quantum-surface-code[sim]"]
+dev = ["quantum-surface-code[sim,plot,test]"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 
 [tool.pyright]
 extraPaths = ["src"]
-include = ["src", "tests"]
+include = ["src", "tests", "scripts"]

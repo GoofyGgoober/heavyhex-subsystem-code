@@ -3,6 +3,7 @@ from .core import Pauli
 from .decoders import decode, z_basis_success
 from .patches import (
     ANCILLAS,
+    PATCH,
     DATA_QUBITS,
     DISTANCE,
     LOGICAL_X,
@@ -25,6 +26,7 @@ __all__ = [
     "DISTANCE",
     "LOGICAL_X",
     "LOGICAL_Z",
+    "PATCH",
     "STABILIZERS",
     "SYNDROME_CIRCUIT",
     "X_ANCILLAS",
@@ -37,8 +39,8 @@ __all__ = [
     "abstract_syndrome",
     "data_qubit",
     "decode",
-    "z_basis_success",
     "extract_syndrome",
     "is_logical",
     "parameters",
+    "z_basis_success",
 ]

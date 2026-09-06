@@ -3,7 +3,14 @@
 Z-tiles: CNOT from each data qubit onto the ancilla, then measure Z.
 X-tiles: H, CNOT from the ancilla onto each data qubit, H, then measure Z.
 
-No IBM layout. Ancillas are fully connected to their tiles.
+No IBM layout. Ancillas are fully connected to their tiles, so the checks run
+one after another and a round's duration is a model parameter, not a schedule.
+
+CNOT order still matters: an ancilla fault halfway through a weight-4 check
+leaves a two-qubit "hook" error on the data qubits it has not visited yet.
+Z-tiles visit their qubits column by column and X-tiles row by row, so every
+hook lies across the logical operator of its own type rather than along it,
+and single faults cannot shorten the effective distance.
 """
 
 from __future__ import annotations
@@ -13,10 +20,15 @@ from ..patches import PATCH
 from .operations import CX, H, MeasureZ
 
 
+def _column_major(qubit: int) -> tuple[int, int]:
+    row, column = divmod(qubit, PATCH.distance)
+    return column, row
+
+
 def _syndrome_circuit() -> tuple[H | CX | MeasureZ, ...]:
     ops: list[H | CX | MeasureZ] = []
     for ancilla, support in zip(PATCH.z_ancillas, PATCH.z_checks):
-        for data in sorted(support):
+        for data in sorted(support, key=_column_major):
             ops.append(CX(data, ancilla))
     for ancilla, support in zip(PATCH.x_ancillas, PATCH.x_checks):
         ops.append(H(ancilla))

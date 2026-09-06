@@ -8,21 +8,31 @@ import random
 import re
 import sys
 from collections.abc import Iterator, Sequence
+from dataclasses import asdict
+from importlib.metadata import PackageNotFoundError, version
 from itertools import combinations, product
+from math import isfinite
 from typing import Any
 
 from ..core import Pauli
 from ..decoders import decode, z_basis_success
 from ..patches import PATCH
 from .aer import MAX_SEED, run_aer, shot_z_success, to_qiskit
-from .memory import (
-    BASELINE_NOISE,
+from .sweep_n import (
+    CadenceExperiment,
+    run_cadence_experiment,
+    run_full_cadence_experiment,
+)
+from .record_shots import (
+    PREPARATIONS,
     CircuitNoise,
+    IdleNoise,
     run_memory,
     summarize_memory,
     to_memory_circuit,
 )
 from .noise import depolarizing_error
+from .profiles import PROFILES, get_profile
 
 DEFAULT_SHOTS = 64
 _COMMANDS = {
@@ -32,6 +42,7 @@ _COMMANDS = {
     "decode",
     "sweep",
     "memory",
+    "cadence",
     "circuit",
     "info",
 }
@@ -300,6 +311,39 @@ def _probability(raw: str) -> float:
     return value
 
 
+def _nonnegative_float(raw: str) -> float:
+    try:
+        value = float(raw)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError(
+            f"expected a non-negative number, got {raw!r}"
+        ) from error
+    if not isfinite(value) or value < 0:
+        raise argparse.ArgumentTypeError(f"expected a non-negative number, got {raw!r}")
+    return value
+
+
+def _positive_float(raw: str) -> float:
+    value = _nonnegative_float(raw)
+    if value == 0:
+        raise argparse.ArgumentTypeError(f"expected a positive number, got {raw!r}")
+    return value
+
+
+def _confidence(raw: str) -> float:
+    value = _probability(raw)
+    if value in {0.0, 1.0}:
+        raise argparse.ArgumentTypeError("confidence must be strictly between 0 and 1")
+    return value
+
+
+def _memory_basis(raw: str) -> str:
+    normalized = raw.upper()
+    if normalized not in {"X", "Z", "BOTH"}:
+        raise argparse.ArgumentTypeError("basis must be X, Z, or both")
+    return normalized
+
+
 def _axes(raw: str) -> str:
     value = re.sub(r"[,\s]+", "", raw.upper())
     if not value or set(value) - {"X", "Y", "Z"}:
@@ -329,7 +373,7 @@ def _add_run_options(parser: argparse.ArgumentParser) -> None:
         dest="extra_errors",
         action="append",
         type=_pauli_argument,
-        default=[],
+        default=None,
         metavar="PAULI",
         help="additional Pauli to compose; may be repeated",
     )
@@ -373,12 +417,53 @@ def _add_run_options(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def _add_circuit_noise_options(parser: argparse.ArgumentParser) -> None:
+    for option, gate in (
+        ("single-qubit", "one-qubit gate depolarizing"),
+        ("two-qubit", "two-qubit gate depolarizing"),
+        ("readout", "measurement flip"),
+        ("reset", "reset flip"),
+    ):
+        parser.add_argument(
+            f"--{option}-error", type=_probability, metavar="P", help=f"{gate} probability"
+        )
+
+
+def _add_profile_options(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--profile",
+        choices=sorted(PROFILES),
+        default="baseline",
+        help="named noise profile supplying the default rates (explicit rates override it)",
+    )
+    parser.add_argument(
+        "--preparation",
+        choices=PREPARATIONS,
+        default="encoder",
+        help="logical-state preparation: synthesized Clifford encoder or product state",
+    )
+
+
+def _describe_preparation(preparation: str) -> str:
+    if preparation == "product":
+        return "product state, every data qubit in |0> (hardware-style)"
+    return "synthesized Clifford encoder (not fault-tolerant)"
+
+
+def _package_version() -> str:
+    try:
+        return version("quantum-surface-code")
+    except PackageNotFoundError:
+        return "unknown"
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="surface-code",
         usage="surface-code [-h] [--version] [COMMAND] ...",
         description=(
-            "Explore an ideal [[9,1,3]] rotated surface-code syndrome round. "
+            "Explore the [[9,1,3]] rotated surface code: single syndrome rounds, "
+            "noisy repeated-round memory, and fixed-duration cadence sweeps. "
             "With no command, open interactive mode."
         ),
         epilog=(
@@ -388,12 +473,13 @@ def build_parser() -> argparse.ArgumentParser:
             "  surface-code syndrome 'X0 Z3'\n"
             "  surface-code decode '0000 1100'\n"
             "  surface-code memory --rounds 8 --two-qubit-error 0.01\n"
+            "  surface-code cadence --time-us 10 --rounds 0 1 2 4 8\n"
             "  surface-code sweep --weight 2 --failures-only\n"
             "  surface-code circuit XL"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("--version", action="version", version="%(prog)s 0.1.0")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {_package_version()}")
     subparsers = parser.add_subparsers(dest="command", metavar="COMMAND")
 
     run = subparsers.add_parser(
@@ -450,14 +536,15 @@ def build_parser() -> argparse.ArgumentParser:
             "baseline noise model."
         ),
     )
-    memory.add_argument("--rounds", type=_nonnegative_int, default=4)
-    memory.add_argument("-s", "--shots", type=_positive_int, default=DEFAULT_SHOTS)
-    memory.add_argument("--seed", type=_seed)
-    memory.add_argument("-e", "--error", type=_pauli_argument, default=Pauli(), metavar="PAULI")
-    memory.add_argument("--single-qubit-error", type=_probability, metavar="P")
-    memory.add_argument("--two-qubit-error", type=_probability, metavar="P")
-    memory.add_argument("--readout-error", type=_probability, metavar="P")
-    memory.add_argument("--reset-error", type=_probability, metavar="P")
+    memory.add_argument("--rounds", type=_nonnegative_int, default=4, help="syndrome rounds to run")
+    _add_profile_options(memory)
+    memory.add_argument("-s", "--shots", type=_positive_int, default=DEFAULT_SHOTS, help="Aer shots")
+    memory.add_argument("--seed", type=_seed, help="seed Aer sampling")
+    memory.add_argument(
+        "-e", "--error", type=_pauli_argument, default=Pauli(), metavar="PAULI",
+        help="Pauli injected after state preparation",
+    )
+    _add_circuit_noise_options(memory)
     memory.add_argument(
         "--ideal",
         action="store_true",
@@ -465,12 +552,72 @@ def build_parser() -> argparse.ArgumentParser:
     )
     memory.add_argument("--json", action="store_true")
 
+    cadence = subparsers.add_parser(
+        "cadence",
+        help="sweep syndrome frequency at one fixed storage time",
+        description=(
+            "Hold total memory time fixed, vary the number of syndrome rounds, "
+            "and decode each complete syndrome history."
+        ),
+    )
+    cadence.add_argument(
+        "--time-us", type=_positive_float, default=10.0, metavar="T",
+        help="fixed storage window in microseconds",
+    )
+    cadence.add_argument(
+        "--rounds",
+        type=_nonnegative_int,
+        nargs="+",
+        default=(0, 1, 2, 4, 8),
+        metavar="N",
+        help="numbers of syndrome rounds to compare (0 is the readout-only control)",
+    )
+    cadence.add_argument(
+        "--round-duration-us",
+        type=_nonnegative_float,
+        metavar="TAU",
+        help="modeled duration of one syndrome round (default: the profile's value)",
+    )
+    _add_profile_options(cadence)
+    cadence.add_argument("-s", "--shots", type=_positive_int, default=1024, help="Aer shots per point")
+    cadence.add_argument("--seed", type=_seed, help="seed Aer sampling")
+    cadence.add_argument(
+        "--basis", type=_memory_basis, default="BOTH",
+        help="logical basis to store and read out: Z, X, or BOTH",
+    )
+    cadence.add_argument(
+        "--confidence", type=_confidence, default=0.95, help="Wilson interval confidence level"
+    )
+    _add_circuit_noise_options(cadence)
+    for axis in "xyz":
+        cadence.add_argument(
+            f"--idle-{axis}-rate", type=_nonnegative_float, metavar="RATE",
+            help=f"idle {axis.upper()}-event rate per microsecond on each data qubit",
+        )
+    cadence.add_argument(
+        "--ideal-circuit",
+        action="store_true",
+        help="start circuit faults at zero before applying explicit overrides",
+    )
+    cadence.add_argument(
+        "--ideal-idle",
+        action="store_true",
+        help="start idle rates at zero before applying explicit overrides",
+    )
+    cadence.add_argument("--json", action="store_true")
+
     circuit = subparsers.add_parser("circuit", help="draw the generated Qiskit circuit")
     circuit.add_argument("error", nargs="?", type=_pauli_argument, default=Pauli(), metavar="PAULI")
     circuit.add_argument(
         "--rounds",
         type=_nonnegative_int,
         help="draw a repeated-round memory circuit instead of the one-round circuit",
+    )
+    circuit.add_argument(
+        "--preparation",
+        choices=PREPARATIONS,
+        default="encoder",
+        help="logical-state preparation for the repeated-round circuit",
     )
 
     info = subparsers.add_parser("info", help="show patch geometry, checks, and logical operators")
@@ -492,7 +639,7 @@ def _call_aer(error: Pauli, *, shots: int, seed: int | None) -> Tallies:
 
 
 def _run_command(args: argparse.Namespace) -> int:
-    initial = _combined_error(args.error, args.extra_errors)
+    initial = _combined_error(args.error, (args.extra_errors or ()))
     frame = initial
     probability = 0.0 if args.noise is None else args.noise
     steps = int(args.noise is not None) if args.steps is None else args.steps
@@ -627,20 +774,21 @@ def _sweep_command(args: argparse.Namespace) -> int:
     return 0
 
 
-def _memory_noise(args: argparse.Namespace) -> CircuitNoise:
-    base = CircuitNoise.ideal() if args.ideal else BASELINE_NOISE
+def _override_circuit_noise(base: CircuitNoise, args: argparse.Namespace) -> CircuitNoise:
+    """Apply any explicit --*-error options on top of a base noise model."""
     return CircuitNoise(
         single_qubit=(
-            base.single_qubit
-            if args.single_qubit_error is None
-            else args.single_qubit_error
+            base.single_qubit if args.single_qubit_error is None else args.single_qubit_error
         ),
-        two_qubit=(
-            base.two_qubit if args.two_qubit_error is None else args.two_qubit_error
-        ),
+        two_qubit=base.two_qubit if args.two_qubit_error is None else args.two_qubit_error,
         readout=base.readout if args.readout_error is None else args.readout_error,
         reset=base.reset if args.reset_error is None else args.reset_error,
     )
+
+
+def _memory_noise(args: argparse.Namespace) -> CircuitNoise:
+    base = CircuitNoise.ideal() if args.ideal else get_profile(args.profile).circuit_noise
+    return _override_circuit_noise(base, args)
 
 
 def _memory_command(args: argparse.Namespace) -> int:
@@ -657,13 +805,14 @@ def _memory_command(args: argparse.Namespace) -> int:
     if has_overrides:
         profile_name = "custom"
     else:
-        profile_name = "ideal" if args.ideal else "baseline"
+        profile_name = "ideal" if args.ideal else args.profile
     tallies = run_memory(
         args.rounds,
         shots=args.shots,
         seed=args.seed,
         error=args.error,
         noise=noise,
+        preparation=args.preparation,
     )
     summary = summarize_memory(tallies)
     round_rows = [
@@ -690,8 +839,8 @@ def _memory_command(args: argparse.Namespace) -> int:
         "round_data": round_rows,
         "raw_z_success_rate": summary.raw_z_success_rate,
         "last_round_only_z_success_rate": summary.last_round_z_success_rate,
-        "space_time_decoded": False,
-        "preparation": "synthesized_clifford_not_fault_tolerant",
+        "history_decoded": False,
+        "preparation": args.preparation,
         "unique_histories": len(tallies),
     }
     if args.json:
@@ -700,9 +849,8 @@ def _memory_command(args: argparse.Namespace) -> int:
 
     print("Repeated logical-zero memory experiment")
     print("Backend:        Aer stabilizer")
-    profile = profile_name
-    print(f"Noise profile:  {profile}")
-    print("Preparation:    synthesized Clifford (not fault-tolerant)")
+    print(f"Noise profile:  {profile_name}")
+    print(f"Preparation:    {_describe_preparation(args.preparation)}")
     print(f"Rounds:         {summary.rounds}")
     print(f"Shots:          {summary.shots}")
     print(f"Injected error: {format_pauli(args.error)}")
@@ -719,7 +867,117 @@ def _memory_command(args: argparse.Namespace) -> int:
             "Last-round-only decode: "
             f"{summary.last_round_z_success_rate:.3%}"
         )
-    print("Space-time decode:       not implemented yet")
+    print("History decode:          not applied here; see `surface-code cadence`")
+    return 0
+
+
+def _cadence_noise(args: argparse.Namespace) -> tuple[CircuitNoise, IdleNoise]:
+    profile = get_profile(args.profile)
+    circuit_base = CircuitNoise.ideal() if args.ideal_circuit else profile.circuit_noise
+    idle_base = IdleNoise.ideal() if args.ideal_idle else profile.idle_noise
+    circuit_noise = _override_circuit_noise(circuit_base, args)
+    idle_noise = IdleNoise(
+        x_rate=idle_base.x_rate if args.idle_x_rate is None else args.idle_x_rate,
+        y_rate=idle_base.y_rate if args.idle_y_rate is None else args.idle_y_rate,
+        z_rate=idle_base.z_rate if args.idle_z_rate is None else args.idle_z_rate,
+    )
+    return circuit_noise, idle_noise
+
+
+def _cadence_payload(
+    experiments: Sequence[CadenceExperiment],
+    circuit_noise: CircuitNoise,
+    idle_noise: IdleNoise,
+    *,
+    profile: str,
+) -> dict[str, Any]:
+    first = experiments[0]
+    return {
+        "experiment": "fixed_duration_syndrome_cadence",
+        "backend": "aer_stabilizer",
+        "total_time_us": first.total_time_us,
+        "round_duration_us": first.round_duration_us,
+        "noise_profile": profile,
+        "preparation": first.preparation,
+        "confidence": first.confidence,
+        "circuit_noise": asdict(circuit_noise),
+        "idle_noise_per_us": asdict(idle_noise),
+        "decoder": "exact_css_history_with_approximate_circuit_weights",
+        "results": {
+            experiment.basis: {
+                "optimum_rounds": experiment.optimum_rounds,
+                "bare_qubit_failure_rate": experiment.bare_qubit_failure_rate,
+                "points": [asdict(point) for point in experiment.points],
+            }
+            for experiment in experiments
+        },
+    }
+
+
+def _cadence_command(args: argparse.Namespace) -> int:
+    circuit_noise, idle_noise = _cadence_noise(args)
+    round_duration_us = (
+        get_profile(args.profile).round_duration_us
+        if args.round_duration_us is None
+        else args.round_duration_us
+    )
+    if args.basis == "BOTH":
+        experiments = run_full_cadence_experiment(
+            args.time_us,
+            args.rounds,
+            round_duration_us=round_duration_us,
+            shots=args.shots,
+            seed=args.seed,
+            confidence=args.confidence,
+            circuit_noise=circuit_noise,
+            idle_noise=idle_noise,
+            preparation=args.preparation,
+        )
+    else:
+        experiments = (
+            run_cadence_experiment(
+                args.time_us,
+                args.rounds,
+                round_duration_us=round_duration_us,
+                basis=args.basis,
+                shots=args.shots,
+                seed=args.seed,
+                confidence=args.confidence,
+                circuit_noise=circuit_noise,
+                idle_noise=idle_noise,
+                preparation=args.preparation,
+            ),
+        )
+
+    payload = _cadence_payload(experiments, circuit_noise, idle_noise, profile=args.profile)
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+
+    print("Fixed-duration syndrome-cadence experiment")
+    print(f"Noise profile:      {args.profile}")
+    print(f"Preparation:        {_describe_preparation(args.preparation)}")
+    print(f"Storage time:       {args.time_us:g} us")
+    print(f"Syndrome duration:  {round_duration_us:g} us per round")
+    print(f"Shots per point:    {args.shots}")
+    print("Decoder:            syndrome history (approximate circuit weights)")
+    for experiment in experiments:
+        print(f"\nLogical {experiment.basis}-basis memory")
+        print(
+            "rounds  interval(us)  idle(us)  decoded failure (CI)       "
+            "raw failure  events/shot"
+        )
+        for point in experiment.points:
+            print(
+                f"{point.rounds:6d}  {point.interval_us:12.3f}  "
+                f"{point.idle_per_round_us:8.3f}  "
+                f"{point.logical_failure_rate:8.3%} "
+                f"[{point.confidence_low:7.3%}, {point.confidence_high:7.3%}]  "
+                f"{point.raw_logical_failure_rate:10.3%}  "
+                f"{point.mean_detection_events:11.3f}"
+            )
+        print(f"Best sampled cadence: n={experiment.optimum_rounds}")
+        print(f"Bare-qubit reference: {experiment.bare_qubit_failure_rate:.3%}")
     return 0
 
 
@@ -781,7 +1039,7 @@ def _circuit_command(args: argparse.Namespace) -> int:
     circuit = (
         to_qiskit(args.error)
         if args.rounds is None
-        else to_memory_circuit(args.rounds, args.error)
+        else to_memory_circuit(args.rounds, args.error, preparation=args.preparation)
     )
     print(circuit.draw(output="text"))
     return 0
@@ -1011,6 +1269,7 @@ def main(argv: list[str] | None = None, *, lines: Sequence[str] | None = None) -
         "decode": _decode_command,
         "sweep": _sweep_command,
         "memory": _memory_command,
+        "cadence": _cadence_command,
         "circuit": _circuit_command,
         "info": _info_command,
     }
@@ -1018,6 +1277,9 @@ def main(argv: list[str] | None = None, *, lines: Sequence[str] | None = None) -
         if args.command == "interactive":
             return _interactive_command(args, lines)
         return handlers[args.command](args)
+    except ValueError as error:
+        print(f"Error: {error}", file=sys.stderr)
+        return 2
     except ImportError as error:
         if not _missing_qiskit(error):
             raise

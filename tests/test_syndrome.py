@@ -1,9 +1,11 @@
 from surface_code import (
     ANCILLAS,
     DATA_QUBITS,
+    DISTANCE,
     LOGICAL_X,
     LOGICAL_Z,
     STABILIZERS,
+    Z_ANCILLAS,
     Pauli,
     abstract_syndrome,
     extract_syndrome,
@@ -46,3 +48,28 @@ def test_circuit_is_cnots_hadamards_and_eight_z_measures():
     assert all(isinstance(op, (H, CX, MeasureZ)) for op in SYNDROME_CIRCUIT)
     measures = [op for op in SYNDROME_CIRCUIT if isinstance(op, MeasureZ)]
     assert tuple(op.qubit for op in measures) == ANCILLAS
+
+
+def _cnot_order_by_ancilla() -> dict[int, list[int]]:
+    order: dict[int, list[int]] = {}
+    for op in SYNDROME_CIRCUIT:
+        if isinstance(op, CX):
+            ancilla, data = (op.target, op.control) if op.target in ANCILLAS else (op.control, op.target)
+            order.setdefault(ancilla, []).append(data)
+    return order
+
+
+def test_hook_errors_lie_across_the_logical_operator_of_their_type():
+    """An ancilla fault after the second CNOT of a weight-4 check leaves a
+    two-qubit error on the two data qubits not yet visited. Along the logical
+    operator of the same type that would cut the effective distance to 2."""
+    for ancilla, order in _cnot_order_by_ancilla().items():
+        if len(order) != 4:
+            continue
+        (row_a, col_a), (row_b, col_b) = (divmod(qubit, DISTANCE) for qubit in order[2:])
+        if ancilla in Z_ANCILLAS:
+            # Z hooks must not share a row: logical Z runs along a row.
+            assert col_a == col_b and row_a != row_b
+        else:
+            # X hooks must not share a column: logical X runs down a column.
+            assert row_a == row_b and col_a != col_b
