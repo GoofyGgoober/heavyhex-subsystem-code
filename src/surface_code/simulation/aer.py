@@ -13,7 +13,7 @@ from ..circuits.operations import CX, H
 from ..circuits.syndrome import SYNDROME_CIRCUIT
 from ..core import Pauli
 from ..decoders import decode
-from ..decoders.infer_logical import normalize_measurement_basis
+from ..decoders.basis import normalize_measurement_basis
 from ..patches import PATCH
 
 if TYPE_CHECKING:

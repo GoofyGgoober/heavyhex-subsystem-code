@@ -5,13 +5,10 @@ from __future__ import annotations
 import argparse
 import re
 from importlib.metadata import PackageNotFoundError, version
-from math import isfinite
 
 from ..core import Pauli
 from ..patches import PATCH
 from .aer import MAX_SEED
-from .profiles import PROFILES
-from .record_shots import PREPARATIONS
 
 DEFAULT_SHOTS = 64
 _TOKEN = re.compile(r"([XYZ])(_?L|\d+)", re.IGNORECASE)
@@ -112,37 +109,6 @@ def parse_probability(raw: str) -> float:
     return value
 
 
-def parse_nonnegative_float(raw: str) -> float:
-    try:
-        value = float(raw)
-    except ValueError as error:
-        raise argparse.ArgumentTypeError(f"expected a non-negative number, got {raw!r}") from error
-    if not isfinite(value) or value < 0:
-        raise argparse.ArgumentTypeError(f"expected a non-negative number, got {raw!r}")
-    return value
-
-
-def parse_positive_float(raw: str) -> float:
-    value = parse_nonnegative_float(raw)
-    if value == 0:
-        raise argparse.ArgumentTypeError(f"expected a positive number, got {raw!r}")
-    return value
-
-
-def parse_confidence(raw: str) -> float:
-    value = parse_probability(raw)
-    if value in {0.0, 1.0}:
-        raise argparse.ArgumentTypeError("confidence must be strictly between 0 and 1")
-    return value
-
-
-def parse_memory_basis(raw: str) -> str:
-    normalized = raw.upper()
-    if normalized not in {"X", "Z", "BOTH"}:
-        raise argparse.ArgumentTypeError("basis must be X, Z, or both")
-    return normalized
-
-
 def parse_axes(raw: str) -> str:
     value = re.sub(r"[,\s]+", "", raw.upper())
     if not value or set(value) - {"X", "Y", "Z"}:
@@ -216,33 +182,6 @@ def _add_run_options(parser: argparse.ArgumentParser) -> None:
     )
 
 
-def _add_circuit_noise_options(parser: argparse.ArgumentParser) -> None:
-    for option, gate in (
-        ("single-qubit", "one-qubit gate depolarizing"),
-        ("two-qubit", "two-qubit gate depolarizing"),
-        ("readout", "measurement flip"),
-        ("reset", "reset flip"),
-    ):
-        parser.add_argument(
-            f"--{option}-error", type=parse_probability, metavar="P", help=f"{gate} probability"
-        )
-
-
-def _add_profile_options(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument(
-        "--profile",
-        choices=sorted(PROFILES),
-        default="baseline",
-        help="named noise profile supplying the default rates (explicit rates override it)",
-    )
-    parser.add_argument(
-        "--preparation",
-        choices=PREPARATIONS,
-        default="encoder",
-        help="logical-state preparation: synthesized Clifford encoder or product state",
-    )
-
-
 def _package_version() -> str:
     try:
         return version("quantum-surface-code")
@@ -255,8 +194,8 @@ def build_parser() -> argparse.ArgumentParser:
         prog="surface-code",
         usage="surface-code [-h] [--version] [COMMAND] ...",
         description=(
-            "Explore the [[9,1,3]] rotated surface code: single syndrome rounds, "
-            "noisy repeated-round memory, and fixed-duration cadence sweeps. "
+            "Explore the [[9,1,3]] rotated surface code: single syndrome rounds "
+            "and exhaustive ideal-error decoding. "
             "With no command, open interactive mode."
         ),
         epilog=(
@@ -265,8 +204,6 @@ def build_parser() -> argparse.ArgumentParser:
             "  surface-code X4 --shots 128 --seed 7\n"
             "  surface-code syndrome 'X0 Z3'\n"
             "  surface-code decode '0000 1100'\n"
-            "  surface-code memory --rounds 8 --two-qubit-error 0.01\n"
-            "  surface-code cadence --time-us 10 --rounds 0 1 2 4 8\n"
             "  surface-code sweep --weight 2 --failures-only\n"
             "  surface-code circuit XL"
         ),
@@ -321,114 +258,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sweep.add_argument("--json", action="store_true")
 
-    memory = subparsers.add_parser(
-        "memory",
-        help="run repeated ancilla measurement/reset rounds",
-        description=(
-            "Run a repeated logical-zero memory circuit in Aer with a vendor-neutral "
-            "baseline noise model."
-        ),
-    )
-    memory.add_argument(
-        "--rounds", type=parse_nonnegative_int, default=4, help="syndrome rounds to run"
-    )
-    _add_profile_options(memory)
-    memory.add_argument(
-        "-s", "--shots", type=parse_positive_int, default=DEFAULT_SHOTS, help="Aer shots"
-    )
-    memory.add_argument("--seed", type=parse_seed, help="seed Aer sampling")
-    memory.add_argument(
-        "-e",
-        "--error",
-        type=_pauli_argument,
-        default=Pauli(),
-        metavar="PAULI",
-        help="Pauli injected after state preparation",
-    )
-    _add_circuit_noise_options(memory)
-    memory.add_argument(
-        "--ideal",
-        action="store_true",
-        help="start from zero noise (explicit error-rate options still override it)",
-    )
-    memory.add_argument("--json", action="store_true")
-
-    cadence = subparsers.add_parser(
-        "cadence",
-        help="sweep syndrome frequency at one fixed storage time",
-        description=(
-            "Hold total memory time fixed, vary the number of syndrome rounds, "
-            "and decode each complete syndrome history."
-        ),
-    )
-    cadence.add_argument(
-        "--time-us",
-        type=parse_positive_float,
-        default=10.0,
-        metavar="T",
-        help="fixed storage window in microseconds",
-    )
-    cadence.add_argument(
-        "--rounds",
-        type=parse_nonnegative_int,
-        nargs="+",
-        default=(0, 1, 2, 4, 8),
-        metavar="N",
-        help="numbers of syndrome rounds to compare (0 is the readout-only control)",
-    )
-    cadence.add_argument(
-        "--round-duration-us",
-        type=parse_nonnegative_float,
-        metavar="TAU",
-        help="modeled duration of one syndrome round (default: the profile's value)",
-    )
-    _add_profile_options(cadence)
-    cadence.add_argument(
-        "-s", "--shots", type=parse_positive_int, default=1024, help="Aer shots per point"
-    )
-    cadence.add_argument("--seed", type=parse_seed, help="seed Aer sampling")
-    cadence.add_argument(
-        "--basis",
-        type=parse_memory_basis,
-        default="BOTH",
-        help="logical basis to store and read out: Z, X, or BOTH",
-    )
-    cadence.add_argument(
-        "--confidence", type=parse_confidence, default=0.95, help="Wilson interval confidence level"
-    )
-    _add_circuit_noise_options(cadence)
-    for axis in "xyz":
-        cadence.add_argument(
-            f"--idle-{axis}-rate",
-            type=parse_nonnegative_float,
-            metavar="RATE",
-            help=f"idle {axis.upper()}-event rate per microsecond on each data qubit",
-        )
-    cadence.add_argument(
-        "--ideal-circuit",
-        action="store_true",
-        help="start circuit faults at zero before applying explicit overrides",
-    )
-    cadence.add_argument(
-        "--ideal-idle",
-        action="store_true",
-        help="start idle rates at zero before applying explicit overrides",
-    )
-    cadence.add_argument("--json", action="store_true")
-
     circuit = subparsers.add_parser("circuit", help="draw the generated Qiskit circuit")
     circuit.add_argument("error", nargs="?", type=_pauli_argument, default=Pauli(), metavar="PAULI")
-    circuit.add_argument(
-        "--rounds",
-        type=parse_nonnegative_int,
-        help="draw a repeated-round memory circuit instead of the one-round circuit",
-    )
-    circuit.add_argument(
-        "--preparation",
-        choices=PREPARATIONS,
-        default="encoder",
-        help="logical-state preparation for the repeated-round circuit",
-    )
 
     info = subparsers.add_parser("info", help="show patch geometry, checks, and logical operators")
     info.add_argument("--json", action="store_true")

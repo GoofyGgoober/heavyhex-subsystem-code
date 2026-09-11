@@ -8,7 +8,6 @@ import random
 import re
 import sys
 from collections.abc import Iterator, Sequence
-from dataclasses import asdict
 from itertools import combinations, product
 from typing import Any
 
@@ -35,19 +34,6 @@ from .cli_arguments import (
     parse_syndrome as parse_syndrome,
 )
 from .noise import depolarizing_error
-from .profiles import get_profile
-from .record_shots import (
-    CircuitNoise,
-    IdleNoise,
-    run_memory,
-    summarize_memory,
-    to_memory_circuit,
-)
-from .sweep_n import (
-    CadenceExperiment,
-    run_cadence_experiment,
-    run_full_cadence_experiment,
-)
 
 _COMMANDS = {
     "run",
@@ -55,8 +41,6 @@ _COMMANDS = {
     "syndrome",
     "decode",
     "sweep",
-    "memory",
-    "cadence",
     "circuit",
     "info",
 }
@@ -227,13 +211,6 @@ def _report_payload(tallies: Tallies, error: Pauli) -> dict[str, Any]:
     }
 
 
-def _describe_preparation(preparation: str, basis: str = "Z") -> str:
-    if preparation == "product":
-        state = {"Z": "|0>", "X": "|+>", "BOTH": "|0> for Z, |+> for X"}[basis]
-        return f"product state, every data qubit in {state}"
-    return "synthesized Clifford encoder (not fault-tolerant)"
-
-
 def _combined_error(primary: Pauli, extras: Sequence[Pauli]) -> Pauli:
     result = primary
     for error in extras:
@@ -383,207 +360,6 @@ def _sweep_command(args: argparse.Namespace) -> int:
     return 0
 
 
-def _override_circuit_noise(base: CircuitNoise, args: argparse.Namespace) -> CircuitNoise:
-    """Apply any explicit --*-error options on top of a base noise model."""
-    return CircuitNoise(
-        single_qubit=(
-            base.single_qubit if args.single_qubit_error is None else args.single_qubit_error
-        ),
-        two_qubit=base.two_qubit if args.two_qubit_error is None else args.two_qubit_error,
-        readout=base.readout if args.readout_error is None else args.readout_error,
-        reset=base.reset if args.reset_error is None else args.reset_error,
-    )
-
-
-def _memory_noise(args: argparse.Namespace) -> CircuitNoise:
-    base = CircuitNoise.ideal() if args.ideal else get_profile(args.profile).circuit_noise
-    return _override_circuit_noise(base, args)
-
-
-def _memory_command(args: argparse.Namespace) -> int:
-    noise = _memory_noise(args)
-    has_overrides = any(
-        value is not None
-        for value in (
-            args.single_qubit_error,
-            args.two_qubit_error,
-            args.readout_error,
-            args.reset_error,
-        )
-    )
-    if has_overrides:
-        profile_name = "custom"
-    else:
-        profile_name = "ideal" if args.ideal else args.profile
-    tallies = run_memory(
-        args.rounds,
-        shots=args.shots,
-        seed=args.seed,
-        error=args.error,
-        noise=noise,
-        preparation=args.preparation,
-    )
-    summary = summarize_memory(tallies)
-    round_rows = [
-        {
-            "round": round_index + 1,
-            "syndrome_trigger_rate": summary.syndrome_trigger_rate[round_index],
-            "detection_event_rate": summary.detection_event_rate[round_index],
-        }
-        for round_index in range(summary.rounds)
-    ]
-    payload = {
-        "backend": "aer_stabilizer",
-        "experiment": "repeated_logical_zero_memory",
-        "rounds": summary.rounds,
-        "shots": summary.shots,
-        "injected_error": _plain_pauli(args.error),
-        "noise_profile": profile_name,
-        "noise": {
-            "single_qubit": noise.single_qubit,
-            "two_qubit": noise.two_qubit,
-            "readout": noise.readout,
-            "reset": noise.reset,
-        },
-        "round_data": round_rows,
-        "raw_z_success_rate": summary.raw_z_success_rate,
-        "last_round_only_z_success_rate": summary.last_round_z_success_rate,
-        "history_decoded": False,
-        "preparation": args.preparation,
-        "unique_histories": len(tallies),
-    }
-    if args.json:
-        print(json.dumps(payload, indent=2, sort_keys=True))
-        return 0
-
-    print("Repeated logical-zero memory experiment")
-    print("Backend:        Aer stabilizer")
-    print(f"Noise profile:  {profile_name}")
-    print(f"Preparation:    {_describe_preparation(args.preparation)}")
-    print(f"Rounds:         {summary.rounds}")
-    print(f"Shots:          {summary.shots}")
-    print(f"Injected error: {format_pauli(args.error)}")
-    if round_rows:
-        print("\nround  nontrivial syndrome  detection-event bits")
-        for row in round_rows:
-            print(
-                f"{row['round']:5d}  {row['syndrome_trigger_rate']:19.3%}  "
-                f"{row['detection_event_rate']:20.3%}"
-            )
-    print(f"\nRaw final Z_L +1:       {summary.raw_z_success_rate:.3%}")
-    if summary.last_round_z_success_rate is not None:
-        print(f"Last-round-only decode: {summary.last_round_z_success_rate:.3%}")
-    print("History decode:          not applied here; see `surface-code cadence`")
-    return 0
-
-
-def _cadence_noise(args: argparse.Namespace) -> tuple[CircuitNoise, IdleNoise]:
-    profile = get_profile(args.profile)
-    circuit_base = CircuitNoise.ideal() if args.ideal_circuit else profile.circuit_noise
-    idle_base = IdleNoise.ideal() if args.ideal_idle else profile.idle_noise
-    circuit_noise = _override_circuit_noise(circuit_base, args)
-    idle_noise = IdleNoise(
-        x_rate=idle_base.x_rate if args.idle_x_rate is None else args.idle_x_rate,
-        y_rate=idle_base.y_rate if args.idle_y_rate is None else args.idle_y_rate,
-        z_rate=idle_base.z_rate if args.idle_z_rate is None else args.idle_z_rate,
-    )
-    return circuit_noise, idle_noise
-
-
-def _cadence_payload(
-    experiments: Sequence[CadenceExperiment],
-    circuit_noise: CircuitNoise,
-    idle_noise: IdleNoise,
-    *,
-    profile: str,
-) -> dict[str, Any]:
-    first = experiments[0]
-    return {
-        "experiment": "fixed_duration_syndrome_cadence",
-        "backend": "aer_stabilizer",
-        "total_time_us": first.total_time_us,
-        "round_duration_us": first.round_duration_us,
-        "noise_profile": profile,
-        "preparation": first.preparation,
-        "confidence": first.confidence,
-        "circuit_noise": asdict(circuit_noise),
-        "idle_noise_per_us": asdict(idle_noise),
-        "decoder": "exact_css_history_with_approximate_circuit_weights",
-        "results": {
-            experiment.basis: {
-                "optimum_rounds": experiment.optimum_rounds,
-                "bare_qubit_failure_rate": experiment.bare_qubit_failure_rate,
-                "points": [asdict(point) for point in experiment.points],
-            }
-            for experiment in experiments
-        },
-    }
-
-
-def _cadence_command(args: argparse.Namespace) -> int:
-    circuit_noise, idle_noise = _cadence_noise(args)
-    round_duration_us = (
-        get_profile(args.profile).round_duration_us
-        if args.round_duration_us is None
-        else args.round_duration_us
-    )
-    if args.basis == "BOTH":
-        experiments = run_full_cadence_experiment(
-            args.time_us,
-            args.rounds,
-            round_duration_us=round_duration_us,
-            shots=args.shots,
-            seed=args.seed,
-            confidence=args.confidence,
-            circuit_noise=circuit_noise,
-            idle_noise=idle_noise,
-            preparation=args.preparation,
-        )
-    else:
-        experiments = (
-            run_cadence_experiment(
-                args.time_us,
-                args.rounds,
-                round_duration_us=round_duration_us,
-                basis=args.basis,
-                shots=args.shots,
-                seed=args.seed,
-                confidence=args.confidence,
-                circuit_noise=circuit_noise,
-                idle_noise=idle_noise,
-                preparation=args.preparation,
-            ),
-        )
-
-    payload = _cadence_payload(experiments, circuit_noise, idle_noise, profile=args.profile)
-    if args.json:
-        print(json.dumps(payload, indent=2, sort_keys=True))
-        return 0
-
-    print("Fixed-duration syndrome-cadence experiment")
-    print(f"Noise profile:      {args.profile}")
-    print(f"Preparation:        {_describe_preparation(args.preparation, args.basis)}")
-    print(f"Storage time:       {args.time_us:g} us")
-    print(f"Syndrome duration:  {round_duration_us:g} us per round")
-    print(f"Shots per point:    {args.shots}")
-    print("Decoder:            syndrome history (approximate circuit weights)")
-    for experiment in experiments:
-        print(f"\nLogical {experiment.basis}-basis memory")
-        print("rounds  interval(us)  idle(us)  decoded failure (CI)       raw failure  events/shot")
-        for point in experiment.points:
-            print(
-                f"{point.rounds:6d}  {point.interval_us:12.3f}  "
-                f"{point.idle_per_round_us:8.3f}  "
-                f"{point.logical_failure_rate:8.3%} "
-                f"[{point.confidence_low:7.3%}, {point.confidence_high:7.3%}]  "
-                f"{point.raw_logical_failure_rate:10.3%}  "
-                f"{point.mean_detection_events:11.3f}"
-            )
-        print(f"Best sampled cadence: n={experiment.optimum_rounds}")
-        print(f"Bare-qubit reference: {experiment.bare_qubit_failure_rate:.3%}")
-    return 0
-
-
 def _info_payload() -> dict[str, Any]:
     grid = [
         list(PATCH.data_qubits[row * PATCH.distance : (row + 1) * PATCH.distance])
@@ -639,12 +415,7 @@ def _info_command(args: argparse.Namespace) -> int:
 
 
 def _circuit_command(args: argparse.Namespace) -> int:
-    circuit = (
-        to_qiskit(args.error)
-        if args.rounds is None
-        else to_memory_circuit(args.rounds, args.error, preparation=args.preparation)
-    )
-    print(circuit.draw(output="text"))
+    print(to_qiskit(args.error).draw(output="text"))
     return 0
 
 
@@ -868,8 +639,6 @@ def main(argv: list[str] | None = None, *, lines: Sequence[str] | None = None) -
         "syndrome": _syndrome_command,
         "decode": _decode_command,
         "sweep": _sweep_command,
-        "memory": _memory_command,
-        "cadence": _cadence_command,
         "circuit": _circuit_command,
         "info": _info_command,
     }
