@@ -1,14 +1,22 @@
-"""Simulators for the syndrome circuit. Aer is the first backend.
+"""Heavy-hex simulators. Aer is the first backend.
 
 Run: python -m surface_code
 """
 
-from .aer import run_aer, shot_z_success, to_qiskit
+from .heavyhex_aer import (
+    flagged_syndrome,
+    run_flagged_circuit,
+    run_memory,
+    run_memory_flagged,
+    syndrome_from_checks,
+)
 from .noise import depolarizing_error
 
 __all__ = [
     "depolarizing_error",
-    "run_aer",
-    "shot_z_success",
-    "to_qiskit",
+    "flagged_syndrome",
+    "run_flagged_circuit",
+    "run_memory",
+    "run_memory_flagged",
+    "syndrome_from_checks",
 ]
