@@ -153,5 +153,5 @@ def test_single_faults_never_grow_or_go_silent(basis):
 def test_flagged_memory_rejects_bad_options():
     with pytest.raises(ValueError, match="positive integer"):
         run_memory_flagged(shots=0)
-    with pytest.raises(ValueError, match="d=3 only"):
-        memory_circuit_flagged(build_operators(5))
+    with pytest.raises(ValueError, match="d=3 and d=5 only"):
+        memory_circuit_flagged(build_operators(7))

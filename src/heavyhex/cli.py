@@ -1,7 +1,7 @@
 """Command-line tools for the heavy-hex subsystem code.
 
-Data-qubit ids are 0-based (paper Q label = id + 1). Decoding, flagged circuits
-and Aer runs are d=3 only; d=5 reports detection.
+Data-qubit ids are 0-based (paper Q label = id + 1). Lookup decoding is
+d=3 only; d=5 circuits and Aer runs report syndromes without decoded success.
 """
 
 from __future__ import annotations
@@ -260,13 +260,13 @@ def _run_command(args: argparse.Namespace) -> int:
     from .simulation.aer import run_memory_flagged  # qiskit-aer is an optional extra
 
     patch = _patch(args)
-    _require_d3(patch, "flagged Aer runs")
     error = parse_error(args.error, patch) if args.error else None
     records = run_memory_flagged(
         patch, basis=args.basis, error=error, shots=args.shots, seed=args.seed
     )
 
-    successes = sum(1 for record in records if record["success"])
+    graded = all(record["success"] is not None for record in records)
+    successes = sum(1 for record in records if record["success"]) if graded else None
     syndromes = Counter("".join(map(str, record["syndrome"])) for record in records)
     # Most frequent syndrome, ties broken lexicographically for reproducibility.
     dominant = min(syndromes, key=lambda bits: (-syndromes[bits], bits))
@@ -282,9 +282,9 @@ def _run_command(args: argparse.Namespace) -> int:
     if args.counts:
         payload["syndrome_counts"] = dict(syndromes)
     lines = [
-        "Backend:  Aer stabilizer (flagged d=3 memory, one round)",
+        f"Backend:  Aer stabilizer (flagged d={patch.distance} memory, one round)",
         f"Error:    {format_pauli(error, patch) if error else 'I'}",
-        f"Shots:    {len(records)}  successes: {successes}",
+        f"Shots:    {len(records)}  successes: {successes if graded else 'not decoded'}",
         f"Syndrome: {dominant}  ({len(syndromes)} distinct)",
     ]
     return _emit(payload, lines, as_json=args.json)
@@ -294,7 +294,6 @@ def _circuit_command(args: argparse.Namespace) -> int:
     from .circuits.flagged import memory_circuit_flagged  # qiskit is an optional extra
 
     patch = _patch(args)
-    _require_d3(patch, "flagged circuits")
     error = parse_error(args.error, patch) if args.error else None
     circuit, _ = memory_circuit_flagged(patch, basis=args.basis, error=error)
     print(circuit.draw(output="text"))
@@ -331,14 +330,16 @@ def build_parser() -> argparse.ArgumentParser:
     sweep.add_argument("--details", action="store_true")
     sweep.add_argument("--failures-only", action="store_true")
 
-    run = sub.add_parser("run", help="Flagged Aer memory round (d=3)")
+    run = sub.add_parser(
+        "run", help="Flagged Aer memory round (d=3 or d=5; lookup grading only at d=3)"
+    )
     run.add_argument("--basis", type=str.upper, choices=BASES, default="Z")
     run.add_argument("--shots", type=int, default=128)
     run.add_argument("--seed", type=int, default=None)
     run.add_argument("--error", default=None, help="e.g. 'X0 Z3'")
     run.add_argument("--counts", action="store_true")
 
-    circuit = sub.add_parser("circuit", help="Draw the flagged memory circuit (d=3)")
+    circuit = sub.add_parser("circuit", help="Draw the flagged memory circuit (d=3 or d=5)")
     circuit.add_argument("--basis", type=str.upper, choices=BASES, default="Z")
     circuit.add_argument("--error", default=None, help="e.g. 'X0 Z3'")
     return parser

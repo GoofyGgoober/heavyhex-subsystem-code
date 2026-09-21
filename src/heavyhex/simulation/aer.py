@@ -191,7 +191,7 @@ def run_flagged_circuit(
     seed: int | None = None,
     grade: bool = True,
 ) -> list[Record]:
-    """Parse Aer counts for a (possibly fault-injected) flagged circuit."""
+    """Parse flagged counts; success is None when no supported decoder is available."""
     _validate_options(shots, seed)
     counts = _sample_counts(circuit, shots, seed)
 
@@ -199,7 +199,7 @@ def run_flagged_circuit(
     basis = schedule.basis
     n_data = patch.distance * patch.distance
     support = _logical_support(patch, basis)
-    grade = grade and schedule.rounds == 1
+    grade = grade and schedule.rounds == 1 and patch.distance == 3
     records: list[Record] = []
     for key, count in counts.items():
         data_bits, gauge_bits = _shot_bits(key, n_data, len(schedule.measurements))

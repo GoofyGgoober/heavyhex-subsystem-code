@@ -1,17 +1,20 @@
-"""Device-faithful flagged d=3 heavy-hex circuits (Sundaresan et al. 2023, Fig. 4).
+"""Device-faithful flagged d=3 and d=5 heavy-hex circuits (Sundaresan et al. 2023, Fig. 4).
 
-23 qubits with reset reuse: 9 data + 6 in-row flags (X gauges) + 4 Z syndromes +
-4 boundary relays. Flags catch hook errors in the weight-4 Z gadgets; the CX
-orders below are verified by single-fault enumeration in the test suite.
+Reset reuse needs 23 qubits at d=3 and 65 at d=5: data, in-row X-gauge
+ancillas (also Z-gadget flags), Z syndromes, and boundary relays. Gadget-local
+CX orders are checked by single-fault enumeration; full circuit-level distance
+with noisy decoding remains to be validated.
 """
 
 from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import dataclass
+from functools import cached_property
 from itertools import product
 from typing import TYPE_CHECKING
 
+from .._validation import validate_binary_bits
 from ..core import Pauli
 from ..patches.operators import D3, HeavyHexOperators
 from .ideal import _apply_pauli, _half_order, _stabilizer_checks
@@ -66,14 +69,54 @@ FALCON = {
     22: 25,
 }
 
-# The flag's other data qubit: back-action is Z_a Z_b, DEFLAG takes one factor.
-_RESIDUAL_OF_FLAG = {
-    flag: next(q for q in pair if q != DEFLAG[flag])
-    for arms in Z4_ARMS.values()
-    for pair, flag in arms
-}
-_Z_HALF_BITS = 3 * len(Z_HALF_ORDER)  # two flags or relays + one syndrome per gauge
-_X_HALF_BITS = len(X_HALF_ORDER)
+
+@dataclass(frozen=True)
+class FlaggedRoles:
+    """Abstract circuit indices, independent of the physical device placement."""
+
+    num_data: int
+    num_qubits: int
+    flag_of_x: dict[str, int]
+    syn_of_z: dict[str, int]
+    z4_arms: dict[str, tuple[tuple[tuple[int, int], str], ...]]
+    z2_arms: dict[str, tuple[tuple[int, int], ...]]
+    deflag: dict[str, int]
+    residual: dict[str, int]
+
+
+def flagged_roles(patch: HeavyHexOperators = D3) -> FlaggedRoles:
+    """Build the blueprint's data, in-row flags, Z syndromes and boundary relays.
+
+    Numerical support ordering preserves the historical d=3 circuit ordering.
+    Each Z plaquette uses its upper and lower X-gauge ancillas in that order;
+    lone flags receive the upper-left / lower-right virtual Z correction.
+    """
+    if patch.distance not in (3, 5):
+        raise ValueError("flagged circuits support d=3 and d=5 only")
+    n = patch.distance**2
+    xs = sorted(patch.x_gauges, key=lambda name: patch.x_gauges[name])
+    zs = sorted(patch.z_gauges, key=lambda name: patch.z_gauges[name])
+    flags = {name: n + i for i, name in enumerate(xs)}
+    syndromes = {name: n + len(xs) + i for i, name in enumerate(zs)}
+    by_support = {tuple(sorted(support)): name for name, support in patch.x_gauges.items()}
+    z4, z2, deflag, residual = {}, {}, {}, {}
+    next_qubit = n + len(xs) + len(zs)
+    for name in zs:
+        support = sorted(patch.z_gauges[name])
+        if len(support) == 2:
+            z2[name] = tuple((q - 1, next_qubit + i) for i, q in enumerate(support))
+            next_qubit += 2
+        else:
+            a, b, c, d = support
+            arms = []
+            for i, pair in enumerate(((a, c), (b, d))):
+                flag = by_support[pair]
+                data = tuple(q - 1 for q in pair)
+                arms.append((data, flag))
+                deflag[flag] = data[i]
+                residual[flag] = data[1 - i]
+            z4[name] = tuple(arms)
+    return FlaggedRoles(n, next_qubit, flags, syndromes, z4, z2, deflag, residual)
 
 
 @dataclass(frozen=True)
@@ -105,9 +148,17 @@ class FlaggedSchedule:
     fragments: tuple[Fragment, ...]
     half_order: tuple[tuple[int, str], ...]
 
+    @cached_property
+    def roles(self) -> FlaggedRoles:
+        return flagged_roles(self.patch)
+
     def checks(self, gauge_bits: tuple[int, ...]) -> dict[tuple[int, str], int]:
-        # Relay outcomes share their gauge's key and are overwritten by the syndrome bit.
-        outcomes = {(m.round, m.half, m.gauge): gauge_bits[m.bit] for m in self.measurements}
+        validate_binary_bits("gauge outcomes", gauge_bits, len(self.measurements))
+        outcomes = {
+            (m.round, m.half, m.gauge): gauge_bits[m.bit]
+            for m in self.measurements
+            if m.kind in ("z_syn", "x_gauge")
+        }
         return _stabilizer_checks(self.patch, outcomes)
 
     def deflag_corrections(
@@ -115,7 +166,7 @@ class FlaggedSchedule:
     ) -> list[tuple[tuple[int, str], Pauli]]:
         """Virtual Z corrections for lone flags, tagged by (round, half) of their Z half."""
         return [
-            ((round, "Z"), Pauli.z_on((DEFLAG[flag],)))
+            ((round, "Z"), Pauli.z_on((self.roles.deflag[flag],)))
             for round, flag in self._lone_flags(gauge_bits)
         ]
 
@@ -124,11 +175,12 @@ class FlaggedSchedule:
     ) -> list[tuple[tuple[int, str], Pauli]]:
         """Weight-1 Z left on the flag's other data qubit once DEFLAG cancels one factor.
 
-        Deterministic given the flags, so single-shot decoding subtracts them
-        instead of handing the lookup a weight-2 error.
+        This is the ideal gadget back-action used for noiseless and injected
+        data-error validation. Noisy flags require circuit-aware decoding;
+        these residuals must not be treated as known faults in that setting.
         """
         return [
-            ((round, "Z"), Pauli.z_on((_RESIDUAL_OF_FLAG[flag],)))
+            ((round, "Z"), Pauli.z_on((self.roles.residual[flag],)))
             for round, flag in self._lone_flags(gauge_bits)
         ]
 
@@ -137,6 +189,7 @@ class FlaggedSchedule:
 
         Both flags firing leaves the full gauge operator, which is harmless.
         """
+        validate_binary_bits("gauge outcomes", gauge_bits, len(self.measurements))
         bits = {
             (m.round, m.gauge): gauge_bits[m.bit] for m in self.measurements if m.kind == "z_flag"
         }
@@ -144,7 +197,8 @@ class FlaggedSchedule:
         return [
             (round, first if bits[round, first] else second)
             for round in rounds
-            for first, second in FLAGS_OF_Z4.values()
+            for arms in self.roles.z4_arms.values()
+            for first, second in [(arms[0][1], arms[1][1])]
             if bool(bits[round, first]) != bool(bits[round, second])
         ]
 
@@ -157,23 +211,22 @@ def memory_circuit_flagged(
     error: Pauli | None = None,
     inject_at: str = "after_prep",
 ) -> tuple[QuantumCircuit, FlaggedSchedule]:
-    """Flagged memory circuit on 23 reused qubits; same shape as ideal.memory_circuit."""
+    """Flagged memory on 23 (d=3) or 65 (d=5) reused qubits."""
     from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 
-    if patch.distance != 3:
-        raise ValueError("flagged gadgets are implemented for d=3 only")
+    roles = flagged_roles(patch)
     prep_half, halves = _half_order(patch, rounds, basis, error, inject_at)
 
-    total = _Z_HALF_BITS * (rounds + (prep_half == "Z")) + _X_HALF_BITS * (
+    total = 3 * len(roles.syn_of_z) * (rounds + (prep_half == "Z")) + len(roles.flag_of_x) * (
         rounds + (prep_half == "X")
     )
-    qubits = QuantumRegister(NUM_QUBITS, "q")
+    qubits = QuantumRegister(roles.num_qubits, "q")
     gauge = ClassicalRegister(total, "m")
-    data = ClassicalRegister(NUM_DATA, "d")
+    data = ClassicalRegister(roles.num_data, "d")
     circuit = QuantumCircuit(qubits, gauge, data)
 
     if basis == "X":
-        circuit.h(list(range(NUM_DATA)))
+        circuit.h(list(range(roles.num_data)))
 
     measurements: list[FlaggedMeasurement] = []
     fragments: list[Fragment] = []
@@ -187,34 +240,36 @@ def memory_circuit_flagged(
         bit += 1
 
     def measure_z4(round: int, name: str) -> None:
-        (pair_a, gauge_a), (pair_b, gauge_b) = Z4_ARMS[name]
-        syndrome = SYN_OF_Z[name]
+        (pair_a, gauge_a), (pair_b, gauge_b) = roles.z4_arms[name]
+        syndrome = roles.syn_of_z[name]
         flag_a, flag_b = _z4_fragment(
-            circuit, ((pair_a, FLAG_OF_X[gauge_a]), (pair_b, FLAG_OF_X[gauge_b])), syndrome
+            circuit,
+            ((pair_a, roles.flag_of_x[gauge_a]), (pair_b, roles.flag_of_x[gauge_b])),
+            syndrome,
         )
         record(round, "Z", "z_flag", gauge_a, flag_a)
         record(round, "Z", "z_flag", gauge_b, flag_b)
         record(round, "Z", "z_syn", name, syndrome)
 
     def measure_z2(round: int, name: str) -> None:
-        syndrome = SYN_OF_Z[name]
-        relay_a, relay_b = _z2_fragment(circuit, Z2_ARMS[name], syndrome)
+        syndrome = roles.syn_of_z[name]
+        relay_a, relay_b = _z2_fragment(circuit, roles.z2_arms[name], syndrome)
         record(round, "Z", "relay", name, relay_a)
         record(round, "Z", "relay", name, relay_b)
         record(round, "Z", "z_syn", name, syndrome)
 
     def measure_x2(round: int, name: str) -> None:
         first, second = (q - 1 for q in patch.x_gauges[name])
-        _x2_fragment(circuit, (first, second), FLAG_OF_X[name])
-        record(round, "X", "x_gauge", name, FLAG_OF_X[name])
+        _x2_fragment(circuit, (first, second), roles.flag_of_x[name])
+        record(round, "X", "x_gauge", name, roles.flag_of_x[name])
 
     def run_half(round: int, half: str) -> None:
         half_order.append((round, half))
-        for name in Z_HALF_ORDER if half == "Z" else X_HALF_ORDER:
+        for name in roles.syn_of_z if half == "Z" else roles.flag_of_x:
             start = len(circuit.data)
             if half == "X":
                 measure_x2(round, name)
-            elif name in Z4_ARMS:
+            elif name in roles.z4_arms:
                 measure_z4(round, name)
             else:
                 measure_z2(round, name)
@@ -234,8 +289,8 @@ def memory_circuit_flagged(
                 _apply_pauli(circuit, error)
 
     if basis == "X":
-        circuit.h(list(range(NUM_DATA)))
-    for i in range(NUM_DATA):
+        circuit.h(list(range(roles.num_data)))
+    for i in range(roles.num_data):
         circuit.measure(i, data[i])
 
     return circuit, FlaggedSchedule(
@@ -352,7 +407,9 @@ def propagate_fault(
             z_set.difference_update((qubit,))
         else:  # pragma: no cover - fragments contain only the above
             raise ValueError(f"unexpected instruction in fragment: {name}")
-    data = set(range(NUM_DATA))
+    # Builders place data first and expose their width in the final-readout register.
+    data_register = next(register for register in circuit.cregs if register.name == "d")
+    data = set(range(len(data_register)))
     return Pauli(frozenset(x_set & data), frozenset(z_set & data)), frozenset(flipped)
 
 

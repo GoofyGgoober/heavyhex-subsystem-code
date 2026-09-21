@@ -84,8 +84,6 @@ def test_run_reports_successes(capsys):
     [
         (["syndrome", "Q1"], "cannot parse"),
         (["decode", "010"], "6 bits"),
-        (["--distance", "5", "run"], "d=3 only"),
-        (["--distance", "5", "circuit"], "d=3 only"),
         (["run", "--basis", "Y"], "invalid choice"),
         (["sweep", "--weight", "1", "--axes", "Q"], "selection from XYZ"),
         (["sweep", "--weight", "99"], "weight must be in 0..9"),
@@ -114,3 +112,18 @@ def test_missing_qiskit_extra_is_reported_not_raised(argv, monkeypatch, capsys):
     monkeypatch.setitem(sys.modules, "qiskit_aer", None)
     assert main(argv) == 1
     assert "pip install" in capsys.readouterr().err
+
+
+def test_d5_run_is_explicitly_ungraded(capsys):
+    pytest.importorskip("qiskit_aer")
+    assert main(["--distance", "5", "--json", "run", "--shots", "8", "--seed", "7"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["shots"] == 8
+    assert payload["successes"] is None
+    assert payload["dominant_syndrome"] == "0" * 16
+
+
+def test_d5_circuit_is_available(capsys):
+    pytest.importorskip("qiskit")
+    assert main(["--distance", "5", "circuit"]) == 0
+    assert "q_64" in capsys.readouterr().out
