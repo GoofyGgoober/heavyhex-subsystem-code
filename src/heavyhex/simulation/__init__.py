@@ -1,9 +1,6 @@
-"""Heavy-hex simulators. Aer is the first backend.
+"""Aer-backed heavy-hex simulators."""
 
-Run: python -m surface_code
-"""
-
-from .heavyhex_aer import (
+from .aer import (
     flagged_syndrome,
     run_flagged_circuit,
     run_memory,

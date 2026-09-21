@@ -2,12 +2,16 @@
 
 import pytest
 
-from surface_code.core.subsystem import SubsystemCode
-from surface_code.patches.heavyhex import (
-    D3,
-    D5,
-    GAUGE_QUBITS_D3,
-    build_operators,
+from heavyhex.core import Pauli
+from heavyhex.core.subsystem import SubsystemCode
+from heavyhex.patches.operators import D3, D5, build_operators
+
+PATCHES = [pytest.param(D3, id="d3"), pytest.param(D5, id="d5")]
+
+# d=3 gauge qubits A = (X1X4, Z1Z2) and B = (X5X8, Z8Z9), 0-based ids.
+GAUGE_QUBITS_D3 = (
+    (Pauli.x_on((0, 3)), Pauli.z_on((0, 1))),
+    (Pauli.x_on((4, 7)), Pauli.z_on((7, 8))),
 )
 
 
@@ -20,28 +24,42 @@ def test_d3_operator_names_match_the_paper_convention():
     assert D3.logical_z == (1, 4, 7)
 
 
-def test_counts_follow_the_chamberland_formulas():
-    for patch in (D3, D5):
-        d = patch.distance
-        assert len(patch.x_gauges) == d * (d - 1)
-        assert len(patch.z_gauges) == (d * d - 1) // 2
-        assert len(patch.z_stabilizers) == d - 1
-        code = patch.code
-        assert code.gauge_qubit_count() == (d - 1) ** 2 // 2
-        assert code.logical_count() == 1
+@pytest.mark.parametrize("patch", PATCHES)
+def test_counts_follow_the_chamberland_formulas(patch):
+    d = patch.distance
+    assert len(patch.x_gauges) == d * (d - 1)
+    assert len(patch.z_gauges) == (d * d - 1) // 2
+    assert len(patch.z_stabilizers) == d - 1
+    assert patch.code.gauge_qubit_count() == (d - 1) ** 2 // 2
+    assert patch.code.logical_count() == 1
 
 
-def test_stabilizers_are_central_gauge_products():
+@pytest.mark.parametrize("patch", PATCHES)
+def test_stabilizers_are_independent_products_of_same_basis_gauges(patch):
     # Constructing SubsystemCode already asserts centrality and gauge membership.
-    for patch in (D3, D5):
-        code = patch.code
-        assert code.stabilizer_rank() == len(patch.x_stabilizers) + len(patch.z_stabilizers)
-        factors = patch.stabilizer_gauge_factors()
-        assert set(factors) == set(patch.x_stabilizers) | set(patch.z_stabilizers)
+    stabilizers = {**patch.x_stabilizers, **patch.z_stabilizers}
+    gauges = {**patch.x_gauges, **patch.z_gauges}
+    assert patch.code.stabilizer_rank() == len(stabilizers)
+    factors = patch.stabilizer_gauge_factors
+    assert set(factors) == set(stabilizers)
+    for name, support in stabilizers.items():
+        product: set[int] = set()
+        for gauge in factors[name]:
+            product ^= set(gauges[gauge])
+        assert product == set(support)
+
+
+@pytest.mark.parametrize("patch", PATCHES)
+def test_stabilizer_names_track_the_code_stabilizer_order(patch):
+    # simulation/ zips these names against code.stabilizers.
+    supports = {**patch.x_stabilizers, **patch.z_stabilizers}
+    assert patch.stabilizer_names == tuple(supports)
+    for name, pauli in zip(patch.stabilizer_names, patch.code.stabilizers, strict=True):
+        assert pauli.x | pauli.z == {q - 1 for q in supports[name]}
 
 
 def test_d3_stabilizer_gauge_factors():
-    factors = D3.stabilizer_gauge_factors()
+    factors = D3.stabilizer_gauge_factors
     assert set(factors["Z1Z2Z4Z5Z7Z8"]) == {"Z1Z2", "Z4Z5Z7Z8"}
     assert set(factors["X1X2X4X5"]) == {"X1X4", "X2X5"}
     assert factors["X4X7"] == ("X4X7",)
@@ -64,14 +82,13 @@ def test_d3_gauge_qubits_factor_the_codespace():
         assert gauge.commutes(code.logical_x) and gauge.commutes(code.logical_z)
 
 
-def test_d3_distance_is_three_with_weight_two_holes_in_the_gauge_group():
-    code = D3.code
-    assert code.min_harmful_weight(max_weight=2) is None
-    assert code.distance() == 3
+@pytest.mark.parametrize("patch", PATCHES)
+def test_no_harmful_error_below_weight_three(patch):
+    assert patch.code.min_harmful_weight(max_weight=2) is None
 
 
-def test_d5_has_no_harmful_error_below_weight_three():
-    assert D5.code.min_harmful_weight(max_weight=2) is None
+def test_d3_distance_is_three():
+    assert D3.code.distance() == 3
 
 
 def test_gauge_group_rejects_non_central_stabilizers():

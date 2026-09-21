@@ -7,7 +7,3 @@ __pycache__/
 dist/
 build/
 
-# Regenerable plot outputs (PNGs are kept for the README; JSON/CSV are the record)
-artifacts/**/*.svg
-artifacts/**/*.json.tmp
-

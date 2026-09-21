@@ -1,4 +1,4 @@
-"""Code-capacity depolarizing noise on data qubits."""
+"""Code-capacity depolarizing noise: sampled Pauli errors, not circuit-level noise."""
 
 from __future__ import annotations
 

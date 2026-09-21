@@ -1,10 +1,10 @@
-"""Lookup decoder: every correction is min-weight and subsystem-correct."""
+"""Lookup decoder: every correction is minimum weight and subsystem-correct."""
 
 import pytest
 
-from surface_code.core import Pauli
-from surface_code.decoders.heavyhex_lookup import decode, residual_in_gauge_group
-from surface_code.patches.heavyhex import D3
+from heavyhex.core import Pauli
+from heavyhex.decoders.lookup import decode, residual_in_gauge_group
+from heavyhex.patches.operators import D3, D5
 
 CODE = D3.code
 
@@ -36,6 +36,12 @@ def test_logical_operators_are_invisible_but_fatal():
     assert not residual_in_gauge_group(CODE.logical_x)
 
 
-def test_decode_rejects_malformed_syndromes():
+@pytest.mark.parametrize("syndrome", [(0,) * 5, (0,) * 7, (2,) * 6])
+def test_decode_rejects_malformed_syndromes(syndrome):
     with pytest.raises(ValueError, match="6 bits"):
-        decode((0,) * 5)
+        decode(syndrome)
+
+
+def test_lookup_refuses_distances_beyond_reach():
+    with pytest.raises(ValueError, match="infeasible"):
+        decode((0,) * D5.code.syndrome_size, D5.code)

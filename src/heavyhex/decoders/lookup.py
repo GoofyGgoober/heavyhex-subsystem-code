@@ -1,21 +1,21 @@
-"""Lookup decoder for the heavy-hex code: check syndrome -> min-weight correction.
+"""Lookup decoder for the heavy-hex code: syndrome -> minimum-weight correction.
 
-Success is subsystem success: the residual (correction * error) must lie in
-the gauge group, i.e. act as identity on the logical factor. Syndrome bits
-follow SubsystemCode.stabilizers order (X stabilizers, then Z stabilizers).
+Success means the residual (correction * error) lies in the gauge group.
+Syndrome bits follow SubsystemCode.stabilizers order: X stabilizers, then Z.
 """
 
 from functools import cache
 
 from ..core import Pauli
 from ..core.subsystem import SubsystemCode
-from ..patches.heavyhex import D3
+from ..patches.operators import D3
 
 Syndrome = tuple[int, ...]
 
 
 @cache
 def _table(code: SubsystemCode) -> dict[Syndrome, Pauli]:
+    """Minimum-weight representative per syndrome; only viable for d=3."""
     if code.syndrome_size > 8:
         raise ValueError(
             f"lookup over {1 << code.syndrome_size} syndromes is infeasible; "

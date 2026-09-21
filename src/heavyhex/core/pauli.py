@@ -1,14 +1,9 @@
-"""n-qubit Paulis, up to phase.
-
-A Pauli is a pair of bit-sets: X support and Z support. A qubit in both
-is Y. Phase is dropped — we only need commutation and the stabilizer
-group as a vector space over GF(2).
-"""
+"""n-qubit Paulis up to phase: X and Z supports; a qubit in both carries Y."""
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 
 @dataclass(frozen=True)
