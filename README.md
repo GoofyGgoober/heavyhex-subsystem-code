@@ -20,3 +20,8 @@ heavyhex --help
 ```
 
 Data qubit ids are 0-based; the paper's Q label is id + 1.
+
+Before anything goes to hardware, run `heavyhex calibrate` to pull today's Fez
+numbers and pick where the patches go, then redraw with
+`python docs/figures/draw_blueprint.py`. Hardware runs pull fresh numbers
+themselves if the last ones aren't from today.

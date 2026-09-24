@@ -2,6 +2,7 @@
 
 import json
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -174,3 +175,18 @@ def test_missing_matching_extra_is_reported(monkeypatch, capsys):
     monkeypatch.setitem(sys.modules, "pymatching", None)
     assert main(["mwpm-sim", "--shots", "1"]) == 1
     assert "[sim,matching]" in capsys.readouterr().err
+
+
+def test_calibrate_offline_reports_the_saved_picks(capsys):
+    figures = Path(__file__).resolve().parents[1] / "docs" / "figures"
+    argv = ["--json", "calibrate", "--offline", "--file", str(figures / "fez_calibration.json")]
+    assert main(argv + ["--map", str(figures / "fez_map.json")]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert set(payload["spots"]) == {"3", "5"}
+    assert payload["spots"]["3"]["broken"] == []
+
+
+def test_missing_hardware_extra_is_reported(monkeypatch, capsys):
+    monkeypatch.setitem(sys.modules, "qiskit_ibm_runtime", None)
+    assert main(["calibrate", "--file", "/nonexistent/calibration.json"]) == 1
+    assert "[hardware]" in capsys.readouterr().err

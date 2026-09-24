@@ -9,3 +9,8 @@ build/
 
 # Personal Claude Code overrides
 .claude/settings.local.json
+
+# Never commit credentials
+apikey*.json
+qiskit-ibm.json
+.env

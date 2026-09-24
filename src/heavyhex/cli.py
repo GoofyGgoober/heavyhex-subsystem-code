@@ -12,6 +12,7 @@ import re
 import sys
 from collections import Counter
 from collections.abc import Sequence
+from pathlib import Path
 from typing import Any
 
 from .core import Pauli
@@ -22,6 +23,7 @@ PATCHES: dict[int, HeavyHexOperators] = {3: D3, 5: D5}
 AXES = "XYZ"
 BASES = ("X", "Z")
 INSTALL_HINT = "python -m pip install -e '.[sim,matching]'"
+HARDWARE_HINT = "python -m pip install -e '.[hardware]'"
 _PAULI_WORD = re.compile(r"([XYZ])(\d+)", re.IGNORECASE)
 
 
@@ -321,6 +323,49 @@ def _mwpm_sim_command(args: argparse.Namespace) -> int:
     )
 
 
+def _calibrate_command(args: argparse.Namespace) -> int:
+    from .patches.layout import build_layout
+    from .patches.placement import Calibration, best_spots, calibrate, cost, problems, weak
+
+    if args.offline:
+        calibration = Calibration.load(args.file)
+    else:
+        calibration = calibrate(args.backend, args.file)
+    device = json.loads(Path(args.map).read_text())
+    spots = best_spots(device["coords"], device["edges"], calibration)
+    picks = {}
+    for d, spot in sorted(spots.items()):
+        layout = build_layout(
+            d, device["coords"], device["edges"], origin=spot.origin, direction=spot.direction
+        )
+        picks[d] = {
+            "origin": list(spot.origin),
+            "direction": list(spot.direction),
+            "errors_per_round": round(cost(layout, calibration), 3),
+            "broken": problems(layout, calibration),
+            "weak": weak(layout, calibration),
+        }
+    lines = [
+        f"{calibration.backend} calibrated {calibration.calibrated}, "
+        f"pulled {calibration.pulled}" + ("" if args.offline else f", saved to {args.file}")
+    ]
+    for d, pick in picks.items():
+        broken = f"; {', '.join(pick['broken'])}" if pick["broken"] else ""
+        lines.append(
+            f"d={d}: data qubit 1 at {tuple(pick['origin'])} facing {tuple(pick['direction'])}, "
+            f"~{pick['errors_per_round']:.2f} errors per round{broken}"
+        )
+        lines += [f"    weak: {part}" for part in pick["weak"]]
+    lines.append("Redraw with: python docs/figures/draw_blueprint.py")
+    payload = {
+        "backend": calibration.backend,
+        "calibrated": calibration.calibrated,
+        "pulled": calibration.pulled,
+        "spots": picks,
+    }
+    return _emit(payload, lines, as_json=args.json)
+
+
 COMMANDS = {
     "info": _info_command,
     "syndrome": _syndrome_command,
@@ -329,6 +374,7 @@ COMMANDS = {
     "run": _run_command,
     "circuit": _circuit_command,
     "mwpm-sim": _mwpm_sim_command,
+    "calibrate": _calibrate_command,
 }
 
 
@@ -379,17 +425,29 @@ def build_parser() -> argparse.ArgumentParser:
     mwpm_sim.add_argument("--data-error", type=float, default=0.01)
     mwpm_sim.add_argument("--measurement-error", type=float, default=0.01)
     mwpm_sim.add_argument("--readout-error", type=float, default=0.0)
+
+    from .patches.placement import FEZ_MAP, LAST_CALIBRATION
+
+    calibrate = sub.add_parser(
+        "calibrate", help="Pull IBM's latest calibration (read-only) and pick the patch spots"
+    )
+    calibrate.add_argument("--backend", default="ibm_fez")
+    calibrate.add_argument("--file", default=str(LAST_CALIBRATION))
+    calibrate.add_argument("--map", default=str(FEZ_MAP))
+    calibrate.add_argument(
+        "--offline", action="store_true", help="use the last calibration instead of asking IBM"
+    )
     return parser
 
 
-def _missing_extra(error: ImportError) -> bool:
-    return (error.name or "").split(".", 1)[0] in (
-        "qiskit",
-        "qiskit_aer",
-        "pymatching",
-        "numpy",
-        "scipy",
-    )
+def _install_hint(error: ImportError) -> str | None:
+    """How to install the optional package that failed to import, if it is one."""
+    module = (error.name or "").split(".", 1)[0]
+    if module == "qiskit_ibm_runtime":
+        return HARDWARE_HINT
+    if module in ("qiskit", "qiskit_aer", "pymatching", "numpy", "scipy"):
+        return INSTALL_HINT
+    return None
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -405,10 +463,11 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     except ImportError as error:
         # qiskit, numpy and pymatching are optional and only imported where needed.
-        if not _missing_extra(error):
+        hint = _install_hint(error)
+        if hint is None:
             raise
         print(
-            f"Error: the {args.command} command needs optional dependencies: {INSTALL_HINT}",
+            f"Error: the {args.command} command needs optional dependencies: {hint}",
             file=sys.stderr,
         )
         return 1
