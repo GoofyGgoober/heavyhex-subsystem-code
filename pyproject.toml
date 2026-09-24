@@ -14,7 +14,8 @@ heavyhex = "heavyhex.cli:main"
 
 [project.optional-dependencies]
 sim = ["qiskit>=2", "qiskit-aer>=0.15"]
-test = ["pytest", "heavyhex-scalability-check[sim]"]
+matching = ["numpy>=1.24,<3", "pymatching>=2.3,<3"]
+test = ["pytest", "heavyhex-scalability-check[sim,matching]"]
 dev = ["heavyhex-scalability-check[sim,test]", "ruff>=0.16,<0.17"]
 
 [tool.setuptools.packages.find]

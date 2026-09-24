@@ -1,34 +1,22 @@
-"""Aer runners for the heavy-hex memory experiments, graded by lookup decoding."""
+"""Run memory circuits on Aer's stabilizer simulator and grade each shot."""
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
-from .._validation import validate_binary_bits
+from .._validation import validate_binary_bits, validate_shots_and_seed
 from ..circuits.flagged import FlaggedSchedule, memory_circuit_flagged
 from ..circuits.ideal import MemorySchedule, memory_circuit
 from ..core import Pauli
 from ..decoders.lookup import decode
+from ..decoders.shots import Shot, read_shot
 from ..patches.operators import D3, HeavyHexOperators
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
 
-MAX_SEED = (1 << 63) - 1
-
 Record = dict[str, Any]
-# Virtual Pauli corrections tagged by the (round, half) they apply after.
-Corrections = list[tuple[tuple[int, str], Pauli]]
-
-
-def _validate_options(shots: int, seed: int | None) -> None:
-    if not isinstance(shots, int) or isinstance(shots, bool) or shots <= 0:
-        raise ValueError(f"shots must be a positive integer, got {shots!r}")
-    if seed is not None and (
-        not isinstance(seed, int) or isinstance(seed, bool) or seed < 0 or seed > MAX_SEED
-    ):
-        raise ValueError(f"seed must be an integer from 0 to {MAX_SEED}, or None, got {seed!r}")
 
 
 def _sample_counts(circuit: QuantumCircuit, shots: int, seed: int | None) -> dict[str, int]:
@@ -40,49 +28,43 @@ def _sample_counts(circuit: QuantumCircuit, shots: int, seed: int | None) -> dic
     return AerSimulator(method="stabilizer").run(circuit, **options).result().get_counts()
 
 
-def _bits_le(bitstring: str) -> tuple[int, ...]:
-    return tuple(int(bit) for bit in bitstring[::-1])
-
-
-def _shot_bits(key: str, n_data: int, n_gauge: int) -> tuple[tuple[int, ...], tuple[int, ...]]:
-    """Split one Aer count key into little-endian (data bits, gauge bits)."""
+def _split_key(key: str, n_data: int, n_gauge: int) -> tuple[tuple[int, ...], tuple[int, ...]]:
+    """Aer count key -> (data bits, gauge bits), each with bit 0 first."""
     data_str, gauge_str = key.split()
-    data_bits, gauge_bits = _bits_le(data_str), _bits_le(gauge_str)
+    data_bits = tuple(int(bit) for bit in data_str[::-1])
+    gauge_bits = tuple(int(bit) for bit in gauge_str[::-1])
     validate_binary_bits("data readout", data_bits, n_data)
     validate_binary_bits("gauge outcomes", gauge_bits, n_gauge)
     return data_bits, gauge_bits
 
 
-def _logical_support(patch: HeavyHexOperators, basis: str) -> frozenset[int]:
-    logical = patch.code.logical_x if basis == "X" else patch.code.logical_z
-    return logical.x or logical.z
+def _lookup_fails(shot: Shot) -> bool:
+    """Decode the round-0 syndrome with the lookup table and check the logical readout."""
+    code = shot.memory.patch.code
+    return shot.logical_error(decode(shot.detectors[: code.syndrome_size], code))
 
 
-def _survives(data_bits: tuple[int, ...], flips: Iterable[int], support: frozenset[int]) -> bool:
-    """True when the corrected readout still carries even logical parity."""
-    bits = list(data_bits)
-    for qubit in flips:
-        bits[qubit] ^= 1
-    return sum(bits[qubit] for qubit in support) % 2 == 0
-
-
-def syndrome_from_checks(
-    schedule: MemorySchedule, checks: dict[tuple[int, str], int]
-) -> tuple[int, ...]:
-    """Round-0 detectors for an error injected right after prep.
-
-    Checks measured in the prep half are differenced against round 0; checks
-    of the other basis start at +1 from the product-state prep.
-    """
-    prep_half = "X" if schedule.basis == "Z" else "Z"
-    bits = []
-    for name in schedule.patch.stabilizer_names:
-        half = "X" if name.startswith("X") else "Z"
-        bit = checks[0, name]
-        if half == prep_half:
-            bit ^= checks[-1, name]
-        bits.append(bit)
-    return tuple(bits)
+def _records(
+    schedule: MemorySchedule | FlaggedSchedule,
+    counts: dict[str, int],
+    fails: Callable[[Shot], bool] | None,
+) -> list[Record]:
+    """One record per shot, graded with `fails` when it is given."""
+    code = schedule.patch.code
+    records: list[Record] = []
+    for key, count in counts.items():
+        data_bits, gauge_bits = _split_key(key, code.n, len(schedule.measurements))
+        shot = read_shot(schedule, gauge_bits, data_bits)
+        record: Record = {
+            "gauge_bits": gauge_bits,
+            "data_bits": data_bits,
+            "checks": schedule.checks(gauge_bits),
+            "syndrome": shot.detectors[: code.syndrome_size],
+            "detectors": shot.detectors,
+            "success": None if fails is None else not fails(shot),
+        }
+        records.extend([record] * count)  # identical shots share one record
+    return records
 
 
 def run_memory(
@@ -95,92 +77,15 @@ def run_memory(
     shots: int = 1024,
     seed: int | None = None,
 ) -> list[Record]:
-    """One record per shot: gauge bits, data bits, checks, syndrome, success."""
-    _validate_options(shots, seed)
+    """Run the ideal circuit. Only one round with the error right after prep gets graded."""
+    validate_shots_and_seed(shots, seed)
     circuit, schedule = memory_circuit(
         patch, rounds=rounds, basis=basis, error=error, inject_at=inject_at
     )
-    counts = _sample_counts(circuit, shots, seed)
-
-    n_data = patch.distance * patch.distance
-    support = _logical_support(patch, basis)
     grade = inject_at == "after_prep" and rounds == 1
-    records: list[Record] = []
-    for key, count in counts.items():
-        data_bits, gauge_bits = _shot_bits(key, n_data, len(schedule.gauges))
-        checks = schedule.checks(gauge_bits)
-        syndrome = syndrome_from_checks(schedule, checks)
-        success: bool | None = None
-        if grade:
-            correction = decode(syndrome, patch.code)
-            success = _survives(data_bits, correction.x if basis == "Z" else correction.z, support)
-        record: Record = {
-            "gauge_bits": gauge_bits,
-            "data_bits": data_bits,
-            "checks": checks,
-            "syndrome": syndrome,
-            "success": success,
-        }
-        records.extend([record] * count)  # identical shots share one record
-    return records
-
-
-def _virtual_corrections(schedule: FlaggedSchedule, gauge_bits: tuple[int, ...]) -> Corrections:
-    return schedule.deflag_corrections(gauge_bits) + schedule.backaction_residuals(gauge_bits)
-
-
-def _deflag_adjusted_x_checks(
-    schedule: FlaggedSchedule,
-    checks: dict[tuple[int, str], int],
-    corrections: Corrections,
-) -> dict[tuple[int, str], int]:
-    """Flip X checks measured after each virtual Z correction's Z half."""
-    position = {half: index for index, half in enumerate(schedule.half_order)}
-    stabs = {
-        name: pauli
-        for name, pauli in zip(schedule.patch.stabilizer_names, schedule.patch.code.stabilizers)
-        if name.startswith("X")
-    }
-    adjusted = dict(checks)
-    for (round, name), bit in checks.items():
-        if not name.startswith("X"):
-            continue
-        flip = 0
-        for correction_half, correction in corrections:
-            if position[correction_half] < position[round, "X"] and not correction.commutes(
-                stabs[name]
-            ):
-                flip ^= 1
-        adjusted[round, name] = bit ^ flip
-    return adjusted
-
-
-def _syndrome_from_flagged_checks(
-    schedule: FlaggedSchedule,
-    checks: dict[tuple[int, str], int],
-    corrections: Corrections,
-) -> tuple[int, ...]:
-    adjusted = _deflag_adjusted_x_checks(schedule, checks, corrections)
-    bits = []
-    for name in schedule.patch.stabilizer_names:
-        bit = adjusted[0, name]
-        if (-1, name) in adjusted:
-            bit ^= adjusted[-1, name]
-        bits.append(bit)
-    return tuple(bits)
-
-
-def flagged_syndrome(
-    schedule: FlaggedSchedule, gauge_bits: tuple[int, ...]
-) -> tuple[tuple[int, ...], Corrections]:
-    """Round-0 detectors plus the deflag corrections they assume.
-
-    X checks are deflag-adjusted before being differenced against the prep
-    half; Z deflag corrections commute with the Z checks, so those pass through.
-    """
-    corrections = _virtual_corrections(schedule, gauge_bits)
-    checks = schedule.checks(gauge_bits)
-    return _syndrome_from_flagged_checks(schedule, checks, corrections), corrections
+    return _records(
+        schedule, _sample_counts(circuit, shots, seed), _lookup_fails if grade else None
+    )
 
 
 def run_flagged_circuit(
@@ -190,40 +95,24 @@ def run_flagged_circuit(
     shots: int = 1024,
     seed: int | None = None,
     grade: bool = True,
+    decoder: str = "lookup",
 ) -> list[Record]:
-    """Parse flagged counts; success is None when no supported decoder is available."""
-    _validate_options(shots, seed)
-    counts = _sample_counts(circuit, shots, seed)
+    """Sample a flagged circuit and grade the shots.
 
-    patch = schedule.patch
-    basis = schedule.basis
-    n_data = patch.distance * patch.distance
-    support = _logical_support(patch, basis)
-    grade = grade and schedule.rounds == 1 and patch.distance == 3
-    records: list[Record] = []
-    for key, count in counts.items():
-        data_bits, gauge_bits = _shot_bits(key, n_data, len(schedule.measurements))
-        checks = schedule.checks(gauge_bits)
-        corrections = _virtual_corrections(schedule, gauge_bits)
-        syndrome = _syndrome_from_flagged_checks(schedule, checks, corrections)
-        success: bool | None = None
-        if grade:
-            correction = decode(syndrome, patch.code)
-            flips = list(correction.x if basis == "Z" else correction.z)
-            if basis == "X":
-                # X readout sees the virtual Z corrections; Z readout does not.
-                flips += [qubit for _, deflag in corrections for qubit in deflag.z]
-            success = _survives(data_bits, flips, support)
-        record: Record = {
-            "gauge_bits": gauge_bits,
-            "data_bits": data_bits,
-            "checks": checks,
-            "syndrome": syndrome,
-            "corrections": corrections,
-            "success": success,
-        }
-        records.extend([record] * count)  # identical shots share one record
-    return records
+    success is None for shots that aren't graded. Lookup can only grade d=3 with one round.
+    """
+    validate_shots_and_seed(shots, seed)
+    if decoder not in ("lookup", "mwpm"):
+        raise ValueError("decoder must be lookup or mwpm")
+    fails = None
+    if decoder == "mwpm":
+        from ..decoders.mwpm import MWPMDecoder
+
+        matcher = MWPMDecoder(schedule.patch, basis=schedule.basis, rounds=schedule.rounds)
+        fails = matcher.fails if grade else None
+    elif grade and schedule.rounds == 1 and schedule.patch.distance == 3:
+        fails = _lookup_fails
+    return _records(schedule, _sample_counts(circuit, shots, seed), fails)
 
 
 def run_memory_flagged(
@@ -235,11 +124,17 @@ def run_memory_flagged(
     inject_at: str = "after_prep",
     shots: int = 1024,
     seed: int | None = None,
+    decoder: str = "lookup",
 ) -> list[Record]:
-    """Flagged memory experiment; records match run_flagged_circuit."""
+    """Build the flagged circuit and run it; same records as run_flagged_circuit."""
     circuit, schedule = memory_circuit_flagged(
         patch, rounds=rounds, basis=basis, error=error, inject_at=inject_at
     )
     return run_flagged_circuit(
-        circuit, schedule, shots=shots, seed=seed, grade=inject_at == "after_prep"
+        circuit,
+        schedule,
+        shots=shots,
+        seed=seed,
+        grade=decoder == "mwpm" or inject_at == "after_prep",
+        decoder=decoder,
     )
