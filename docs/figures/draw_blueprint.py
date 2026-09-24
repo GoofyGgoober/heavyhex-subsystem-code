@@ -1,7 +1,7 @@
-"""Draw the disjoint d=3 and d=5 heavy-hex layouts on the cached ibm_fez map.
+"""Draw the d=3 and d=5 patches on ibm_fez, and save the d=5 placement.
 
-Operators follow Sundaresan et al., Nat. Commun. 14, 2852 (2023), eqs (1)-(4).
-Offline: the coupling map comes from the cached fez_map.json.
+Writes heavyhex-blueprint.png and d5_fez_layout.json. Uses the saved coupling
+map in fez_map.json, so it runs offline.
 """
 
 from __future__ import annotations
@@ -19,7 +19,6 @@ from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from matplotlib.patches import FancyBboxPatch, Rectangle
 
-from heavyhex.circuits.flagged import DEFLAG
 from heavyhex.patches.layout import HeavyHexLayout, build_layout
 from heavyhex.patches.operators import D3 as D3_CODE
 
@@ -32,6 +31,10 @@ MANIFEST_NAME = "d5_fez_layout.json"
 # Falcon-27 placement of Fig. 4a, as tests/test_layout.py pins.
 D3_ORIGIN = (5, 1)
 D5_ORIGIN = (3, 7)
+
+# The paper's d=3 flag rule, quoted in the caption: a lone flag on this X
+# ancilla means Z on this data qubit (0-based id).
+PAPER_FLAG_RULE = {"X2X5": 1, "X3X6": 5, "X4X7": 3, "X5X8": 7}
 
 GOLD = "#F2C230"
 GREEN = "#1B7A3D"
@@ -106,7 +109,7 @@ def bounds(pos: dict[int, tuple[float, float]], qubits) -> tuple[float, float, f
     return min(xs), max(xs), min(ys), max(ys)
 
 
-def wire_color(kind: str) -> str:
+def bond_color(kind: str) -> str:
     return Z_BLUE if kind == "z" else X_RED
 
 
@@ -199,8 +202,8 @@ def draw_chip_overview(
         ax.plot(*zip(device.pos[a], device.pos[b]), color=CHIP_BOND, lw=0.6, zorder=1)
     ax.scatter(*zip(*device.pos.values()), s=5, color=IDLE, zorder=2)
     for layout, roles in patches:
-        for kind, u, v in layout.wires:
-            ax.plot(*zip(device.pos[u], device.pos[v]), color=wire_color(kind), lw=1.5, zorder=3)
+        for kind, u, v in layout.couplings:
+            ax.plot(*zip(device.pos[u], device.pos[v]), color=bond_color(kind), lw=1.5, zorder=3)
         for q, (role, _) in roles.items():
             color = ROLE_COLOR[role]
             ax.scatter(*device.pos[q], s=20, color=color, edgecolor=INK, lw=0.5, zorder=4)
@@ -237,7 +240,7 @@ def draw_chip_overview(
 
 
 def draw_d3_device(ax: Axes, device: DeviceMap, d3: HeavyHexLayout, roles: dict) -> None:
-    """(b) The d=3 patch at true device coordinates, with its idle neighbours."""
+    """(b) The d=3 patch where it sits on the chip, with its idle neighbours."""
     x0, x1, y0, y1 = bounds(device.pos, roles)
     left, right, bottom, top = x0 - 1.3, x1 + 1.3, y0 - 1.0, y1 + 1.35
     bonds = {tuple(sorted(edge)) for edge in device.edges}
@@ -261,10 +264,10 @@ def draw_d3_device(ax: Axes, device: DeviceMap, d3: HeavyHexLayout, roles: dict)
         color=IDLE,
         zorder=2,
     )
-    for kind, u, v in d3.wires:
+    for kind, u, v in d3.couplings:
         ax.plot(
             *zip(device.pos[u], device.pos[v]),
-            color=wire_color(kind),
+            color=bond_color(kind),
             lw=2.8,
             solid_capstyle="round",
             zorder=3,
@@ -391,7 +394,7 @@ def draw_d3_operator_table(ax: Axes, d3: HeavyHexLayout) -> None:
 
 
 def draw_d3_x_gauges(ax: Axes, d3: HeavyHexLayout) -> None:
-    """(d) Every X gauge is an in-row pair carrying one flag qubit."""
+    """(d) The X gauges: pairs along each row, each with its own ancilla."""
     for name, support in d3.x_gauges.items():
         operator_bar(
             ax,
@@ -535,7 +538,7 @@ def draw_d3_z_stabilizers(ax: Axes, d3: HeavyHexLayout) -> None:
 
 
 def draw_d5_device(ax: Axes, device: DeviceMap, d5: HeavyHexLayout, roles: dict) -> None:
-    """(h) The d=5 patch at true device coordinates."""
+    """(h) The d=5 patch where it sits on the chip."""
     x0, x1, y0, y1 = bounds(device.pos, roles)
     left, right, bottom, top = x0 - 1.0, x1 + 1.0, y0 - 0.8, y1 + 0.8
     for a, b in device.edges:
@@ -543,10 +546,10 @@ def draw_d5_device(ax: Axes, device: DeviceMap, d5: HeavyHexLayout, roles: dict)
             left <= device.pos[q][0] <= right and bottom <= device.pos[q][1] <= top for q in (a, b)
         ):
             ax.plot(*zip(device.pos[a], device.pos[b]), color=PATCH_BOND, lw=1.2, zorder=1)
-    for kind, u, v in d5.wires:
+    for kind, u, v in d5.couplings:
         ax.plot(
             *zip(device.pos[u], device.pos[v]),
-            color=wire_color(kind),
+            color=bond_color(kind),
             lw=2.8,
             solid_capstyle="round",
             zorder=3,
@@ -597,7 +600,7 @@ def draw_d5_device(ax: Axes, device: DeviceMap, d5: HeavyHexLayout, roles: dict)
 
 
 def draw_d5_operator_table(ax: Axes, d5: HeavyHexLayout) -> None:
-    """(i) All measured d=5 gauges; the stabilizers below are inferred products."""
+    """(i) Every d=5 gauge and its ancilla."""
     columns = (
         (0.0, f"{len(d5.x_gauges)} X gauges", d5.x_gauges, d5.x_ancillas, X_RED),
         (0.49, f"{len(d5.z_gauges)} Z gauges", d5.z_gauges, d5.z_ancillas, Z_BLUE),
@@ -655,7 +658,7 @@ def draw_d5_operator_table(ax: Axes, d5: HeavyHexLayout) -> None:
 
 
 def draw_d5_grids(axes: tuple[Axes, ...], d5: HeavyHexLayout) -> None:
-    """(j)-(m) The same four views as the d=3 row, with identical conventions."""
+    """(j)-(m) The same four views as the d=3 row."""
     ax_xg, ax_zg, ax_xs, ax_zs = axes
     for name, support in d5.x_gauges.items():
         operator_bar(
@@ -809,7 +812,7 @@ def draw_captions(fig: Figure, d3: HeavyHexLayout, d5: HeavyHexLayout) -> None:
         fontsize=11,
         color=INK,
     )
-    rule = ", ".join(f"q{d3.x_ancillas[name]}→Z on Q{q + 1}" for name, q in DEFLAG.items())
+    rule = ", ".join(f"q{d3.x_ancillas[name]}→Z on Q{q + 1}" for name, q in PAPER_FLAG_RULE.items())
     fig.text(
         0.5,
         0.012,
@@ -888,7 +891,7 @@ def write_manifest(layout: HeavyHexLayout, path: Path) -> None:
         "x_gauge_ancillas": layout.x_ancillas,
         "z_gauge_ancillas": layout.z_ancillas,
         "boundary_relays": layout.relays,
-        "couplings": layout.wires,
+        "couplings": layout.couplings,
     }
     path.write_text(json.dumps(manifest, indent=2) + "\n")
 
@@ -906,14 +909,14 @@ def main(argv: list[str] | None = None) -> None:
     args.out.mkdir(parents=True, exist_ok=True)
 
     device = load_device_map(FEZ_MAP)
-    d3 = build_layout(3, device.coords, device.edges, first_data_position=D3_ORIGIN)
-    d5 = build_layout(5, device.coords, device.edges, first_data_position=D5_ORIGIN)
+    d3 = build_layout(3, device.coords, device.edges, origin=D3_ORIGIN)
+    d5 = build_layout(5, device.coords, device.edges, origin=D5_ORIGIN)
     if not d3.physical_qubits.isdisjoint(d5.physical_qubits):
         raise ValueError("the two patches must not share any physical qubits")
     for layout in (d3, d5):
         print(
             f"d={layout.distance}: {len(layout.physical_qubits)} qubits, "
-            f"{len(layout.wires)} real ibm_fez bonds"
+            f"{len(layout.couplings)} real ibm_fez bonds"
         )
 
     fig = build_figure(device, d3, d5)

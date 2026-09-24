@@ -1,4 +1,4 @@
-"""Algebra of the heavy-hex subsystem code: center, ranks, distance."""
+"""The heavy-hex code itself: stabilizers, ranks, distance."""
 
 import pytest
 
@@ -51,7 +51,7 @@ def test_stabilizers_are_independent_products_of_same_basis_gauges(patch):
 
 @pytest.mark.parametrize("patch", PATCHES)
 def test_stabilizer_names_track_the_code_stabilizer_order(patch):
-    # simulation/ zips these names against code.stabilizers.
+    # Syndromes pair these names with code.stabilizers.
     supports = {**patch.x_stabilizers, **patch.z_stabilizers}
     assert patch.stabilizer_names == tuple(supports)
     for name, pauli in zip(patch.stabilizer_names, patch.code.stabilizers, strict=True):
@@ -83,8 +83,8 @@ def test_d3_gauge_qubits_factor_the_codespace():
 
 
 @pytest.mark.parametrize("patch", PATCHES)
-def test_no_harmful_error_below_weight_three(patch):
-    assert patch.code.min_harmful_weight(max_weight=2) is None
+def test_no_logical_below_weight_three(patch):
+    assert patch.code.distance(max_weight=2) is None
 
 
 def test_d3_distance_is_three():

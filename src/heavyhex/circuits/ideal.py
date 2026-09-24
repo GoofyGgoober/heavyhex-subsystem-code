@@ -1,4 +1,4 @@
-"""Ideal heavy-hex gauge circuits: one fresh ancilla per gauge, no flags."""
+"""Textbook gauge circuits: a fresh ancilla for every gauge measurement, no flags."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class GaugeSlot:
     round: int  # -1 for the prep half, 0..rounds-1 otherwise
     half: str  # "X" or "Z"
-    name: str
+    gauge: str
     bit: int  # index into the gauge classical register
 
 
@@ -25,13 +25,12 @@ class MemorySchedule:
     patch: HeavyHexOperators
     basis: str
     rounds: int
-    gauges: tuple[GaugeSlot, ...]
-
-    def outcomes(self, gauge_bits: tuple[int, ...]) -> dict[tuple[int, str, str], int]:
-        return {(slot.round, slot.half, slot.name): gauge_bits[slot.bit] for slot in self.gauges}
+    measurements: tuple[GaugeSlot, ...]
 
     def checks(self, gauge_bits: tuple[int, ...]) -> dict[tuple[int, str], int]:
-        return _stabilizer_checks(self.patch, self.outcomes(gauge_bits))
+        """Each stabilizer's value per round, the XOR of its gauge outcomes."""
+        outcomes = {(m.round, m.half, m.gauge): gauge_bits[m.bit] for m in self.measurements}
+        return _checks(self.patch, outcomes)
 
 
 def memory_circuit(
@@ -42,14 +41,14 @@ def memory_circuit(
     error: Pauli | None = None,
     inject_at: str = "after_prep",
 ) -> tuple[QuantumCircuit, MemorySchedule]:
-    """Prep |basis>_L, run rounds of gauge halves, read out the data.
+    """Prepare logical |0> (or |+>), measure the gauges for some rounds, read out the data.
 
-    Z basis: prep |0>^n and an X half, then rounds of (Z half, X half), Z
-    readout; X basis is the mirror image.
+    In the Z basis: |0> on every data qubit, an X half, then each round a Z half
+    and an X half, then Z readout. The X basis swaps X and Z.
     """
     from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 
-    prep_half, halves = _half_order(patch, rounds, basis, error, inject_at)
+    prep_half, halves = _halves(patch, rounds, basis, error, inject_at)
 
     n = patch.distance * patch.distance
     total = len(_supports(patch, prep_half)) + rounds * (len(patch.x_gauges) + len(patch.z_gauges))
@@ -93,14 +92,14 @@ def memory_circuit(
     return circuit, MemorySchedule(patch, basis, rounds, tuple(slots))
 
 
-def _half_order(
+def _halves(
     patch: HeavyHexOperators,
     rounds: int,
     basis: str,
     error: Pauli | None,
     inject_at: str,
 ) -> tuple[str, tuple[str, str]]:
-    """Validate the memory options; return (prep half, per-round half order)."""
+    """Check the options; return the prep half and the order of halves in a round."""
     if basis not in ("X", "Z"):
         raise ValueError(f"basis must be X or Z, got {basis!r}")
     if not isinstance(rounds, int) or isinstance(rounds, bool) or rounds < 1:
@@ -115,13 +114,13 @@ def _half_order(
     return prep_half, halves
 
 
-def _stabilizer_checks(
+def _checks(
     patch: HeavyHexOperators, outcomes: dict[tuple[int, str, str], int]
 ) -> dict[tuple[int, str], int]:
-    """Stabilizer values per round from same-basis gauge products.
+    """XOR each stabilizer's gauge outcomes, round by round.
 
-    outcomes is keyed (round, half, gauge name); rounds missing a stabilizer's
-    basis are skipped, since the prep half measures one basis only.
+    outcomes is keyed by (round, half, gauge). The prep half measures only one
+    basis, so round -1 has only those stabilizers.
     """
     checks: dict[tuple[int, str], int] = {}
     rounds = sorted({round for round, _, _ in outcomes})

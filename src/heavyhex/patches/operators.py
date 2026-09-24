@@ -1,7 +1,7 @@
-"""Heavy-hex subsystem code: gauge, stabilizer and logical operators for odd d.
+"""Gauges, stabilizers and logicals of the heavy-hex code at odd distance.
 
-Code qubits carry 1-based column-major labels (Sundaresan et al. 2023, eqs. 1-4,
-generalized as in Chamberland et al. 2020); Pauli data ids are label - 1.
+Follows Sundaresan et al. 2023, eqs. 1-4, extended to any d as in Chamberland
+et al. 2020. Qubit labels are 1-based and run down the columns; Pauli ids are label - 1.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ def label(row: int, column: int, distance: int) -> int:
 
 @dataclass(frozen=True)
 class HeavyHexOperators:
-    """Labeled operator supports (1-based labels) plus Pauli forms (0-based)."""
+    """Supports as 1-based labels. .code holds the same operators as 0-based Paulis."""
 
     distance: int
     x_gauges: dict[str, tuple[int, ...]]
@@ -36,7 +36,7 @@ class HeavyHexOperators:
 
     @property
     def stabilizer_names(self) -> tuple[str, ...]:
-        """Names in SubsystemCode.stabilizers order (X stabilizers, then Z)."""
+        """X stabilizers then Z, the same order as code.stabilizers."""
         return tuple(self.x_stabilizers) + tuple(self.z_stabilizers)
 
     @cached_property
@@ -55,19 +55,14 @@ class HeavyHexOperators:
 
     @cached_property
     def stabilizer_gauge_factors(self) -> dict[str, tuple[str, ...]]:
-        """Each stabilizer as a product of same-basis gauges (GF(2) solve)."""
+        """The gauges whose product is each stabilizer: the same-basis gauges inside it."""
         factors: dict[str, tuple[str, ...]] = {}
         for gauges, stabilizers in (
             (self.x_gauges, self.x_stabilizers),
             (self.z_gauges, self.z_stabilizers),
         ):
-            names = list(gauges)
-            supports = [set(gauges[name]) for name in names]
-            for stab_name, support in stabilizers.items():
-                solution = _solve_product(supports, set(support))
-                if solution is None:
-                    raise RuntimeError(f"{stab_name} is not a product of same-basis gauges")
-                factors[stab_name] = tuple(name for name, bit in zip(names, solution) if bit)
+            for name, support in stabilizers.items():
+                factors[name] = tuple(g for g, s in gauges.items() if set(s) <= set(support))
         return factors
 
     def _pauli(self, basis: str, support: tuple[int, ...]) -> Pauli:
@@ -76,7 +71,7 @@ class HeavyHexOperators:
 
 
 def build_operators(distance: int) -> HeavyHexOperators:
-    """Gauge set, stabilizers and logicals for odd distance >= 3."""
+    """All operators for an odd distance of at least 3."""
     d = _validate_distance(distance)
     x_gauges: dict[str, tuple[int, ...]] = {}
     z_gauges: dict[str, tuple[int, ...]] = {}
@@ -136,31 +131,6 @@ def _block(row: int, column: int, distance: int) -> tuple[int, int, int, int]:
 
 def _name(basis: str, support: tuple[int, ...]) -> str:
     return "".join(f"{basis}{q}" for q in support)
-
-
-def _solve_product(supports: list[set[int]], target: set[int]) -> list[int] | None:
-    """Subset of supports whose symmetric difference is target, or None; free vars are 0."""
-    universe = sorted(set().union(*supports, target))
-    matrix = [[1 if q in support else 0 for support in supports] for q in universe]
-    rhs = [1 if q in target else 0 for q in universe]
-    pivot_row: dict[int, int] = {}
-    row = 0
-    for column in range(len(supports)):
-        pivot = next((i for i in range(row, len(matrix)) if matrix[i][column]), None)
-        if pivot is None:
-            continue
-        matrix[row], matrix[pivot] = matrix[pivot], matrix[row]
-        rhs[row], rhs[pivot] = rhs[pivot], rhs[row]
-        pivot_row[column] = row
-        for i in range(len(matrix)):
-            if i != row and matrix[i][column]:
-                matrix[i] = [a ^ b for a, b in zip(matrix[i], matrix[row])]
-                rhs[i] ^= rhs[row]
-        row += 1
-    for i in range(len(matrix)):
-        if all(bit == 0 for bit in matrix[i]) and rhs[i]:
-            return None
-    return [rhs[pivot_row[column]] if column in pivot_row else 0 for column in range(len(supports))]
 
 
 D3 = build_operators(3)

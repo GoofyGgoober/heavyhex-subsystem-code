@@ -1,7 +1,6 @@
-"""Lookup decoder for the heavy-hex code: syndrome -> minimum-weight correction.
+"""Lookup decoder: for every syndrome, the lightest error that produces it.
 
-Success means the residual (correction * error) lies in the gauge group.
-Syndrome bits follow SubsystemCode.stabilizers order: X stabilizers, then Z.
+The table only fits at d=3. Syndrome bits follow the code's stabilizer order, X then Z.
 """
 
 from functools import cache
@@ -15,7 +14,6 @@ Syndrome = tuple[int, ...]
 
 @cache
 def _table(code: SubsystemCode) -> dict[Syndrome, Pauli]:
-    """Minimum-weight representative per syndrome; only viable for d=3."""
     if code.syndrome_size > 8:
         raise ValueError(
             f"lookup over {1 << code.syndrome_size} syndromes is infeasible; "
@@ -36,9 +34,3 @@ def decode(syndrome: Syndrome, code: SubsystemCode | None = None) -> Pauli:
     if len(syndrome) != code.syndrome_size or any(bit not in (0, 1) for bit in syndrome):
         raise ValueError(f"syndrome must be {code.syndrome_size} bits, got {syndrome!r}")
     return _table(code)[syndrome]
-
-
-def residual_in_gauge_group(error: Pauli, code: SubsystemCode | None = None) -> bool:
-    """True when lookup-correcting error leaves the logical factor untouched."""
-    code = D3.code if code is None else code
-    return code.in_gauge_group(decode(code.syndrome(error), code) * error)
