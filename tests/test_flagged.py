@@ -1,7 +1,5 @@
 """Flagged d=3 circuit: its shape, the flags, and single faults."""
 
-from itertools import combinations
-
 import pytest
 
 from heavyhex.circuits.flagged import (
@@ -12,7 +10,7 @@ from heavyhex.circuits.flagged import (
     with_fault,
 )
 from heavyhex.core import Pauli
-from heavyhex.patches.operators import D3, build_operators
+from heavyhex.patches.operators import D3, D5, build_operators
 
 pytest.importorskip("qiskit_aer")
 
@@ -23,22 +21,11 @@ from heavyhex.simulation.aer import (  # noqa: E402
 
 CODE = D3.code
 ROLES = qubit_roles(D3)
-FLAG_QUBITS = frozenset(ROLES.x_ancillas.values())
-RELAY_QUBITS = frozenset(relay for arms in ROLES.z2_arms.values() for _, relay in arms)
 
 
 def single_qubit_paulis(qubit: int) -> tuple[Pauli, ...]:
     x, z = Pauli.x_on((qubit,)), Pauli.z_on((qubit,))
     return (x, z, x * z)
-
-
-WEIGHT_ONE_OR_LESS = (Pauli(),) + tuple(
-    pauli for qubit in CODE.data_qubits for pauli in single_qubit_paulis(qubit)
-)
-
-
-def in_gauge_times_weight_one(pauli: Pauli) -> bool:
-    return any(CODE.in_gauge_group(pauli * other) for other in WEIGHT_ONE_OR_LESS)
 
 
 def test_d3_roles_are_unchanged():
@@ -72,13 +59,13 @@ def test_noiseless_flagged_memory_survives(basis):
     assert all(record["success"] for record in records)
 
 
-def test_relays_return_to_zero_in_the_absence_of_faults():
-    _, schedule = memory_circuit_flagged(rounds=1, basis="Z")
-    relay_bits = [m.bit for m in schedule.measurements if m.kind == "relay"]
-    assert len(relay_bits) == 4
-    records = run_memory_flagged(rounds=1, basis="Z", shots=100, seed=9)
-    for record in records:
-        assert all(record["gauge_bits"][bit] == 0 for bit in relay_bits)
+@pytest.mark.parametrize("basis", ["Z", "X"])
+def test_flags_and_relays_read_zero_without_faults(basis):
+    _, schedule = memory_circuit_flagged(rounds=2, basis=basis)
+    bits = [m.bit for m in schedule.measurements if m.kind in ("z_flag", "relay")]
+    assert len(bits) == 8 * 3 if basis == "X" else 8 * 2
+    for record in run_memory_flagged(rounds=2, basis=basis, shots=100, seed=9):
+        assert all(record["gauge_bits"][bit] == 0 for bit in bits)
 
 
 @pytest.mark.parametrize("qubit", D3.code.data_qubits)
@@ -90,65 +77,57 @@ def test_every_single_qubit_data_error_is_corrected_flagged(basis, qubit):
         assert all(record["success"] for record in records), (basis, error)
 
 
-def test_shots_with_one_flag_fired_still_succeed():
-    _, schedule = memory_circuit_flagged(rounds=1, basis="Z")
-    flag_bits = {(m.round, m.gauge): m.bit for m in schedule.measurements if m.kind == "z_flag"}
-    records = run_memory_flagged(rounds=1, basis="Z", shots=400, seed=13)
-    lone = [
-        record
-        for record in records
-        if (record["gauge_bits"][flag_bits[0, "X2X5"]] == 1)
-        != (record["gauge_bits"][flag_bits[0, "X3X6"]] == 1)
-    ]
-    assert len(lone) > 50  # flags fire at random, so this is common
-    assert all(record["success"] for record in lone)
+def allowed_leftovers(patch) -> list[Pauli]:
+    """What one fault may leave on the data: X, Y or Z on one qubit, or Z on two
+    neighbours in the same column (at right angles to the logical Z, so harmless)."""
+    d = patch.distance
+    single = [p for q in patch.data_qubits for p in single_qubit_paulis(q)]
+    column_pairs = [Pauli.z_on((q, q + 1)) for q in patch.data_qubits if q % d != d - 1]
+    return [Pauli(), *single, *column_pairs]
+
+
+@pytest.mark.parametrize("patch", [D3, D5], ids=["d3", "d5"])
+@pytest.mark.parametrize("basis", ["Z", "X"])
+def test_single_faults_leave_one_qubit_or_a_column_pair(patch, basis):
+    circuit, schedule = memory_circuit_flagged(patch, basis=basis)
+    allowed = allowed_leftovers(patch)
+    count = 0
+    for gadget in schedule.gadgets:
+        for index, fault in single_faults(circuit, gadget):
+            count += 1
+            outgoing, _ = propagate_fault(circuit, gadget, index, fault)
+            assert any(patch.code.in_gauge_group(outgoing * p) for p in allowed), (
+                basis,
+                gadget,
+                index,
+                fault,
+            )
+    assert count > 30 * len(schedule.gadgets)  # every gadget has dozens of fault spots
 
 
 @pytest.mark.parametrize("basis", ["Z", "X"])
-def test_single_faults_never_grow_or_go_silent(basis):
-    """Push every single fault through its gadget, then run it on Aer.
-
-    Without a flag, a fault leaves at most weight 1 up to a gauge, and decodes
-    fine when the syndrome shows it. With a flag, it leaves at most weight 2, and
-    faults with the same flags and syndrome never differ by a logical.
-    """
+def test_single_faults_the_syndrome_shows_are_corrected(basis):
+    """Run every single gadget fault on Aer and decode round 0 with the lookup table."""
     circuit, schedule = memory_circuit_flagged(rounds=1, basis=basis)
-    faults = [
-        (gadget, index, fault)
-        for gadget in schedule.gadgets
-        for index, fault in single_faults(circuit, gadget)
-    ]
-    assert len(faults) > 500
-    flagged_groups: dict[tuple, list[Pauli]] = {}
     visible = nontrivial = 0
-    for gadget, index, fault in faults:
-        context = (basis, gadget, index, fault)
-        outgoing, flipped = propagate_fault(circuit, gadget, index, fault)
-        flag_flips = flipped & FLAG_QUBITS if gadget.half == "Z" else frozenset()
-        if flag_flips:
-            assert outgoing.weight() <= 2, context
-            key = (gadget, flag_flips, flipped - FLAG_QUBITS - RELAY_QUBITS)
-            flagged_groups.setdefault(key, []).append(outgoing)
-        else:
-            assert in_gauge_times_weight_one(outgoing), context
-
-        faulty = with_fault(circuit, index, fault)
-        records = run_flagged_circuit(faulty, schedule, shots=8, seed=17)
-        syndromes = {record["syndrome"] for record in records}
-        assert len(syndromes) == 1, context  # a fault gives the same syndrome every shot
-        syndrome = syndromes.pop()
-        # The rest look like measurement errors or come after the last check.
-        # Those need several rounds to decode, so skip them here.
-        if not flag_flips and syndrome == CODE.syndrome(outgoing):
-            visible += 1
-            nontrivial += any(syndrome)
-            assert all(record["success"] for record in records), context
+    for gadget in schedule.gadgets:
+        for index, fault in single_faults(circuit, gadget):
+            context = (basis, gadget, index, fault)
+            outgoing, _ = propagate_fault(circuit, gadget, index, fault)
+            records = run_flagged_circuit(
+                with_fault(circuit, index, fault), schedule, shots=8, seed=17
+            )
+            syndromes = {record["syndrome"] for record in records}
+            assert len(syndromes) == 1, context  # a fault gives the same syndrome every shot
+            syndrome = syndromes.pop()
+            # The rest look like measurement errors or come after the last check.
+            # Those need several rounds to decode, so skip them here.
+            if syndrome == CODE.syndrome(outgoing):
+                visible += 1
+                nontrivial += any(syndrome)
+                assert all(record["success"] for record in records), context
     assert visible > 100
     assert nontrivial > 50
-    assert len(flagged_groups) > 10
-    for key, errors in flagged_groups.items():
-        for first, second in combinations(errors, 2):
-            assert not CODE.is_logical(first * second), (basis, key)
 
 
 def test_flagged_memory_rejects_bad_options():

@@ -82,19 +82,11 @@ def read_shot(
     gauge_bits: tuple[int, ...],
     data_bits: tuple[int, ...],
 ) -> Shot:
-    """Detectors and data bits for one shot of a memory circuit.
-
-    In the flagged circuit, X readout bits are flipped back where a flag left a Z.
-    """
+    """Detectors and data bits for one shot of a memory circuit."""
     memory = Memory(schedule.patch, schedule.basis, schedule.rounds)
     validate_binary_bits("gauge outcomes", gauge_bits, len(schedule.measurements))
     validate_binary_bits("data readout", data_bits, schedule.patch.code.n)
     syndromes = schedule.checks(gauge_bits)
-    if isinstance(schedule, FlaggedSchedule) and schedule.basis == "X":
-        z = Pauli()
-        for _, pauli in schedule.z_from_flags(gauge_bits):
-            z *= pauli
-        data_bits = tuple(bit ^ (q in z.z) for q, bit in enumerate(data_bits))
     return Shot(memory, detectors_from_syndromes(memory, syndromes, data_bits), data_bits)
 
 

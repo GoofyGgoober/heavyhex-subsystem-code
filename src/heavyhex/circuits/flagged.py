@@ -1,7 +1,9 @@
-"""Flagged d=3 and d=5 circuits as they would run on the chip (Sundaresan et al. 2023, Fig. 4).
+"""Flagged d=3 and d=5 memory circuits as they would run on the chip.
 
-Qubits are reset and reused: 23 at d=3, 65 at d=5. The X ancillas double as
-flags for the Z4 gauges, and the boundary Z2 gauges reach their data through relays.
+Qubits are reset and reused: 23 at d=3, 65 at d=5, laid out as in Sundaresan et
+al. 2023, Fig. 4. The X ancillas double as flags for the Z4 gauges, and the
+boundary Z2 gauges reach their data through relays. Flags and relays are undone
+after use, so they read 0 unless a fault hit them.
 """
 
 from __future__ import annotations
@@ -19,6 +21,18 @@ from .ideal import _apply_pauli, _checks, _halves
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
+
+
+# Gate order of a Z4 gadget, as (arm, step): step 0 or 1 is a CX from that data
+# qubit of the arm's pair onto its flag, "pass" a CX from the flag onto the ancilla.
+# Each flag passes its data qubits one at a time and the two flags take turns,
+# so a single Z fault on a flag or the ancilla spreads to at most one data qubit,
+# or two in the same column. Undone this way, every flag ends back at 0.
+Z4_GATES = (
+    (0, 0), (0, "pass"), (1, 0), (1, "pass"),
+    (0, 0), (0, 1), (0, "pass"), (1, 0), (1, 1), (1, "pass"),
+    (0, 1), (1, 1),
+)  # fmt: skip
 
 
 @dataclass(frozen=True)
@@ -95,50 +109,14 @@ class FlaggedSchedule:
         return qubit_roles(self.patch)
 
     def checks(self, gauge_bits: tuple[int, ...]) -> dict[tuple[int, str], int]:
-        """Each stabilizer's value per round, the XOR of its gauge outcomes.
-
-        X values are flipped back where the Z from a flag earlier on flipped them.
-        """
+        """Each stabilizer's value per round, the XOR of its gauge outcomes."""
         validate_binary_bits("gauge outcomes", gauge_bits, len(self.measurements))
         outcomes = {
             (m.round, m.half, m.gauge): gauge_bits[m.bit]
             for m in self.measurements
             if m.kind in ("z_syn", "x_gauge")
         }
-        checks = _checks(self.patch, outcomes)
-        position = {half: index for index, half in enumerate(self.half_order)}
-        x_stabilizers = dict(zip(self.patch.x_stabilizers, self.patch.code.stabilizers))
-        z_from_flags = self.z_from_flags(gauge_bits)
-        for r, name in checks:
-            if name in x_stabilizers:
-                flips = sum(
-                    not z.commutes(x_stabilizers[name])
-                    for round, z in z_from_flags
-                    if position[round, "Z"] < position[r, "X"]
-                )
-                checks[r, name] ^= flips % 2
-        return checks
-
-    def z_from_flags(self, gauge_bits: tuple[int, ...]) -> list[tuple[int, Pauli]]:
-        """Z that the flags left on the data, as (round, Pauli).
-
-        A flag holds the parity of its two data qubits and is then read in the X
-        basis, so reading 1 leaves Z on both. If both flags of a Z4 gauge read 1,
-        that is the gauge itself and changes nothing, so only a lone flag counts.
-        Assumes the flags themselves are not faulty.
-        """
-        validate_binary_bits("gauge outcomes", gauge_bits, len(self.measurements))
-        fired = {
-            (m.round, m.gauge): gauge_bits[m.bit] for m in self.measurements if m.kind == "z_flag"
-        }
-        rounds = sorted({m.round for m in self.measurements if m.half == "Z"})
-        z_from_flags = []
-        for round in rounds:
-            for (pair_a, flag_a), (pair_b, flag_b) in self.roles.z4_arms.values():
-                if fired[round, flag_a] != fired[round, flag_b]:
-                    pair = pair_a if fired[round, flag_a] else pair_b
-                    z_from_flags.append((round, Pauli.z_on(pair)))
-        return z_from_flags
+        return _checks(self.patch, outcomes)
 
 
 def memory_circuit_flagged(
@@ -178,18 +156,20 @@ def memory_circuit_flagged(
         bit += 1
 
     def measure_z4(round: int, name: str) -> None:
-        # Each data pair's parity goes to its flag, and both flags feed the ancilla.
+        # Each data pair's parity goes through its flag to the ancilla, in the
+        # order Z4_GATES gives. The flags read 0 unless something went wrong.
         (pair_a, gauge_a), (pair_b, gauge_b) = roles.z4_arms[name]
         flag_a, flag_b = roles.x_ancillas[gauge_a], roles.x_ancillas[gauge_b]
         ancilla = roles.z_ancillas[name]
         for qubit in (ancilla, flag_a, flag_b):
             circuit.reset(qubit)
-        for pair, flag in ((pair_a, flag_a), (pair_b, flag_b)):
-            circuit.cx(pair[0], flag)
-            circuit.cx(pair[1], flag)
-            circuit.cx(flag, ancilla)
-        circuit.h(flag_a)
-        circuit.h(flag_b)
+        arms = ((pair_a, flag_a), (pair_b, flag_b))
+        for arm, step in Z4_GATES:
+            pair, flag = arms[arm]
+            if step == "pass":
+                circuit.cx(flag, ancilla)
+            else:
+                circuit.cx(pair[step], flag)
         record(round, "Z", "z_flag", gauge_a, flag_a)
         record(round, "Z", "z_flag", gauge_b, flag_b)
         record(round, "Z", "z_syn", name, ancilla)

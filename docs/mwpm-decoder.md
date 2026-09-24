@@ -32,10 +32,9 @@ Only the memory basis is checked against the readout, so MWPM only uses those
 stabilizers.
 
 `read_shot(schedule, gauge_bits, data_bits)` returns a `Shot` with the detectors
-and the data bits. In the flagged circuit, a flag that reads 1 leaves Z on its
-two data qubits. `FlaggedSchedule.checks` flips back the X values measured
-after it, and `read_shot` flips back the X readout. This assumes the flags
-themselves are fine.
+and the data bits. In the flagged circuit the flags and relays are undone after
+use, so they read 0 unless a fault hit them. This decoder ignores them; the
+circuit-level decoder in `simulation/noisy.py` uses them.
 
 ## Graph
 
@@ -69,4 +68,5 @@ decoder.fails(shot)  # True if the logical readout is still wrong after correcti
 
 Corrections only need to be right up to a gauge.
 
-Next: use the flags in matching, then IBM data.
+`simulation/noisy.py` goes further: it simulates the flagged circuit in stim with
+Fez's calibrated noise and matches on the circuit's own error model. Next: IBM data.
