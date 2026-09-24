@@ -7,3 +7,8 @@ __pycache__/
 dist/
 build/
 
+
+# Never commit credentials
+apikey*.json
+qiskit-ibm.json
+.env

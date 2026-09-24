@@ -1,4 +1,4 @@
-"""The d=3 and d=5 placements on Fez drawn in docs/figures."""
+"""Where the d=3 and d=5 patches sit on Fez, as picked from the saved calibration."""
 
 import json
 from collections import Counter
@@ -7,10 +7,9 @@ from pathlib import Path
 import pytest
 
 from heavyhex.patches.layout import build_layout
+from heavyhex.patches.placement import Calibration, best_spots
 
 FIGURES = Path(__file__).resolve().parents[1] / "docs" / "figures"
-# Must match D3_ORIGIN / D5_ORIGIN in docs/figures/draw_blueprint.py.
-ORIGINS = {3: (5, 1), 5: (3, 7)}
 
 
 @pytest.fixture(scope="module")
@@ -18,11 +17,23 @@ def device_map():
     return json.loads((FIGURES / "fez_map.json").read_text())
 
 
+@pytest.fixture(scope="module")
+def spots(device_map):
+    calibration = Calibration.load(FIGURES / "fez_calibration.json")
+    return best_spots(device_map["coords"], device_map["edges"], calibration)
+
+
 @pytest.fixture
-def layouts(device_map):
+def layouts(device_map, spots):
     return {
-        distance: build_layout(distance, device_map["coords"], device_map["edges"], origin=origin)
-        for distance, origin in ORIGINS.items()
+        d: build_layout(
+            d,
+            device_map["coords"],
+            device_map["edges"],
+            origin=spot.origin,
+            direction=spot.direction,
+        )
+        for d, spot in spots.items()
     }
 
 
@@ -54,12 +65,12 @@ def test_patches_share_no_qubits_or_direct_couplings(layouts, device_map):
     )
 
 
-def test_d3_matches_the_original_falcon_mapping(layouts):
-    """The d=3 placement still reproduces Sundaresan et al. Fig. 4a on fez."""
+def test_d3_at_5_1_matches_the_falcon_mapping(device_map):
+    """Placed at (5, 1), d=3 reproduces Sundaresan et al. Fig. 4a on Fez."""
     mapping = {
         int(q): fez for q, fez in json.loads((FIGURES / "d3_fez_layout.json").read_text()).items()
     }
-    patch = layouts[3]
+    patch = build_layout(3, device_map["coords"], device_map["edges"], origin=(5, 1))
     assert patch.data == {
         k: mapping[q] for k, q in enumerate((2, 10, 17, 5, 13, 21, 9, 16, 24), start=1)
     }
@@ -76,11 +87,13 @@ def test_d3_matches_the_original_falcon_mapping(layouts):
     assert set(patch.z_stabilizers) == {"Z1Z2Z4Z5Z7Z8", "Z2Z3Z5Z6Z8Z9"}
 
 
-def test_missing_physical_bond_is_rejected(layouts, device_map):
+def test_missing_physical_bond_is_rejected(layouts, device_map, spots):
     _, a, b = layouts[5].couplings[0]
     edges = [edge for edge in device_map["edges"] if set(edge) != {a, b}]
     with pytest.raises(ValueError, match="missing device bond"):
-        build_layout(5, device_map["coords"], edges, origin=ORIGINS[5])
+        build_layout(
+            5, device_map["coords"], edges, origin=spots[5].origin, direction=spots[5].direction
+        )
 
 
 def test_off_chip_placement_is_rejected(device_map):
@@ -88,10 +101,12 @@ def test_off_chip_placement_is_rejected(device_map):
         build_layout(5, device_map["coords"], device_map["edges"], origin=(3, 11))
 
 
-def test_saved_d5_manifest_matches_generated_layout(layouts):
+def test_saved_d5_manifest_matches_generated_layout(layouts, spots):
+    """Fails when the calibration changed but the figure and manifest weren't redrawn."""
     saved = json.loads((FIGURES / "d5_fez_layout.json").read_text())
     patch = layouts[5]
-    assert saved["first_data_position"] == list(ORIGINS[5])
+    assert saved["first_data_position"] == list(spots[5].origin)
+    assert saved["direction"] == list(spots[5].direction)
     assert {int(q): physical for q, physical in saved["data_qubits"].items()} == patch.data
     assert saved["x_gauge_ancillas"] == patch.x_ancillas
     assert saved["z_gauge_ancillas"] == patch.z_ancillas
