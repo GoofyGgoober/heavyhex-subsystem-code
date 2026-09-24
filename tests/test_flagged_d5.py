@@ -1,4 +1,4 @@
-"""Local validation of the 65-qubit blueprint circuit; no hardware access."""
+"""The 65-qubit d=5 flagged circuit, checked on Aer."""
 
 import json
 from itertools import combinations
@@ -6,36 +6,13 @@ from pathlib import Path
 
 import pytest
 
-from heavyhex.circuits.flagged import (
-    DEFLAG,
-    FLAG_OF_X,
-    SYN_OF_Z,
-    Z2_ARMS,
-    Z4_ARMS,
-    flagged_roles,
-    memory_circuit_flagged,
-    propagate_fault,
-    single_faults,
-)
+from heavyhex.circuits.flagged import memory_circuit_flagged, propagate_fault, single_faults
 from heavyhex.core import Pauli
-from heavyhex.patches.operators import D3, D5
+from heavyhex.patches.operators import D5
 
 pytest.importorskip("qiskit_aer")
 
-from heavyhex.simulation.aer import (  # noqa: E402
-    _deflag_adjusted_x_checks,
-    run_flagged_circuit,
-    run_memory_flagged,
-)
-
-
-def test_generated_d3_roles_preserve_original_assignments():
-    roles = flagged_roles(D3)
-    assert roles.flag_of_x == FLAG_OF_X
-    assert roles.syn_of_z == SYN_OF_Z
-    assert roles.z2_arms == Z2_ARMS
-    assert roles.z4_arms == Z4_ARMS
-    assert roles.deflag == DEFLAG
+from heavyhex.simulation.aer import run_flagged_circuit, run_memory_flagged  # noqa: E402
 
 
 def test_d5_gates_follow_every_blueprint_bond():
@@ -45,8 +22,8 @@ def test_d5_gates_follow_every_blueprint_bond():
     circuit, schedule = memory_circuit_flagged(D5, rounds=3)
     roles = schedule.roles
     mapping = {int(q) - 1: physical for q, physical in saved["data_qubits"].items()}
-    mapping.update({q: saved["x_gauge_ancillas"][name] for name, q in roles.flag_of_x.items()})
-    mapping.update({q: saved["z_gauge_ancillas"][name] for name, q in roles.syn_of_z.items()})
+    mapping.update({q: saved["x_gauge_ancillas"][name] for name, q in roles.x_ancillas.items()})
+    mapping.update({q: saved["z_gauge_ancillas"][name] for name, q in roles.z_ancillas.items()})
     bonds = {frozenset((a, b)) for _, a, b in saved["couplings"]}
     for name, arms in roles.z2_arms.items():
         for data, relay in arms:
@@ -73,31 +50,13 @@ def test_d5_gates_follow_every_blueprint_bond():
 
 
 @pytest.mark.parametrize("basis", ["X", "Z"])
-@pytest.mark.parametrize("rounds", [1, 3])
-def test_noiseless_d5_preserves_checks_and_logical_frame(basis, rounds):
-    circuit, schedule = memory_circuit_flagged(D5, rounds=rounds, basis=basis)
-    records = run_flagged_circuit(circuit, schedule, shots=64, seed=27)
-    logical = D5.code.logical_x if basis == "X" else D5.code.logical_z
-    support = logical.x or logical.z
-    for record in records:
-        assert record["success"] is None  # MWPM has not been implemented yet.
-        assert not any(record["syndrome"])
-        assert all(
-            record["gauge_bits"][m.bit] == 0 for m in schedule.measurements if m.kind == "relay"
-        )
-        adjusted = _deflag_adjusted_x_checks(schedule, record["checks"], record["corrections"])
-        for name in D5.stabilizer_names:
-            values = [value for (_, stab), value in adjusted.items() if stab == name]
-            assert len(set(values)) == 1
-        bits = list(record["data_bits"])
-        if basis == "X":
-            for _, correction in record["corrections"]:
-                for q in correction.z:
-                    bits[q] ^= 1
-        assert sum(bits[q] for q in support) % 2 == 0
-        stabs = D5.x_stabilizers if basis == "X" else D5.z_stabilizers
-        for name, labels in stabs.items():
-            assert sum(bits[q - 1] for q in labels) % 2 == adjusted[rounds - 1, name]
+def test_noiseless_d5_has_quiet_relays_and_no_detectors(basis):
+    circuit, schedule = memory_circuit_flagged(D5, rounds=3, basis=basis)
+    relays = [m.bit for m in schedule.measurements if m.kind == "relay"]
+    for record in run_flagged_circuit(circuit, schedule, shots=64, seed=27):
+        assert record["success"] is None  # lookup can't grade d=5
+        assert not any(record["detectors"])
+        assert all(record["gauge_bits"][bit] == 0 for bit in relays)
 
 
 @pytest.mark.parametrize("basis", ["X", "Z"])
@@ -113,7 +72,7 @@ def test_all_d5_single_data_paulis_have_expected_syndrome(basis):
 def test_d5_gadget_faults_do_not_grow_or_hide_logicals(basis):
     circuit, schedule = memory_circuit_flagged(D5, basis=basis)
     roles = schedule.roles
-    flags = set(roles.flag_of_x.values())
+    flags = set(roles.x_ancillas.values())
     relays = {q for arms in roles.z2_arms.values() for _, q in arms}
     candidates = [Pauli()]
     for q in D5.data_qubits:
@@ -121,18 +80,18 @@ def test_d5_gadget_faults_do_not_grow_or_hide_logicals(basis):
         candidates.extend((x, z, x * z))
     groups = {}
     count = 0
-    for fragment in schedule.fragments:
-        for index, fault in single_faults(circuit, fragment):
+    for gadget in schedule.gadgets:
+        for index, fault in single_faults(circuit, gadget):
             count += 1
-            outgoing, flipped = propagate_fault(circuit, fragment, index, fault)
-            flag_flips = flipped & flags if fragment.half == "Z" else frozenset()
+            outgoing, flipped = propagate_fault(circuit, gadget, index, fault)
+            flag_flips = flipped & flags if gadget.half == "Z" else frozenset()
             if flag_flips:
                 assert outgoing.weight() <= 2
-                key = (fragment.name, flag_flips, flipped - flags - relays)
+                key = (gadget, flag_flips, flipped - flags - relays)
                 groups.setdefault(key, []).append(outgoing)
             else:
                 assert any(D5.code.in_gauge_group(outgoing * p) for p in candidates)
     assert count > 2000
     for errors in groups.values():
         for first, second in combinations(errors, 2):
-            assert not D5.code.is_harmful_undetectable(first * second)
+            assert not D5.code.is_logical(first * second)

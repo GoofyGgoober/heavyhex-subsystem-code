@@ -1,7 +1,7 @@
-"""Embed a heavy-hex patch on a device coupling map.
+"""Place a heavy-hex patch on the chip's coupling map.
 
-Data sit on even offsets from the anchor, ancillas and relays on odd ones.
-Supports are 1-based code labels; every other value is a physical device id.
+Data qubits sit two sites apart, with ancillas and relays on the sites between.
+Supports use 1-based code labels; every other number is a physical qubit.
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ class HeavyHexLayout:
     x_ancillas: dict[str, int]
     z_ancillas: dict[str, int]
     relays: tuple[int, ...]
-    wires: tuple[tuple[str, int, int], ...]
+    couplings: tuple[tuple[str, int, int], ...]
 
     @property
     def physical_qubits(self) -> set[int]:
@@ -39,12 +39,12 @@ def build_layout(
     coords: list[list[int]],
     edges: list[tuple[int, int]],
     *,
-    first_data_position: tuple[int, int],
+    origin: tuple[int, int],
 ) -> HeavyHexLayout:
-    """Embed a patch at a specified top-left data site; reject missing bonds."""
+    """Put data qubit 1 at origin, and fail if the patch needs a bond the chip doesn't have."""
     operators = build_operators(distance)
     d = operators.distance
-    x0, y0 = first_data_position
+    x0, y0 = origin
     position_to_qubit = {tuple(position): q for q, position in enumerate(coords)}
     bonds = {tuple(sorted(edge)) for edge in edges}
 
@@ -62,36 +62,37 @@ def build_layout(
     x_ancillas: dict[str, int] = {}
     z_ancillas: dict[str, int] = {}
     relays: list[int] = []
-    wires: list[tuple[str, int, int]] = []
+    couplings: list[tuple[str, int, int]] = []
 
     for name, support in operators.x_gauges.items():
         row, column = _row_column(support[0], d)
         ancilla = site(x0 + 2 * column - 1, y0 + 2 * (row - 1))
         x_ancillas[name] = ancilla
-        wires.extend(("x", data[q], ancilla) for q in support)
+        couplings.extend(("x", data[q], ancilla) for q in support)
 
     for name, support in operators.z_gauges.items():
         row, column = _row_column(support[0], d)
         y = y0 + 2 * row - 1
         if len(support) == 4:
-            # Block arms run through the in-row X ancillas, which double as flags.
+            # A Z4 gauge reaches its data through the X ancillas above and below it,
+            # which double as flags.
             x = x0 + 2 * column - 1
             ancilla = site(x, y)
-            wires.extend(("z", site(x, arm_y), ancilla) for arm_y in (y - 1, y + 1))
+            couplings.extend(("z", site(x, arm_y), ancilla) for arm_y in (y - 1, y + 1))
         else:
-            # Boundary pairs have no in-row flag to borrow: they reach data through relays.
+            # Boundary pairs have no X ancilla in their row, so they go through relays.
             x = x0 - 1 if column == 1 else x0 + 2 * (d - 1) + 1
             ancilla = site(x, y)
             for q, arm_y in zip(support, (y - 1, y + 1)):
                 relay = site(x, arm_y)
                 relays.append(relay)
-                wires.extend((("z", data[q], relay), ("z", relay, ancilla)))
+                couplings.extend((("z", data[q], relay), ("z", relay, ancilla)))
         z_ancillas[name] = ancilla
 
     assigned = [*data.values(), *x_ancillas.values(), *z_ancillas.values(), *relays]
     if len(set(assigned)) != len(assigned):
         raise ValueError("device qubit assigned to multiple patch roles")
-    for _, a, b in wires:
+    for _, a, b in couplings:
         if tuple(sorted((a, b))) not in bonds:
             raise ValueError(f"patch requires a missing device bond: {a}-{b}")
     return HeavyHexLayout(
@@ -104,7 +105,7 @@ def build_layout(
         x_ancillas=x_ancillas,
         z_ancillas=z_ancillas,
         relays=tuple(relays),
-        wires=tuple(wires),
+        couplings=tuple(couplings),
     )
 
 

@@ -1,18 +1,17 @@
 # ML decoder (planned)
 
-**Goal.** Map a shot's gauge history and final data readout to a logical-flip
-prediction, as a drop-in alternative to the lookup decoder.
+**Goal.** Predict a shot's logical flip from its gauge outcomes and final
+readout, as an alternative to MWPM.
 
-**Why.** Lookup tables grow as \(2^{n_{checks}}\) and stop at d=5, and real
-device noise is correlated, biased and drifting. A learned decoder can fit it.
+**Why.** MWPM assumes independent errors with known rates. Noise on the chip
+is correlated, biased and drifts, and a learned decoder can fit that.
 
-**Training data.** Simulated shots labelled by their sampled faults, so the
-simulator must record per-shot faults.
+**Training data.** Simulated shots labelled with their true logical flip.
+`sample_memory` gives these for the simple noise model; there is no noisy
+circuit simulation yet.
 
-**Baseline and metric.** Flag-conditioned minimum-weight matching on the
-derived stabilizers. Compare decoded logical failure and decode time per
-shot; ship only if it beats matching on mismatched noise or is decisively
-faster.
+**Compare against** [MWPM](mwpm-decoder.md) that uses the flags, once it
+exists, on logical error rate and time per shot. Keep it only if it wins when
+the noise model is wrong, or is much faster.
 
-**Non-goals.** Real-time FPGA decoding; small matched models, where
-enumeration already wins.
+**Not planned.** Real-time decoding on an FPGA.

@@ -5,9 +5,9 @@ import sys
 
 import pytest
 
-from heavyhex.cli import COMMANDS, main, parse_error, parse_syndrome
+from heavyhex.cli import COMMANDS, main, parse_pauli, parse_syndrome
 from heavyhex.core import Pauli
-from heavyhex.patches import D3
+from heavyhex.patches.operators import D3
 
 
 @pytest.mark.parametrize(
@@ -20,17 +20,17 @@ from heavyhex.patches import D3
         ("ZL", D3.code.logical_z),
     ],
 )
-def test_parse_error_accepts_paulis_logicals_and_identity(text, expected):
-    assert parse_error(text, D3) == expected
+def test_parse_pauli_accepts_paulis_logicals_and_identity(text, expected):
+    assert parse_pauli(text, D3) == expected
 
 
 @pytest.mark.parametrize(
     "text, message",
     [("X9", "data qubit"), ("Q1", "cannot parse"), ("", "expected a Pauli")],
 )
-def test_parse_error_rejects_bad_input(text, message):
+def test_parse_pauli_rejects_bad_input(text, message):
     with pytest.raises(ValueError, match=message):
-        parse_error(text, D3)
+        parse_pauli(text, D3)
 
 
 @pytest.mark.parametrize("text", ["00000", "00000x"])
@@ -127,3 +127,50 @@ def test_d5_circuit_is_available(capsys):
     pytest.importorskip("qiskit")
     assert main(["--distance", "5", "circuit"]) == 0
     assert "q_64" in capsys.readouterr().out
+
+
+def test_d5_mwpm_run_decodes_late_error(capsys):
+    pytest.importorskip("qiskit_aer")
+    pytest.importorskip("pymatching")
+    assert (
+        main(
+            [
+                "--distance",
+                "5",
+                "--json",
+                "run",
+                "--decoder",
+                "mwpm",
+                "--rounds",
+                "3",
+                "--shots",
+                "8",
+                "--seed",
+                "7",
+                "--error",
+                "X0",
+                "--inject-at",
+                "after_x2",
+            ]
+        )
+        == 0
+    )
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["successes"] == 8
+    assert payload["rounds"] == 3
+    assert payload["decoder"] == "mwpm"
+
+
+def test_phenomenological_simulation_cli(capsys):
+    pytest.importorskip("pymatching")
+    assert main(["--distance", "5", "--json", "mwpm-sim", "--shots", "128", "--seed", "7"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["shots"] == 128
+    assert payload["model"] == "phenomenological_independent_stabilizer_errors"
+    assert payload["logical_failures"] <= payload["raw_logical_flips"]
+
+
+def test_missing_matching_extra_is_reported(monkeypatch, capsys):
+    monkeypatch.setitem(sys.modules, "pymatching", None)
+    assert main(["mwpm-sim", "--shots", "1"]) == 1
+    assert "[sim,matching]" in capsys.readouterr().err

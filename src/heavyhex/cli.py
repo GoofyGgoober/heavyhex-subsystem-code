@@ -1,7 +1,7 @@
-"""Command-line tools for the heavy-hex subsystem code.
+"""The heavyhex command.
 
-Data-qubit ids are 0-based (paper Q label = id + 1). Lookup decoding is
-d=3 only; d=5 circuits and Aer runs report syndromes without decoded success.
+Data qubit ids are 0-based (the paper's Q label is id + 1). Lookup decoding
+only works at d=3, MWPM at d=3 and d=5.
 """
 
 from __future__ import annotations
@@ -11,8 +11,7 @@ import json
 import re
 import sys
 from collections import Counter
-from collections.abc import Iterator, Sequence
-from itertools import combinations, product
+from collections.abc import Sequence
 from typing import Any
 
 from .core import Pauli
@@ -22,11 +21,11 @@ from .patches.operators import D3, D5, HeavyHexOperators
 PATCHES: dict[int, HeavyHexOperators] = {3: D3, 5: D5}
 AXES = "XYZ"
 BASES = ("X", "Z")
-INSTALL_HINT = "python -m pip install -e '.[sim]'"
+INSTALL_HINT = "python -m pip install -e '.[sim,matching]'"
 _PAULI_WORD = re.compile(r"([XYZ])(\d+)", re.IGNORECASE)
 
 
-def parse_error(text: str, patch: HeavyHexOperators) -> Pauli:
+def parse_pauli(text: str, patch: HeavyHexOperators) -> Pauli:
     """Parse 'X0 Z3' (0-based data ids), 'I', 'X_L', 'Z_L' or 'Y_L'."""
     code = patch.code
     words = text.split()
@@ -78,7 +77,7 @@ def pauli_words(pauli: Pauli) -> str:
 
 
 def format_pauli(pauli: Pauli, patch: HeavyHexOperators) -> str:
-    """Pauli words, annotated when the operator is exactly a bare logical."""
+    """Pauli words, plus X_L, Y_L or Z_L when it is exactly that logical."""
     code = patch.code
     logicals = {
         code.logical_x: "X_L",
@@ -110,10 +109,12 @@ def _emit(payload: dict[str, Any], lines: Sequence[str], *, as_json: bool) -> in
     return 0
 
 
-def _info_payload(patch: HeavyHexOperators) -> dict[str, Any]:
+def _info_command(args: argparse.Namespace) -> int:
+    patch = _patch(args)
     code = patch.code
-    return {
-        "distance": patch.distance,
+    d = patch.distance
+    payload = {
+        "distance": d,
         "data_qubits": list(patch.data_qubits),
         "n_stabilizers": code.syndrome_size,
         "n_gauge_qubits": code.gauge_qubit_count(),
@@ -126,12 +127,7 @@ def _info_payload(patch: HeavyHexOperators) -> dict[str, Any]:
         "logical_x": pauli_words(code.logical_x),
         "logical_z": pauli_words(code.logical_z),
     }
-
-
-def _info_lines(patch: HeavyHexOperators) -> list[str]:
-    code = patch.code
-    d = patch.distance
-    return [
+    lines = [
         f"[[{d * d},1,{d}]] heavy-hex subsystem code, d={d}",
         f"Data ids: 0..{d * d - 1} (paper Q label = id + 1)",
         f"Stabilizers: {code.syndrome_size}, gauge qubits: {code.gauge_qubit_count()}",
@@ -140,17 +136,13 @@ def _info_lines(patch: HeavyHexOperators) -> list[str]:
         f"X gauges ({len(patch.x_gauges)}), Z gauges ({len(patch.z_gauges)}) measured;",
         f"stabilizers ({', '.join(patch.stabilizer_names)}) inferred as products.",
     ]
-
-
-def _info_command(args: argparse.Namespace) -> int:
-    patch = _patch(args)
-    return _emit(_info_payload(patch), _info_lines(patch), as_json=args.json)
+    return _emit(payload, lines, as_json=args.json)
 
 
 def _syndrome_command(args: argparse.Namespace) -> int:
     patch = _patch(args)
     code = patch.code
-    error = parse_error(args.error, patch)
+    error = parse_pauli(args.error, patch)
     syndrome = code.syndrome(error)
     payload: dict[str, Any] = {
         "error": pauli_words(error),
@@ -193,23 +185,14 @@ def _decode_command(args: argparse.Namespace) -> int:
     return _emit(payload, lines, as_json=args.json)
 
 
-def _errors_of_weight(weight: int, axes: str, patch: HeavyHexOperators) -> Iterator[Pauli]:
-    for qubits in combinations(patch.data_qubits, weight):
-        for chosen in product(axes, repeat=weight):
-            pairs = tuple(zip(chosen, qubits))
-            x = frozenset(qubit for axis, qubit in pairs if axis in "XY")
-            z = frozenset(qubit for axis, qubit in pairs if axis in "ZY")
-            yield Pauli(x, z)
-
-
 def _grade_errors(
     patch: HeavyHexOperators, weight: int, axes: str
 ) -> tuple[dict[str, int], list[dict[str, Any]]]:
-    """Grade every error of the given weight; rows cover the decoded cases."""
+    """Sort every error of this weight into the four counts. Rows list the decoded and harmful ones."""
     code = patch.code
     counts = {"corrected": 0, "detected": 0, "harmless": 0, "harmful": 0}
     rows: list[dict[str, Any]] = []
-    for error in _errors_of_weight(weight, axes, patch):
+    for error in code.paulis_of_weight(weight, axes):
         syndrome = code.syndrome(error)
         if any(syndrome):
             if patch.distance != 3:
@@ -260,18 +243,29 @@ def _run_command(args: argparse.Namespace) -> int:
     from .simulation.aer import run_memory_flagged  # qiskit-aer is an optional extra
 
     patch = _patch(args)
-    error = parse_error(args.error, patch) if args.error else None
+    error = parse_pauli(args.error, patch) if args.error else None
     records = run_memory_flagged(
-        patch, basis=args.basis, error=error, shots=args.shots, seed=args.seed
+        patch,
+        basis=args.basis,
+        rounds=args.rounds,
+        error=error,
+        inject_at=args.inject_at,
+        decoder=args.decoder,
+        shots=args.shots,
+        seed=args.seed,
     )
 
     graded = all(record["success"] is not None for record in records)
     successes = sum(1 for record in records if record["success"]) if graded else None
     syndromes = Counter("".join(map(str, record["syndrome"])) for record in records)
-    # Most frequent syndrome, ties broken lexicographically for reproducibility.
+    # Most common syndrome; ties go to the smallest bitstring.
     dominant = min(syndromes, key=lambda bits: (-syndromes[bits], bits))
     payload: dict[str, Any] = {
         "backend": "aer_stabilizer_flagged",
+        "distance": patch.distance,
+        "rounds": args.rounds,
+        "decoder": args.decoder,
+        "inject_at": args.inject_at,
         "basis": args.basis,
         "error": pauli_words(error) if error else "I",
         "shots": len(records),
@@ -282,7 +276,9 @@ def _run_command(args: argparse.Namespace) -> int:
     if args.counts:
         payload["syndrome_counts"] = dict(syndromes)
     lines = [
-        f"Backend:  Aer stabilizer (flagged d={patch.distance} memory, one round)",
+        f"Backend:  Aer stabilizer (flagged d={patch.distance} memory, "
+        f"{args.rounds} round{'s' if args.rounds != 1 else ''})",
+        f"Decoder:  {args.decoder}",
         f"Error:    {format_pauli(error, patch) if error else 'I'}",
         f"Shots:    {len(records)}  successes: {successes if graded else 'not decoded'}",
         f"Syndrome: {dominant}  ({len(syndromes)} distinct)",
@@ -294,10 +290,35 @@ def _circuit_command(args: argparse.Namespace) -> int:
     from .circuits.flagged import memory_circuit_flagged  # qiskit is an optional extra
 
     patch = _patch(args)
-    error = parse_error(args.error, patch) if args.error else None
-    circuit, _ = memory_circuit_flagged(patch, basis=args.basis, error=error)
+    error = parse_pauli(args.error, patch) if args.error else None
+    circuit, _ = memory_circuit_flagged(patch, basis=args.basis, rounds=args.rounds, error=error)
     print(circuit.draw(output="text"))
     return 0
+
+
+def _mwpm_sim_command(args: argparse.Namespace) -> int:
+    from .decoders.mwpm import MemoryNoise
+    from .simulation.phenomenological import benchmark_memory
+
+    result = benchmark_memory(
+        _patch(args),
+        basis=args.basis,
+        rounds=args.rounds,
+        shots=args.shots,
+        seed=args.seed,
+        noise=MemoryNoise(args.data_error, args.measurement_error, args.readout_error),
+    )
+    low, high = result["logical_error_rate_95ci"]
+    return _emit(
+        result,
+        [
+            f"Phenomenological MWPM: d={args.distance}, {args.basis} memory, {args.rounds} rounds",
+            f"Shots: {result['shots']}  raw logical flips: {result['raw_logical_flips']}",
+            f"Decoded logical failures: {result['logical_failures']} "
+            f"({result['logical_error_rate']:.3g}, 95% CI {low:.3g}-{high:.3g})",
+        ],
+        as_json=args.json,
+    )
 
 
 COMMANDS = {
@@ -307,6 +328,7 @@ COMMANDS = {
     "sweep": _sweep_command,
     "run": _run_command,
     "circuit": _circuit_command,
+    "mwpm-sim": _mwpm_sim_command,
 }
 
 
@@ -331,22 +353,43 @@ def build_parser() -> argparse.ArgumentParser:
     sweep.add_argument("--failures-only", action="store_true")
 
     run = sub.add_parser(
-        "run", help="Flagged Aer memory round (d=3 or d=5; lookup grading only at d=3)"
+        "run", help="Flagged Aer memory (lookup or phenomenological MWPM baseline)"
     )
     run.add_argument("--basis", type=str.upper, choices=BASES, default="Z")
     run.add_argument("--shots", type=int, default=128)
     run.add_argument("--seed", type=int, default=None)
     run.add_argument("--error", default=None, help="e.g. 'X0 Z3'")
     run.add_argument("--counts", action="store_true")
+    run.add_argument("--rounds", type=int, default=1)
+    run.add_argument("--decoder", choices=("lookup", "mwpm"), default="lookup")
+    run.add_argument(
+        "--inject-at", default="after_prep", help="after_prep, after_x0, after_z0, ..."
+    )
 
     circuit = sub.add_parser("circuit", help="Draw the flagged memory circuit (d=3 or d=5)")
     circuit.add_argument("--basis", type=str.upper, choices=BASES, default="Z")
     circuit.add_argument("--error", default=None, help="e.g. 'X0 Z3'")
+    circuit.add_argument("--rounds", type=int, default=1)
+
+    mwpm_sim = sub.add_parser("mwpm-sim", help="Local phenomenological noise benchmark (no QPU)")
+    mwpm_sim.add_argument("--basis", type=str.upper, choices=BASES, default="Z")
+    mwpm_sim.add_argument("--rounds", type=int, default=3)
+    mwpm_sim.add_argument("--shots", type=int, default=1024)
+    mwpm_sim.add_argument("--seed", type=int, default=None)
+    mwpm_sim.add_argument("--data-error", type=float, default=0.01)
+    mwpm_sim.add_argument("--measurement-error", type=float, default=0.01)
+    mwpm_sim.add_argument("--readout-error", type=float, default=0.0)
     return parser
 
 
 def _missing_extra(error: ImportError) -> bool:
-    return (error.name or "").split(".", 1)[0] in ("qiskit", "qiskit_aer")
+    return (error.name or "").split(".", 1)[0] in (
+        "qiskit",
+        "qiskit_aer",
+        "pymatching",
+        "numpy",
+        "scipy",
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -361,8 +404,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Error: {error}", file=sys.stderr)
         return 2
     except ImportError as error:
-        # Qiskit only ever reaches us from the lazily imported simulator paths.
+        # qiskit, numpy and pymatching are optional and only imported where needed.
         if not _missing_extra(error):
             raise
-        print(f"Error: the {args.command} command needs Qiskit: {INSTALL_HINT}", file=sys.stderr)
+        print(
+            f"Error: the {args.command} command needs optional dependencies: {INSTALL_HINT}",
+            file=sys.stderr,
+        )
         return 1

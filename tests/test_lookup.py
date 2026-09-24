@@ -1,23 +1,27 @@
-"""Lookup decoder: every correction is minimum weight and subsystem-correct."""
+"""Lookup decoder: corrections are the lightest possible and leave only a gauge."""
 
 import pytest
 
 from heavyhex.core import Pauli
-from heavyhex.decoders.lookup import decode, residual_in_gauge_group
+from heavyhex.decoders.lookup import decode
 from heavyhex.patches.operators import D3, D5
 
 CODE = D3.code
 
 
+def corrects(error: Pauli) -> bool:
+    return CODE.in_gauge_group(decode(CODE.syndrome(error)) * error)
+
+
 def test_every_single_qubit_error_corrects_into_the_gauge_group():
-    assert residual_in_gauge_group(Pauli())
+    assert corrects(Pauli())
     for qubit in CODE.data_qubits:
         for error in (
             Pauli.x_on((qubit,)),
             Pauli.z_on((qubit,)),
             Pauli.x_on((qubit,)) * Pauli.z_on((qubit,)),
         ):
-            assert residual_in_gauge_group(error)
+            assert corrects(error)
 
 
 def test_table_entries_are_minimum_weight():
@@ -33,7 +37,7 @@ def test_table_entries_are_minimum_weight():
 def test_logical_operators_are_invisible_but_fatal():
     assert CODE.syndrome(CODE.logical_x) == (0,) * CODE.syndrome_size
     assert decode((0,) * CODE.syndrome_size) == Pauli()
-    assert not residual_in_gauge_group(CODE.logical_x)
+    assert not corrects(CODE.logical_x)
 
 
 @pytest.mark.parametrize("syndrome", [(0,) * 5, (0,) * 7, (2,) * 6])

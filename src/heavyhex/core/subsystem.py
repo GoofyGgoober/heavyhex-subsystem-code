@@ -1,6 +1,7 @@
-"""Phase-free CSS subsystem-code algebra.
+"""CSS subsystem codes, with Paulis as GF(2) bitmasks.
 
-Gauge group G, stabilizers S = center of G, distance = min |N(S) \\ G|.
+G is the gauge group and S, its center, the stabilizers. The distance is the
+weight of the lightest Pauli that commutes with S but is not in G.
 """
 
 from __future__ import annotations
@@ -12,14 +13,10 @@ from itertools import combinations, product
 
 from .pauli import Pauli
 
-# Single-qubit axes as (has_x, has_z); the order fixes which minimum-weight
-# error a decoder sees first when several share a syndrome.
-_AXES = ((True, False), (True, True), (False, True))
-
 
 @dataclass(frozen=True)
 class SubsystemCode:
-    """A phase-free CSS subsystem code over an explicit set of data qubits."""
+    """Checks on construction that the stabilizers and logicals fit the gauges."""
 
     data_qubits: tuple[int, ...]
     gauge_x: tuple[Pauli, ...]
@@ -113,34 +110,30 @@ class SubsystemCode:
         self.validate_data_pauli(error, name="error")
         return tuple(0 if error.commutes(s) else 1 for s in self.stabilizers)
 
-    def is_harmful_undetectable(self, pauli: Pauli) -> bool:
-        """True for N(S) \\ G: commutes with every stabilizer, outside G."""
+    def is_logical(self, pauli: Pauli) -> bool:
+        """Undetectable but not a gauge, so it acts on the logical qubit."""
         return all(pauli.commutes(s) for s in self.stabilizers) and not self.in_gauge_group(pauli)
 
-    def paulis_of_weight(self, weight: int) -> Iterator[Pauli]:
-        if weight == 0:
-            yield Pauli()
-            return
+    def paulis_of_weight(self, weight: int, axes: str = "XYZ") -> Iterator[Pauli]:
+        """Every Pauli of this weight using only the given axes.
+
+        The lookup table keeps the first error it sees per syndrome, so this order
+        decides its corrections.
+        """
         for qubits in combinations(self.data_qubits, weight):
-            for axes in product(_AXES, repeat=weight):
-                x = frozenset(q for q, (has_x, _) in zip(qubits, axes) if has_x)
-                z = frozenset(q for q, (_, has_z) in zip(qubits, axes) if has_z)
+            for letters in product(axes, repeat=weight):
+                x = frozenset(q for q, a in zip(qubits, letters) if a in "XY")
+                z = frozenset(q for q, a in zip(qubits, letters) if a in "YZ")
                 yield Pauli(x, z)
 
-    def min_harmful_weight(self, max_weight: int | None = None) -> int | None:
-        """Lightest N(S) \\ G element, or None if none exists up to max_weight."""
+    def distance(self, max_weight: int | None = None) -> int | None:
+        """Weight of the lightest logical, or None if there is none up to max_weight."""
         limit = self.n if max_weight is None else max_weight
         for weight in range(1, limit + 1):
             for pauli in self.paulis_of_weight(weight):
-                if self.is_harmful_undetectable(pauli):
+                if self.is_logical(pauli):
                     return weight
         return None
-
-    def distance(self) -> int:
-        found = self.min_harmful_weight()
-        if found is None:  # pragma: no cover - a code always has a logical operator
-            raise RuntimeError("no harmful undetectable error found")
-        return found
 
     @cached_property
     def _positions(self) -> dict[int, int]:
@@ -148,7 +141,7 @@ class SubsystemCode:
 
 
 def _independent_rows(rows: Iterable[int], width: int) -> list[int]:
-    """Reduced row echelon form over GF(2); every row's pivot is its lowest set bit."""
+    """GF(2) row reduction. Each row that comes back has its pivot at its lowest set bit."""
     rows = list(rows)
     lead = 0
     row = 0
@@ -167,7 +160,7 @@ def _independent_rows(rows: Iterable[int], width: int) -> list[int]:
 
 
 def _in_rowspace(bits: int, basis: tuple[int, ...]) -> bool:
-    """True when bits is a GF(2) sum of basis, which must come from _independent_rows."""
+    """True when bits is a sum of basis rows. basis must come from _independent_rows."""
     leftover = bits
     for row in basis:
         pivot = row & -row

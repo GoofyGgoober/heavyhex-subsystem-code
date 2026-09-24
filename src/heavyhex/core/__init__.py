@@ -1,4 +1,4 @@
-"""Algebraic primitives for phase-free subsystem codes."""
+"""Paulis and subsystem-code algebra."""
 
 from .pauli import Pauli
 from .subsystem import SubsystemCode

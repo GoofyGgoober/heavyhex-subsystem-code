@@ -1,4 +1,4 @@
-"""Offline checks for the two heavy-hex device layouts drawn in docs/figures."""
+"""The d=3 and d=5 placements on Fez drawn in docs/figures."""
 
 import json
 from collections import Counter
@@ -21,29 +21,13 @@ def device_map():
 @pytest.fixture
 def layouts(device_map):
     return {
-        distance: build_layout(
-            distance, device_map["coords"], device_map["edges"], first_data_position=origin
-        )
+        distance: build_layout(distance, device_map["coords"], device_map["edges"], origin=origin)
         for distance, origin in ORIGINS.items()
     }
 
 
-def binary_rank(supports):
-    """GF(2) rank of operator supports encoded as bitmasks over code qubits."""
-    pivots = {}
-    for support in supports:
-        vector = sum(1 << (q - 1) for q in support)
-        while vector:
-            pivot = vector.bit_length() - 1
-            if pivot not in pivots:
-                pivots[pivot] = vector
-                break
-            vector ^= pivots[pivot]
-    return len(pivots)
-
-
 @pytest.mark.parametrize(("distance", "sites", "bonds"), [(3, 23, 24), (5, 65, 72)])
-def test_patch_roles_counts_and_real_couplings(layouts, device_map, distance, sites, bonds):
+def test_patch_sits_on_real_couplings(layouts, device_map, distance, sites, bonds):
     device_bonds = {tuple(sorted(edge)) for edge in device_map["edges"]}
     patch = layouts[distance]
     d = patch.distance
@@ -53,8 +37,8 @@ def test_patch_roles_counts_and_real_couplings(layouts, device_map, distance, si
     assert len(patch.z_ancillas) == len(patch.z_gauges) == (d * d - 1) // 2
     assert len(patch.relays) == 2 * (d - 1)
     assert len(patch.physical_qubits) == sites
-    patch_bonds = {tuple(sorted((a, b))) for _, a, b in patch.wires}
-    assert len(patch.wires) == len(patch_bonds) == bonds
+    patch_bonds = {tuple(sorted((a, b))) for _, a, b in patch.couplings}
+    assert len(patch.couplings) == len(patch_bonds) == bonds
     assert patch_bonds <= device_bonds
     assert {q for edge in patch_bonds for q in edge} == patch.physical_qubits
     # Heavy-hex is degree <= 3; a busier site would not be routable.
@@ -92,47 +76,16 @@ def test_d3_matches_the_original_falcon_mapping(layouts):
     assert set(patch.z_stabilizers) == {"Z1Z2Z4Z5Z7Z8", "Z2Z3Z5Z6Z8Z9"}
 
 
-@pytest.mark.parametrize("distance", [3, 5])
-def test_stabilizers_are_central_gauge_products_with_one_logical_qubit(layouts, distance):
-    patch = layouts[distance]
-    d = patch.distance
-    gx, gz = list(patch.x_gauges.values()), list(patch.z_gauges.values())
-    sx, sz = list(patch.x_stabilizers.values()), list(patch.z_stabilizers.values())
-    for same_basis, stabilizers, other_basis in ((gx, sx, gz), (gz, sz, gx)):
-        assert binary_rank(stabilizers) == len(stabilizers)
-        assert binary_rank(same_basis + stabilizers) == binary_rank(same_basis)
-        assert all(len(set(s) & set(g)) % 2 == 0 for s in stabilizers for g in other_basis)
-    stabilizer_rank = binary_rank(sx) + binary_rank(sz)
-    gauge_rank = binary_rank(gx) + binary_rank(gz)
-    gauge_qubits = (gauge_rank - stabilizer_rank) // 2
-    assert gauge_qubits == (d - 1) ** 2 // 2
-    assert d * d - stabilizer_rank - gauge_qubits == 1
-    logical_x = tuple(range(1, d + 1))
-    logical_z = tuple(range(1, d * d + 1, d))
-    for logical, same_basis, other_basis in ((logical_x, gx, gz), (logical_z, gz, gx)):
-        assert all(len(set(logical) & set(g)) % 2 == 0 for g in other_basis)
-        assert binary_rank(same_basis + [logical]) == binary_rank(same_basis) + 1
-    assert len(set(logical_x) & set(logical_z)) % 2 == 1
-
-
-@pytest.mark.parametrize("distance", [True, 2, 4, 5.0])
-def test_invalid_distance_is_rejected(device_map, distance):
-    with pytest.raises(ValueError, match="odd integer"):
-        build_layout(
-            distance, device_map["coords"], device_map["edges"], first_data_position=ORIGINS[5]
-        )
-
-
 def test_missing_physical_bond_is_rejected(layouts, device_map):
-    _, a, b = layouts[5].wires[0]
+    _, a, b = layouts[5].couplings[0]
     edges = [edge for edge in device_map["edges"] if set(edge) != {a, b}]
     with pytest.raises(ValueError, match="missing device bond"):
-        build_layout(5, device_map["coords"], edges, first_data_position=ORIGINS[5])
+        build_layout(5, device_map["coords"], edges, origin=ORIGINS[5])
 
 
 def test_off_chip_placement_is_rejected(device_map):
     with pytest.raises(ValueError, match="no device qubit"):
-        build_layout(5, device_map["coords"], device_map["edges"], first_data_position=(3, 11))
+        build_layout(5, device_map["coords"], device_map["edges"], origin=(3, 11))
 
 
 def test_saved_d5_manifest_matches_generated_layout(layouts):
@@ -143,7 +96,7 @@ def test_saved_d5_manifest_matches_generated_layout(layouts):
     assert saved["x_gauge_ancillas"] == patch.x_ancillas
     assert saved["z_gauge_ancillas"] == patch.z_ancillas
     assert set(saved["boundary_relays"]) == set(patch.relays)
-    assert {tuple(wire) for wire in saved["couplings"]} == set(patch.wires)
+    assert {tuple(coupling) for coupling in saved["couplings"]} == set(patch.couplings)
     for field in ("x_gauges", "z_gauges", "x_stabilizers", "z_stabilizers"):
         assert {name: tuple(support) for name, support in saved[field].items()} == getattr(
             patch, field

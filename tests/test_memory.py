@@ -1,4 +1,4 @@
-"""Aer validation of abstract heavy-hex memory: stability, randomness, correction."""
+"""The ideal d=3 memory circuit on Aer."""
 
 import pytest
 
@@ -45,7 +45,7 @@ def test_logical_error_is_invisible_and_fatal(basis):
 
 def test_checks_are_frozen_across_noiseless_rounds_while_gauges_jitter():
     _, schedule = memory_circuit(D3, rounds=3, basis="Z")
-    round_bits = [[slot.bit for slot in schedule.gauges if slot.round == r] for r in range(3)]
+    round_bits = [[m.bit for m in schedule.measurements if m.round == r] for r in range(3)]
     records = run_memory(rounds=3, basis="Z", shots=32, seed=5)
     for record in records:
         checks = record["checks"]

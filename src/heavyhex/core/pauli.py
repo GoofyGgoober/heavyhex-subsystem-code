@@ -1,4 +1,4 @@
-"""n-qubit Paulis up to phase: X and Z supports; a qubit in both carries Y."""
+"""Paulis without phases, stored as their X and Z supports. A qubit in both has a Y."""
 
 from __future__ import annotations
 
