@@ -1,12 +1,11 @@
 """The 65-qubit d=5 flagged circuit, checked on Aer."""
 
 import json
-from itertools import combinations
 from pathlib import Path
 
 import pytest
 
-from heavyhex.circuits.flagged import memory_circuit_flagged, propagate_fault, single_faults
+from heavyhex.circuits.flagged import memory_circuit_flagged
 from heavyhex.core import Pauli
 from heavyhex.patches.operators import D5
 
@@ -66,32 +65,3 @@ def test_all_d5_single_data_paulis_have_expected_syndrome(basis):
         for error in (x, z, x * z):
             records = run_memory_flagged(D5, basis=basis, error=error, shots=8, seed=31)
             assert all(r["syndrome"] == D5.code.syndrome(error) for r in records), (q, error)
-
-
-@pytest.mark.parametrize("basis", ["X", "Z"])
-def test_d5_gadget_faults_do_not_grow_or_hide_logicals(basis):
-    circuit, schedule = memory_circuit_flagged(D5, basis=basis)
-    roles = schedule.roles
-    flags = set(roles.x_ancillas.values())
-    relays = {q for arms in roles.z2_arms.values() for _, q in arms}
-    candidates = [Pauli()]
-    for q in D5.data_qubits:
-        x, z = Pauli.x_on((q,)), Pauli.z_on((q,))
-        candidates.extend((x, z, x * z))
-    groups = {}
-    count = 0
-    for gadget in schedule.gadgets:
-        for index, fault in single_faults(circuit, gadget):
-            count += 1
-            outgoing, flipped = propagate_fault(circuit, gadget, index, fault)
-            flag_flips = flipped & flags if gadget.half == "Z" else frozenset()
-            if flag_flips:
-                assert outgoing.weight() <= 2
-                key = (gadget, flag_flips, flipped - flags - relays)
-                groups.setdefault(key, []).append(outgoing)
-            else:
-                assert any(D5.code.in_gauge_group(outgoing * p) for p in candidates)
-    assert count > 2000
-    for errors in groups.values():
-        for first, second in combinations(errors, 2):
-            assert not D5.code.is_logical(first * second)

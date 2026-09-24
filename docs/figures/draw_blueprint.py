@@ -30,9 +30,6 @@ CALIBRATION = HERE / "fez_calibration.json"
 PNG_NAME = "heavyhex-blueprint.png"
 MANIFEST_NAME = "d5_fez_layout.json"
 
-# The paper's d=3 flag rule, quoted in the caption: a lone flag on this X
-# ancilla means Z on this data qubit (0-based id).
-PAPER_FLAG_RULE = {"X2X5": 1, "X3X6": 5, "X4X7": 3, "X5X8": 7}
 
 GOLD = "#F2C230"
 GREEN = "#1B7A3D"
@@ -811,15 +808,14 @@ def draw_captions(
         fontsize=11,
         color=INK,
     )
-    rule = ", ".join(f"q{d3.x_ancillas[name]}→Z on Q{q + 1}" for name, q in PAPER_FLAG_RULE.items())
     parts = [p for layout in (d3, d5) for p in problems(layout, calibration)]
     broken = f"; uses what IBM marks broken: {', '.join(parts)}" if parts else ""
     fig.text(
         0.5,
         0.012,
         "d=3 reference: a Z round (4 syndromes + 8 flags) then an X round "
-        f"(6 gauges) = 18 measurements. Deflagging: {rule}; the four relay "
-        "flags are discarded.\n"
+        "(6 gauges) = 18 measurements. Flags and relays are undone after use "
+        "and read 0 unless a fault hit them.\n"
         "d=5 keeps the same boundary relays: 57 core sites + 8 relays = 65. "
         f"Placed from the {calibration.backend} calibration of {calibration.calibrated[:16]}"
         f"{broken}.\n"

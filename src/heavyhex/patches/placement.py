@@ -129,21 +129,31 @@ def spots(distance: int, coords: list[list[int]], edges: list) -> dict[Spot, Hea
     return found
 
 
+def broken_coupler(error: float | None) -> bool:
+    return error is None or error >= BROKEN
+
+
+def broken_qubit(q: int, calibration: Calibration) -> bool:
+    return (
+        q in calibration.broken_qubits
+        or calibration.readout.get(q, 1) >= BROKEN
+        or not calibration.t1_us.get(q)
+        or not calibration.t2_us.get(q)
+    )
+
+
 def problems(layout: HeavyHexLayout, calibration: Calibration) -> list[str]:
     """Everything the patch uses that IBM marks broken."""
-    found = []
-    for a, b in _couplers(layout):
-        error = calibration.cz.get((a, b))
-        if error is None or error >= BROKEN:
-            found.append(f"coupler {a}-{b} is broken")
-    for q in sorted(layout.physical_qubits):
-        if (
-            q in calibration.broken_qubits
-            or calibration.readout.get(q, 1) >= BROKEN
-            or not calibration.t1_us.get(q)
-            or not calibration.t2_us.get(q)
-        ):
-            found.append(f"qubit {q} is broken")
+    found = [
+        f"coupler {a}-{b} is broken"
+        for a, b in _couplers(layout)
+        if broken_coupler(calibration.cz.get((a, b)))
+    ]
+    found += [
+        f"qubit {q} is broken"
+        for q in sorted(layout.physical_qubits)
+        if broken_qubit(q, calibration)
+    ]
     return found
 
 
