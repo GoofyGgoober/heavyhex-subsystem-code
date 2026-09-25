@@ -130,6 +130,14 @@ def test_single_faults_the_syndrome_shows_are_corrected(basis):
     assert nontrivial > 50
 
 
+@pytest.mark.parametrize("basis", ["Z", "X"])
+def test_d5_rounds_are_no_longer_than_d3_rounds(basis):
+    # Gadgets take turns instead of queueing on shared data qubits, so a half-round
+    # doesn't get longer as the patch grows.
+    depths = [memory_circuit_flagged(p, rounds=3, basis=basis)[0].depth() for p in (D3, D5)]
+    assert depths[0] == depths[1]
+
+
 def test_flagged_memory_rejects_bad_options():
     with pytest.raises(ValueError, match="positive integer"):
         run_memory_flagged(shots=0)

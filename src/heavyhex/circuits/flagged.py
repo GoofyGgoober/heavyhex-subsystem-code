@@ -11,7 +11,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 from dataclasses import dataclass
 from functools import cached_property
-from itertools import product
+from itertools import product, zip_longest
 from typing import TYPE_CHECKING
 
 from .._validation import validate_binary_bits
@@ -86,13 +86,12 @@ class Measurement:
 
 @dataclass(frozen=True)
 class Gadget:
-    """The gates that measure one gauge: circuit.data[start:end]."""
+    """The instructions that measure one gauge, as positions in circuit.data."""
 
     round: int
     half: str
     gauge: str
-    start: int
-    end: int
+    gates: tuple[int, ...]
 
 
 @dataclass(frozen=True)
@@ -147,67 +146,26 @@ def memory_circuit_flagged(
     measurements: list[Measurement] = []
     gadgets: list[Gadget] = []
     half_order: list[tuple[int, str]] = []
-    bit = 0
-
-    def record(round: int, half: str, kind: str, gauge_name: str, qubit: int) -> None:
-        nonlocal bit
-        circuit.measure(qubit, gauge[bit])
-        measurements.append(Measurement(round, half, kind, gauge_name, bit))
-        bit += 1
-
-    def measure_z4(round: int, name: str) -> None:
-        # Each data pair's parity goes through its flag to the ancilla, in the
-        # order Z4_GATES gives. The flags read 0 unless something went wrong.
-        (pair_a, gauge_a), (pair_b, gauge_b) = roles.z4_arms[name]
-        flag_a, flag_b = roles.x_ancillas[gauge_a], roles.x_ancillas[gauge_b]
-        ancilla = roles.z_ancillas[name]
-        for qubit in (ancilla, flag_a, flag_b):
-            circuit.reset(qubit)
-        arms = ((pair_a, flag_a), (pair_b, flag_b))
-        for arm, step in Z4_GATES:
-            pair, flag = arms[arm]
-            if step == "pass":
-                circuit.cx(flag, ancilla)
-            else:
-                circuit.cx(pair[step], flag)
-        record(round, "Z", "z_flag", gauge_a, flag_a)
-        record(round, "Z", "z_flag", gauge_b, flag_b)
-        record(round, "Z", "z_syn", name, ancilla)
-
-    def measure_z2(round: int, name: str) -> None:
-        # Each data qubit reaches the ancilla through a relay, which is then reset to |0>.
-        (data_a, relay_a), (data_b, relay_b) = roles.z2_arms[name]
-        ancilla = roles.z_ancillas[name]
-        for qubit in (ancilla, relay_a, relay_b):
-            circuit.reset(qubit)
-        for qubit, relay in ((data_a, relay_a), (data_b, relay_b)):
-            circuit.cx(qubit, relay)
-            circuit.cx(relay, ancilla)
-            circuit.cx(qubit, relay)
-        record(round, "Z", "relay", name, relay_a)
-        record(round, "Z", "relay", name, relay_b)
-        record(round, "Z", "z_syn", name, ancilla)
-
-    def measure_x2(round: int, name: str) -> None:
-        ancilla = roles.x_ancillas[name]
-        circuit.reset(ancilla)
-        circuit.h(ancilla)
-        for label in patch.x_gauges[name]:
-            circuit.cx(ancilla, label - 1)
-        circuit.h(ancilla)
-        record(round, "X", "x_gauge", name, ancilla)
 
     def run_half(round: int, half: str) -> None:
         half_order.append((round, half))
-        for name in roles.z_ancillas if half == "Z" else roles.x_ancillas:
-            start = len(circuit.data)
-            if half == "X":
-                measure_x2(round, name)
-            elif name in roles.z4_arms:
-                measure_z4(round, name)
-            else:
-                measure_z2(round, name)
-            gadgets.append(Gadget(round, half, name, start, len(circuit.data)))
+        names = list(roles.z_ancillas if half == "Z" else roles.x_ancillas)
+        built = [_gadget(patch, roles, half, name) for name in names]
+        positions: dict[str, list[int]] = {name: [] for name in names}
+        # Every gadget's first gate, then every gadget's second, and so on. Gadgets
+        # share data qubits, so one after another they would queue up, and more
+        # so at d=5, making its rounds longer than d=3's.
+        for step in zip_longest(*(gates for gates, _ in built)):
+            for name, gate in zip(names, step):
+                if gate is not None:
+                    positions[name].append(len(circuit.data))
+                    getattr(circuit, gate[0])(*gate[1:])
+        for name, (_, reads) in zip(names, built):
+            for kind, gauge_name, qubit in reads:
+                positions[name].append(len(circuit.data))
+                circuit.measure(qubit, gauge[len(measurements)])
+                measurements.append(Measurement(round, half, kind, gauge_name, len(measurements)))
+            gadgets.append(Gadget(round, half, name, tuple(positions[name])))
 
     run_half(-1, prep_half)
     circuit.barrier()
@@ -228,6 +186,36 @@ def memory_circuit_flagged(
     return circuit, FlaggedSchedule(
         patch, basis, rounds, tuple(measurements), tuple(gadgets), tuple(half_order)
     )
+
+
+def _gadget(
+    patch: HeavyHexOperators, roles: Roles, half: str, name: str
+) -> tuple[list[tuple], list[tuple[str, str, int]]]:
+    """One gauge measurement: its gates, then its readouts as (kind, gauge, qubit)."""
+    if half == "X":
+        ancilla = roles.x_ancillas[name]
+        gates = [("reset", ancilla), ("h", ancilla)]
+        gates += [("cx", ancilla, label - 1) for label in patch.x_gauges[name]]
+        gates.append(("h", ancilla))
+        return gates, [("x_gauge", name, ancilla)]
+    ancilla = roles.z_ancillas[name]
+    if name in roles.z4_arms:
+        # Each data pair's parity goes through its flag to the ancilla, in the
+        # order Z4_GATES gives. The flags read 0 unless something went wrong.
+        (pair_a, gauge_a), (pair_b, gauge_b) = roles.z4_arms[name]
+        arms = ((pair_a, roles.x_ancillas[gauge_a]), (pair_b, roles.x_ancillas[gauge_b]))
+        gates = [("reset", qubit) for qubit in (ancilla, arms[0][1], arms[1][1])]
+        for arm, step in Z4_GATES:
+            pair, flag = arms[arm]
+            gates.append(("cx", flag, ancilla) if step == "pass" else ("cx", pair[step], flag))
+        reads = [("z_flag", gauge_a, arms[0][1]), ("z_flag", gauge_b, arms[1][1])]
+        return gates, [*reads, ("z_syn", name, ancilla)]
+    # Each data qubit reaches the ancilla through a relay, which is then undone.
+    (data_a, relay_a), (data_b, relay_b) = roles.z2_arms[name]
+    gates = [("reset", qubit) for qubit in (ancilla, relay_a, relay_b)]
+    for data, relay in ((data_a, relay_a), (data_b, relay_b)):
+        gates += [("cx", data, relay), ("cx", relay, ancilla), ("cx", data, relay)]
+    return gates, [("relay", name, relay_a), ("relay", name, relay_b), ("z_syn", name, ancilla)]
 
 
 def with_fault(circuit: QuantumCircuit, index: int, fault: dict[int, str]) -> QuantumCircuit:
@@ -257,7 +245,7 @@ def single_faults(circuit: QuantumCircuit, gadget: Gadget) -> Iterator[tuple[int
     X, Y or Z after an H, X after a reset, any of the 15 two-qubit Paulis after
     a CX, and X just before a measurement.
     """
-    for index in range(gadget.start, gadget.end):
+    for index in gadget.gates:
         name, qubits = _instruction(circuit, index)
         if name == "h":
             (qubit,) = qubits
@@ -292,7 +280,8 @@ def propagate_fault(
 
     Returns the Pauli left on the data and the measured qubits whose outcome
     flipped. Signs are ignored, and whatever is left on ancillas is dropped
-    because they are reset before reuse.
+    because they are reset before reuse. Other gadgets' gates in between are
+    left out: to them, what this gadget left on the data is a data error.
     """
     x_set: set[int] = set()
     z_set: set[int] = set()
@@ -302,7 +291,9 @@ def propagate_fault(
         if axis in ("Z", "Y"):
             z_set.add(qubit)
     flipped: set[int] = set()
-    for position in range(fault_index + 1, gadget.end):
+    for position in gadget.gates:
+        if position <= fault_index:
+            continue
         name, qubits = _instruction(circuit, position)
         if name == "h":
             (qubit,) = qubits
