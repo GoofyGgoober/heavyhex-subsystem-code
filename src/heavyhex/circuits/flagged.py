@@ -188,6 +188,17 @@ def memory_circuit_flagged(
     )
 
 
+def one_round(patch: HeavyHexOperators = D3) -> list[tuple]:
+    """Every gate, reset and measurement of one round, as (name, *circuit qubits)."""
+    roles = qubit_roles(patch)
+    gates: list[tuple] = []
+    for half, names in (("X", roles.x_ancillas), ("Z", roles.z_ancillas)):
+        for name in names:
+            steps, reads = _gadget(patch, roles, half, name)
+            gates += steps + [("measure", qubit) for _, _, qubit in reads]
+    return gates
+
+
 def _gadget(
     patch: HeavyHexOperators, roles: Roles, half: str, name: str
 ) -> tuple[list[tuple], list[tuple[str, str, int]]]:

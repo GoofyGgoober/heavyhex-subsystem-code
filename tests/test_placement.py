@@ -7,12 +7,13 @@ from pathlib import Path
 
 import pytest
 
-from heavyhex.circuits.flagged import memory_circuit_flagged
+from heavyhex.circuits.flagged import memory_circuit_flagged, qubit_roles
 from heavyhex.patches.layout import build_layout
 from heavyhex.patches.operators import build_operators
 from heavyhex.patches.placement import (
     Calibration,
     best_spots,
+    cost,
     fez_qubits,
     problems,
     spots,
@@ -73,8 +74,22 @@ def test_weak_parts_are_named_and_warned_about():
 
 
 def test_placement_with_broken_parts_is_refused():
-    with pytest.raises(ValueError, match="coupler 27-28 is broken"):
+    with pytest.raises(ValueError, match="coupler 102-103 is broken"):
         fez_qubits(5, SAVED)
+
+
+def test_cost_charges_parts_as_often_as_a_round_uses_them():
+    layout = next(iter(spots(3, COORDS, EDGES).values()))
+    flags = {flag for arms in qubit_roles(build_operators(3)).z4_arms.values() for _, flag in arms}
+
+    def worse_readout(q):
+        worse = replace(SAVED, readout={**SAVED.readout, q: SAVED.readout[q] + 0.01})
+        return cost(layout, worse) - cost(layout, SAVED)
+
+    assert worse_readout(layout.data[1]) == pytest.approx(0)  # read once, at the end
+    for name, q in layout.x_ancillas.items():
+        # Reset and measured in the X half, and again in the Z half if it is a flag.
+        assert worse_readout(q) == pytest.approx(0.04 if name in flags else 0.02)
 
 
 def test_picks_have_as_few_broken_parts_as_possible():
