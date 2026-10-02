@@ -403,6 +403,12 @@ def _experiment_command(args: argparse.Namespace) -> int:
             return 1
         run.submit(folder, backend, args.shots)
         print(f"Done; shots saved in {folder / 'shots.npz'}")
+        from .patches.placement import calibrate
+
+        after = calibrate(info["backend"], folder / "calibration_after.json")  # read-only
+        before = json.loads((folder / "calibration.json").read_text())["calibrated"]
+        changed = "recalibrated" if after.calibrated != before else "not recalibrated since"
+        print(f"{info['backend']} {changed} the prepared calibration ({after.calibrated})")
         return 0
     if not (folder / "shots.npz").exists():
         if not (folder / "job.json").exists():
@@ -464,11 +470,15 @@ def _emit_analysis(args: argparse.Namespace, analysis: dict, folder: Path) -> in
         got, want = seen["fits"][basis], expected["fits"][basis]
         lines.append(
             f"{basis} memory per round: d=3 {got['per_round']['3'][0]:.2%}, "
-            f"d=5 {got['per_round']['5'][0]:.2%}, Λ {got['lambda']:.2f} "
+            f"d=5 {got['per_round']['5'][0]:.2%}, Λ {got['lambda']:.2f} ± "
+            f"{got['lambda_uncertainty']:.2f}, {got['verdict']} "
             f"(predicted {want['per_round']['3'][0]:.2%}, {want['per_round']['5'][0]:.2%}, "
             f"Λ {want['lambda']:.2f})"
         )
-    lines.append("Detectors firing most above the prediction:")
+    lines.append(
+        "Detectors firing most above the prediction "
+        f"(chance alone reaches about {analysis['chance_excess']:.1f}):"
+    )
     for row in analysis["worst_detectors"][:5]:
         d, r, name = row["detector"]
         lines.append(

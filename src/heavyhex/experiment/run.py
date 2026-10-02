@@ -12,6 +12,7 @@ import gzip
 import json
 from dataclasses import asdict
 from datetime import datetime
+from math import log, sqrt
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -74,11 +75,13 @@ def predict(
             sampler = model.compile_detector_sampler(seed=setting.rounds)
             detectors, flips = sampler.sample(SIMULATED_SHOTS, separate_observables=True)
             failed = _decode(model, detectors) != flips
+            rates = detectors.mean(axis=0).tolist()
             settings.append(
                 {
                     "logical_error": failed.mean(axis=0).tolist(),
-                    "detector_rates": detectors.mean(axis=0).tolist(),
+                    "detector_rates": rates,
                     "detectors": labels,
+                    "by_round": _by_round(labels, rates),
                 }
             )
         else:
@@ -190,7 +193,7 @@ def analyze(folder: Path, decoupled_dephasing: float | None = None) -> dict:
     if decoupled_dephasing is None and not np.isfinite(measured_f["median"]):
         raise ValueError("the idle test gave no dephasing; pass one to analyze")
     f = measured_f["median"] if decoupled_dephasing is None else decoupled_dephasing
-    f = float(np.clip(f, 0, 1))
+    f = max(float(f), 0.0)  # above 1 is physical (more noise than the echo T2), below 0 is not
     observed = []
     for i, (setting, circuit) in enumerate(zip(SETTINGS, circuits)):
         model, records, labels = simulated(setting, circuit, calibration, run["dt"], f)
@@ -200,18 +203,22 @@ def analyze(folder: Path, decoupled_dephasing: float | None = None) -> dict:
                 measurements=measurements, separate_observables=True
             )
             failed = _decode(model, detectors) != flips
+            rates = detectors.mean(axis=0).tolist()
             observed.append(
                 {
                     "logical_error": failed.mean(axis=0).tolist(),
-                    "detector_rates": detectors.mean(axis=0).tolist(),
+                    "detector_rates": rates,
                     "detectors": labels,
+                    "by_round": _by_round(labels, rates),
                 }
             )
         else:
             observed.append({"x": x_values(shots[i])})
     expected = predict(circuits, calibration, run["dt"], decoupled_dephasing=f)
+    count_detectors = sum(len(s["detector_rates"]) for s in observed if "detector_rates" in s)
     analysis = {
         "decoupled_dephasing": f,
+        "chance_excess": sqrt(2 * log(max(count_detectors, 2))),
         "idle_test": measured_f,
         "observed": {"settings": observed, **_fits(observed, count)},
         "predicted_at_measured_dephasing": expected,
@@ -322,8 +329,26 @@ def _idle_dephasing(shots: list, prediction: dict) -> dict:
     }
 
 
+def _by_round(labels: list, rates: list) -> dict[str, list[float]]:
+    """Mean firing rate of each patch's stabilizer detectors, round by round.
+
+    A rise over the rounds that the prediction lacks points to leakage or heating.
+    """
+    sums: dict[tuple[int, int], list[float]] = {}
+    for (d, r, name), rate in zip(labels, rates):
+        if " " not in name:  # stabilizers, not flags or relays
+            sums.setdefault((d, r), []).append(rate)
+    return {
+        str(d): [sum(v) / len(v) for (dd, _), v in sorted(sums.items()) if dd == d]
+        for d in DISTANCES
+    }
+
+
 def _worst_detectors(observed: list, expected: list, shots: int, many: int = 10) -> list:
-    """The detectors that fire most above the prediction, in standard errors."""
+    """The detectors that fire most above the prediction, in standard errors.
+
+    With N detectors in all, chance alone reaches about sqrt(2 ln N) standard errors.
+    """
     import numpy as np
 
     rows = []
@@ -354,9 +379,19 @@ def _fits(settings: list[dict], shots: int) -> dict:
         for k, d in enumerate(DISTANCES):
             fit = fit_per_round(ROUNDS, [r["logical_error"][k] for r in rows], shots)
             per_round[str(d)] = [fit.per_round, fit.uncertainty]
+        (e3, u3), (e5, u5) = per_round["3"], per_round["5"]
+        lam = e3 / e5
+        sigma = lam * sqrt((u3 / e3) ** 2 + (u5 / e5) ** 2)  # one standard error
+        verdict = "undecided"
+        if lam - 1.645 * sigma > 1:
+            verdict = "d = 5 better"
+        elif lam + 1.645 * sigma < 1:
+            verdict = "d = 5 worse"
         fits[basis] = {
             "per_round": per_round,
-            "lambda": per_round["3"][0] / per_round["5"][0],
+            "lambda": lam,
+            "lambda_uncertainty": sigma,
+            "verdict": verdict,  # one-sided, 95%
         }
     return {"fits": fits}
 

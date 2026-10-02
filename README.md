@@ -1,8 +1,9 @@
-# Heavy-hex scalability check
+# Heavy-hex error suppression on IBM Fez
 
-Does the heavy-hex code get better from d=3 to d=5 on IBM hardware? The plan is
-to run both side by side on `ibm_fez` and compare logical error rates,
-Λ = p_L(3) / p_L(5).
+Measures the error-suppression factor Λ = p_L(3) / p_L(5) of the heavy-hex
+code, the ratio of logical error per round at d=3 and d=5, by running both side
+by side on `ibm_fez`, and compares it with a simulation built from IBM's
+calibration.
 
 The code is the heavy-hex subsystem code of [Chamberland et al.
 2020](https://arxiv.org/abs/1907.09528), as run by [Sundaresan et al.

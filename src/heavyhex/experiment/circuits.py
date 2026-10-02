@@ -1,8 +1,9 @@
 """What runs on the chip: both patches side by side, in Fez's native gates.
 
-Memory in X and Z at each number of rounds, and an idle test: the same rounds
-with every CX removed, so the data qubits just wait in |+> while their ancillas
-are reset and read out. Patch d writes registers m{d} (gauges) and d{d} (data).
+Memory in X and Z at each number of rounds, and an idle test: X memory with
+every CX replaced by a wait of the same length, so the data qubits wait in |+>,
+with the same waits and pulses, while their ancillas are reset and read out.
+Patch d writes registers m{d} (gauges) and d{d} (data).
 """
 
 from __future__ import annotations
@@ -46,6 +47,7 @@ def logical_circuit(
 ) -> tuple[QuantumCircuit, dict[int, FlaggedSchedule]]:
     """Both patches on their chip qubits, before translation to native gates."""
     from qiskit import ClassicalRegister, QuantumCircuit
+    from qiskit.circuit import Instruction
 
     pair = QuantumCircuit(num_qubits)
     schedules = {}
@@ -56,7 +58,9 @@ def logical_circuit(
         if setting.kind == "idle":
             kept = circuit.copy_empty_like()
             for item in circuit.data:
-                if item.operation.name != "cx":
+                if item.operation.name == "cx":
+                    kept.append(Instruction("wait", 2, 0, []), item.qubits)
+                else:
                     kept.append(item)
             circuit = kept
         gauges, data = (ClassicalRegister(r.size, f"{r.name}{d}") for r in circuit.cregs)
@@ -73,6 +77,7 @@ def for_fez(circuit: QuantumCircuit, target: Target) -> QuantumCircuit:
     barrier waits for all of them, and a CX is H, CZ, H on its target back to back.
     A reset, and the gates after it, wait until just before the qubit's first CX,
     so a fresh qubit sits in |0>. Waits of at least DECOUPLE_NS get two X pulses.
+    A two-qubit "wait" lasts as long as a CX and does nothing.
     """
     if target.granularity != 1 or target.pulse_alignment != 1:
         raise ValueError("delays would need aligning to the device's time grid")
@@ -150,6 +155,12 @@ def for_fez(circuit: QuantumCircuit, target: Target) -> QuantumCircuit:
             free[control] = free[target_qubit] = (
                 start + 2 * turn + length("cz", control, target_qubit)
             )
+        elif name == "wait":
+            a, b = qubits
+            span = 2 * length("sx", b) + length("cz", a, b)
+            out.delay(span, a, unit="dt")
+            out.delay(span, b, unit="dt")
+            free[a] = free[b] = start + span
         elif name == "measure":
             (q,) = qubits
             out.append(item)

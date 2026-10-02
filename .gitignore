@@ -7,7 +7,7 @@ __pycache__/
 dist/
 build/
 
-# Personal Claude Code overrides
+# Local tool settings
 .claude/settings.local.json
 
 # Never commit credentials
