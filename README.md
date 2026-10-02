@@ -1,7 +1,7 @@
-# Heavy-hex error suppression on IBM Fez
+# Heavy-hex subsystem code
 
 Measures the error-suppression factor Λ = p_L(3) / p_L(5) of the heavy-hex
-code, the ratio of logical error per round at d=3 and d=5, by running both side
+subsystem code, the ratio of logical error per round at d=3 and d=5, by running both side
 by side on `ibm_fez`, and compares it with a simulation built from IBM's
 calibration.
 
