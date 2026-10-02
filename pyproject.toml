@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "heavyhex-scalability-check"
+name = "heavyhex-subsystem-code"
 version = "0.1.0"
-description = "Does the heavy-hex code get better from d=3 to d=5 on IBM hardware?"
+description = "Heavy-hex subsystem code: error suppression from d=3 to d=5 on IBM hardware"
 readme = "README.md"
 requires-python = ">=3.10"
 
@@ -16,8 +16,8 @@ heavyhex = "heavyhex.cli:main"
 sim = ["qiskit>=2", "qiskit-aer>=0.15"]
 matching = ["numpy>=1.24,<3", "pymatching>=2.3,<3", "stim>=1.14"]
 hardware = ["qiskit-ibm-runtime>=0.40"]
-test = ["pytest", "heavyhex-scalability-check[sim,matching]"]
-dev = ["heavyhex-scalability-check[sim,test,hardware]", "ruff>=0.16,<0.17"]
+test = ["pytest", "heavyhex-subsystem-code[sim,matching]"]
+dev = ["heavyhex-subsystem-code[sim,test,hardware]", "ruff>=0.16,<0.17"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
