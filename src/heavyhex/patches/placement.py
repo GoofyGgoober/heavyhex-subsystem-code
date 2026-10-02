@@ -16,7 +16,9 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import NamedTuple
 
+from ..circuits.flagged import one_round, qubit_roles
 from .layout import HeavyHexLayout, build_layout
+from .operators import build_operators
 
 BROKEN = 0.5  # IBM reports a coupler or readout it can't use with error 1.0
 # Working but weak: several times worse than Fez's median (CZ ~0.3%, readout ~1%,
@@ -177,11 +179,21 @@ def weak(layout: HeavyHexLayout, calibration: Calibration) -> list[str]:
 
 
 def cost(layout: HeavyHexLayout, calibration: Calibration) -> float:
-    """Rough errors per round: CZ and readout errors, plus dephasing while idle (t / 2T2)."""
-    total = sum(calibration.cz.get(c) or 1.0 for c in _couplers(layout))
-    for q in layout.physical_qubits:
-        t2 = calibration.t2_us.get(q)
-        total += calibration.readout.get(q, 1.0) + (ROUND_US / (2 * t2) if t2 else 1.0)
+    """Rough errors per round: every CZ, measurement and reset a round makes, plus decay of the data.
+
+    Parts count as often as a round uses them. The data idles through every
+    ancilla measurement and reset; with decoupling it decays at the T1 rate.
+    """
+    qubits = chip_qubits(layout)
+    total = 0.0
+    for name, *used in one_round(build_operators(layout.distance)):
+        if name == "cx":
+            total += calibration.cz.get(tuple(sorted(qubits[q] for q in used))) or 1.0
+        elif name in ("measure", "reset"):
+            total += calibration.readout.get(qubits[used[0]], 1.0)
+    for q in layout.data.values():
+        t1 = calibration.t1_us.get(q)
+        total += ROUND_US / (2 * t1) if t1 else 1.0
     return total
 
 
@@ -219,9 +231,6 @@ def fez_qubits(distance: int, calibration: Calibration | None = None) -> list[in
     Refuses a placement that uses anything IBM marks broken, and warns about
     parts that work but are weak.
     """
-    from ..circuits.flagged import qubit_roles
-    from .operators import build_operators
-
     calibration = calibration or todays_calibration()
     device = json.loads(FEZ_MAP.read_text())
     coords, edges = device["coords"], device["edges"]
@@ -238,18 +247,23 @@ def fez_qubits(distance: int, calibration: Calibration | None = None) -> list[in
             f"d={distance} on {calibration.backend} uses weak parts: {'; '.join(weak_parts)}",
             stacklevel=2,
         )
-    roles = qubit_roles(build_operators(distance))
+    return chip_qubits(layout)
+
+
+def chip_qubits(layout: HeavyHexLayout) -> list[int]:
+    """The chip qubit for each qubit of the flagged circuit."""
+    roles = qubit_roles(build_operators(layout.distance))
     qubits = {label - 1: q for label, q in layout.data.items()}
     qubits.update({i: layout.x_ancillas[name] for name, i in roles.x_ancillas.items()})
     qubits.update({i: layout.z_ancillas[name] for name, i in roles.z_ancillas.items()})
-    bonds = {frozenset(edge) for edge in edges}
+    couplings = {frozenset((a, b)) for _, a, b in layout.couplings}
     for name, arms in roles.z2_arms.items():
         ancilla = layout.z_ancillas[name]
         for data, relay in arms:
             (qubits[relay],) = (
                 q
                 for q in layout.relays
-                if frozenset((qubits[data], q)) in bonds and frozenset((q, ancilla)) in bonds
+                if {frozenset((qubits[data], q)), frozenset((q, ancilla))} <= couplings
             )
     return [qubits[i] for i in range(roles.num_qubits)]
 
