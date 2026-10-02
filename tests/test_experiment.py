@@ -102,6 +102,7 @@ def test_a_rehearsal_gives_back_its_dephasing(tmp_path, monkeypatch):
     run.rehearse(tmp_path / "run", 20_000, decoupled_dephasing=0.5)
     analysis = run.analyze(tmp_path / "run")
     assert analysis["decoupled_dephasing"] == pytest.approx(0.5, abs=0.1)
+    assert 0 < analysis["observed"]["fits"]["X"]["lambda_uncertainty"] < 0.2
     seen = analysis["observed"]["settings"]
     expected = analysis["predicted_at_measured_dephasing"]["settings"]
     for got, want in zip(seen[:4], expected[:4]):
@@ -123,3 +124,18 @@ def test_submit_refuses_yesterdays_run(tmp_path, capsys):
 
 def test_default_folder_is_under_runs():
     assert run.default_folder("ibm_fez", offline=False).parent == Path(run.RUNS)
+
+
+def test_the_idle_test_waits_and_pulses_like_x_memory():
+    def pulses_and_length(setting):
+        circuit = native(setting)
+        data = [q for d, chip in chips().items() for q in chip[: d * d]]
+        sent = Counter(circuit.find_bit(i.qubits[0]).index for i in circuit.data if i.name == "x")
+        return [sent[q] for q in data], circuit.estimate_duration(TARGET, unit="s")
+
+    idle, memory = (
+        pulses_and_length(Setting("idle", "X", 2)),
+        pulses_and_length(Setting("memory", "X", 2)),
+    )
+    assert idle[0] == memory[0]
+    assert idle[1] == pytest.approx(memory[1])

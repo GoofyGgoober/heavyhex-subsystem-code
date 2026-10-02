@@ -195,7 +195,8 @@ class Decay:
     rounds: tuple[int, ...]
     logical_error: tuple[float, ...]
     per_round: float
-    uncertainty: float  # one standard error of per_round, from shot noise
+    uncertainty: float  # one standard error of per_round, widened by a poor fit
+    chi2_red: float = float("nan")  # reduced chi-squared of the fit
 
 
 def decay(
@@ -240,9 +241,17 @@ def fit_per_round(rounds: tuple[int, ...], logical_error: list[float], shots: in
         return Decay(tuple(rounds), tuple(logical_error), 0.5, float("nan"))
     p, n = p[keep], n[keep]
     sigma = 2 * np.sqrt(p * (1 - p) / shots) / (1 - 2 * p)  # shot noise on log(1 - 2p)
-    (b, _), cov = np.polyfit(n, np.log(1 - 2 * p), 1, w=1 / sigma, cov="unscaled")
+    y = np.log(1 - 2 * p)
+    (b, a), cov = np.polyfit(n, y, 1, w=1 / sigma, cov="unscaled")
+    # Shot noise alone, unless the points scatter more than it allows.
+    chi2_red = float(np.sum(((y - a - b * n) / sigma) ** 2) / (len(n) - 2)) if len(n) > 2 else 1.0
+    spread = sqrt(max(chi2_red, 1.0))
     return Decay(
-        tuple(rounds), tuple(logical_error), (1 - exp(b)) / 2, exp(b) / 2 * sqrt(cov[0, 0])
+        tuple(rounds),
+        tuple(logical_error),
+        (1 - exp(b)) / 2,
+        exp(b) / 2 * sqrt(cov[0, 0]) * spread,
+        chi2_red,
     )
 
 
