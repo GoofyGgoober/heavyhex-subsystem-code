@@ -31,6 +31,17 @@ SINGLE_QUBIT_ERROR = 2.3e-4
 DECOUPLE_NS = 500
 
 
+def idle_error(t: float, t1: float, t2: float) -> tuple[float, float]:
+    """(px, pz) of an idle of t ns, Pauli-twirled from T1 and T2 decay; py = px."""
+    px = (1 - exp(-t / t1)) / 4
+    return px, max((1 - exp(-t / t2)) / 2 - px, 0)
+
+
+def decoupled_t2(t1: float, t2: float, decoupled_dephasing: float) -> float:
+    """T2 under decoupling, keeping that share of the pure dephasing."""
+    return 1 / (1 / (2 * t1) + decoupled_dephasing * (1 / t2 - 1 / (2 * t1)))
+
+
 def typical(calibration: Calibration) -> Calibration:
     """Every coupler and qubit at the chip's median, nothing broken."""
     working = [q for q in calibration.readout if not broken_qubit(q, calibration)]
@@ -111,11 +122,8 @@ def noisy_circuit(
             pulses = 2 if decoupling and idle >= DECOUPLE_NS else 0
             if pulses:
                 idle -= pulses * ns["x"]
-                dephasing = 1 / t2 - 1 / (2 * t1)
-                t2 = 1 / (1 / (2 * t1) + decoupled_dephasing * dephasing)
-            t = scale * idle
-            px = (1 - exp(-t / t1)) / 4
-            pz = max((1 - exp(-t / t2)) / 2 - px, 0)
+                t2 = decoupled_t2(t1, t2, decoupled_dephasing)
+            px, pz = idle_error(scale * idle, t1, t2)
             out.append("PAULI_CHANNEL_1", [q], [px, px, pz])
             # Pauli noise commutes with the pulses, so where they sit in the idle doesn't matter.
             for _ in range(pulses):
@@ -163,7 +171,7 @@ def noisy_circuit(
         for q in qubits:
             free[q] = start + duration
 
-    _add_detectors(out, schedule, records)
+    add_detectors(out, schedule, records)
     return out
 
 
@@ -202,13 +210,7 @@ def decay(
     decoupling: bool = False,
     decoupled_dephasing: float = 0.0,
 ) -> Decay:
-    """Fit log(1 - 2 p_L) = a + b n, each point weighted by its shot noise.
-
-    The error per round is (1 - e^b) / 2; a takes up prep and readout error.
-    Points with p_L = 0 or p_L >= 0.5 say nothing about b and are left out.
-    """
-    import numpy as np
-
+    """Simulate each number of rounds and fit the error per round."""
     errors = []
     for n in rounds:
         circuit = noisy_circuit(
@@ -221,28 +223,47 @@ def decay(
             decoupled_dephasing=decoupled_dephasing,
         )
         errors.append(logical_errors(circuit, shots, None if seed is None else seed + n) / shots)
-    p, n = np.array(errors), np.array(rounds, dtype=float)
+    return fit_per_round(rounds, errors, shots)
+
+
+def fit_per_round(rounds: tuple[int, ...], logical_error: list[float], shots: int) -> Decay:
+    """Fit log(1 - 2 p_L) = a + b n, each point weighted by its shot noise.
+
+    The error per round is (1 - e^b) / 2; a takes up prep and readout error.
+    Points with p_L = 0 or p_L >= 0.5 say nothing about b and are left out.
+    """
+    import numpy as np
+
+    p, n = np.array(logical_error), np.array(rounds, dtype=float)
     keep = (p > 0) & (p < 0.5)
     if keep.sum() < 2:
-        return Decay(tuple(rounds), tuple(errors), 0.5, float("nan"))
+        return Decay(tuple(rounds), tuple(logical_error), 0.5, float("nan"))
     p, n = p[keep], n[keep]
     sigma = 2 * np.sqrt(p * (1 - p) / shots) / (1 - 2 * p)  # shot noise on log(1 - 2p)
     (b, _), cov = np.polyfit(n, np.log(1 - 2 * p), 1, w=1 / sigma, cov="unscaled")
-    return Decay(tuple(rounds), tuple(errors), (1 - exp(b)) / 2, exp(b) / 2 * sqrt(cov[0, 0]))
+    return Decay(
+        tuple(rounds), tuple(logical_error), (1 - exp(b)) / 2, exp(b) / 2 * sqrt(cov[0, 0])
+    )
 
 
-def _add_detectors(
-    out: stim.Circuit, schedule: FlaggedSchedule, records: dict[tuple[str, int], int]
+def add_detectors(
+    out: stim.Circuit,
+    schedule: FlaggedSchedule,
+    records: dict[tuple[str, int], int],
+    observable: int = 0,
+    labels: list | None = None,
 ) -> None:
-    """Detectors on the memory-basis stabilizers, and the logical.
+    """Detectors on the memory-basis stabilizers, and the logical as that observable.
 
-    A detector is a stabilizer's value XOR its value the round before. In Z
-    memory every flag and relay is a detector too: each should read 0.
+    records maps (register "m" or "d", bit) to its measurement in out. A detector
+    is a stabilizer's value XOR its value the round before. In Z memory every
+    flag and relay is a detector too: each should read 0. labels, if given, gets
+    (round, stabilizer or "kind gauge") for each detector.
     """
     import stim
 
     patch, basis, rounds = schedule.patch, schedule.basis, schedule.rounds
-    total = len(records)
+    total = out.num_measurements
 
     def rec(register: str, bit: int) -> stim.GateTarget:
         return stim.target_rec(records[register, bit] - total)
@@ -254,16 +275,24 @@ def _add_detectors(
     def outcomes(r: int, name: str) -> list[stim.GateTarget]:
         return [rec("m", bits[r, basis, kind, g]) for g in patch.stabilizer_gauge_factors[name]]
 
+    found = []
     for r in range(rounds):
         for name in stabilizers:
             previous = outcomes(r - 1, name) if r else []
             out.append("DETECTOR", outcomes(r, name) + previous)
-    for name, labels in stabilizers.items():
-        data = [rec("d", q - 1) for q in sorted(labels)]
+            found.append((r, name))
+    for name, support in stabilizers.items():
+        data = [rec("d", q - 1) for q in sorted(support)]
         out.append("DETECTOR", data + outcomes(rounds - 1, name))
+        found.append((rounds, name))
     if basis == "Z":
         for m in schedule.measurements:
             if m.kind in ("z_flag", "relay"):
                 out.append("DETECTOR", [rec("m", m.bit)])
+                found.append((m.round, f"{m.kind} {m.gauge}"))
+    if labels is not None:
+        labels += found
     logical = patch.code.logical_x if basis == "X" else patch.code.logical_z
-    out.append("OBSERVABLE_INCLUDE", [rec("d", q) for q in sorted(logical.x or logical.z)], 0)
+    out.append(
+        "OBSERVABLE_INCLUDE", [rec("d", q) for q in sorted(logical.x or logical.z)], observable
+    )

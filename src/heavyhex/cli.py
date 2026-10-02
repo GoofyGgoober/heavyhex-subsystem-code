@@ -366,6 +366,119 @@ def _calibrate_command(args: argparse.Namespace) -> int:
     return _emit(payload, lines, as_json=args.json)
 
 
+def _experiment_command(args: argparse.Namespace) -> int:
+    from datetime import date, datetime
+
+    from .experiment import run  # qiskit, stim and pymatching are optional extras
+
+    folder = Path(args.run) if args.run else run.default_folder(args.backend, args.offline)
+    if args.step == "prepare":
+        return _emit_prepared(args, run, folder)
+    if not (folder / "run.json").exists():
+        raise ValueError(f"no prepared run in {folder}")
+    info = json.loads((folder / "run.json").read_text())
+    if args.step == "rehearse":
+        dephasing = 0.5 if args.dephasing is None else args.dephasing
+        run.rehearse(folder, args.shots, dephasing)
+        payload = {"run": str(folder), "shots": args.shots, "decoupled_dephasing": dephasing}
+        lines = [f"Simulated {args.shots} shots per circuit into {folder / 'shots.npz'}"]
+        return _emit(payload, lines, as_json=args.json)
+    if args.step == "submit":
+        if info["offline"]:
+            raise ValueError("this run was prepared offline; prepare it again before using the QPU")
+        prepared = datetime.fromisoformat(info["prepared"]).date()
+        if prepared != date.today():
+            raise ValueError(f"prepared on {prepared}; Fez recalibrates daily, prepare it again")
+        from qiskit_ibm_runtime import QiskitRuntimeService
+
+        backend = QiskitRuntimeService().backend(info["backend"])
+        rest = getattr(backend.configuration(), "default_rep_delay", 250e-6)
+        seconds = args.shots * sum(t + rest for t in info["seconds"])
+        print(
+            f"About to send {len(info['seconds'])} circuits x {args.shots} shots to "
+            f"{info['backend']}: about {seconds:.0f} s of QPU time, plus IBM's overhead."
+        )
+        if input("Type yes to send: ").strip() != "yes":
+            print("Not sent.")
+            return 1
+        run.submit(folder, backend, args.shots)
+        print(f"Done; shots saved in {folder / 'shots.npz'}")
+        return 0
+    if not (folder / "shots.npz").exists():
+        if not (folder / "job.json").exists():
+            raise ValueError(f"no shots in {folder}; submit or rehearse first")
+        run.fetch(folder)
+    return _emit_analysis(args, run.analyze(folder, args.dephasing), folder)
+
+
+def _emit_prepared(args: argparse.Namespace, run: Any, folder: Path) -> int:
+    from .patches.placement import LAST_CALIBRATION, Calibration, todays_calibration
+
+    if args.offline:
+        from qiskit_ibm_runtime.fake_provider import FakeFez
+
+        calibration = Calibration.load(args.calibration or LAST_CALIBRATION)
+        target = FakeFez().target
+    else:
+        from qiskit_ibm_runtime import QiskitRuntimeService
+
+        calibration = todays_calibration(args.backend)
+        target = QiskitRuntimeService().backend(args.backend).target  # read-only
+    prediction = run.prepare(folder, calibration, target, offline=args.offline)
+    low, high = (prediction[str(f)]["fits"] for f in run.ENDS)
+    lines = [
+        f"Run folder: {folder}",
+        f"{calibration.backend} calibrated {calibration.calibrated}, pulled {calibration.pulled}",
+        "Predicted error per round, from decoupling leaving only T1 to leaving IBM's T2:",
+    ]
+    for basis in BASES:
+        a, b = low[basis], high[basis]
+        lines.append(
+            f"  {basis} memory: d=3 {a['per_round']['3'][0]:.1%}-{b['per_round']['3'][0]:.1%}"
+            f", d=5 {a['per_round']['5'][0]:.1%}-{b['per_round']['5'][0]:.1%}"
+            f", Λ {a['lambda']:.2f}-{b['lambda']:.2f}"
+        )
+    lines += [
+        "Redraw the blueprint with: python docs/figures/draw_blueprint.py",
+        f"Sending it uses the QPU: heavyhex experiment submit --run {folder}",
+    ]
+    payload = {"run": str(folder), "prediction": {f: p["fits"] for f, p in prediction.items()}}
+    return _emit(payload, lines, as_json=args.json)
+
+
+def _emit_analysis(args: argparse.Namespace, analysis: dict, folder: Path) -> int:
+    from .experiment.circuits import SETTINGS
+
+    seen, expected = analysis["observed"], analysis["predicted_at_measured_dephasing"]
+    lines = [
+        f"Decoupling leaves {analysis['decoupled_dephasing']:.2f} of the calibrated dephasing "
+        "(0: only T1, 1: IBM's T2)",
+        f"{'':22s} {'observed':>18s} {'predicted':>18s}",
+    ]
+    for setting, got, want in zip(SETTINGS, seen["settings"], expected["settings"]):
+        if setting.kind == "memory":
+            got3, got5 = got["logical_error"]
+            want3, want5 = want["logical_error"]
+            lines.append(f"{setting!s:22s} {got3:8.1%} {got5:8.1%}  {want3:8.1%} {want5:8.1%}")
+    for basis in BASES:
+        got, want = seen["fits"][basis], expected["fits"][basis]
+        lines.append(
+            f"{basis} memory per round: d=3 {got['per_round']['3'][0]:.2%}, "
+            f"d=5 {got['per_round']['5'][0]:.2%}, Λ {got['lambda']:.2f} "
+            f"(predicted {want['per_round']['3'][0]:.2%}, {want['per_round']['5'][0]:.2%}, "
+            f"Λ {want['lambda']:.2f})"
+        )
+    lines.append("Detectors firing most above the prediction:")
+    for row in analysis["worst_detectors"][:5]:
+        d, r, name = row["detector"]
+        lines.append(
+            f"  {row['setting']}, d={d} round {r} {name}: {row['observed']:.1%} "
+            f"vs {row['predicted']:.1%} ({row['excess']:+.1f} standard errors)"
+        )
+    lines.append(f"Everything is in {folder / 'analysis.json'}")
+    return _emit({"run": str(folder), **analysis}, lines, as_json=args.json)
+
+
 COMMANDS = {
     "info": _info_command,
     "syndrome": _syndrome_command,
@@ -375,6 +488,7 @@ COMMANDS = {
     "circuit": _circuit_command,
     "mwpm-sim": _mwpm_sim_command,
     "calibrate": _calibrate_command,
+    "experiment": _experiment_command,
 }
 
 
@@ -436,6 +550,31 @@ def build_parser() -> argparse.ArgumentParser:
     calibrate.add_argument("--map", default=str(FEZ_MAP))
     calibrate.add_argument(
         "--offline", action="store_true", help="use the last calibration instead of asking IBM"
+    )
+
+    experiment = sub.add_parser(
+        "experiment",
+        help="The hardware run: prepare, rehearse, submit (uses the QPU) or analyze",
+    )
+    experiment.add_argument("step", choices=("prepare", "rehearse", "submit", "analyze"))
+    experiment.add_argument(
+        "--run", default=None, help="run folder (default: runs/<backend>-<date>)"
+    )
+    experiment.add_argument("--backend", default="ibm_fez")
+    experiment.add_argument("--shots", type=int, default=5000)
+    experiment.add_argument(
+        "--offline",
+        action="store_true",
+        help="prepare from the last calibration and IBM's snapshot",
+    )
+    experiment.add_argument(
+        "--calibration", default=None, help="with --offline: a saved calibration file"
+    )
+    experiment.add_argument(
+        "--dephasing",
+        type=float,
+        default=None,
+        help="decoupled_dephasing for rehearse (default 0.5) or analyze (default: idle test)",
     )
     return parser
 

@@ -25,3 +25,14 @@ Before anything goes to hardware, run `heavyhex calibrate` to pull today's Fez
 numbers and pick where the patches go, then redraw with
 `python docs/figures/draw_blueprint.py`. Hardware runs pull fresh numbers
 themselves if the last ones aren't from today.
+
+The hardware run is X and Z memory at 1-8 rounds, both patches at once, plus an
+idle test that measures how much dephasing the decoupling pulses leave. Each run
+keeps its calibration, circuits, prediction and shots in `runs/<backend>-<date>`:
+
+```bash
+heavyhex experiment prepare                      # place, translate, freeze the prediction
+heavyhex experiment rehearse --run runs/ibm_fez-<date>   # simulated shots, to try the analysis
+heavyhex experiment submit --run runs/ibm_fez-<date>     # uses the QPU, asks first
+heavyhex experiment analyze --run runs/ibm_fez-<date>
+```
