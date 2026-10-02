@@ -48,6 +48,21 @@ def test_old_or_missing_calibration_is_pulled_again(tmp_path, monkeypatch, days_
     assert Calibration.load(path) == fresh
 
 
+def test_fetch_keeps_the_device_durations(tmp_path, monkeypatch):
+    runtime = pytest.importorskip("qiskit_ibm_runtime")
+    from qiskit_ibm_runtime.fake_provider import FakeKingston
+
+    class Service:
+        def backend(self, name):
+            return FakeKingston()
+
+    monkeypatch.setattr(runtime, "QiskitRuntimeService", Service)
+    fetched = Calibration.fetch("ibm_kingston")
+    assert fetched.durations_ns == {"x": 32, "cz": 68, "measure": 2280, "reset": 2312}
+    fetched.save(tmp_path / "calibration.json")
+    assert Calibration.load(tmp_path / "calibration.json") == fetched
+
+
 @pytest.mark.filterwarnings("ignore:.*weak parts")
 @pytest.mark.parametrize("distance", [3, 5])
 def test_every_cx_lands_on_a_fez_bond(distance):

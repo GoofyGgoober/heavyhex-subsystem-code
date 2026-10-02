@@ -10,6 +10,7 @@ we take the one expected to make the fewest errors.
 from __future__ import annotations
 
 import json
+import statistics
 import warnings
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -46,6 +47,7 @@ class Calibration:
     t1_us: dict[int, float]
     t2_us: dict[int, float]
     broken_qubits: tuple[int, ...] = ()
+    durations_ns: dict[str, int] | None = None  # median x, cz, measure and reset times
 
     @classmethod
     def fetch(cls, backend: str) -> Calibration:
@@ -55,6 +57,10 @@ class Calibration:
         device = QiskitRuntimeService().backend(backend)
         target = device.target
         qubits = range(device.num_qubits)
+
+        def median_ns(gate: str) -> int:
+            return round(statistics.median(p.duration for p in target[gate].values() if p) * 1e9)
+
         return cls(
             backend=backend,
             calibrated=str(device.properties().last_update_date),
@@ -64,6 +70,7 @@ class Calibration:
             t1_us={q: (target.qubit_properties[q].t1 or 0) * 1e6 for q in qubits},
             t2_us={q: (target.qubit_properties[q].t2 or 0) * 1e6 for q in qubits},
             broken_qubits=tuple(device.properties().faulty_qubits()),
+            durations_ns={gate: median_ns(gate) for gate in ("x", "cz", "measure", "reset")},
         )
 
     @classmethod
@@ -78,6 +85,7 @@ class Calibration:
             t1_us={int(q): t for q, t in saved["t1_us"].items()},
             t2_us={int(q): t for q, t in saved["t2_us"].items()},
             broken_qubits=tuple(saved["broken_qubits"]),
+            durations_ns=saved.get("durations_ns"),
         )
 
     def save(self, path: str | Path) -> None:
@@ -86,6 +94,7 @@ class Calibration:
             "calibrated": self.calibrated,
             "pulled": self.pulled,
             "broken_qubits": list(self.broken_qubits),
+            "durations_ns": self.durations_ns,
             "cz": {f"{a}-{b}": error for (a, b), error in sorted(self.cz.items())},
             "readout": {str(q): error for q, error in sorted(self.readout.items())},
             "t1_us": {str(q): t for q, t in sorted(self.t1_us.items())},
