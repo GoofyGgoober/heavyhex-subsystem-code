@@ -1,1 +1,1 @@
-"""The heavy-hex subsystem code, its memory circuits and decoders."""
+"""The heavy-hex subsystem code, its flagged memory circuits, and the Fez run."""

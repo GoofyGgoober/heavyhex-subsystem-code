@@ -1,4 +1,4 @@
-"""Turn a shot's measurements into detectors for MWPM.
+"""Turn a shot of the flagged circuit into detectors, independently of Stim.
 
 A stabilizer's value in a round is the XOR of its gauge outcomes, and a round's
 values are its syndrome. A detector is a stabilizer's value XOR its value the
@@ -12,10 +12,8 @@ from dataclasses import dataclass
 from functools import cached_property
 
 from .._validation import validate_binary_bits
-from ..circuits.flagged import FlaggedSchedule
-from ..circuits.ideal import MemorySchedule
-from ..core import Pauli
 from ..patches.operators import HeavyHexOperators
+from .flagged import FlaggedSchedule
 
 
 @dataclass(frozen=True)
@@ -48,7 +46,7 @@ class Memory:
 
     @cached_property
     def basis_indices(self) -> tuple[int, ...]:
-        """Positions of the detectors on memory-basis stabilizers, the only ones MWPM uses."""
+        """Positions of the detectors on memory-basis stabilizers, the only ones decoded."""
         return tuple(i for i, (_, name) in enumerate(self.labels) if name.startswith(self.basis))
 
     @cached_property
@@ -71,14 +69,9 @@ class Shot:
     def logical_bit(self) -> int:
         return sum(self.data_bits[q] for q in self.memory.logical_support) % 2
 
-    def logical_error(self, correction: Pauli) -> bool:
-        """True if the readout, with `correction` applied, has the wrong logical value."""
-        flips = correction.x if self.memory.basis == "Z" else correction.z
-        return bool((self.logical_bit + len(flips & self.memory.logical_support)) % 2)
-
 
 def read_shot(
-    schedule: MemorySchedule | FlaggedSchedule,
+    schedule: FlaggedSchedule,
     gauge_bits: tuple[int, ...],
     data_bits: tuple[int, ...],
 ) -> Shot:

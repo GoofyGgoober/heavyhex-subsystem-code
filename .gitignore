@@ -10,7 +10,8 @@ build/
 # Rehearsals are simulated; only the chip's shots belong to a run's record
 runs/*/rehearsal*
 
-# Local tool settings
+# Local tool and editor settings
+.vscode/
 
 # Never commit credentials
 apikey*.json
