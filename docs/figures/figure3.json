@@ -1,24 +1,24 @@
 {
  "calibration": {
   "backend": "ibm_fez",
-  "calibrated": "2026-10-03 20:05:40+03:00",
-  "pulled": "2026-10-03T20:31:44+03:00",
+  "calibrated": "2026-10-03 23:05:17+03:00",
+  "pulled": "2026-10-04T00:02:46+03:00",
   "durations_ns": {
    "x": 24,
    "cz": 68,
    "measure": 1660,
    "reset": 1684
   },
-  "path": "runs/ibm_fez-2026-10-03/calibration.json"
+  "path": "runs/ibm_fez-2026-10-04-r1/calibration.json"
  },
  "gate_times": "the calibration's",
  "code": {
-  "commit": "4bdc323e6937573264994ff5d5241cfabb88729a",
+  "commit": "1c86fce02f50d2665dbc2d3d3bc84482870ec801",
   "code": [
-   "7aa90d917f30983bf2fd2867db1eac03bc5bc49e",
+   "cf0b2c84bc3ed0bcd2f6231e6d4088ce88b1da14",
    "f8e44350df9165b40fb5a3259f75ba9c9f697fee"
   ],
-  "changed": false
+  "changed": true
  },
  "setup": "every row: both patches in one circuit, as the run sends them; the run's circuits on the qubits fez_qubits picks from this calibration, translated by for_fez, simulated by run.simulated with the row's calibration, decoded by MWPM, sampler seed = rounds; ε per round fitted over ROUNDS",
  "shots": {
