@@ -613,11 +613,15 @@ def combine(*, rehearsal: bool = False) -> dict:
     A rep's Λ sets its d=3 job's ε₃ against its d=5 job's ε₅, the same job when the
     rep is paired; a split rep's bound adds its two jobs' variances. In X memory, Λ
     pooled over the reps, each weighted by its inverse variance, is decided by the
-    same one-sided rule as one rep; and the simulation matches the chip if, for each
+    one-sided rule as one rep, with two changes for a few reps that may scatter more
+    than their errors allow: the standard error is widened by the reps' spread about
+    the pooled Λ (χ² per degree of freedom, when above 1), and the bar is Student's t
+    with one degree fewer than the reps, not 1.645. The simulation matches the chip if, for each
     of Λ, ε₃ and ε₅, the sum over reps of ((observed - predicted) / (bound / 2))² is
     below the 95% point of χ² with a degree per rep. Z memory is reported, not decided.
     """
     from scipy.stats import chi2
+    from scipy.stats import t as student_t
 
     name = "rehearsal_analysis.json" if rehearsal else "analysis.json"
     reps: dict[tuple[str, int], dict] = {}
@@ -668,11 +672,19 @@ def combine(*, rehearsal: bool = False) -> dict:
         rows = [entry["tests"]["X lambda"] for entry in complete]
         weights = [1 / row["observed_uncertainty"] ** 2 for row in rows]
         lam = sum(w * row["observed"] for w, row in zip(weights, rows)) / sum(weights)
-        sigma = 1 / sqrt(sum(weights))
+        spread = (
+            sum(w * (row["observed"] - lam) ** 2 for w, row in zip(weights, rows)) / (len(rows) - 1)
+            if len(rows) > 1
+            else 1.0
+        )
+        sigma = sqrt(max(spread, 1.0) / sum(weights))
+        critical = float(student_t.ppf(0.95, len(rows) - 1)) if len(rows) > 1 else 1.645
         pooled = {
             "lambda": lam,
             "lambda_uncertainty": sigma,
-            "verdict": verdict(lam, sigma),
+            "spread": spread,  # χ² per degree of freedom of the reps about the pooled Λ
+            "critical": critical,
+            "verdict": verdict(lam, sigma, critical),
             "predicted": sum(w * row["predicted"] for w, row in zip(weights, rows)) / sum(weights),
         }
         for test in ("X lambda", "X eps3", "X eps5", "Z lambda", "Z eps3", "Z eps5"):
@@ -1175,10 +1187,11 @@ def ratio(per_round: dict[str, list[float]]) -> dict:
     return {"lambda": lam, "lambda_uncertainty": sigma, "verdict": verdict(lam, sigma)}
 
 
-def verdict(lam: float, sigma: float) -> str:
-    if lam - 1.645 * sigma > 1:
+def verdict(lam: float, sigma: float, critical: float = 1.645) -> str:
+    """One-sided 5% each way: 1.645 standard errors, or `critical` for a pooled Λ."""
+    if lam - critical * sigma > 1:
         return "d = 5 better"
-    if lam + 1.645 * sigma < 1:
+    if lam + critical * sigma < 1:
         return "d = 5 worse"
     return "undecided"
 
