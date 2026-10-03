@@ -11,7 +11,7 @@ pytest.importorskip("qiskit")
 
 import heavyhex.simulation.noisy as noisy  # noqa: E402
 from heavyhex.circuits.flagged import memory_circuit_flagged  # noqa: E402
-from heavyhex.decoders.shots import Memory, read_shot  # noqa: E402
+from heavyhex.circuits.shots import Memory, read_shot  # noqa: E402
 from heavyhex.patches.operators import build_operators  # noqa: E402
 from heavyhex.patches.placement import LAST_CALIBRATION, Calibration  # noqa: E402
 

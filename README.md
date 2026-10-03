@@ -10,13 +10,10 @@ The code is the heavy-hex subsystem code of [Chamberland et al.
 2023](https://arxiv.org/abs/2203.07205). d=3 takes 23 qubits and d=5 takes 65,
 and both fit on Fez at once ([layout](docs/figures/heavyhex-blueprint.png)).
 
-So far there are both patches, their flagged circuits, and Aer runs decoded with
-a lookup table (d=3) or [MWPM](docs/mwpm-decoder.md). Nothing has run on the QPU yet.
-
 ```bash
 pip install -e '.[sim,matching]'
-heavyhex info
-heavyhex --distance 5 run --decoder mwpm --rounds 3 --error X0
+heavyhex info                          # the patch's operators
+heavyhex --distance 5 circuit          # draw its flagged memory circuit
 heavyhex --help
 ```
 
