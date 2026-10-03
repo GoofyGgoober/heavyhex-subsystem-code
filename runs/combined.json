@@ -1,0 +1,263 @@
+{
+ "shots_from": "shots.npz",
+ "days": 1,
+ "reps": [
+  {
+   "day": "2026-10-04",
+   "rep": 1,
+   "pairing": "paired",
+   "folders": [
+    "ibm_fez-2026-10-04-r1"
+   ],
+   "spots": {
+    "3": [
+     [
+      3,
+      5
+     ],
+     [
+      1,
+      -1
+     ]
+    ],
+    "5": [
+     [
+      3,
+      7
+     ],
+     [
+      1,
+      1
+     ]
+    ]
+   },
+   "decoupled_dephasing": {
+    "ibm_fez-2026-10-04-r1": 1.0572945121021786
+   },
+   "tests": {
+    "X eps3": {
+     "observed": 0.13212567107699585,
+     "predicted": 0.09736389071282392,
+     "observed_uncertainty": 0.007146099787959185,
+     "simulator_noise": 0.0007748094293480056,
+     "from_f": 0.007835513069962361,
+     "calibration_gap": 0.0,
+     "bound": 0.021266154979293073,
+     "agrees": false
+    },
+    "X eps5": {
+     "observed": 0.17583215364117016,
+     "predicted": 0.17919477045836096,
+     "observed_uncertainty": 0.012829227101130457,
+     "simulator_noise": 0.0015474632985292879,
+     "from_f": 0.014572405048926696,
+     "calibration_gap": 0.0,
+     "bound": 0.03895323861157938,
+     "agrees": true
+    },
+    "X lambda": {
+     "observed": 0.751430658960315,
+     "predicted": 0.5433411391625858,
+     "observed_uncertainty": 0.06824729106793408,
+     "simulator_noise": 0.0063805506533406425,
+     "from_f": -0.0003376287087319243,
+     "calibration_gap": 0.0,
+     "bound": 0.13709147541544833,
+     "agrees": false
+    },
+    "Z eps3": {
+     "observed": 0.1290192880306153,
+     "predicted": 0.06513178670115677,
+     "observed_uncertainty": 0.004569666944569313,
+     "simulator_noise": 0.0008975993483465557,
+     "from_f": 3.1459984428796845e-06,
+     "calibration_gap": 0.0,
+     "bound": 0.009313978842953811,
+     "agrees": false
+    },
+    "Z eps5": {
+     "observed": 0.26630238367292547,
+     "predicted": 0.1672276340927632,
+     "observed_uncertainty": 0.022937549344704013,
+     "simulator_noise": 0.001280011797796422,
+     "from_f": -2.7859605570858055e-05,
+     "calibration_gap": 0.0,
+     "bound": 0.04594650699676101,
+     "agrees": false
+    },
+    "Z lambda": {
+     "observed": 0.4844841651476831,
+     "predicted": 0.3894798072968453,
+     "observed_uncertainty": 0.045120652867036634,
+     "simulator_noise": 0.006139863378894564,
+     "from_f": 6.755831776978132e-05,
+     "calibration_gap": 0.0,
+     "bound": 0.09107306520778603,
+     "agrees": false
+    }
+   },
+   "drift": false,
+   "leakage": true,
+   "detectors_beyond_chance": 757,
+   "verdict": "d = 5 worse"
+  },
+  {
+   "day": "2026-10-04",
+   "rep": 2,
+   "pairing": "split",
+   "folders": [
+    "ibm_fez-2026-10-04-r2-d3",
+    "ibm_fez-2026-10-04-r2-d5"
+   ],
+   "spots": {
+    "3": [
+     [
+      5,
+      15
+     ],
+     [
+      1,
+      -1
+     ]
+    ],
+    "5": [
+     [
+      3,
+      13
+     ],
+     [
+      1,
+      -1
+     ]
+    ]
+   },
+   "decoupled_dephasing": {
+    "ibm_fez-2026-10-04-r2-d3": 0.8833140337009852,
+    "ibm_fez-2026-10-04-r2-d5": 0.9471254591763452
+   },
+   "tests": {
+    "X eps3": {
+     "observed": 0.10057854274032302,
+     "predicted": 0.08066946798416152,
+     "observed_uncertainty": 0.0042776289683980175,
+     "simulator_noise": 0.00036418370710241207,
+     "from_f": 0.015595096515869218,
+     "calibration_gap": 0.0,
+     "bound": 0.03235044201880852,
+     "agrees": true
+    },
+    "Z eps3": {
+     "observed": 0.1369047290059206,
+     "predicted": 0.08789648303121184,
+     "observed_uncertainty": 0.004851094649637964,
+     "simulator_noise": 0.0014767308845077963,
+     "from_f": 0.0002041030686544455,
+     "calibration_gap": 0.0,
+     "bound": 0.010149977629066859,
+     "agrees": false
+    },
+    "X eps5": {
+     "observed": 0.22004213780762533,
+     "predicted": 0.20125815002550623,
+     "observed_uncertainty": 0.013165567871839647,
+     "simulator_noise": 0.002168730506449096,
+     "from_f": 0.019362194932772452,
+     "calibration_gap": 0.0,
+     "bound": 0.047028934158124334,
+     "agrees": true
+    },
+    "Z eps5": {
+     "observed": 0.2325235648704126,
+     "predicted": 0.15420911184660452,
+     "observed_uncertainty": 0.04192484950144668,
+     "simulator_noise": 0.0006478386877073267,
+     "from_f": -0.0012009461655211795,
+     "calibration_gap": 0.0,
+     "bound": 0.0838940992532067,
+     "agrees": true
+    },
+    "X lambda": {
+     "observed": 0.45708764576835326,
+     "predicted": 0.4008258446872237,
+     "observed_uncertainty": 0.033553759784317794,
+     "simulator_noise": 0.004682979191955525,
+     "from_f": 0.0865528924287738,
+     "calibration_gap": 0.0,
+     "bound": 0.1858944676698355,
+     "agrees": true
+    },
+    "Z lambda": {
+     "observed": 0.5887778689537071,
+     "predicted": 0.5699824217822133,
+     "observed_uncertainty": 0.10818941006662963,
+     "simulator_noise": 0.009870994467431967,
+     "from_f": 0.00463201630754849,
+     "calibration_gap": 0.0,
+     "bound": 0.21747496920257106,
+     "agrees": true
+    }
+   },
+   "drift": false,
+   "leakage": true,
+   "detectors_beyond_chance": 727,
+   "verdict": "d = 5 worse"
+  }
+ ],
+ "pooled_x": {
+  "lambda": 0.514385954641415,
+  "lambda_uncertainty": 0.11654295639285929,
+  "spread": 14.980046227505191,
+  "critical": 6.313751514675037,
+  "verdict": "undecided",
+  "predicted": 0.4285685971766775
+ },
+ "model": {
+  "X lambda": {
+   "chi2": 9.582336230825543,
+   "reps": 2,
+   "bar": 5.991464547107979,
+   "p_value": 0.008302753141277269,
+   "agrees": false
+  },
+  "X eps3": {
+   "chi2": 12.20270643167863,
+   "reps": 2,
+   "bar": 5.991464547107979,
+   "p_value": 0.0022398346879982708,
+   "agrees": false
+  },
+  "X eps5": {
+   "chi2": 0.6679319853803912,
+   "reps": 2,
+   "bar": 5.991464547107979,
+   "p_value": 0.7160781337040791,
+   "agrees": true
+  },
+  "Z lambda": {
+   "chi2": 4.382661883951421,
+   "reps": 2,
+   "bar": 5.991464547107979,
+   "p_value": 0.11176789299987747,
+   "agrees": true
+  },
+  "Z eps3": {
+   "chi2": 281.4548737239286,
+   "reps": 2,
+   "bar": 5.991464547107979,
+   "p_value": 7.635732727901632e-62,
+   "agrees": false
+  },
+  "Z eps5": {
+   "chi2": 22.08425779644393,
+   "reps": 2,
+   "bar": 5.991464547107979,
+   "p_value": 1.601269203136927e-05,
+   "agrees": false
+  }
+ },
+ "matches": {
+  "X": false,
+  "Z": false
+ },
+ "incomplete": []
+}
