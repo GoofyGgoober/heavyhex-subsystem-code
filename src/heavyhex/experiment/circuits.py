@@ -1,11 +1,12 @@
-"""What runs on the chip: both patches side by side, in Fez's native gates.
+"""What runs on the chip: the job's patches side by side, in Fez's native gates.
 
 Memory in X and Z at each number of rounds, and an idle test: X memory with
 the CZ of every CX replaced by a wait of the same length, so the data qubits
 wait in |+>, with the same waits, pulses and H gates, while their ancillas are
 reset and read out. Half the idle test reads the data in Y instead of X, so a
 frequency offset, which turns X into Y, isn't taken for dephasing.
-Patch p writes registers m{p} (gauges) and d{p} (data), p being "3" or "5".
+A job runs both patches, or one of them alone. Patch p writes registers m{p}
+(gauges) and d{p} (data), p being "3" or "5".
 """
 
 from __future__ import annotations
@@ -46,7 +47,7 @@ class Setting:
 
     @property
     def patches(self) -> tuple[str, ...]:
-        """The patches it runs, by register suffix."""
+        """The patches it can run, by register suffix; a job runs those it has qubits for."""
         return tuple(map(str, DISTANCES))
 
     @property
@@ -100,16 +101,16 @@ def distance(patch: str) -> int:
 def logical_circuit(
     setting: Setting, chips: dict[str, list[int]], num_qubits: int
 ) -> tuple[QuantumCircuit, dict[str, FlaggedSchedule]]:
-    """Both patches on their chip qubits, before translation to native gates.
+    """The job's patches on their chip qubits, before translation to native gates.
 
-    chips maps each patch ("3", "5") to its chip qubits.
+    chips maps each patch the job runs ("3", "5" or both) to its chip qubits.
     """
     from qiskit import ClassicalRegister, QuantumCircuit
     from qiskit.circuit import Instruction
 
     pair = QuantumCircuit(num_qubits)
     schedules = {}
-    for patch in setting.patches:
+    for patch in (p for p in setting.patches if p in chips):
         circuit, schedules[patch] = memory_circuit_flagged(
             build_operators(distance(patch)), rounds=setting.rounds, basis=setting.basis
         )

@@ -1,11 +1,16 @@
-"""Prepare, submit and analyze a run. Each run keeps everything in its own folder.
+"""Prepare, submit and analyze the runs. Each job keeps everything in its own folder.
 
-prepare: place the patches from the day's calibration, translate the circuits
-for the chip, and freeze the simulator's prediction. rehearse: fake the chip's
-shots with the simulator, into rehearsal.npz. submit: send the circuits (uses
-the QPU, at most QPU_SECONDS_LIMIT of it), then save the shots and IBM's
-calibration as the job finished. analyze: decode the shots and compare with the
-prediction.
+The run is RUN_DAYS days. Each day has one rep per clean place for the d=5
+patch (at most MAX_REPS), with the d=3 patch beside it in the same job, or, if no
+clean d=3 place fits beside it, in a job of its own straight after.
+
+prepare_day: plan the day's reps from the day's calibration and prepare a folder
+for each job. prepare: place one job's patches, translate the circuits for the
+chip, and freeze the simulator's prediction. rehearse: fake the chip's shots with
+the simulator, into rehearsal.npz. submit: send the circuits (uses the QPU, at
+most QPU_SECONDS_LIMIT per job and QPU_TOTAL_SECONDS over every job), then save
+the shots and IBM's calibration as the job finished. analyze: decode one job's
+shots and compare with the prediction. combine: Λ for each rep and over all of them.
 
 The job lists every circuit's pieces in BLOCKS blocks, each in its own shuffled
 order, and every piece takes the same number of shots. IBM runs a job shot by shot
@@ -27,7 +32,7 @@ from typing import TYPE_CHECKING, Any
 
 from ..circuits.flagged import memory_circuit_flagged
 from ..patches.operators import build_operators
-from ..patches.placement import Calibration, fez_qubits
+from ..patches.placement import MAX_REPS, Calibration, fez_plan, fez_qubits
 from ..simulation.noisy import add_detectors, fit_per_round
 from ..simulation.scheduled import noisy_scheduled
 from .circuits import (
@@ -66,11 +71,18 @@ LEAKAGE_BAR = 3.0
 # standard errors, in any of the four ε, counts as drift. Set before the run; a drift-free
 # rehearsal reached 3.1.
 DRIFT_BAR = 3.5
-# The job may use this much QPU time and no more: IBM cancels it there, whatever has
-# happened by then, and a run folder that had a job is never sent again. Set by the author.
+# Days with at least one rep; a day with no clean place for the d=5 patch doesn't count.
+RUN_DAYS = 5
+# Shots per memory circuit in each job; each idle readout gets half.
+SHOTS_PER_CIRCUIT = 2500
+# A job may use this much QPU time and no more, and every job together QPU_TOTAL_SECONDS:
+# IBM cancels a job at its limit, whatever has happened by then, a job's limit is cut to
+# what the total has left, and a run folder that had a job is never sent again. Set by
+# the author.
 QPU_SECONDS_LIMIT = 50
-# Jobs the author approved, across every run folder: one more is refused.
-QPU_JOBS_LIMIT = 1
+QPU_TOTAL_SECONDS = 300
+# Jobs across every run folder: RUN_DAYS days of MAX_REPS reps, each at most two jobs.
+QPU_JOBS_LIMIT = 20
 # IBM's rule for a sampler job's QPU time: about 2 s to load it, then the repetition delay
 # and the circuit for every shot (quantum.cloud.ibm.com/docs/guides/estimate-job-run-time).
 LOAD_SECONDS = 2.0
@@ -80,11 +92,61 @@ REP_DELAY = 250e-6  # IBM's default, when the backend doesn't say
 SHOTS, REHEARSAL = "shots.npz", "rehearsal.npz"
 
 
-def prepare(folder: Path, calibration: Calibration, target: Any, *, offline: bool = False) -> dict:
-    """Write the run's calibration, circuits and prediction into a new folder."""
+def prepare_day(
+    calibration: Calibration, target: Any, *, offline: bool = False, reps: int = MAX_REPS
+) -> list[tuple[Path, dict]]:
+    """Plan the day's reps and prepare a folder for each job, in the order they are sent."""
+    plan = fez_plan(calibration, reps)
+    if not plan:
+        raise ValueError(
+            f"no clean place for the d=5 patch on {calibration.backend} today; the day is skipped"
+        )
+    day = f"{datetime.now():%Y-%m-%d}"
+    prepared = []
+    for r, jobs in enumerate(plan, start=1):
+        pairing = "paired" if len(jobs) == 1 else "split"
+        for k, spots in enumerate(jobs, start=1):
+            chips = {str(d): fez_qubits(d, calibration, spot) for d, spot in sorted(spots.items())}
+            alone = None if pairing == "paired" else next(iter(spots))
+            folder = day_folder(calibration.backend, day, r, alone, offline=offline)
+            rep = {
+                "day": day,
+                "rep": r,
+                "pairing": pairing,
+                "job": k,  # its place in the rep's order
+                "spots": {str(d): [list(s.origin), list(s.direction)] for d, s in spots.items()},
+            }
+            prediction = prepare(folder, calibration, target, offline=offline, chips=chips, rep=rep)
+            prepared.append((folder, prediction))
+    return prepared
+
+
+def day_folder(
+    backend: str, day: str, rep: int, alone: int | None = None, *, offline: bool = False
+) -> Path:
+    """runs/<backend>-<day>-r<rep>, with -d<d> for a patch that runs alone."""
+    return RUNS / (
+        f"{backend}-{day}-r{rep}{f'-d{alone}' if alone else ''}{'-offline' if offline else ''}"
+    )
+
+
+def prepare(
+    folder: Path,
+    calibration: Calibration,
+    target: Any,
+    *,
+    offline: bool = False,
+    chips: dict[str, list[int]] | None = None,
+    rep: dict | None = None,
+) -> dict:
+    """Write a job's calibration, circuits and prediction into a new folder.
+
+    chips gives each of the job's patches its chip qubits; both patches at their
+    best pair of spots if it isn't given. rep records the job's day and rep.
+    """
     from qiskit import qpy
 
-    chips = {str(d): fez_qubits(d, calibration) for d in DISTANCES}
+    chips = chips or {str(d): fez_qubits(d, calibration) for d in DISTANCES}
     circuits = [for_fez(logical_circuit(s, chips, target.num_qubits)[0], target) for s in SETTINGS]
     folder.mkdir(parents=True)
     calibration.save(folder / "calibration.json")
@@ -97,6 +159,7 @@ def prepare(folder: Path, calibration: Calibration, target: Any, *, offline: boo
         "prepared": _now(),
         "code": commit(),
         "chips": chips,
+        "rep": rep,
         "settings": [asdict(s) for s in SETTINGS],
         "order": job_order(SETTINGS),
         "seconds": [c.estimate_duration(target, unit="s") for c in circuits],
@@ -133,7 +196,7 @@ def predict(
         else:
             measured = model.compile_sampler(seed=setting.rounds).sample(shots)
             settings.append({"x": x_values(by_register(measured, records))})
-    return {"settings": settings, **_fits(settings, shots)}
+    return {"settings": settings, **_fits(settings, shots, _patches(settings))}
 
 
 def simulated(
@@ -147,7 +210,7 @@ def simulated(
     """The stim circuit for a translated circuit; memory gets detectors and one logical per patch.
 
     Returns the circuit, the measurement of each (register, bit), and detector labels
-    as (patch, round, stabilizer).
+    as (patch, round, stabilizer). Logical k is the circuit's k-th patch.
     """
     model, records = noisy_scheduled(
         circuit,
@@ -158,7 +221,8 @@ def simulated(
     )
     labels: list = []
     if setting.decoded:
-        for k, patch in enumerate(setting.patches):
+        present = [p for p in setting.patches if (f"d{p}", 0) in records]
+        for k, patch in enumerate(present):
             _, schedule = memory_circuit_flagged(
                 build_operators(distance(patch)), rounds=setting.rounds, basis=setting.basis
             )
@@ -170,14 +234,15 @@ def simulated(
 
 
 def submit(folder: Path, backend: Any, shots: int) -> None:
-    """Send the run's circuits and save every shot. Uses QPU time on a real backend.
+    """Send the job's circuits and save every shot. Uses QPU time on a real backend.
 
-    shots is per memory circuit; each idle readout gets half. Refuses a run that
+    shots is per memory circuit; each idle readout gets half. Refuses a folder that
     already has a job: analyze fetches its shots. On the QPU the job is capped at
-    QPU_SECONDS_LIMIT: it isn't sent if it's estimated to need more, it's cancelled
-    before it runs if IBM's estimate, read once as it's queued, is more, and IBM
-    cancels it if it uses more. job.json claims the folder before anything is sent,
-    so even a job whose reply from IBM is lost is never sent twice.
+    job_limit(): QPU_SECONDS_LIMIT, or what QPU_TOTAL_SECONDS has left if that is
+    less. It isn't sent if it's estimated to need more, it's cancelled before it runs
+    if IBM's estimate, read once as it's queued, is more, and IBM cancels it if it
+    uses more. job.json claims the folder before anything is sent, so even a job
+    whose reply from IBM is lost is never sent twice.
     """
     from qiskit_ibm_runtime import SamplerV2
 
@@ -187,20 +252,23 @@ def submit(folder: Path, backend: Any, shots: int) -> None:
     if run["offline"] and on_qpu:
         raise ValueError("this run was prepared offline; prepare it again before using the QPU")
     refuse_resubmit(folder)
+    limit = None
     if on_qpu:
         refuse_another_job()
+        limit = job_limit()
     each = piece_shots(shots)
     estimate = qpu_seconds(run, shots, backend) if on_qpu else 0.0
-    if estimate > QPU_SECONDS_LIMIT:
+    if limit is not None and estimate > limit:
         raise ValueError(
-            f"the job would need about {estimate:.0f} s of QPU time, "
-            f"over the {QPU_SECONDS_LIMIT} s limit; not sent"
+            f"the job would need about {estimate:.0f} s of QPU time, over its {limit} s limit "
+            f"({QPU_SECONDS_LIMIT} s a job, {QPU_TOTAL_SECONDS} s in all, "
+            f"{qpu_committed():.0f} s already counted); not sent"
         )
     sampler = SamplerV2(mode=backend)
     sampler.options.default_shots = each
     tag = f"heavyhex:{folder.name}"  # finds the job in IBM's list if its reply is lost
     if on_qpu:
-        sampler.options.max_execution_time = QPU_SECONDS_LIMIT  # IBM cancels the job past it
+        sampler.options.max_execution_time = limit  # IBM cancels the job past it
         sampler.options.environment.job_tags = [tag]
         # IBM's own decoupling and twirling would change the circuit the prediction is for.
         sampler.options.dynamical_decoupling.enable = False
@@ -216,7 +284,8 @@ def submit(folder: Path, backend: Any, shots: int) -> None:
         "submitted": _now(),
         "submitted_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "code": commit(),
-        "qpu_seconds_limit": QPU_SECONDS_LIMIT if on_qpu else None,
+        "local": not on_qpu,
+        "qpu_seconds_limit": limit,
         "qpu_seconds_estimate": estimate if on_qpu else None,
     }
     with open(folder / "job.json", "x") as f:  # claims the folder, never over an earlier job
@@ -231,7 +300,7 @@ def submit(folder: Path, backend: Any, shots: int) -> None:
             ibm = None
         record["qpu_seconds_ibm_estimate"] = ibm
         _write(folder / "job.json", record)
-        if ibm is not None and ibm > QPU_SECONDS_LIMIT:
+        if ibm is not None and limit is not None and ibm > limit:
             try:
                 job.cancel()
                 outcome = "cancelled before it ran"
@@ -240,8 +309,8 @@ def submit(folder: Path, backend: Any, shots: int) -> None:
             with suppress(Exception):
                 finish(folder, job)
             raise ValueError(
-                f"IBM estimates the job at {ibm:.0f} s of QPU time, over the "
-                f"{QPU_SECONDS_LIMIT} s limit; {outcome}"
+                f"IBM estimates the job at {ibm:.0f} s of QPU time, over its "
+                f"{limit} s limit; {outcome}"
             )
     try:
         result = job.result()
@@ -264,13 +333,49 @@ def qpu_seconds(run: dict, shots: int, backend: Any = None) -> float:
     return LOAD_SECONDS + each * sum(run["seconds"][i] + rest for i, _ in run["order"])
 
 
+def _qpu_jobs() -> list[tuple[str, dict]]:
+    """The run folders' jobs that went, or may have gone, to the QPU."""
+    found = []
+    for path in sorted(RUNS.glob("*/job.json")):
+        record = json.loads(path.read_text() or "{}")
+        if not record.get("local"):  # an unreadable or older record counts as the QPU's
+            found.append((path.parent.name, record))
+    return found
+
+
+def qpu_committed() -> float:
+    """QPU seconds the jobs so far count against QPU_TOTAL_SECONDS: what IBM counted
+    for a job it has finished counting, and the job's whole limit otherwise.
+    """
+    total = 0.0
+    for _, record in _qpu_jobs():
+        usage = record.get("usage") or {}
+        used = next(
+            (usage[key] for key in ("qpu_charge_time_seconds", "quantum_seconds") if key in usage),
+            None,
+        )
+        limit = record.get("qpu_seconds_limit") or QPU_SECONDS_LIMIT
+        total += used if used is not None and usage.get("status") == "complete" else limit
+    return total
+
+
+def job_limit() -> int:
+    """The next job's QPU limit: QPU_SECONDS_LIMIT, or what QPU_TOTAL_SECONDS has left."""
+    return max(int(min(QPU_SECONDS_LIMIT, QPU_TOTAL_SECONDS - qpu_committed())), 0)
+
+
 def refuse_another_job() -> None:
-    """Refuse once the run folders hold as many jobs as the author approved."""
-    sent = sorted(p.parent.name for p in RUNS.glob("*/job.json"))
+    """Refuse once the jobs reach QPU_JOBS_LIMIT or the QPU time QPU_TOTAL_SECONDS."""
+    sent = _qpu_jobs()
     if len(sent) >= QPU_JOBS_LIMIT:
         raise ValueError(
-            f"runs/{sent[0]} already sent a job, and {QPU_JOBS_LIMIT} was approved in all; "
+            f"{len(sent)} jobs have gone, and {QPU_JOBS_LIMIT} were approved in all; "
             "nothing more goes to the QPU without the author's new approval"
+        )
+    if job_limit() <= 0:
+        raise ValueError(
+            f"the jobs so far count {qpu_committed():.0f} s of the {QPU_TOTAL_SECONDS} s "
+            "approved in all; nothing more goes to the QPU without the author's new approval"
         )
 
 
@@ -404,6 +509,7 @@ def analyze(
 
     run = _read(folder / "run.json")
     check_settings(run)
+    patches = patches_of(run)
     calibration = Calibration.load(folder / "calibration.json")
     circuits = load_circuits(folder)
     source = REHEARSAL if rehearsal else SHOTS
@@ -440,9 +546,10 @@ def analyze(
             _decoded(setting, labels, np.concatenate(detectors), np.concatenate(failed))
         )
     count = _memory_shots(shots)
-    seen = {"settings": observed, **_fits(observed, count)}
+    seen = {"settings": observed, **_fits(observed, count, patches)}
     halves = [
-        _fits(part, _memory_shots(half))["fits"] for part, half in zip(by_half, halves_of_shots)
+        _fits(part, _memory_shots(half), patches)["fits"]
+        for part, half in zip(by_half, halves_of_shots)
     ]
 
     expected = predict(circuits, calibration, run["dt"], decoupled_dephasing=f)
@@ -469,6 +576,8 @@ def analyze(
     frozen = _read(folder / "prediction.json")
     analysis = {
         "shots_from": source,
+        "patches": patches,
+        "rep": run.get("rep"),
         "code": {"prepared": run.get("code"), "analyzed": commit()},
         "calibration_after_missing": after_missing,
         "calibration_after_filled": filled,
@@ -496,6 +605,129 @@ def analyze(
     }
     _write(folder / ("rehearsal_analysis.json" if rehearsal else "analysis.json"), analysis)
     return analysis
+
+
+def combine(*, rehearsal: bool = False) -> dict:
+    """Λ for every rep, and over all of them, from the job folders' analyses.
+
+    A rep's Λ sets its d=3 job's ε₃ against its d=5 job's ε₅, the same job when the
+    rep is paired; a split rep's bound adds its two jobs' variances. In X memory, Λ
+    pooled over the reps, each weighted by its inverse variance, is decided by the
+    same one-sided rule as one rep; and the simulation matches the chip if, for each
+    of Λ, ε₃ and ε₅, the sum over reps of ((observed - predicted) / (bound / 2))² is
+    below the 95% point of χ² with a degree per rep. Z memory is reported, not decided.
+    """
+    from scipy.stats import chi2
+
+    name = "rehearsal_analysis.json" if rehearsal else "analysis.json"
+    reps: dict[tuple[str, int], dict] = {}
+    for folder in sorted(path.parent for path in RUNS.glob(f"*/{name}")):
+        info = _read(folder / "run.json")
+        if not info.get("rep") or (info.get("offline") and not rehearsal):
+            continue
+        analysis = _read(folder / name)
+        entry = reps.setdefault(
+            (info["rep"]["day"], info["rep"]["rep"]),
+            {
+                "day": info["rep"]["day"],
+                "rep": info["rep"]["rep"],
+                "pairing": info["rep"]["pairing"],
+                "folders": [],
+                "spots": {},
+                "decoupled_dephasing": {},
+                "tests": {},
+                "drift": False,
+                "leakage": False,
+                "detectors_beyond_chance": 0,
+            },
+        )
+        entry["folders"].append(folder.name)
+        entry["spots"].update(info["rep"]["spots"])
+        entry["decoupled_dephasing"][folder.name] = analysis["decoupled_dephasing"]
+        entry["tests"].update(analysis["agreement"]["tests"])
+        entry["drift"] |= any(row["drift"] for row in analysis["drift"].values())
+        entry["leakage"] |= any(row["rises"] for row in analysis["leakage"].values())
+        entry["detectors_beyond_chance"] += analysis["detectors_beyond_chance"]
+    complete = []
+    for entry in reps.values():
+        tests = entry["tests"]
+        if not all(f"{b} eps{d}" in tests for b in "XZ" for d in DISTANCES):
+            continue  # a split rep with one job still to analyze
+        for basis in "XZ":
+            if f"{basis} lambda" not in tests:
+                tests[f"{basis} lambda"] = _ratio_test(
+                    tests[f"{basis} eps3"], tests[f"{basis} eps5"]
+                )
+        row = tests["X lambda"]
+        entry["verdict"] = verdict(row["observed"], row["observed_uncertainty"])
+        complete.append(entry)
+    complete.sort(key=lambda entry: (entry["day"], entry["rep"]))
+    pooled: dict = {}
+    model: dict = {}
+    if complete:
+        rows = [entry["tests"]["X lambda"] for entry in complete]
+        weights = [1 / row["observed_uncertainty"] ** 2 for row in rows]
+        lam = sum(w * row["observed"] for w, row in zip(weights, rows)) / sum(weights)
+        sigma = 1 / sqrt(sum(weights))
+        pooled = {
+            "lambda": lam,
+            "lambda_uncertainty": sigma,
+            "verdict": verdict(lam, sigma),
+            "predicted": sum(w * row["predicted"] for w, row in zip(weights, rows)) / sum(weights),
+        }
+        for test in ("X lambda", "X eps3", "X eps5", "Z lambda", "Z eps3", "Z eps5"):
+            z = [
+                (row["observed"] - row["predicted"]) / (row["bound"] / 2)
+                for row in (entry["tests"][test] for entry in complete)
+            ]
+            stat, bar = sum(v * v for v in z), float(chi2.ppf(0.95, len(z)))
+            model[test] = {
+                "chi2": stat,
+                "reps": len(z),
+                "bar": bar,
+                "p_value": float(chi2.sf(stat, len(z))),
+                "agrees": stat < bar,
+            }
+    combined = {
+        "shots_from": REHEARSAL if rehearsal else SHOTS,
+        "days": len({entry["day"] for entry in complete}),
+        "reps": complete,
+        "pooled_x": pooled,
+        "model": model,
+        "matches": {
+            basis: all(model[f"{basis} {q}"]["agrees"] for q in ("lambda", "eps3", "eps5"))
+            for basis in "XZ"
+            if model
+        },
+        "incomplete": [entry["folders"] for entry in reps.values() if entry not in complete],
+    }
+    _write(RUNS / ("rehearsal_combined.json" if rehearsal else "combined.json"), combined)
+    return combined
+
+
+def _ratio_test(e3: dict, e5: dict) -> dict:
+    """The Λ test of a split rep, from its two jobs' ε tests, as independent."""
+    observed = e3["observed"] / e5["observed"]
+    predicted = e3["predicted"] / e5["predicted"]
+
+    def spread(key: str, against: str) -> float:
+        return sqrt(sum((row[key] / row[against]) ** 2 for row in (e3, e5)))
+
+    sigma = observed * spread("observed_uncertainty", "observed")
+    noise = predicted * spread("simulator_noise", "predicted")
+    from_f = predicted * spread("from_f", "predicted")
+    gap = predicted * spread("calibration_gap", "predicted")
+    bound = 2 * sqrt(sigma**2 + noise**2 + from_f**2 + gap**2 / 2)
+    return {
+        "observed": observed,
+        "predicted": predicted,
+        "observed_uncertainty": sigma,
+        "simulator_noise": noise,
+        "from_f": from_f,
+        "calibration_gap": gap,
+        "bound": bound,
+        "agrees": abs(observed - predicted) < bound,
+    }
 
 
 CODE = ("src", "pyproject.toml")  # what the prediction depends on
@@ -586,10 +818,6 @@ def load_shots(
     ]
 
 
-def default_folder(backend: str, offline: bool) -> Path:
-    return RUNS / f"{backend}-{datetime.now():%Y-%m-%d}{'-offline' if offline else ''}"
-
-
 def _decode(model: stim.Circuit, detectors: np.ndarray) -> np.ndarray:
     import pymatching
 
@@ -625,8 +853,21 @@ def in_record_order(bits: dict[str, np.ndarray], records: dict) -> np.ndarray:
 def x_values(bits: dict[str, np.ndarray]) -> dict[str, list[float]]:
     """<X> of each data qubit, per patch, from the final readout (<Y> for a Y readout)."""
     return {
-        str(d): [float(1 - 2 * bits[f"d{d}"][:, q].mean()) for q in range(d * d)] for d in DISTANCES
+        str(d): [float(1 - 2 * bits[f"d{d}"][:, q].mean()) for q in range(d * d)]
+        for d in DISTANCES
+        if f"d{d}" in bits
     }
+
+
+def patches_of(run: dict) -> list[str]:
+    """The patches a job runs, "3" before "5"."""
+    return [p for p in map(str, DISTANCES) if p in run["chips"]]
+
+
+def _patches(rows: list[dict]) -> list[str]:
+    """The patches of decoded rows, in the order of their logicals."""
+    labels = next(row["detectors"] for row in rows if "detectors" in row)
+    return list(dict.fromkeys(str(patch) for patch, _, _ in labels))
 
 
 def _decoded(setting: Setting, labels: list, detectors: np.ndarray, failed: np.ndarray) -> dict:
@@ -646,7 +887,7 @@ def _decoded(setting: Setting, labels: list, detectors: np.ndarray, failed: np.n
     }
     if setting.kind == "memory" and setting.rounds == max(ROUNDS):
         found["round_covariance"] = {}
-        for patch in setting.patches:
+        for patch in dict.fromkeys(str(p) for p, _, _ in labels):
             columns = [
                 [
                     k
@@ -682,7 +923,7 @@ def _idle_dephasing(shots: list, circuits: list, calibration: Calibration, dt: f
     found: dict[str, dict[str, list[float]]] = {
         key: {} for key in ("per_qubit", "uncertainty", "x_only", "phase_per_round")
     }
-    for d in map(str, DISTANCES):
+    for d in xs[0]:
         for found_d in found.values():
             found_d[d] = []
         for q in range(int(d) ** 2):
@@ -774,7 +1015,8 @@ def _exact_x(
     import stim
 
     model, records = noisy_scheduled(circuit, calibration, dt, decoupled_dephasing=f)
-    data = [(d, q) for d in DISTANCES for q in range(d * d)]
+    present = [d for d in DISTANCES if (f"d{d}", 0) in records]
+    data = [(d, q) for d in present for q in range(d * d)]
     for k, (d, q) in enumerate(data):
         last = stim.target_rec(records[f"d{d}", q] - model.num_measurements)
         model.append("OBSERVABLE_INCLUDE", [last], k)
@@ -784,7 +1026,7 @@ def _exact_x(
             for target in error.targets_copy():
                 if target.is_logical_observable_id():
                     x[data[target.val]] *= 1 - 2 * error.args_copy()[0]
-    return {str(d): [x[d, q] for q in range(d * d)] for d in DISTANCES}
+    return {str(d): [x[d, q] for q in range(d * d)] for d in present}
 
 
 def _fit_share(
@@ -900,34 +1142,48 @@ def _worst_detectors(
     }
 
 
-def _fits(settings: list[dict], shots: int) -> dict:
-    """Error per round per basis and patch, and Λ."""
+def _fits(settings: list[dict], shots: int, patches: list[str]) -> dict:
+    """Error per round per basis and patch, and Λ when the job has both patches.
+
+    Logical k of each row is patches[k].
+    """
     fits: dict = {}
     for basis in "XZ":
         rows = [r for s, r in zip(SETTINGS, settings) if s.kind == "memory" and s.basis == basis]
         per_round = {}
-        for k, d in enumerate(DISTANCES):
+        for k, d in enumerate(patches):
             fit = fit_per_round(ROUNDS, [r["logical_error"][k] for r in rows], shots)
-            per_round[str(d)] = [fit.per_round, fit.uncertainty]
-        (e3, u3), (e5, u5) = per_round["3"], per_round["5"]
-        lam = e3 / e5
-        sigma = lam * sqrt((u3 / e3) ** 2 + (u5 / e5) ** 2)  # one standard error
-        verdict = "undecided"
-        if lam - 1.645 * sigma > 1:
-            verdict = "d = 5 better"
-        elif lam + 1.645 * sigma < 1:
-            verdict = "d = 5 worse"
+            per_round[d] = [fit.per_round, fit.uncertainty]
         fits[basis] = {
             "per_round": per_round,
-            "lambda": lam,
-            "lambda_uncertainty": sigma,
-            "verdict": verdict,  # one-sided 5% each way
-            "from_round_2": _window(rows, shots),
+            **ratio(per_round),
+            "from_round_2": _window(rows, shots, patches),
         }
     return {"fits": fits}
 
 
-def _window(rows: list[dict], shots: int, first: int = 2) -> dict:
+def ratio(per_round: dict[str, list[float]]) -> dict:
+    """Λ = ε₃ / ε₅, its standard error, and the decision: one-sided 5% each way.
+
+    Empty unless both patches are there.
+    """
+    if not {"3", "5"} <= set(per_round):
+        return {}
+    (e3, u3), (e5, u5) = per_round["3"], per_round["5"]
+    lam = e3 / e5
+    sigma = lam * sqrt((u3 / e3) ** 2 + (u5 / e5) ** 2)  # one standard error
+    return {"lambda": lam, "lambda_uncertainty": sigma, "verdict": verdict(lam, sigma)}
+
+
+def verdict(lam: float, sigma: float) -> str:
+    if lam - 1.645 * sigma > 1:
+        return "d = 5 better"
+    if lam + 1.645 * sigma < 1:
+        return "d = 5 worse"
+    return "undecided"
+
+
+def _window(rows: list[dict], shots: int, patches: list[str], first: int = 2) -> dict:
     """ε and Λ fitted from round `first` on: the first round, compared with the
     prepared state, differs from the rest. Exploratory, nothing is decided on it.
     """
@@ -935,23 +1191,20 @@ def _window(rows: list[dict], shots: int, first: int = 2) -> dict:
     if len(keep) < 2:
         return {}
     per_round = {}
-    for k, d in enumerate(DISTANCES):
+    for k, d in enumerate(patches):
         fit = fit_per_round(
             [ROUNDS[j] for j in keep], [rows[j]["logical_error"][k] for j in keep], shots
         )
-        per_round[str(d)] = [fit.per_round, fit.uncertainty]
-    (e3, u3), (e5, u5) = per_round["3"], per_round["5"]
-    return {
-        "per_round": per_round,
-        "lambda": e3 / e5,
-        "lambda_uncertainty": e3 / e5 * sqrt((u3 / e3) ** 2 + (u5 / e5) ** 2),
-    }
+        per_round[d] = [fit.per_round, fit.uncertainty]
+    found = {"per_round": per_round, **ratio(per_round)}
+    found.pop("verdict", None)
+    return found
 
 
 def _quantities(fits: dict, basis: str) -> dict[str, tuple[float, float]]:
     """What the agreement rule compares: (value, standard error) of Λ in X, ε₃ and ε₅."""
-    found = {f"eps{d}": tuple(fits[basis]["per_round"][d]) for d in map(str, DISTANCES)}
-    if basis == "X":
+    found = {f"eps{d}": tuple(value) for d, value in fits[basis]["per_round"].items()}
+    if basis == "X" and "lambda" in fits[basis]:
         found["lambda"] = (fits[basis]["lambda"], fits[basis]["lambda_uncertainty"])
     return found
 
@@ -1038,8 +1291,11 @@ def _agreement(
             found[f"{basis} {name}"] = {
                 "observed": value,
                 "predicted": guess,
-                "bound": bound,
+                "observed_uncertainty": sigma,
+                "simulator_noise": noise,
+                "from_f": from_f,
                 "calibration_gap": gap,
+                "bound": bound,
                 "agrees": abs(value - guess) < bound,
             }
     verdicts = {
@@ -1071,8 +1327,9 @@ def _dephasing_from_memory(
     degree = len(known) - 1
     grid = np.linspace(-0.5, 2.0, 2501)
 
-    eps, sigma = observed["fits"]["X"]["per_round"]["3"]
-    curve = np.polyfit(at, [p["fits"]["X"]["per_round"]["3"][0] for _, p in known], degree)
+    small = min(observed["fits"]["X"]["per_round"], key=int)  # d=3 when the job has it
+    eps, sigma = observed["fits"]["X"]["per_round"][small]
+    curve = np.polyfit(at, [p["fits"]["X"]["per_round"][small][0] for _, p in known], degree)
     from_eps = float(grid[np.argmin(np.abs(np.polyval(curve, grid) - eps))])
     sigma_eps = float(sigma / abs(np.polyval(np.polyder(curve), from_eps)))
 
@@ -1097,6 +1354,7 @@ def _dephasing_from_memory(
         )
 
     return {
+        "from_eps": small,
         "from_eps3": from_eps,
         "from_eps3_uncertainty": sigma_eps,
         "from_detector_rates": from_rates,
@@ -1112,7 +1370,7 @@ def _drift(halves: list[dict]) -> dict:
     """ε per round in each half of the job's shots, and the second half's change in standard errors."""
     found = {}
     for basis in "XZ":
-        for d in map(str, DISTANCES):
+        for d in halves[0][basis]["per_round"]:
             (early, u1), (late, u2) = (fits[basis]["per_round"][d] for fits in halves[:2])
             change = (late - early) / sqrt(u1**2 + u2**2)
             found[f"{basis} eps{d}"] = {

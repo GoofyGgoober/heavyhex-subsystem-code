@@ -404,7 +404,7 @@ def test_ibm_cancels_the_job_past_50_s_of_qpu_time_and_it_is_never_sent_again(
 def test_a_job_estimated_past_the_limit_is_not_sent(tmp_path, monkeypatch):
     sent, folder = fake_ibm(monkeypatch, tmp_path)
     prepared_today(folder, seconds=1e-3)  # about 108 s
-    with pytest.raises(ValueError, match="over the 50 s limit; not sent"):
+    with pytest.raises(ValueError, match="over its 50 s limit .* not sent"):
         run.submit(folder, QPU, 5000)
     assert sent.circuits is None and not (folder / "job.json").exists()
 
@@ -433,14 +433,58 @@ def test_a_job_whose_reply_from_ibm_is_lost_is_never_sent_again(tmp_path, monkey
         run.fetch(folder)
 
 
-def test_no_second_job_goes_to_the_qpu_from_another_folder(tmp_path, monkeypatch):
+def earlier_job(name, **record):
+    folder = run.RUNS / name
+    folder.mkdir(parents=True)
+    (folder / "job.json").write_text(json.dumps(record) if record else "")
+
+
+def test_the_jobs_count_ibms_usage_or_their_whole_limit(monkeypatch):
+    earlier_job("counted", usage={"quantum_seconds": 17, "status": "complete"})
+    earlier_job("still counting", qpu_seconds_limit=40, usage={"quantum_seconds": 3})
+    earlier_job("reply lost", job=None, qpu_seconds_limit=30)
+    earlier_job("unreadable")  # an empty record counts as a whole job
+    earlier_job("local", local=True, usage={"quantum_seconds": 99, "status": "complete"})
+    assert run.qpu_committed() == 17 + 40 + 30 + run.QPU_SECONDS_LIMIT
+    assert run.job_limit() == min(run.QPU_SECONDS_LIMIT, 300 - 137) == 50
+    earlier_job("big", usage={"quantum_seconds": 150, "status": "complete"})
+    assert run.job_limit() == 300 - 287 == 13
+
+
+def test_every_job_together_stays_within_300_s_of_qpu_time(tmp_path, monkeypatch):
+    sent, folder = fake_ibm(monkeypatch, tmp_path, ibm_estimate=10.0)
+    prepared_today(folder)  # 2 s + 68 pieces x 625 shots x 350 us: about 17 s
+    earlier_job("earlier", usage={"quantum_seconds": 270, "status": "complete"})
+    with pytest.raises(Exception, match="Ran too long"):
+        run.submit(folder, QPU, 2500)
+    assert sent.options.max_execution_time == 30  # what the 300 s had left
+    assert json.loads((folder / "job.json").read_text())["qpu_seconds_limit"] == 30
+    sent.circuits = None
+    other = run.RUNS / "other"
+    other.mkdir()
+    prepared_today(other)
+    with pytest.raises(ValueError, match="jobs so far count 320 s of the 300 s"):
+        run.submit(other, QPU, 2500)  # the first job counts 50 s until IBM's count is final
+    assert sent.circuits is None and not (other / "job.json").exists()
+
+
+def test_a_job_estimated_past_what_the_total_has_left_is_not_sent(tmp_path, monkeypatch):
     sent, folder = fake_ibm(monkeypatch, tmp_path)
     prepared_today(folder)
-    (tmp_path / "runs" / "earlier").mkdir()
-    (tmp_path / "runs" / "earlier" / "job.json").write_text("{}")
-    with pytest.raises(ValueError, match="runs/earlier already sent a job"):
-        run.submit(folder, QPU, 5000)
+    earlier_job("earlier", usage={"quantum_seconds": 290, "status": "complete"})
+    with pytest.raises(ValueError, match="over its 10 s limit .*290 s already counted"):
+        run.submit(folder, QPU, 2500)
     assert sent.circuits is None and not (folder / "job.json").exists()
+
+
+def test_no_job_goes_past_the_approved_count(tmp_path, monkeypatch):
+    sent, folder = fake_ibm(monkeypatch, tmp_path)
+    prepared_today(folder)
+    for k in range(run.QPU_JOBS_LIMIT):
+        earlier_job(f"job {k}", usage={"quantum_seconds": 0, "status": "complete"})
+    with pytest.raises(ValueError, match="20 jobs have gone, and 20 were approved"):
+        run.submit(folder, QPU, 2500)
+    assert sent.circuits is None
 
 
 def test_drift_sets_the_first_half_of_every_pieces_shots_against_the_second(tmp_path):
@@ -452,8 +496,100 @@ def test_drift_sets_the_first_half_of_every_pieces_shots_against_the_second(tmp_
     assert not first.any() and second.all() and len(first) == len(second) == 4
 
 
-def test_default_folder_is_under_runs():
-    assert run.default_folder("ibm_fez", offline=False).parent == Path(run.RUNS)
+def test_day_folders_are_named_by_day_rep_and_lone_patch():
+    assert run.day_folder("ibm_fez", "2026-10-04", 1) == run.RUNS / "ibm_fez-2026-10-04-r1"
+    assert run.day_folder("ibm_fez", "2026-10-04", 2, 5).name == "ibm_fez-2026-10-04-r2-d5"
+    assert run.day_folder("ibm_fez", "2026-10-04", 2, 3, offline=True).name.endswith("d3-offline")
+
+
+OCTOBER_3 = Calibration.load(Path(__file__).parent / "data" / "fez_calibration_2026-10-03.json")
+SMALL = (
+    (Setting("memory", "X", 1), Setting("memory", "X", 2))
+    + (Setting("memory", "Z", 1), Setting("memory", "Z", 2))
+    + tuple(Setting("idle", "X", n, readout=r) for r in "XY" for n in (1, 4, 8))
+)
+
+
+@pytest.fixture
+def small_run(monkeypatch):
+    """Two rounds and few shots, so a whole day runs in seconds."""
+    monkeypatch.setattr(run, "SETTINGS", SMALL)
+    monkeypatch.setattr(run, "ROUNDS", (1, 2))
+    monkeypatch.setattr(run, "SIMULATED_SHOTS", 10_000)
+    monkeypatch.setattr(run, "SIDE_SHOTS", 2_000)
+
+
+def test_a_day_gets_a_folder_for_each_job_in_the_order_they_are_sent(small_run):
+    prepared = run.prepare_day(OCTOBER_3, TARGET, offline=True)
+    infos = [json.loads((folder / "run.json").read_text()) for folder, _ in prepared]
+    day = infos[0]["rep"]["day"]
+    assert day == infos[0]["prepared"][:10]
+    names = [folder.name for folder, _ in prepared]
+    assert names == [f"ibm_fez-{day}-r{r}-offline" for r in ("1", "2-d5", "2-d3")]
+    assert [sorted(info["chips"]) for info in infos] == [["3", "5"], ["5"], ["3"]]
+    assert [(i["rep"]["rep"], i["rep"]["pairing"], i["rep"]["job"]) for i in infos] == [
+        (1, "paired", 1),
+        (2, "split", 1),
+        (2, "split", 2),
+    ]
+    alone = prepared[1][1]["0.0"]["fits"]["X"]
+    assert set(alone["per_round"]) == {"5"} and "lambda" not in alone
+
+
+def test_a_split_rep_gets_its_lambda_from_both_jobs_and_every_rep_is_pooled(small_run, capsys):
+    jobs = [
+        ("r1", 1, "paired", {"3": fez_qubits(3, WORKING), "5": fez_qubits(5, WORKING)}),
+        ("r2-d5", 2, "split", {"5": fez_qubits(5, WORKING)}),
+        ("r2-d3", 2, "split", {"3": fez_qubits(3, WORKING)}),
+    ]
+    for k, (name, r, pairing, chips) in enumerate(jobs):
+        folder = run.RUNS / f"ibm_fez-2026-10-04-{name}"
+        rep = {"day": "2026-10-04", "rep": r, "pairing": pairing, "job": 1, "spots": {}}
+        run.prepare(folder, WORKING, TARGET, offline=True, chips=chips, rep=rep)
+        run.rehearse(folder, 10_000, decoupled_dephasing=0.5, seed=10 * k)
+        analysis = run.analyze(folder, rehearsal=True)
+        assert analysis["patches"] == sorted(chips)
+        assert ("lambda" in analysis["observed"]["fits"]["X"]) == (len(chips) == 2)
+        if name == "r2-d5":
+            assert run.combine(rehearsal=True)["incomplete"] == [["ibm_fez-2026-10-04-r2-d5"]]
+    assert main(["experiment", "analyze", "--rehearsal", "--run", str(folder)]) == 0
+    assert "Rep 2 of 2026-10-04, split" in capsys.readouterr().out
+    combined = run.combine(rehearsal=True)
+    assert [entry["pairing"] for entry in combined["reps"]] == ["paired", "split"]
+    assert combined["days"] == 1 and not combined["incomplete"]
+    for entry in combined["reps"]:
+        row = entry["tests"]["X lambda"]
+        assert abs(row["observed"] - row["predicted"]) < 1.5 * row["bound"]
+        assert entry["verdict"] == "d = 5 worse"  # Λ is far below 1 here
+    pooled = combined["pooled_x"]
+    sigmas = [entry["tests"]["X lambda"]["observed_uncertainty"] for entry in combined["reps"]]
+    assert pooled["lambda_uncertainty"] < min(sigmas)
+    assert set(combined["model"]) == {f"{b} {q}" for b in "XZ" for q in ("lambda", "eps3", "eps5")}
+    assert all(row["reps"] == 2 for row in combined["model"].values())
+    assert (run.RUNS / "rehearsal_combined.json").exists()
+    assert main(["experiment", "combine", "--rehearsal"]) == 0
+    assert "Λ over every rep" in capsys.readouterr().out
+
+
+def test_a_split_reps_lambda_bound_adds_both_jobs_variances():
+    from heavyhex.experiment.run import _ratio_test
+
+    def row(value, sigma, noise, from_f, gap):
+        return {
+            "observed": value,
+            "predicted": value,
+            "observed_uncertainty": sigma,
+            "simulator_noise": noise,
+            "from_f": from_f,
+            "calibration_gap": gap,
+        }
+
+    test = _ratio_test(row(0.05, 0.001, 0.0, 0.002, 0.0), row(0.10, 0.004, 0.0, 0.0, 0.002))
+    assert test["observed"] == pytest.approx(0.5)
+    expected = 0.5 * ((0.001 / 0.05) ** 2 + (0.004 / 0.1) ** 2) ** 0.5
+    assert test["observed_uncertainty"] == pytest.approx(expected)
+    pred = 0.5**2 * ((0.002 / 0.05) ** 2 + (0.002 / 0.1) ** 2 / 2)
+    assert test["bound"] == pytest.approx(2 * (expected**2 + pred) ** 0.5)
 
 
 def test_the_idle_test_waits_and_pulses_like_x_memory():

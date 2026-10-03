@@ -1,10 +1,12 @@
 """Pull IBM's calibration and pick where the patches sit on the chip.
 
-IBM recalibrates about once a day. `calibrate()` pulls the latest numbers and
-keeps them as the last calibration. Hardware runs get their qubits from
-`fez_qubits()`, which pulls again first if the last calibration isn't from
-today. Anything IBM marks broken can't be used; among the spots that avoid it
-we take the one expected to make the fewest errors.
+IBM updates its calibration one or more times a day. `calibrate()` pulls the
+latest numbers and keeps them as the last calibration. Anything IBM marks broken
+can't be used. `day_plan()` turns a calibration into the day's reps: one per
+clean place for the d=5 patch, best first, each with the d=3 patch at a clean
+place of its own. Hardware runs get their qubits from `fez_qubits()`, which
+pulls again first if the last calibration isn't from today and refuses broken
+parts.
 """
 
 from __future__ import annotations
@@ -29,6 +31,7 @@ WEAK_READOUT = 0.05
 WEAK_T1_US = 50
 WEAK_T2_US = 30
 ROUND_US = 9  # one round at d=3 or d=5, from compiling the flagged circuit for Fez
+MAX_REPS = 2  # reps a day at most: one per clean place for the d=5 patch, best first
 DIRECTIONS = ((1, 1), (1, -1), (-1, 1), (-1, -1))
 
 # The repo's docs/figures (the package is installed editable).
@@ -273,10 +276,7 @@ def best_spots(coords: list[list[int]], edges: list, calibration: Calibration) -
     }
     pairs = []
     for d5, (layout5, broken5, cost5) in scored[5].items():
-        near = set(layout5.physical_qubits)
-        for a, b in edges:
-            if a in layout5.physical_qubits or b in layout5.physical_qubits:
-                near |= {a, b}
+        near = neighbourhood(layout5, edges)
         for d3, (layout3, broken3, cost3) in scored[3].items():
             if not layout3.physical_qubits & near:
                 # Rounded so that equal costs summed in a different order tie (a footprint's
@@ -288,17 +288,80 @@ def best_spots(coords: list[list[int]], edges: list, calibration: Calibration) -
     return {3: d3, 5: d5}
 
 
-def fez_qubits(distance: int, calibration: Calibration | None = None) -> list[int]:
+def neighbourhood(layout: HeavyHexLayout, edges: list) -> set[int]:
+    """The patch's qubits and every qubit coupled to one of them."""
+    near = set(layout.physical_qubits)
+    for a, b in edges:
+        if a in layout.physical_qubits or b in layout.physical_qubits:
+            near |= {a, b}
+    return near
+
+
+def clean_places(
+    distance: int, coords: list[list[int]], edges: list, calibration: Calibration
+) -> list[tuple[Spot, HeavyHexLayout]]:
+    """Every place the patch fits with no broken part, at its best spot, best first.
+
+    A place is a set of chip qubits; its two orientations are two spots on it. Best
+    means the lowest cost, with equal costs settled by the spots' order.
+    """
+    best: dict[frozenset[int], tuple[tuple[float, Spot], HeavyHexLayout]] = {}
+    for spot, layout in spots(distance, coords, edges).items():
+        if problems(layout, calibration):
+            continue
+        key = (round(cost(layout, calibration), 9), spot)
+        place = frozenset(layout.physical_qubits)
+        if place not in best or key < best[place][0]:
+            best[place] = (key, layout)
+    return [(key[1], layout) for key, layout in sorted(best.values(), key=lambda kept: kept[0])]
+
+
+def day_plan(
+    coords: list[list[int]], edges: list, calibration: Calibration, reps: int = MAX_REPS
+) -> list[list[dict[int, Spot]]]:
+    """The day's reps: one per clean d=5 place, best first, at most `reps`.
+
+    Each rep puts the d=3 patch on a clean place no earlier rep that day used: the
+    best one that doesn't touch the d=5 patch, both in one job. If there is none,
+    the d=5 patch runs alone and the d=3 patch in a job of its own straight after,
+    at the best clean place not yet used that day. Returns each rep's jobs, in the
+    order they are sent, each job as {distance: spot}.
+    """
+    threes = clean_places(3, coords, edges, calibration)
+    if not threes:
+        raise ValueError(f"no clean place for the d=3 patch on {calibration.backend}")
+    used: set[frozenset[int]] = set()
+    plan = []
+    for spot5, layout5 in clean_places(5, coords, edges, calibration)[:reps]:
+        near = neighbourhood(layout5, edges)
+        fresh = [t for t in threes if frozenset(t[1].physical_qubits) not in used] or threes
+        beside = [t for t in fresh if not t[1].physical_qubits & near]
+        spot3, layout3 = (beside or fresh)[0]
+        used.add(frozenset(layout3.physical_qubits))
+        plan.append([{3: spot3, 5: spot5}] if beside else [{5: spot5}, {3: spot3}])
+    return plan
+
+
+def fez_plan(calibration: Calibration | None = None, reps: int = MAX_REPS) -> list:
+    """day_plan on Fez, from today's calibration unless one is given."""
+    calibration = calibration or todays_calibration()
+    device = json.loads(FEZ_MAP.read_text())
+    return day_plan(device["coords"], device["edges"], calibration, reps)
+
+
+def fez_qubits(
+    distance: int, calibration: Calibration | None = None, spot: Spot | None = None
+) -> list[int]:
     """The chip qubit for each qubit of the flagged circuit, from today's calibration.
 
-    Hardware runs get their qubits here, so they always use today's numbers.
-    Refuses a placement that uses anything IBM marks broken, and warns about
-    parts that work but are weak.
+    At `spot`, or the best spot of the best pair if none is given. Hardware runs
+    get their qubits here, so they always use today's numbers. Refuses a placement
+    that uses anything IBM marks broken, and warns about parts that work but are weak.
     """
     calibration = calibration or todays_calibration()
     device = json.loads(FEZ_MAP.read_text())
     coords, edges = device["coords"], device["edges"]
-    spot = best_spots(coords, edges, calibration)[distance]
+    spot = spot or best_spots(coords, edges, calibration)[distance]
     layout = build_layout(distance, coords, edges, origin=spot.origin, direction=spot.direction)
     broken = problems(layout, calibration)
     if broken:
