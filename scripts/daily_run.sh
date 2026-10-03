@@ -8,6 +8,7 @@
 # five run days, never starts a second day on one date or too late to finish before
 # midnight, stops on any failure, and resumes where it stopped when run again.
 # The QPU caps (50 s a job, 300 s and 20 jobs in all) are enforced by heavyhex itself.
+# One run at a time: a second start (Claude's 20:10 check, say) waits for the first.
 #
 #   scripts/daily_run.sh            the real run: sends the day's jobs
 #   scripts/daily_run.sh --dry-run  offline calibration, rehearsed shots: no QPU, no commits
@@ -21,7 +22,10 @@ run_days=5
 cal_after=${CAL_AFTER:-20:00}        # IBM's evening calibration lands at 20:05 local time
 cal_deadline=${CAL_DEADLINE:-21:30}  # past this, use the latest calibration there is
 latest_start=${LATEST_START:-22:30}  # a day is prepared and sent on one calendar date
+earliest_start=${EARLIEST_START:-19:30}  # so a retry after midnight never starts the next day
 approval=${HEAVYHEX_APPROVAL:-$HOME/.config/heavyhex/qpu-approval.json}
+exec 9>/tmp/heavyhex-daily-run.lock
+flock -w 14400 9 || exit 75  # another run held it 4 hours; the caller tries again
 today=$(date +%F)
 dry=false
 [ "${1:-}" = --dry-run ] && dry=true
@@ -56,7 +60,7 @@ run_dates() {
   local d
   for d in runs/"$backend"-*-r*/; do
     case $d in *-offline/) continue ;; esac
-    if [ -f "$d/shots.npz" ]; then basename "$d" | cut -d- -f3-5; fi
+    if [ -f "$d/shots.npz" ]; then d=$(basename "$d"); d=${d#"$backend"-}; echo "${d:0:10}"; fi
   done | sort -u
 }
 
@@ -85,15 +89,33 @@ wait_for_calibration() {
   done
 }
 
-# Commit the run's record and figures (never the paper or anything else), then push.
+# Commit the run's record and figures (never the paper or anything else), then push
+# whatever is not on GitHub yet, including a commit left unpushed by a crash.
 commit() {
   if $dry; then say "dry run, not committed: $1"; return; fi
   git add -A runs docs/figures ':!runs/*-offline'
-  if git diff --cached --quiet; then say "nothing new to commit: $1"; return; fi
-  printf '%s\n\n%s\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n' "$1" "$2" | git commit -q -F -
-  git -c credential.helper= -c credential.helper='!gh auth git-credential' push -q origin HEAD
-  say "committed and pushed: $1"
+  if git diff --cached --quiet; then
+    say "nothing new to commit: $1"
+  else
+    printf '%s\n\n%s\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n' "$1" "$2" | git commit -q -F -
+    say "committed: $1"
+  fi
+  if [ -n "$(git log --oneline '@{u}..HEAD' 2>/dev/null)" ]; then
+    git -c credential.helper= -c credential.helper='!gh auth git-credential' push -q origin HEAD
+    say "pushed to GitHub"
+  fi
 }
+
+# Analyze a job folder; a folder with a job but no shots gets them from IBM first (read-only).
+analyze_folder() {
+  local f=$1 result=analysis.json have=shots.npz
+  if $dry; then result=rehearsal_analysis.json; have=rehearsal.npz; fi
+  if [ -f "$f/$result" ]; then return; fi
+  if [ ! -f "$f/$have" ] && { $dry || [ ! -f "$f/job.json" ]; }; then say "$f has no shots to analyze"; return; fi
+  $hh experiment analyze --run "$f" $(rehearsal) 2>&1 | quiet | tail -4
+}
+
+complete() { [ -f "$1/run.json" ] && [ -f "$1/prediction.json" ] && [ -f "$1/calibration.json" ] && [ -f "$1/circuits.qpy.gz" ]; }
 
 qpu_used() { $py -c "from heavyhex.experiment import run; print(f'{run.qpu_committed():.0f}')" 2>/dev/null; }
 field() { $py -c "import json,sys; print(json.load(open(sys.argv[1]))[sys.argv[2]])" "$1" "$2"; }
@@ -101,7 +123,25 @@ day_name() { date -d "$today" '+%-d %B'; }
 
 # --- guards (the real run only) ---------------------------------------------
 if ! $dry; then
-  git pull -q --ff-only
+  if ! git pull -q --ff-only; then
+    git pull -q --rebase || { git rebase --abort 2>/dev/null || true; say "git pull failed"; exit 1; }
+  fi
+  # Catch up first: an earlier day's job that went but never got its shots or analysis
+  # (WSL died mid-run) is fetched from IBM, analyzed, combined and pushed. A job that
+  # can't be fetched (IBM cancelled it, say) never holds up today's run.
+  behind=()
+  for d in runs/"$backend"-*-r*/; do
+    d=${d%/}
+    case $d in *-offline|*"-$today-"*) continue ;; esac
+    if [ -f "$d/job.json" ] && [ ! -f "$d/analysis.json" ]; then behind+=("$d"); fi
+  done
+  if [ ${#behind[@]} -gt 0 ]; then
+    say "catching up on an earlier day: ${behind[*]}"
+    for d in "${behind[@]}"; do analyze_folder "$d" || say "$d still can't be analyzed"; done
+    $hh experiment combine 2>&1 | quiet | tail -12 || say "combine failed"
+    commit "Analyze the jobs left from an earlier day and combine the reps" \
+      "Shots fetched from IBM (read-only) for jobs whose run was interrupted, then analyzed."
+  fi
   if [ ! -f "$approval" ]; then say "no QPU approval at $approval; nothing is sent"; exit 1; fi
   first=$(field "$approval" first_day)
   last=$(field "$approval" last_day)
@@ -148,6 +188,10 @@ prepare_today() {
 
 mapfile -t jobs < <(folders)
 if [ ${#jobs[@]} -eq 0 ]; then
+  if ! $dry && [ "$(date +%s)" -lt "$(date -d "$today $earliest_start" +%s)" ]; then
+    say "a run day starts at $earliest_start or later; nothing to do now"
+    exit 0
+  fi
   if [ "$(date +%s)" -ge "$(date -d "$today $latest_start" +%s)" ]; then
     say "too late to prepare and send before midnight; the day is not started"
     exit 0
@@ -157,19 +201,30 @@ if [ ${#jobs[@]} -eq 0 ]; then
   prepare_today
 fi
 
-# Before the first job only: if IBM's numbers changed since the prepare, prepare again
-# (as on day 1). Once a job has gone, the day finishes as prepared.
-if ! $dry; then
+# Before the first job only: a prepare cut short by a crash, or IBM's numbers changed
+# since the prepare, means preparing again (as on day 1). Then make sure the prediction
+# is committed and on GitHub before anything is sent. Once a job has gone, the day
+# finishes as prepared.
+if ! $dry && ! compgen -G "runs/$backend-$today-r*/job.json" >/dev/null; then
   for again in 1 2 3; do
-    if compgen -G "runs/$backend-$today-r*/job.json" >/dev/null; then break; fi  # a job has gone
-    prepared=$(field "${jobs[0]}/calibration.json" calibrated)
-    now=$(calibrated) || now=""
-    if [ -z "$now" ] || [ "$(date -d "$now" +%s)" -eq "$(date -d "$prepared" +%s)" ]; then break; fi
-    if [ "$again" -eq 3 ]; then say "IBM keeps recalibrating ($prepared -> $now); stopping"; exit 1; fi
-    say "IBM recalibrated after the prepare ($prepared -> $now); preparing again"
+    whole=true
+    for f in "${jobs[@]}"; do complete "$f" || whole=false; done
+    if $whole; then
+      prepared=$(field "${jobs[0]}/calibration.json" calibrated)
+      now=$(calibrated) || now=""
+      if [ -z "$now" ] || [ "$(date -d "$now" +%s)" -eq "$(date -d "$prepared" +%s)" ]; then break; fi
+      reason="IBM recalibrated after the prepare ($prepared -> $now)"
+    else
+      reason="the prepare was cut short"
+    fi
+    if [ "$again" -eq 3 ]; then say "$reason, a third time; stopping"; exit 1; fi
+    say "$reason; preparing again"
     rm -rf "${jobs[@]}"
     prepare_today
   done
+  at=$(field "${jobs[0]}/calibration.json" calibrated)
+  commit "Prepare $(day_name)'s ${#jobs[@]} jobs from IBM's $(date -u -d "$at" '+%H:%M') UTC calibration" \
+    "The day's folders, predictions and figures, on record before any job is sent."
 fi
 say "jobs in order: ${jobs[*]}"
 
@@ -191,15 +246,13 @@ if [ $sent -gt 0 ]; then
 fi
 
 # --- analyze, combine --------------------------------------------------------
-for f in "${jobs[@]}"; do
-  if $dry; then result=rehearsal_analysis.json; shots=rehearsal.npz
-  else result=analysis.json; shots=shots.npz; fi
-  if [ -f "$f/$result" ]; then continue; fi
-  if [ ! -f "$f/$shots" ]; then say "$f has no shots to analyze"; continue; fi
-  $hh experiment analyze --run "$f" $(rehearsal) 2>&1 | quiet | tail -4
-done
-$hh experiment combine $(rehearsal) 2>&1 | quiet | tail -12
+# A failure here still commits what there is, then exits 1 so the caller tries again;
+# whatever is still missing tomorrow is caught up before tomorrow's run.
+failed=0
+for f in "${jobs[@]}"; do analyze_folder "$f" || { say "$f can't be analyzed yet"; failed=1; }; done
+$hh experiment combine $(rehearsal) 2>&1 | quiet | tail -12 || { say "combine failed"; failed=1; }
 commit "Analyze $(day_name)'s jobs and combine the reps" "Each job's analysis and the reps pooled over the days so far."
+if [ $failed -ne 0 ]; then say "=== stopped with the analysis unfinished ==="; exit 1; fi
 
 if $dry; then
   rm -rf runs/*-offline
