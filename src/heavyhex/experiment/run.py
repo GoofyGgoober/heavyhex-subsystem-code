@@ -52,7 +52,8 @@ SIMULATED_SHOTS = 200_000
 SIDE_SHOTS = 50_000  # for side predictions that no decision rests on
 ENDS = (0.0, 1.0)  # decoupled_dephasing at the two ends of the prediction
 # How far errors in the CZ, readout and single-qubit inputs move the f read off the
-# memory runs (simulated on the 2 October 2026 calibration).
+# memory runs: 0.06-0.13 between IBM's 3 October 2026 calibration and the day before's
+# (docs/calibration_scatter.py).
 CALIBRATION_SCATTER_F = 0.1
 # A data qubit whose idle test pins its own f no better than this is left to the median.
 LOOSEST_F = 0.5
