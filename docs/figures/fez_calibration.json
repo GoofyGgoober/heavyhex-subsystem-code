@@ -1,7 +1,7 @@
 {
  "backend": "ibm_fez",
- "calibrated": "2026-10-03 20:05:40+03:00",
- "pulled": "2026-10-03T20:31:44+03:00",
+ "calibrated": "2026-10-03 23:05:17+03:00",
+ "pulled": "2026-10-04T00:20:34+03:00",
  "broken_qubits": [],
  "durations_ns": {
   "x": 24,
