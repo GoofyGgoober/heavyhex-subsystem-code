@@ -24,11 +24,18 @@ if TYPE_CHECKING:
 # Fez's durations in ns, for calibrations saved without the device's own. H and X
 # take one SX pulse; a CX runs as a CZ with an H on each side of the target.
 FEZ_NS = {"x": 24, "cz": 84, "measure": 1560, "reset": 1584}
-# Median X and SX error on Fez, Kingston and Marrakesh; the calibration file doesn't keep it.
+# Median X and SX error on Fez, Kingston and Marrakesh, for calibrations saved without each
+# qubit's own.
 SINGLE_QUBIT_ERROR = 2.3e-4
 # Idles at least this long get pulses: the waits through readout and reset.
 # Padding the gaps between gates as well changes little.
 DECOUPLE_NS = 500
+
+
+def single_qubit_error(calibration: Calibration, q: int) -> float:
+    """The qubit's SX (and X) error from the calibration, or SINGLE_QUBIT_ERROR if it has none."""
+    error = (calibration.single_qubit or {}).get(q)
+    return SINGLE_QUBIT_ERROR if error is None else error
 
 
 def idle_error(t: float, t1: float, t2: float) -> tuple[float, float]:
@@ -128,7 +135,9 @@ def noisy_circuit(
             # Pauli noise commutes with the pulses, so where they sit in the idle doesn't matter.
             for _ in range(pulses):
                 out.append("X", [q])
-                out.append("DEPOLARIZE1", [q], scaled(1.5 * SINGLE_QUBIT_ERROR))
+                out.append(
+                    "DEPOLARIZE1", [q], scaled(1.5 * single_qubit_error(calibration, chip[q]))
+                )
         free[q] = until
 
     for item in circuit.data:
@@ -142,7 +151,10 @@ def noisy_circuit(
             continue
         if name == "h":
             out.append("H", qubits)
-            out.append("DEPOLARIZE1", qubits, scaled(1.5 * SINGLE_QUBIT_ERROR))
+            for q in qubits:
+                out.append(
+                    "DEPOLARIZE1", [q], scaled(1.5 * single_qubit_error(calibration, chip[q]))
+                )
             duration = ns["x"]
         elif name == "cx":
             control, target = qubits
@@ -150,7 +162,9 @@ def noisy_circuit(
             out.append("CX", qubits)
             # IBM quotes average gate infidelity; a depolarizing channel needs 5/4 of it.
             out.append("DEPOLARIZE2", qubits, scaled(1.25 * error))
-            out.append("DEPOLARIZE1", [target], scaled(3 * SINGLE_QUBIT_ERROR))
+            out.append(
+                "DEPOLARIZE1", [target], scaled(3 * single_qubit_error(calibration, chip[target]))
+            )
             just_reset.difference_update(qubits)
             duration = ns["cz"] + 2 * ns["x"]
         elif name == "reset":

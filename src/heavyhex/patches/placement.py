@@ -48,29 +48,75 @@ class Calibration:
     t2_us: dict[int, float]
     broken_qubits: tuple[int, ...] = ()
     durations_ns: dict[str, int] | None = None  # median x, cz, measure and reset times
+    single_qubit: dict[int, float] | None = None  # each qubit's SX error; older files lack it
 
     @classmethod
     def fetch(cls, backend: str) -> Calibration:
         """Ask IBM for the latest numbers. Read-only, uses no QPU time."""
         from qiskit_ibm_runtime import QiskitRuntimeService
 
-        device = QiskitRuntimeService().backend(backend)
+        return cls.from_device(QiskitRuntimeService().backend(backend))
+
+    @classmethod
+    def from_device(cls, device, at: datetime | None = None) -> Calibration:
+        """The numbers IBM had in force at a time, or its latest. Read-only.
+
+        Gate times are always the device's current ones.
+        """
         target = device.target
         qubits = range(device.num_qubits)
 
         def median_ns(gate: str) -> int:
             return round(statistics.median(p.duration for p in target[gate].values() if p) * 1e9)
 
+        pulled = datetime.now().astimezone().isoformat(timespec="seconds")
+        durations = {gate: median_ns(gate) for gate in ("x", "cz", "measure", "reset")}
+        if at is None:
+            return cls(
+                backend=device.name,
+                calibrated=str(device.properties().last_update_date),
+                pulled=pulled,
+                cz={tuple(sorted(pair)): gate.error for pair, gate in target["cz"].items()},
+                readout={q: target["measure"][(q,)].error for q in qubits},
+                t1_us={q: (target.qubit_properties[q].t1 or 0) * 1e6 for q in qubits},
+                t2_us={q: (target.qubit_properties[q].t2 or 0) * 1e6 for q in qubits},
+                broken_qubits=tuple(device.properties().faulty_qubits()),
+                durations_ns=durations,
+                single_qubit={
+                    q: sx.error
+                    for q in qubits
+                    if (sx := target["sx"].get((q,))) and sx.error is not None
+                },
+            )
+        properties = device.properties(datetime=at)
+        if properties is None:
+            raise ValueError(f"IBM has no calibration of {device.name} for {at}")
+
+        def known(read, *args) -> float:
+            try:
+                return read(*args) or 0.0
+            except Exception:  # IBM leaves out what it didn't measure
+                return 0.0
+
+        pairs = {tuple(sorted(g.qubits)) for g in properties.gates if g.gate == "cz"}
         return cls(
-            backend=backend,
-            calibrated=str(device.properties().last_update_date),
-            pulled=datetime.now().astimezone().isoformat(timespec="seconds"),
-            cz={tuple(sorted(pair)): gate.error for pair, gate in target["cz"].items()},
-            readout={q: target["measure"][(q,)].error for q in qubits},
-            t1_us={q: (target.qubit_properties[q].t1 or 0) * 1e6 for q in qubits},
-            t2_us={q: (target.qubit_properties[q].t2 or 0) * 1e6 for q in qubits},
-            broken_qubits=tuple(device.properties().faulty_qubits()),
-            durations_ns={gate: median_ns(gate) for gate in ("x", "cz", "measure", "reset")},
+            backend=device.name,
+            calibrated=str(properties.last_update_date),
+            pulled=pulled,
+            cz={
+                pair: properties.gate_error("cz", list(pair))
+                if properties.is_gate_operational("cz", list(pair))
+                else 1.0
+                for pair in pairs
+            },
+            readout={q: known(properties.readout_error, q) or 1.0 for q in qubits},
+            t1_us={q: known(properties.t1, q) * 1e6 for q in qubits},
+            t2_us={q: known(properties.t2, q) * 1e6 for q in qubits},
+            broken_qubits=tuple(properties.faulty_qubits()),
+            durations_ns=durations,
+            single_qubit={
+                q: error for q in qubits if (error := known(properties.gate_error, "sx", [q]))
+            },
         )
 
     @classmethod
@@ -86,6 +132,9 @@ class Calibration:
             t2_us={int(q): t for q, t in saved["t2_us"].items()},
             broken_qubits=tuple(saved["broken_qubits"]),
             durations_ns=saved.get("durations_ns"),
+            single_qubit={int(q): e for q, e in saved["single_qubit"].items()}
+            if saved.get("single_qubit")
+            else None,
         )
 
     def save(self, path: str | Path) -> None:
@@ -99,6 +148,9 @@ class Calibration:
             "readout": {str(q): error for q, error in sorted(self.readout.items())},
             "t1_us": {str(q): t for q, t in sorted(self.t1_us.items())},
             "t2_us": {str(q): t for q, t in sorted(self.t2_us.items())},
+            "single_qubit": {str(q): e for q, e in sorted(self.single_qubit.items())}
+            if self.single_qubit
+            else None,
         }
         Path(path).write_text(json.dumps(saved, indent=1) + "\n")
 
@@ -148,6 +200,7 @@ def broken_qubit(q: int, calibration: Calibration) -> bool:
     return (
         q in calibration.broken_qubits
         or calibration.readout.get(q, 1) >= BROKEN
+        or (calibration.single_qubit or {}).get(q, 0) >= BROKEN
         or not calibration.t1_us.get(q)
         or not calibration.t2_us.get(q)
     )
@@ -226,7 +279,9 @@ def best_spots(coords: list[list[int]], edges: list, calibration: Calibration) -
                 near |= {a, b}
         for d3, (layout3, broken3, cost3) in scored[3].items():
             if not layout3.physical_qubits & near:
-                pairs.append((broken3 + broken5, cost3 + cost5, d3, d5))
+                # Rounded so that equal costs summed in a different order tie (a footprint's
+                # two orientations differ in the 16th digit), and the spots' order decides.
+                pairs.append((broken3 + broken5, round(cost3 + cost5, 9), d3, d5))
     if not pairs:
         raise ValueError("the d=3 and d=5 patches don't fit on the chip together")
     _, _, d3, d5 = min(pairs)
@@ -256,6 +311,29 @@ def fez_qubits(distance: int, calibration: Calibration | None = None) -> list[in
             f"d={distance} on {calibration.backend} uses weak parts: {'; '.join(weak_parts)}",
             stacklevel=2,
         )
+    return chip_qubits(layout)
+
+
+def inside_qubits(calibration: Calibration | None = None) -> list[int]:
+    """A d=3 patch on qubits of today's d=5 patch, for the placement test.
+
+    Of the d=3 spots inside the d=5 footprint without broken parts, the one the
+    score rates worst: where the d=5 patch's weak parts sit, so the test shows
+    what they cost. Ties go to the spots' order. Refuses if every spot has broken parts.
+    """
+    calibration = calibration or todays_calibration()
+    device = json.loads(FEZ_MAP.read_text())
+    coords, edges = device["coords"], device["edges"]
+    big = best_spots(coords, edges, calibration)[5]
+    footprint = build_layout(5, coords, edges, origin=big.origin, direction=big.direction)
+    inside = [
+        (-round(cost(layout, calibration), 9), spot, layout)
+        for spot, layout in spots(3, coords, edges).items()
+        if layout.physical_qubits <= footprint.physical_qubits and not problems(layout, calibration)
+    ]
+    if not inside:
+        raise ValueError(f"no d=3 spot inside the d=5 patch on {calibration.backend} is clean")
+    *_, layout = min(inside, key=lambda row: row[:2])
     return chip_qubits(layout)
 
 

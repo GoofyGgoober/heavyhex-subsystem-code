@@ -22,18 +22,50 @@ heavyhex --help
 
 Data qubit ids are 0-based; the paper's Q label is id + 1.
 
-Before anything goes to hardware, run `heavyhex calibrate` to pull today's Fez
-numbers and pick where the patches go, then redraw with
-`python docs/figures/draw_blueprint.py`. Hardware runs pull fresh numbers
-themselves if the last ones aren't from today.
-
-The hardware run is X and Z memory at 1-8 rounds, both patches at once, plus an
-idle test that measures how much dephasing the decoupling pulses leave. Each run
-keeps its calibration, circuits, prediction and shots in `runs/<backend>-<date>`:
+The hardware run is X and Z memory at 1-8 rounds with both patches at once; a
+placement test, X memory with a second d=3 patch on qubits of the d=5 patch
+beside the usual one; and an idle test, read in X and in Y, that measures f,
+how much of the calibrated dephasing the decoupling pulses leave. Every
+circuit's shots are split into an early and a late block, to show drift during
+the job. Each run keeps its calibration, circuits, prediction and shots in
+`runs/<backend>-<date>`:
 
 ```bash
 heavyhex experiment prepare                      # place, translate, freeze the prediction
-heavyhex experiment rehearse --run runs/ibm_fez-<date>   # simulated shots, to try the analysis
+heavyhex experiment rehearse --run runs/ibm_fez-<date>   # simulated shots, into rehearsal.npz
+heavyhex experiment analyze --rehearsal --run runs/ibm_fez-<date>   # try the analysis on them
 heavyhex experiment submit --run runs/ibm_fez-<date>     # uses the QPU, asks first
 heavyhex experiment analyze --run runs/ibm_fez-<date>
 ```
+
+## Run day
+
+This needs `pip install -e '.[sim,matching,hardware]'` and saved IBM
+credentials. Do it all on one day: submit refuses a run prepared on another.
+`<folder>` is the one prepare prints, `ibm_fez-<date>`.
+
+1. `heavyhex calibrate` pulls today's Fez numbers and picks where the patches
+   go (read-only).
+2. `heavyhex experiment prepare` places the patches, translates the circuits and
+   freezes the prediction.
+3. Redraw the layout with `python docs/figures/draw_blueprint.py`, and the
+   paper's Figure 1 with `python docs/figures/figure1.py --out docs/figures/figure1.png`.
+4. Commit and push `runs/<folder>`, with the new calibration and layout in
+   `docs/figures/` (submit refuses a run that isn't committed and pushed). Note
+   the commit hash (`git rev-parse HEAD`) and the UTC time (`date -u`) for the paper.
+5. `heavyhex experiment submit --run runs/<folder>` uses the QPU, and asks first.
+   It saves the shots and IBM's calibration as the job finished; if the wait is
+   cut short, `analyze` fetches both later. It refuses a run that already has a job.
+6. Commit the shots (`shots.npz`, `job.json`) and `calibration_after.json`.
+7. `heavyhex experiment analyze --run runs/<folder>`, then commit `analysis.json`.
+8. Regenerate Figure 3 with `python docs/figures/figure3.py --calibration
+   runs/<folder>/calibration.json --out docs/figures/figure3.json`.
+9. Publish a release on GitHub (a release, not just a tag), so Zenodo mints a DOI.
+
+The paper's current numbers are a preview from IBM's 2 October 2026
+calibration, in `runs/ibm_fez-2026-10-02-offline` (prepared offline, so it can't
+be sent).
+
+## License
+
+MIT, see [LICENSE](LICENSE). [CITATION.cff](CITATION.cff) says how to cite it.
