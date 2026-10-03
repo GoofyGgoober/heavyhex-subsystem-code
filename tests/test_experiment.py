@@ -24,7 +24,8 @@ from heavyhex.patches.placement import LAST_CALIBRATION, Calibration, fez_qubits
 
 TARGET = FakeFez().target
 SAVED = Calibration.load(LAST_CALIBRATION)
-WORKING = replace(SAVED, cz=dict.fromkeys(SAVED.cz, 0.003))  # so both patches can be placed
+# Every CZ working, so both patches can be placed, and FakeFez's gate times, as TARGET has.
+WORKING = replace(SAVED, cz=dict.fromkeys(SAVED.cz, 0.003), durations_ns=None)
 pytestmark = pytest.mark.filterwarnings("ignore:.*weak parts")
 
 
@@ -131,7 +132,8 @@ def test_a_rehearsal_gives_back_its_dephasing(tmp_path, monkeypatch):
     assert set(analysis["agreement"]["matches"]) == {"X", "Z"}
     assert not any(row["calibration_gap"] for row in rows)  # the same calibration after
     assert set(analysis["drift"]) == {f"{b} eps{d}" for b in "XZ" for d in (3, 5)}
-    assert analysis["dephasing_from_memory"]["from_eps3"] == pytest.approx(0.5, abs=0.15)
+    memory = analysis["dephasing_from_memory"]  # two rounds only, so ε₃ pins f to about ±0.06
+    assert abs(memory["from_eps3"] - 0.5) < 3 * memory["from_eps3_uncertainty"]
     assert analysis["detectors_beyond_chance"] < 10
     assert not any(row["drift"] for row in analysis["drift"].values())
     assert not any(row["rises"] for row in analysis["leakage"].values())

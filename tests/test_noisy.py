@@ -16,7 +16,8 @@ from heavyhex.patches.operators import build_operators  # noqa: E402
 from heavyhex.patches.placement import LAST_CALIBRATION, Calibration  # noqa: E402
 
 SAVED = Calibration.load(LAST_CALIBRATION)
-TYPICAL = noisy.typical(SAVED)
+# FakeFez's gate times and the default √X error, whatever the saved calibration carries.
+TYPICAL = replace(noisy.typical(SAVED), durations_ns=None, single_qubit=None)
 CASES = [(d, basis) for d in (3, 5) for basis in ("Z", "X")]
 
 
