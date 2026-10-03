@@ -59,6 +59,7 @@ def test_fetch_keeps_the_device_durations(tmp_path, monkeypatch):
     monkeypatch.setattr(runtime, "QiskitRuntimeService", Service)
     fetched = Calibration.fetch("ibm_kingston")
     assert fetched.durations_ns == {"x": 32, "cz": 68, "measure": 2280, "reset": 2312}
+    assert fetched.single_qubit[0] == FakeKingston().target["sx"][(0,)].error
     fetched.save(tmp_path / "calibration.json")
     assert Calibration.load(tmp_path / "calibration.json") == fetched
 
@@ -89,8 +90,9 @@ def test_weak_parts_are_named_and_warned_about():
 
 
 def test_placement_with_broken_parts_is_refused():
-    with pytest.raises(ValueError, match="coupler 102-103 is broken"):
-        fez_qubits(5, SAVED)
+    broken = replace(SAVED, cz=dict.fromkeys(SAVED.cz, 1.0))  # no spot without a broken part
+    with pytest.raises(ValueError, match="would use broken parts: coupler"):
+        fez_qubits(5, broken)
 
 
 def test_cost_charges_parts_as_often_as_a_round_uses_them():
@@ -134,3 +136,43 @@ def test_calibration_survives_a_save_and_load(tmp_path):
 def test_bad_direction_is_rejected(direction):
     with pytest.raises(ValueError, match="direction"):
         build_layout(3, COORDS, EDGES, origin=(5, 1), direction=direction)
+
+
+def test_equal_costs_tie_the_same_way_however_they_were_summed(monkeypatch):
+    import heavyhex.patches.placement as placement
+
+    exact = best_spots(COORDS, EDGES, SAVED)
+    noise = iter(range(10**6))
+    monkeypatch.setattr(
+        placement, "cost", lambda layout, calibration: 1.0 + next(noise) % 3 * 1e-15
+    )
+    monkeypatch.setattr(placement, "problems", lambda layout, calibration: [])
+    first = best_spots(COORDS, EDGES, SAVED)
+    assert best_spots(COORDS, EDGES, SAVED) == first
+    assert exact  # the real costs still give a placement
+
+
+def test_a_qubit_ibm_cannot_drive_counts_as_broken():
+    from heavyhex.patches.placement import broken_qubit
+
+    assert not broken_qubit(4, replace(SAVED, single_qubit={4: 3e-4}))
+    assert broken_qubit(4, replace(SAVED, single_qubit={4: 1.0}))
+
+
+def test_a_past_calibration_comes_from_ibms_history():
+    pytest.importorskip("qiskit_ibm_runtime")
+    from qiskit_ibm_runtime.fake_provider import FakeKingston
+
+    device = FakeKingston()
+
+    class Then:
+        name, num_qubits, target = "ibm_kingston", device.num_qubits, device.target
+
+        def properties(self, datetime=None):
+            assert datetime is not None
+            return device.properties()
+
+    now = Calibration.from_device(device)
+    then = Calibration.from_device(Then(), at=datetime.now())
+    assert then.readout == now.readout and then.single_qubit == pytest.approx(now.single_qubit)
+    assert then.cz.keys() == now.cz.keys()
