@@ -1,9 +1,13 @@
 """What runs on the chip: both patches side by side, in Fez's native gates.
 
-Memory in X and Z at each number of rounds, and an idle test: X memory with
-every CX replaced by a wait of the same length, so the data qubits wait in |+>,
-with the same waits and pulses, while their ancillas are reset and read out.
-Patch d writes registers m{d} (gauges) and d{d} (data).
+Memory in X and Z at each number of rounds; a placement test, X memory with a
+second d=3 patch on qubits of the d=5 patch beside the usual one; and an idle
+test: X memory with
+the CZ of every CX replaced by a wait of the same length, so the data qubits
+wait in |+>, with the same waits, pulses and H gates, while their ancillas are
+reset and read out. Half the idle test reads the data in Y instead of X, so a
+frequency offset, which turns X into Y, isn't taken for dephasing.
+Patch p writes registers m{p} (gauges) and d{p} (data), p being "3", "5" or "3in".
 """
 
 from __future__ import annotations
@@ -21,52 +25,114 @@ if TYPE_CHECKING:
     from qiskit.transpiler import Target
 
 DISTANCES = (3, 5)
+INSIDE = "3in"  # the placement test's d=3 patch, on qubits of the d=5 patch
 ROUNDS = (1, 2, 3, 4, 6, 8)
 IDLE_ROUNDS = (1, 2, 4, 8, 16)
+BLOCKS = 2  # the job runs every circuit's shots in an early and a late block
+H_FRAME = "h frame"  # marks a wait the target spends between the H gates of a waited-out CX
 
 
 @dataclass(frozen=True)
 class Setting:
     """One circuit of the run."""
 
-    kind: str  # "memory" or "idle"
+    kind: str  # "memory", "inside" (the placement test) or "idle"
     basis: str
     rounds: int
+    readout: str = "X"  # the idle test reads its data in X or in Y
 
     def __str__(self) -> str:
-        return f"{self.basis} {self.kind}, {self.rounds} round{'s' * (self.rounds > 1)}"
+        rounds = f"{self.rounds} round{'s' * (self.rounds > 1)}"
+        if self.kind == "idle":
+            return f"idle, {rounds}, read in {self.readout}"
+        if self.kind == "inside":
+            return f"X memory, d=3 inside d=5, {rounds}"
+        return f"{self.basis} {self.kind}, {rounds}"
+
+    @property
+    def patches(self) -> tuple[str, ...]:
+        """The patches it runs, by register suffix; the first is the usual d=3."""
+        return ("3", INSIDE) if self.kind == "inside" else tuple(map(str, DISTANCES))
+
+    @property
+    def decoded(self) -> bool:
+        """Memory and the placement test are decoded; the idle test isn't."""
+        return self.kind != "idle"
+
+    @property
+    def copies(self) -> int:
+        """Pieces per block: two for memory and the placement test, one per idle readout.
+
+        Every piece takes the same shots, so the idle test splits a memory circuit's
+        share between its X and Y readouts.
+        """
+        return 2 if self.decoded else 1
 
 
-SETTINGS = tuple(Setting("memory", basis, n) for basis in "XZ" for n in ROUNDS) + tuple(
-    Setting("idle", "X", n) for n in IDLE_ROUNDS
+SETTINGS = (
+    tuple(Setting("memory", basis, n) for basis in "XZ" for n in ROUNDS)
+    + tuple(Setting("inside", "X", n) for n in ROUNDS)
+    + tuple(Setting("idle", "X", n) for n in IDLE_ROUNDS)
+    + tuple(Setting("idle", "X", n, readout="Y") for n in IDLE_ROUNDS)
 )
 
 
+def job_order(settings: tuple[Setting, ...], seed: int = 0) -> list[tuple[int, int]]:
+    """(setting, block) for each piece of the job: each block holds every circuit's
+    pieces, shuffled. Comparing the blocks shows drift during the job.
+    """
+    import numpy as np
+
+    rng = np.random.default_rng(seed)
+    order = []
+    for b in range(BLOCKS):
+        pieces = [i for i, s in enumerate(settings) for _ in range(s.copies)]
+        order += [(int(i), b) for i in rng.permutation(pieces)]
+    return order
+
+
+def piece_shots(shots: int) -> int:
+    """Shots in every piece of the job, for `shots` asked per memory circuit."""
+    if shots % (2 * BLOCKS):
+        raise ValueError(f"shots per memory circuit must be a multiple of {2 * BLOCKS}")
+    return shots // (2 * BLOCKS)
+
+
+def distance(patch: str) -> int:
+    return int(patch[0])
+
+
 def logical_circuit(
-    setting: Setting, chips: dict[int, list[int]], num_qubits: int
-) -> tuple[QuantumCircuit, dict[int, FlaggedSchedule]]:
-    """Both patches on their chip qubits, before translation to native gates."""
+    setting: Setting, chips: dict[str, list[int]], num_qubits: int
+) -> tuple[QuantumCircuit, dict[str, FlaggedSchedule]]:
+    """Both patches on their chip qubits, before translation to native gates.
+
+    chips maps each patch ("3", "5", "3in") to its chip qubits.
+    """
     from qiskit import ClassicalRegister, QuantumCircuit
     from qiskit.circuit import Instruction
 
     pair = QuantumCircuit(num_qubits)
     schedules = {}
-    for d in DISTANCES:
-        circuit, schedules[d] = memory_circuit_flagged(
-            build_operators(d), rounds=setting.rounds, basis=setting.basis
+    for patch in setting.patches:
+        circuit, schedules[patch] = memory_circuit_flagged(
+            build_operators(distance(patch)), rounds=setting.rounds, basis=setting.basis
         )
         if setting.kind == "idle":
+            last = max(i for i, item in enumerate(circuit.data) if item.operation.name == "barrier")
             kept = circuit.copy_empty_like()
-            for item in circuit.data:
+            for i, item in enumerate(circuit.data):
                 if item.operation.name == "cx":
                     kept.append(Instruction("wait", 2, 0, []), item.qubits)
-                else:
-                    kept.append(item)
+                    continue
+                if setting.readout == "Y" and i > last and item.operation.name == "h":
+                    kept.rz(-pi / 2, item.qubits[0])  # S^dag, so the closing H reads Y
+                kept.append(item)
             circuit = kept
-        gauges, data = (ClassicalRegister(r.size, f"{r.name}{d}") for r in circuit.cregs)
+        gauges, data = (ClassicalRegister(r.size, f"{r.name}{patch}") for r in circuit.cregs)
         pair.add_register(gauges)
         pair.add_register(data)
-        pair.compose(circuit, qubits=chips[d], clbits=[*gauges, *data], inplace=True)
+        pair.compose(circuit, qubits=chips[patch], clbits=[*gauges, *data], inplace=True)
     return pair, schedules
 
 
@@ -77,7 +143,8 @@ def for_fez(circuit: QuantumCircuit, target: Target) -> QuantumCircuit:
     barrier waits for all of them, and a CX is H, CZ, H on its target back to back.
     A reset, and the gates after it, wait until just before the qubit's first CX,
     so a fresh qubit sits in |0>. Waits of at least DECOUPLE_NS get two X pulses.
-    A two-qubit "wait" lasts as long as a CX and does nothing.
+    A two-qubit "wait" is a CX with a delay in place of its CZ: the target's H
+    gates stay, so both qubits spend the CX as they would in memory.
     """
     if target.granularity != 1 or target.pulse_alignment != 1:
         raise ValueError("delays would need aligning to the device's time grid")
@@ -156,11 +223,18 @@ def for_fez(circuit: QuantumCircuit, target: Target) -> QuantumCircuit:
                 start + 2 * turn + length("cz", control, target_qubit)
             )
         elif name == "wait":
-            a, b = qubits
-            span = 2 * length("sx", b) + length("cz", a, b)
-            out.delay(span, a, unit="dt")
-            out.delay(span, b, unit="dt")
-            free[a] = free[b] = start + span
+            control, target_qubit = qubits
+            turn, gap = length("sx", target_qubit), length("cz", control, target_qubit)
+            h(target_qubit)
+            out.delay(turn, control, unit="dt")
+            out.delay(gap, control, unit="dt")
+            out.barrier(target_qubit, label=H_FRAME)  # a data target sits in |0> meanwhile
+            out.delay(gap, target_qubit, unit="dt")
+            h(target_qubit)
+            out.delay(turn, control, unit="dt")
+            free[control] = free[target_qubit] = start + 2 * turn + gap
+        elif name == "rz":
+            out.append(item)  # virtual, takes no time
         elif name == "measure":
             (q,) = qubits
             out.append(item)
@@ -168,3 +242,35 @@ def for_fez(circuit: QuantumCircuit, target: Target) -> QuantumCircuit:
         else:
             raise ValueError(f"unexpected instruction: {name}")
     return out
+
+
+def with_durations(target: Target, durations_ns: dict[str, int]) -> Target:
+    """A copy of target whose gates take the calibration's median times.
+
+    Qiskit's offline FakeFez is slower than the chip (readout 1.56 vs 1.66 us, CZ
+    84 vs 68 ns), so an offline prediction uses the times the calibration saved.
+    """
+    from copy import deepcopy
+
+    from qiskit.transpiler import InstructionProperties
+
+    timed = deepcopy(target)
+    for name, key in (
+        ("x", "x"),
+        ("sx", "x"),
+        ("cz", "cz"),
+        ("measure", "measure"),
+        ("reset", "reset"),
+    ):
+        if key not in durations_ns:
+            continue
+        for qargs, properties in target[name].items():
+            if properties is not None:
+                timed.update_instruction_properties(
+                    name,
+                    qargs,
+                    InstructionProperties(
+                        duration=durations_ns[key] * 1e-9, error=properties.error
+                    ),
+                )
+    return timed

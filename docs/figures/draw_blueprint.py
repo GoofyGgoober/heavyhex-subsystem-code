@@ -222,7 +222,7 @@ def draw_chip_overview(
         ax.text(
             x1 + 1.0,
             (y0 + y1) / 2,
-            f"d={layout.distance}\n{len(layout.physical_qubits)} sites",
+            f"d={layout.distance}\n{len(layout.physical_qubits)} qubits",
             fontsize=9,
             va="center",
             fontweight="bold",
