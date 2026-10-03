@@ -563,7 +563,8 @@ def test_a_split_rep_gets_its_lambda_from_both_jobs_and_every_rep_is_pooled(smal
         assert entry["verdict"] == "d = 5 worse"  # Λ is far below 1 here
     pooled = combined["pooled_x"]
     sigmas = [entry["tests"]["X lambda"]["observed_uncertainty"] for entry in combined["reps"]]
-    assert pooled["lambda_uncertainty"] < min(sigmas)
+    weight = sum(1 / v**2 for v in sigmas)
+    assert pooled["lambda_uncertainty"] == pytest.approx((max(pooled["spread"], 1) / weight) ** 0.5)
     assert set(combined["model"]) == {f"{b} {q}" for b in "XZ" for q in ("lambda", "eps3", "eps5")}
     assert all(row["reps"] == 2 for row in combined["model"].values())
     assert (run.RUNS / "rehearsal_combined.json").exists()

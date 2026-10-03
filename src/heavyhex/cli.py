@@ -560,7 +560,8 @@ def _emit_combined(args: argparse.Namespace, combined: dict) -> int:
     lines = []
     if combined["shots_from"] != "shots.npz":
         lines.append(f"REHEARSAL: these are simulated shots from {combined['shots_from']}")
-    lines.append(f"{len(combined['reps'])} reps over {combined['days']} days")
+    reps, days = len(combined["reps"]), combined["days"]
+    lines.append(f"{reps} rep{'s' * (reps != 1)} over {days} day{'s' * (days != 1)}")
     for entry in combined["reps"]:
         row = entry["tests"]["X lambda"]
         spots = ", ".join(
