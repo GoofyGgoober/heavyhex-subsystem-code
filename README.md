@@ -65,9 +65,8 @@ credentials. Do it all on one day: submit refuses a run prepared on another.
    runs/<folder>/calibration.json --out docs/figures/figure3.json`.
 9. Publish a release on GitHub (a release, not just a tag), so Zenodo mints a DOI.
 
-The paper's current numbers are a preview from IBM's 3 October 2026
-calibration, in `runs/ibm_fez-2026-10-03-offline` (prepared offline, so it can't
-be sent).
+The paper's predictions come from the run folder `runs/ibm_fez-2026-10-03`,
+prepared from IBM's calibration of 3 October 2026, 17:05 UTC.
 
 ## License
 
