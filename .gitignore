@@ -7,8 +7,12 @@ __pycache__/
 dist/
 build/
 
-# Local tool settings
+# Rehearsals are simulated; only the chip's shots belong to a run's record
+runs/*/rehearsal*
+
+# Local tool and editor settings
 .claude/settings.local.json
+.vscode/
 
 # Never commit credentials
 apikey*.json

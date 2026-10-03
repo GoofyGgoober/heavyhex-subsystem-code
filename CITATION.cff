@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "heavyhex-subsystem-code: a pre-registered d = 3 vs d = 5 memory experiment with the heavy-hex subsystem code on IBM Fez"
+abstract: >-
+  Code for a pre-registered memory experiment on IBM Fez: the heavy-hex
+  subsystem code at d = 3 and d = 5, run side by side, to measure the
+  error-suppression factor Λ = ε₃ / ε₅. It places both patches from IBM's
+  daily calibration, translates the circuits to Fez's native gates, freezes
+  a simulated prediction before the circuits are sent, and decodes and
+  analyzes the shots against it.
+authors:
+  - given-names: Nadav
+    family-names: Abramson
+    affiliation: "Independent researcher"
+version: "0.1.0"
+license: MIT
+repository-code: "https://github.com/GoofyGgoober/heavyhex-subsystem-code"
+url: "https://github.com/GoofyGgoober/heavyhex-subsystem-code"
+keywords:
+  - quantum error correction
+  - heavy-hex
+  - subsystem code
+  - IBM Fez
+  - pre-registration

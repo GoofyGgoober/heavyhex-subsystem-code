@@ -114,14 +114,10 @@ class SubsystemCode:
         """Undetectable but not a gauge, so it acts on the logical qubit."""
         return all(pauli.commutes(s) for s in self.stabilizers) and not self.in_gauge_group(pauli)
 
-    def paulis_of_weight(self, weight: int, axes: str = "XYZ") -> Iterator[Pauli]:
-        """Every Pauli of this weight using only the given axes.
-
-        The lookup table keeps the first error it sees per syndrome, so this order
-        decides its corrections.
-        """
+    def paulis_of_weight(self, weight: int) -> Iterator[Pauli]:
+        """Every Pauli of this weight."""
         for qubits in combinations(self.data_qubits, weight):
-            for letters in product(axes, repeat=weight):
+            for letters in product("XYZ", repeat=weight):
                 x = frozenset(q for q, a in zip(qubits, letters) if a in "XY")
                 z = frozenset(q for q, a in zip(qubits, letters) if a in "YZ")
                 yield Pauli(x, z)

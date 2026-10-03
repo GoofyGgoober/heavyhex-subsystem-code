@@ -1,7 +1,6 @@
 """The heavyhex command.
 
-Data qubit ids are 0-based (the paper's Q label is id + 1). Lookup decoding
-only works at d=3, MWPM at d=3 and d=5.
+Data qubit ids are 0-based (the paper's Q label is id + 1).
 """
 
 from __future__ import annotations
@@ -10,17 +9,14 @@ import argparse
 import json
 import re
 import sys
-from collections import Counter
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
 from .core import Pauli
-from .decoders.lookup import decode as lookup_decode
 from .patches.operators import D3, D5, HeavyHexOperators
 
 PATCHES: dict[int, HeavyHexOperators] = {3: D3, 5: D5}
-AXES = "XYZ"
 BASES = ("X", "Z")
 INSTALL_HINT = "python -m pip install -e '.[sim,matching]'"
 HARDWARE_HINT = "python -m pip install -e '.[hardware]'"
@@ -59,14 +55,6 @@ def parse_pauli(text: str, patch: HeavyHexOperators) -> Pauli:
     return Pauli(frozenset(x), frozenset(z))
 
 
-def parse_syndrome(text: str, patch: HeavyHexOperators) -> tuple[int, ...]:
-    bits = text.replace(" ", "")
-    size = patch.code.syndrome_size
-    if len(bits) != size or any(bit not in "01" for bit in bits):
-        raise ValueError(f"syndrome must be {size} bits, got {text!r}")
-    return tuple(int(bit) for bit in bits)
-
-
 def pauli_words(pauli: Pauli) -> str:
     """Bare Pauli words, e.g. 'X0 Y3' or 'I'."""
     if not (pauli.x or pauli.z):
@@ -91,24 +79,43 @@ def format_pauli(pauli: Pauli, patch: HeavyHexOperators) -> str:
     return f"{text}  ({name})" if name else text
 
 
-def format_syndrome(syndrome: Sequence[int], patch: HeavyHexOperators) -> str:
-    bits = "".join(str(bit) for bit in syndrome)
-    fired = [name for name, bit in zip(patch.stabilizer_names, syndrome) if bit]
-    return f"{bits}  ({', '.join(fired) if fired else 'trivial'})"
-
-
 def _patch(args: argparse.Namespace) -> HeavyHexOperators:
     return PATCHES[args.distance]
-
-
-def _require_d3(patch: HeavyHexOperators, what: str) -> None:
-    if patch.distance != 3:
-        raise ValueError(f"{what} is d=3 only")
 
 
 def _emit(payload: dict[str, Any], lines: Sequence[str], *, as_json: bool) -> int:
     print(json.dumps(payload, indent=2, sort_keys=True) if as_json else "\n".join(lines))
     return 0
+
+
+def _usage(folder: Path) -> str:
+    """The QPU time IBM counted for the run's job, against its limit."""
+    record = json.loads((folder / "job.json").read_text()) if (folder / "job.json").exists() else {}
+    usage = record.get("usage") or {}
+    used = next(
+        (usage[key] for key in ("qpu_charge_time_seconds", "quantum_seconds") if key in usage),
+        None,
+    )
+    limit = record.get("qpu_seconds_limit")
+    if used is None:
+        return f"IBM hasn't reported the QPU time used yet (limit {limit} s)"
+    if usage.get("status") != "complete":
+        return (
+            f"IBM has counted {used} s of QPU time so far and is still counting (limit {limit} s)"
+        )
+    return f"IBM counted {used} s of QPU time (limit {limit} s)"
+
+
+def _not_sent_again(folder: Path) -> str:
+    """What a failed submit left behind."""
+    if not (folder / "job.json").exists():
+        return "Nothing was sent."
+    if json.loads((folder / "job.json").read_text()).get("job") is None:
+        return (
+            "A job may have been sent, but IBM's reply never came; analyze explains how to "
+            "find it. This folder is not sent again."
+        )
+    return f"No shots. {_usage(folder)}; this folder is not sent again."
 
 
 def _info_command(args: argparse.Namespace) -> int:
@@ -141,153 +148,6 @@ def _info_command(args: argparse.Namespace) -> int:
     return _emit(payload, lines, as_json=args.json)
 
 
-def _syndrome_command(args: argparse.Namespace) -> int:
-    patch = _patch(args)
-    code = patch.code
-    error = parse_pauli(args.error, patch)
-    syndrome = code.syndrome(error)
-    payload: dict[str, Any] = {
-        "error": pauli_words(error),
-        "syndrome": "".join(map(str, syndrome)),
-        "fired_checks": [n for n, b in zip(patch.stabilizer_names, syndrome) if b],
-        "in_gauge_group": code.in_gauge_group(error),
-    }
-    lines = [
-        f"Error:    {format_pauli(error, patch)}",
-        f"Syndrome: {format_syndrome(syndrome, patch)}",
-    ]
-    if patch.distance == 3:
-        correction = lookup_decode(syndrome, code)
-        payload["correction"] = pauli_words(correction)
-        payload["residual_in_gauge_group"] = code.in_gauge_group(correction * error)
-        lines += [
-            f"Correction: {format_pauli(correction, patch)}",
-            f"Residual in gauge group: {payload['residual_in_gauge_group']}",
-        ]
-    else:
-        lines.append(f"Lookup decoding is d=3 only; d={patch.distance} reports detection.")
-    return _emit(payload, lines, as_json=args.json)
-
-
-def _decode_command(args: argparse.Namespace) -> int:
-    patch = _patch(args)
-    _require_d3(patch, "lookup decoding")
-    syndrome = parse_syndrome(args.syndrome, patch)
-    correction = lookup_decode(syndrome, patch.code)
-    payload = {
-        "syndrome": "".join(map(str, syndrome)),
-        "correction": pauli_words(correction),
-        "weight": correction.weight(),
-    }
-    lines = [
-        f"Syndrome:   {format_syndrome(syndrome, patch)}",
-        f"Correction: {format_pauli(correction, patch)}",
-        f"Weight:     {correction.weight()}",
-    ]
-    return _emit(payload, lines, as_json=args.json)
-
-
-def _grade_errors(
-    patch: HeavyHexOperators, weight: int, axes: str
-) -> tuple[dict[str, int], list[dict[str, Any]]]:
-    """Sort every error of this weight into the four counts. Rows list the decoded and harmful ones."""
-    code = patch.code
-    counts = {"corrected": 0, "detected": 0, "harmless": 0, "harmful": 0}
-    rows: list[dict[str, Any]] = []
-    for error in code.paulis_of_weight(weight, axes):
-        syndrome = code.syndrome(error)
-        if any(syndrome):
-            if patch.distance != 3:
-                counts["detected"] += 1
-                continue
-            ok = code.in_gauge_group(lookup_decode(syndrome, code) * error)
-            counts["corrected" if ok else "harmful"] += 1
-            rows.append({"error": format_pauli(error, patch), "ok": ok})
-        elif code.in_gauge_group(error):
-            counts["harmless"] += 1
-        else:
-            counts["harmful"] += 1
-            rows.append({"error": format_pauli(error, patch), "ok": False})
-    return counts, rows
-
-
-def _sweep_command(args: argparse.Namespace) -> int:
-    patch = _patch(args)
-    axes = args.axes.upper()
-    if not axes or any(axis not in AXES for axis in axes):
-        raise ValueError(f"axes must be a non-empty selection from {AXES}, got {args.axes!r}")
-    if not 0 <= args.weight <= patch.code.n:
-        raise ValueError(f"weight must be in 0..{patch.code.n}, got {args.weight}")
-
-    counts, rows = _grade_errors(patch, args.weight, axes)
-    selected = [row for row in rows if not row["ok"]] if args.failures_only else rows
-    payload: dict[str, Any] = {
-        "distance": patch.distance,
-        "weight": args.weight,
-        "axes": axes,
-        "total": sum(counts.values()),
-        **counts,
-    }
-    if args.details or args.failures_only:
-        payload["cases"] = selected
-    lines = [
-        f"Heavy-hex d={patch.distance} sweep: weight={args.weight}, axes={axes}",
-        f"Cases:     {payload['total']}",
-        f"Corrected: {counts['corrected']}  Detected: {counts['detected']}",
-        f"Harmless:  {counts['harmless']}  Harmful:   {counts['harmful']}",
-    ]
-    if args.details or args.failures_only:
-        lines += [f"  {row['error']:<12} {'ok' if row['ok'] else 'FAIL'}" for row in selected]
-    return _emit(payload, lines, as_json=args.json)
-
-
-def _run_command(args: argparse.Namespace) -> int:
-    from .simulation.aer import run_memory_flagged  # qiskit-aer is an optional extra
-
-    patch = _patch(args)
-    error = parse_pauli(args.error, patch) if args.error else None
-    records = run_memory_flagged(
-        patch,
-        basis=args.basis,
-        rounds=args.rounds,
-        error=error,
-        inject_at=args.inject_at,
-        decoder=args.decoder,
-        shots=args.shots,
-        seed=args.seed,
-    )
-
-    graded = all(record["success"] is not None for record in records)
-    successes = sum(1 for record in records if record["success"]) if graded else None
-    syndromes = Counter("".join(map(str, record["syndrome"])) for record in records)
-    # Most common syndrome; ties go to the smallest bitstring.
-    dominant = min(syndromes, key=lambda bits: (-syndromes[bits], bits))
-    payload: dict[str, Any] = {
-        "backend": "aer_stabilizer_flagged",
-        "distance": patch.distance,
-        "rounds": args.rounds,
-        "decoder": args.decoder,
-        "inject_at": args.inject_at,
-        "basis": args.basis,
-        "error": pauli_words(error) if error else "I",
-        "shots": len(records),
-        "successes": successes,
-        "dominant_syndrome": dominant,
-        "distinct_syndromes": len(syndromes),
-    }
-    if args.counts:
-        payload["syndrome_counts"] = dict(syndromes)
-    lines = [
-        f"Backend:  Aer stabilizer (flagged d={patch.distance} memory, "
-        f"{args.rounds} round{'s' if args.rounds != 1 else ''})",
-        f"Decoder:  {args.decoder}",
-        f"Error:    {format_pauli(error, patch) if error else 'I'}",
-        f"Shots:    {len(records)}  successes: {successes if graded else 'not decoded'}",
-        f"Syndrome: {dominant}  ({len(syndromes)} distinct)",
-    ]
-    return _emit(payload, lines, as_json=args.json)
-
-
 def _circuit_command(args: argparse.Namespace) -> int:
     from .circuits.flagged import memory_circuit_flagged  # qiskit is an optional extra
 
@@ -296,31 +156,6 @@ def _circuit_command(args: argparse.Namespace) -> int:
     circuit, _ = memory_circuit_flagged(patch, basis=args.basis, rounds=args.rounds, error=error)
     print(circuit.draw(output="text"))
     return 0
-
-
-def _mwpm_sim_command(args: argparse.Namespace) -> int:
-    from .decoders.mwpm import MemoryNoise
-    from .simulation.phenomenological import benchmark_memory
-
-    result = benchmark_memory(
-        _patch(args),
-        basis=args.basis,
-        rounds=args.rounds,
-        shots=args.shots,
-        seed=args.seed,
-        noise=MemoryNoise(args.data_error, args.measurement_error, args.readout_error),
-    )
-    low, high = result["logical_error_rate_95ci"]
-    return _emit(
-        result,
-        [
-            f"Phenomenological MWPM: d={args.distance}, {args.basis} memory, {args.rounds} rounds",
-            f"Shots: {result['shots']}  raw logical flips: {result['raw_logical_flips']}",
-            f"Decoded logical failures: {result['logical_failures']} "
-            f"({result['logical_error_rate']:.3g}, 95% CI {low:.3g}-{high:.3g})",
-        ],
-        as_json=args.json,
-    )
 
 
 def _calibrate_command(args: argparse.Namespace) -> int:
@@ -371,7 +206,9 @@ def _experiment_command(args: argparse.Namespace) -> int:
 
     from .experiment import run  # qiskit, stim and pymatching are optional extras
 
-    folder = Path(args.run) if args.run else run.default_folder(args.backend, args.offline)
+    folder = (
+        Path(args.run) if args.run else run.default_folder(args.backend, args.offline)
+    ).resolve()
     if args.step == "prepare":
         return _emit_prepared(args, run, folder)
     if not (folder / "run.json").exists():
@@ -381,7 +218,10 @@ def _experiment_command(args: argparse.Namespace) -> int:
         dephasing = 0.5 if args.dephasing is None else args.dephasing
         run.rehearse(folder, args.shots, dephasing)
         payload = {"run": str(folder), "shots": args.shots, "decoupled_dephasing": dephasing}
-        lines = [f"Simulated {args.shots} shots per circuit into {folder / 'shots.npz'}"]
+        lines = [
+            f"Simulated {args.shots} shots per memory circuit into {folder / run.REHEARSAL}",
+            f"Analyze them with: heavyhex experiment analyze --rehearsal --run {folder}",
+        ]
         return _emit(payload, lines, as_json=args.json)
     if args.step == "submit":
         if info["offline"]:
@@ -389,52 +229,97 @@ def _experiment_command(args: argparse.Namespace) -> int:
         prepared = datetime.fromisoformat(info["prepared"]).date()
         if prepared != date.today():
             raise ValueError(f"prepared on {prepared}; Fez recalibrates daily, prepare it again")
+        run.check_settings(info)
+        run.refuse_resubmit(folder)
+        run.refuse_another_job()
+        then, now = info.get("code"), run.commit()
+        if not then or then["changed"] or not now or now["code"] != then["code"]:
+            raise ValueError(
+                "the run must be prepared, and sent, from committed code that hasn't changed "
+                "since; commit the code, then prepare again"
+            )
+        unsaved = run.uncommitted(folder)
+        if unsaved:
+            raise ValueError(
+                "commit and push the run folder first, so the prediction is on record "
+                f"before the run: {', '.join(unsaved)}"
+            )
         from qiskit_ibm_runtime import QiskitRuntimeService
 
-        backend = QiskitRuntimeService().backend(info["backend"])
-        rest = getattr(backend.configuration(), "default_rep_delay", 250e-6)
-        seconds = args.shots * sum(t + rest for t in info["seconds"])
+        from .experiment.circuits import piece_shots
+
+        each = piece_shots(args.shots)
+        backend = QiskitRuntimeService().backend(info["backend"])  # read-only
+        seconds = run.qpu_seconds(info, args.shots, backend)
         print(
-            f"About to send {len(info['seconds'])} circuits x {args.shots} shots to "
-            f"{info['backend']}: about {seconds:.0f} s of QPU time, plus IBM's overhead."
+            f"About to send {len(info['seconds'])} circuits ({len(info['order'])} pieces of "
+            f"{each} shots) to {info['backend']}: about {seconds:.0f} s of QPU time by "
+            f"IBM's rule. Limit {run.QPU_SECONDS_LIMIT} s: IBM cancels the job if it uses "
+            "more, whatever has happened by then, and this folder is never sent again."
         )
+        if seconds > run.QPU_SECONDS_LIMIT:
+            raise ValueError(f"over the {run.QPU_SECONDS_LIMIT} s limit; not sent")
         if input("Type yes to send: ").strip() != "yes":
             print("Not sent.")
             return 1
-        run.submit(folder, backend, args.shots)
-        print(f"Done; shots saved in {folder / 'shots.npz'}")
-        from .patches.placement import calibrate
-
-        after = calibrate(info["backend"], folder / "calibration_after.json")  # read-only
-        before = json.loads((folder / "calibration.json").read_text())["calibrated"]
-        changed = "recalibrated" if after.calibrated != before else "not recalibrated since"
-        print(f"{info['backend']} {changed} the prepared calibration ({after.calibrated})")
+        try:
+            run.submit(folder, backend, args.shots)
+        except Exception as error:  # the shots may be in; finish() can be retried by analyze
+            if not (folder / run.SHOTS).exists():
+                print(_not_sent_again(folder))
+                raise
+            print(f"Shots saved, but the calibration after the job wasn't: {error}")
+        print(f"Done; shots saved in {folder / run.SHOTS}. {_usage(folder)}")
+        if (folder / "calibration_after.json").exists():
+            after = json.loads((folder / "calibration_after.json").read_text())["calibrated"]
+            before = json.loads((folder / "calibration.json").read_text())["calibrated"]
+            changed = "recalibrated" if after != before else "not recalibrated since"
+            print(f"{info['backend']} {changed} the prepared calibration as the job finished")
+        print("Commit the shots and calibration_after.json, then analyze.")
         return 0
-    if not (folder / "shots.npz").exists():
+    if args.rehearsal:
+        if not (folder / run.REHEARSAL).exists():
+            raise ValueError(f"no rehearsal in {folder}; rehearse first")
+    elif not (folder / run.SHOTS).exists():
         if not (folder / "job.json").exists():
-            raise ValueError(f"no shots in {folder}; submit or rehearse first")
+            raise ValueError(f"no shots in {folder}; submit first, or analyze --rehearsal")
         run.fetch(folder)
-    return _emit_analysis(args, run.analyze(folder, args.dephasing), folder)
+    elif (folder / "job.json").exists() and (
+        not (folder / "calibration_after.json").exists() or run.usage_pending(folder)
+    ):
+        from qiskit_ibm_runtime import QiskitRuntimeService
+
+        job_id = json.loads((folder / "job.json").read_text())["job"]
+        run.finish(folder, QiskitRuntimeService().job(job_id))  # read-only
+    analysis = run.analyze(folder, args.dephasing, rehearsal=args.rehearsal)
+    return _emit_analysis(args, analysis, folder)
 
 
 def _emit_prepared(args: argparse.Namespace, run: Any, folder: Path) -> int:
-    from .patches.placement import LAST_CALIBRATION, Calibration, todays_calibration
+    from .patches.placement import LAST_CALIBRATION, Calibration, calibrate
 
     if args.offline:
         from qiskit_ibm_runtime.fake_provider import FakeFez
 
+        from .experiment.circuits import with_durations
+
         calibration = Calibration.load(args.calibration or LAST_CALIBRATION)
         target = FakeFez().target
+        if calibration.durations_ns:
+            target = with_durations(target, calibration.durations_ns)
+        timing = "the calibration's gate times" if calibration.durations_ns else "FakeFez's times"
     else:
         from qiskit_ibm_runtime import QiskitRuntimeService
 
-        calibration = todays_calibration(args.backend)
+        calibration = calibrate(args.backend)  # IBM's calibration in force now, read-only
         target = QiskitRuntimeService().backend(args.backend).target  # read-only
+        timing = "the device's gate times"
     prediction = run.prepare(folder, calibration, target, offline=args.offline)
     low, high = (prediction[str(f)]["fits"] for f in run.ENDS)
     lines = [
         f"Run folder: {folder}",
-        f"{calibration.backend} calibrated {calibration.calibrated}, pulled {calibration.pulled}",
+        f"{calibration.backend} calibrated {calibration.calibrated}, pulled {calibration.pulled}; "
+        f"timed with {timing}",
         "Predicted error per round, from decoupling leaving only T1 to leaving IBM's T2:",
     ]
     for basis in BASES:
@@ -446,7 +331,10 @@ def _emit_prepared(args: argparse.Namespace, run: Any, folder: Path) -> int:
         )
     lines += [
         "Redraw the blueprint with: python docs/figures/draw_blueprint.py",
-        f"Sending it uses the QPU: heavyhex experiment submit --run {folder}",
+        "Commit and push the run folder, so the prediction is on record before the run.",
+        "Offline runs can't be sent; prepare again without --offline on the run day."
+        if args.offline
+        else f"Sending it uses the QPU: heavyhex experiment submit --run {folder}",
     ]
     payload = {"run": str(folder), "prediction": {f: p["fits"] for f, p in prediction.items()}}
     return _emit(payload, lines, as_json=args.json)
@@ -454,49 +342,152 @@ def _emit_prepared(args: argparse.Namespace, run: Any, folder: Path) -> int:
 
 def _emit_analysis(args: argparse.Namespace, analysis: dict, folder: Path) -> int:
     from .experiment.circuits import SETTINGS
+    from .experiment.run import DRIFT_BAR, LEAKAGE_BAR
 
     seen, expected = analysis["observed"], analysis["predicted_at_measured_dephasing"]
-    lines = [
+    after = analysis["predicted_from_calibration_after"]
+    idle, table = analysis["idle_test"], analysis["dephasing_by_qubit"]
+    code = analysis["code"]
+    lines = []
+    if analysis["shots_from"] != "shots.npz":
+        lines.append(f"REHEARSAL: these are simulated shots from {analysis['shots_from']}")
+    then, now = code["prepared"] or {}, code["analyzed"] or {}
+    if then.get("code") != now.get("code") or then.get("changed") or now.get("changed"):
+        lines.append(
+            "The code differs from the prepared run's; the prediction below is "
+            "recomputed with today's code (the frozen one is in prediction.json)"
+        )
+    if analysis["calibration_after_missing"]:
+        lines.append(
+            "No calibration_after.json: the agreement bounds leave out the calibration gap"
+        )
+    lines.append(
         f"Decoupling leaves {analysis['decoupled_dephasing']:.2f} of the calibrated dephasing "
-        "(0: only T1, 1: IBM's T2)",
-        f"{'':22s} {'observed':>18s} {'predicted':>18s}",
-    ]
+        f"(0: only T1, 1: IBM's T2), "
+        + (
+            f"the median over data qubits, ± {idle['median_uncertainty']:.2f} "
+            f"(from <X> alone: {idle['x_only_median']:.2f})"
+            if table
+            else "as given"
+        )
+    )
+    spread = idle["uniformity"]
+    if table and spread:
+        low, high = spread["quartiles"]
+        lines.append(
+            f"Across {spread['qubits']} data qubits f runs {low:.2f}-{high:.2f} (quartiles); "
+            f"χ²/dof {spread['chi2_per_dof']:.1f} about their weighted mean, "
+            f"p = {spread['p_value']:.2g}"
+        )
+    if table:
+        lines.append("Highest per data qubit (a side check; the median is used for every qubit):")
+        lines += [
+            f"  d={row['patch']} {row['data']} (q{row['qubit']}, T2 {row['t2_us']:.0f} us): "
+            f"{row['dephasing']:.2f} ± {row['uncertainty']:.2f}, "
+            + (
+                f"phase {row['phase_per_round']:+.3f} rad per round"
+                if row["phase_per_round"] == row["phase_per_round"]  # NaN: the angles don't fit
+                else "phase unclear"
+            )
+            for row in table[:5]
+            if row["measured"]
+        ]
+        unmeasured = [
+            f"d={row['patch']} {row['data']} (q{row['qubit']})"
+            for row in table
+            if not row["measured"]
+        ]
+        if unmeasured:
+            lines.append(f"The idle test can't pin these down: {', '.join(unmeasured)}")
+    lines.append(f"{'':28s} {'observed':>18s} {'predicted':>18s}")
     for setting, got, want in zip(SETTINGS, seen["settings"], expected["settings"]):
-        if setting.kind == "memory":
+        if setting.decoded:
             got3, got5 = got["logical_error"]
             want3, want5 = want["logical_error"]
-            lines.append(f"{setting!s:22s} {got3:8.1%} {got5:8.1%}  {want3:8.1%} {want5:8.1%}")
+            lines.append(f"{setting!s:28s} {got3:8.1%} {got5:8.1%}  {want3:8.1%} {want5:8.1%}")
     for basis in BASES:
         got, want = seen["fits"][basis], expected["fits"][basis]
+        later = (
+            f", {after['fits'][basis]['lambda']:.2f} from the later calibration" if after else ""
+        )
+        verdict = f", {got['verdict']}" if basis == "X" else ""
         lines.append(
             f"{basis} memory per round: d=3 {got['per_round']['3'][0]:.2%}, "
             f"d=5 {got['per_round']['5'][0]:.2%}, Λ {got['lambda']:.2f} ± "
-            f"{got['lambda_uncertainty']:.2f}, {got['verdict']} "
+            f"{got['lambda_uncertainty']:.2f}{verdict} "
             f"(predicted {want['per_round']['3'][0]:.2%}, {want['per_round']['5'][0]:.2%}, "
-            f"Λ {want['lambda']:.2f})"
+            f"Λ {want['lambda']:.2f}{later})"
+        )
+    agreement = analysis["agreement"]
+    gaps = [row["calibration_gap"] for row in agreement["tests"].values()]
+    lines.append(
+        "Simulation matches the chip: "
+        + ", ".join(
+            f"{basis} {'yes' if ok else 'no'}" for basis, ok in agreement["matches"].items()
+        )
+        + " ("
+        + ", ".join(
+            f"{name} {'yes' if row['agrees'] else 'no'}" for name, row in agreement["tests"].items()
+        )
+        + ")"
+        + ("" if any(gaps) else "; IBM didn't recalibrate during the job, so no calibration term")
+    )
+    for basis in BASES:
+        window = seen["fits"][basis]["from_round_2"]
+        lines.append(
+            f"{basis} memory from round 2 (exploratory): Λ {window['lambda']:.2f} ± "
+            f"{window['lambda_uncertainty']:.2f} (predicted "
+            f"{expected['fits'][basis]['from_round_2']['lambda']:.2f})"
+        )
+    memory = analysis["dephasing_from_memory"]
+    lines.append(
+        f"f read off X memory (exploratory): {memory['from_eps3']:.2f} ± "
+        f"{memory['from_eps3_uncertainty']:.2f} from ε₃, {memory['from_detector_rates']:.2f} "
+        f"from detector rates; agree with the idle test: {memory['eps3_agrees']}, "
+        f"{memory['detector_rates_agree']}"
+    )
+    lines.append(
+        "Rise in detection rate over rounds beyond the prediction, in standard errors "
+        f"(leakage above {LEAKAGE_BAR:.0f}): "
+        + ", ".join(
+            f"{name} {row['standard_errors']:+.1f}" for name, row in analysis["leakage"].items()
+        )
+    )
+    lines.append(
+        "Second half of the shots against the first, in standard errors: "
+        + ", ".join(f"{name} {row['change']:+.1f}" for name, row in analysis["drift"].items())
+        + (
+            "; DRIFT"
+            if any(row["drift"] for row in analysis["drift"].values())
+            else f"; no drift (bar {DRIFT_BAR})"
+        )
+    )
+    if analysis["calibration_after_filled"]:
+        lines.append(
+            "The calibration after the job lacked or broke qubits "
+            f"{analysis['calibration_after_filled']}; their prepared values were used"
         )
     lines.append(
-        "Detectors firing most above the prediction "
-        f"(chance alone reaches about {analysis['chance_excess']:.1f}):"
+        f"{analysis['detectors_beyond_chance']} detectors fire beyond chance "
+        f"(about {analysis['chance_excess']:.1f} standard errors) above the prediction"
+        + (" from both calibrations" if after else "")
+        + ("; most often:" if analysis["worst_detectors"] else "")
     )
     for row in analysis["worst_detectors"][:5]:
         d, r, name = row["detector"]
         lines.append(
             f"  {row['setting']}, d={d} round {r} {name}: {row['observed']:.1%} "
-            f"vs {row['predicted']:.1%} ({row['excess']:+.1f} standard errors)"
+            f"vs {row['predicted']:.1%} ({row['ratio']:.1f} times, {row['excess']:+.1f} "
+            "standard errors)"
         )
-    lines.append(f"Everything is in {folder / 'analysis.json'}")
+    saved = "analysis.json" if analysis["shots_from"] == "shots.npz" else "rehearsal_analysis.json"
+    lines.append(f"Everything is in {folder / saved}")
     return _emit({"run": str(folder), **analysis}, lines, as_json=args.json)
 
 
 COMMANDS = {
     "info": _info_command,
-    "syndrome": _syndrome_command,
-    "decode": _decode_command,
-    "sweep": _sweep_command,
-    "run": _run_command,
     "circuit": _circuit_command,
-    "mwpm-sim": _mwpm_sim_command,
     "calibrate": _calibrate_command,
     "experiment": _experiment_command,
 }
@@ -510,45 +501,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("info", help="Patch operators and parameters")
 
-    syndrome = sub.add_parser("syndrome", help="Syndrome + correction for a Pauli error")
-    syndrome.add_argument("error", help="e.g. 'X0 Z3', X_L, I")
-
-    decode = sub.add_parser("decode", help="Lookup correction for a syndrome (d=3)")
-    decode.add_argument("syndrome", help=f"{D3.code.syndrome_size} bits, X stabilizers then Z")
-
-    sweep = sub.add_parser("sweep", help="Grade every error of a Pauli weight")
-    sweep.add_argument("--weight", type=int, required=True)
-    sweep.add_argument("--axes", default=AXES)
-    sweep.add_argument("--details", action="store_true")
-    sweep.add_argument("--failures-only", action="store_true")
-
-    run = sub.add_parser(
-        "run", help="Flagged Aer memory (lookup or phenomenological MWPM baseline)"
-    )
-    run.add_argument("--basis", type=str.upper, choices=BASES, default="Z")
-    run.add_argument("--shots", type=int, default=128)
-    run.add_argument("--seed", type=int, default=None)
-    run.add_argument("--error", default=None, help="e.g. 'X0 Z3'")
-    run.add_argument("--counts", action="store_true")
-    run.add_argument("--rounds", type=int, default=1)
-    run.add_argument("--decoder", choices=("lookup", "mwpm"), default="lookup")
-    run.add_argument(
-        "--inject-at", default="after_prep", help="after_prep, after_x0, after_z0, ..."
-    )
-
     circuit = sub.add_parser("circuit", help="Draw the flagged memory circuit (d=3 or d=5)")
     circuit.add_argument("--basis", type=str.upper, choices=BASES, default="Z")
     circuit.add_argument("--error", default=None, help="e.g. 'X0 Z3'")
     circuit.add_argument("--rounds", type=int, default=1)
-
-    mwpm_sim = sub.add_parser("mwpm-sim", help="Local phenomenological noise benchmark (no QPU)")
-    mwpm_sim.add_argument("--basis", type=str.upper, choices=BASES, default="Z")
-    mwpm_sim.add_argument("--rounds", type=int, default=3)
-    mwpm_sim.add_argument("--shots", type=int, default=1024)
-    mwpm_sim.add_argument("--seed", type=int, default=None)
-    mwpm_sim.add_argument("--data-error", type=float, default=0.01)
-    mwpm_sim.add_argument("--measurement-error", type=float, default=0.01)
-    mwpm_sim.add_argument("--readout-error", type=float, default=0.0)
 
     from .patches.placement import FEZ_MAP, LAST_CALIBRATION
 
@@ -571,7 +527,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--run", default=None, help="run folder (default: runs/<backend>-<date>)"
     )
     experiment.add_argument("--backend", default="ibm_fez")
-    experiment.add_argument("--shots", type=int, default=5000)
+    experiment.add_argument(
+        "--shots",
+        type=int,
+        default=5000,
+        help="per memory circuit, a multiple of 4; each idle readout gets half",
+    )
     experiment.add_argument(
         "--offline",
         action="store_true",
@@ -579,6 +540,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     experiment.add_argument(
         "--calibration", default=None, help="with --offline: a saved calibration file"
+    )
+    experiment.add_argument(
+        "--rehearsal",
+        action="store_true",
+        help="with analyze: the rehearsal's simulated shots instead of the chip's",
     )
     experiment.add_argument(
         "--dephasing",
@@ -594,7 +560,7 @@ def _install_hint(error: ImportError) -> str | None:
     module = (error.name or "").split(".", 1)[0]
     if module == "qiskit_ibm_runtime":
         return HARDWARE_HINT
-    if module in ("qiskit", "qiskit_aer", "pymatching", "numpy", "scipy"):
+    if module in ("qiskit", "pymatching", "numpy", "scipy"):
         return INSTALL_HINT
     return None
 
