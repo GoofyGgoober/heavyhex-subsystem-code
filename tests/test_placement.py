@@ -90,8 +90,9 @@ def test_weak_parts_are_named_and_warned_about():
 
 
 def test_placement_with_broken_parts_is_refused():
-    with pytest.raises(ValueError, match="coupler 102-103 is broken"):
-        fez_qubits(5, SAVED)
+    broken = replace(SAVED, cz=dict.fromkeys(SAVED.cz, 1.0))  # no spot without a broken part
+    with pytest.raises(ValueError, match="would use broken parts: coupler"):
+        fez_qubits(5, broken)
 
 
 def test_cost_charges_parts_as_often_as_a_round_uses_them():
