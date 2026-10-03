@@ -78,13 +78,14 @@ def test_d5_circuit_is_available(capsys):
     assert "q_64" in capsys.readouterr().out
 
 
-def test_calibrate_offline_reports_the_saved_picks(capsys):
+def test_calibrate_offline_reports_the_days_plan(capsys):
     figures = Path(__file__).resolve().parents[1] / "docs" / "figures"
-    argv = ["--json", "calibrate", "--offline", "--file", str(figures / "fez_calibration.json")]
+    saved = Path(__file__).parent / "data" / "fez_calibration_2026-10-03.json"
+    argv = ["--json", "calibrate", "--offline", "--file", str(saved)]
     assert main(argv + ["--map", str(figures / "fez_map.json")]) == 0
-    payload = json.loads(capsys.readouterr().out)
-    assert set(payload["spots"]) == {"3", "5"}
-    assert payload["spots"]["3"]["broken"] == []
+    plan = json.loads(capsys.readouterr().out)["plan"]
+    assert [[set(job) for job in jobs] for jobs in plan] == [[{"3", "5"}], [{"5"}, {"3"}]]
+    assert all(found["broken"] == [] for jobs in plan for job in jobs for found in job.values())
 
 
 def test_missing_hardware_extra_is_reported(monkeypatch, capsys):

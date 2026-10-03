@@ -160,43 +160,57 @@ def _circuit_command(args: argparse.Namespace) -> int:
 
 def _calibrate_command(args: argparse.Namespace) -> int:
     from .patches.layout import build_layout
-    from .patches.placement import Calibration, best_spots, calibrate, cost, problems, weak
+    from .patches.placement import Calibration, calibrate, cost, day_plan, problems, weak
 
     if args.offline:
         calibration = Calibration.load(args.file)
     else:
         calibration = calibrate(args.backend, args.file)
     device = json.loads(Path(args.map).read_text())
-    spots = best_spots(device["coords"], device["edges"], calibration)
-    picks = {}
-    for d, spot in sorted(spots.items()):
-        layout = build_layout(
-            d, device["coords"], device["edges"], origin=spot.origin, direction=spot.direction
-        )
-        picks[d] = {
+    coords, edges = device["coords"], device["edges"]
+
+    def pick(d: int, spot: Any) -> dict:
+        layout = build_layout(d, coords, edges, origin=spot.origin, direction=spot.direction)
+        return {
             "origin": list(spot.origin),
             "direction": list(spot.direction),
             "errors_per_round": round(cost(layout, calibration), 3),
             "broken": problems(layout, calibration),
             "weak": weak(layout, calibration),
         }
+
+    plan = [
+        [{d: pick(d, spot) for d, spot in sorted(job.items())} for job in jobs]
+        for jobs in day_plan(coords, edges, calibration)
+    ]
     lines = [
         f"{calibration.backend} calibrated {calibration.calibrated}, "
         f"pulled {calibration.pulled}" + ("" if args.offline else f", saved to {args.file}")
     ]
-    for d, pick in picks.items():
-        broken = f"; {', '.join(pick['broken'])}" if pick["broken"] else ""
+    if not plan:
+        lines.append("No clean place for the d=5 patch: no rep today")
+    for r, jobs in enumerate(plan, start=1):
         lines.append(
-            f"d={d}: data qubit 1 at {tuple(pick['origin'])} facing {tuple(pick['direction'])}, "
-            f"~{pick['errors_per_round']:.2f} errors per round{broken}"
+            f"Rep {r}: "
+            + (
+                "both patches in one job"
+                if len(jobs) == 1
+                else "d=5 alone, then d=3 in its own job (no clean d=3 place fits beside it)"
+            )
         )
-        lines += [f"    weak: {part}" for part in pick["weak"]]
+        for job in jobs:
+            for d, found in job.items():
+                lines.append(
+                    f"  d={d}: data qubit 1 at {tuple(found['origin'])} facing "
+                    f"{tuple(found['direction'])}, ~{found['errors_per_round']:.2f} errors per round"
+                )
+                lines += [f"      weak: {part}" for part in found["weak"]]
     lines.append("Redraw with: python docs/figures/draw_blueprint.py")
     payload = {
         "backend": calibration.backend,
         "calibrated": calibration.calibrated,
         "pulled": calibration.pulled,
-        "spots": picks,
+        "plan": [[{str(d): found for d, found in job.items()} for job in jobs] for jobs in plan],
     }
     return _emit(payload, lines, as_json=args.json)
 
@@ -206,20 +220,25 @@ def _experiment_command(args: argparse.Namespace) -> int:
 
     from .experiment import run  # qiskit, stim and pymatching are optional extras
 
-    folder = (
-        Path(args.run) if args.run else run.default_folder(args.backend, args.offline)
-    ).resolve()
+    shots = args.shots or run.SHOTS_PER_CIRCUIT
     if args.step == "prepare":
-        return _emit_prepared(args, run, folder)
+        return _emit_prepared(args, run)
+    if args.step == "combine":
+        return _emit_combined(args, run.combine(rehearsal=args.rehearsal))
+    if not args.run:
+        raise ValueError(
+            f"name the job's folder: heavyhex experiment {args.step} --run runs/<folder>"
+        )
+    folder = Path(args.run).resolve()
     if not (folder / "run.json").exists():
         raise ValueError(f"no prepared run in {folder}")
     info = json.loads((folder / "run.json").read_text())
     if args.step == "rehearse":
         dephasing = 0.5 if args.dephasing is None else args.dephasing
-        run.rehearse(folder, args.shots, dephasing)
-        payload = {"run": str(folder), "shots": args.shots, "decoupled_dephasing": dephasing}
+        run.rehearse(folder, shots, dephasing)
+        payload = {"run": str(folder), "shots": shots, "decoupled_dephasing": dephasing}
         lines = [
-            f"Simulated {args.shots} shots per memory circuit into {folder / run.REHEARSAL}",
+            f"Simulated {shots} shots per memory circuit into {folder / run.REHEARSAL}",
             f"Analyze them with: heavyhex experiment analyze --rehearsal --run {folder}",
         ]
         return _emit(payload, lines, as_json=args.json)
@@ -231,7 +250,7 @@ def _experiment_command(args: argparse.Namespace) -> int:
             raise ValueError(f"prepared on {prepared}; Fez recalibrates daily, prepare it again")
         run.check_settings(info)
         run.refuse_resubmit(folder)
-        run.refuse_another_job()
+        run.refuse_another_job()  # the job count and the QPU time in all
         then, now = info.get("code"), run.commit()
         if not then or then["changed"] or not now or now["code"] != then["code"]:
             raise ValueError(
@@ -248,22 +267,25 @@ def _experiment_command(args: argparse.Namespace) -> int:
 
         from .experiment.circuits import piece_shots
 
-        each = piece_shots(args.shots)
+        each = piece_shots(shots)
         backend = QiskitRuntimeService().backend(info["backend"])  # read-only
-        seconds = run.qpu_seconds(info, args.shots, backend)
+        seconds = run.qpu_seconds(info, shots, backend)
+        limit = run.job_limit()
         print(
             f"About to send {len(info['seconds'])} circuits ({len(info['order'])} pieces of "
             f"{each} shots) to {info['backend']}: about {seconds:.0f} s of QPU time by "
-            f"IBM's rule. Limit {run.QPU_SECONDS_LIMIT} s: IBM cancels the job if it uses "
-            "more, whatever has happened by then, and this folder is never sent again."
+            f"IBM's rule. Limit {limit} s ({run.QPU_SECONDS_LIMIT} s a job; "
+            f"{run.qpu_committed():.0f} of {run.QPU_TOTAL_SECONDS} s counted so far): IBM "
+            "cancels the job if it uses more, whatever has happened by then, and this "
+            "folder is never sent again."
         )
-        if seconds > run.QPU_SECONDS_LIMIT:
-            raise ValueError(f"over the {run.QPU_SECONDS_LIMIT} s limit; not sent")
+        if seconds > limit:
+            raise ValueError(f"over the {limit} s limit; not sent")
         if input("Type yes to send: ").strip() != "yes":
             print("Not sent.")
             return 1
         try:
-            run.submit(folder, backend, args.shots)
+            run.submit(folder, backend, shots)
         except Exception as error:  # the shots may be in; finish() can be retried by analyze
             if not (folder / run.SHOTS).exists():
                 print(_not_sent_again(folder))
@@ -295,7 +317,7 @@ def _experiment_command(args: argparse.Namespace) -> int:
     return _emit_analysis(args, analysis, folder)
 
 
-def _emit_prepared(args: argparse.Namespace, run: Any, folder: Path) -> int:
+def _emit_prepared(args: argparse.Namespace, run: Any) -> int:
     from .patches.placement import LAST_CALIBRATION, Calibration, calibrate
 
     if args.offline:
@@ -314,35 +336,73 @@ def _emit_prepared(args: argparse.Namespace, run: Any, folder: Path) -> int:
         calibration = calibrate(args.backend)  # IBM's calibration in force now, read-only
         target = QiskitRuntimeService().backend(args.backend).target  # read-only
         timing = "the device's gate times"
-    prediction = run.prepare(folder, calibration, target, offline=args.offline)
-    low, high = (prediction[str(f)]["fits"] for f in run.ENDS)
+    prepared = run.prepare_day(calibration, target, offline=args.offline)
+    shots = args.shots or run.SHOTS_PER_CIRCUIT
     lines = [
-        f"Run folder: {folder}",
         f"{calibration.backend} calibrated {calibration.calibrated}, pulled {calibration.pulled}; "
         f"timed with {timing}",
         "Predicted error per round, from decoupling leaving only T1 to leaving IBM's T2:",
     ]
-    for basis in BASES:
-        a, b = low[basis], high[basis]
-        lines.append(
-            f"  {basis} memory: d=3 {a['per_round']['3'][0]:.1%}-{b['per_round']['3'][0]:.1%}"
-            f", d=5 {a['per_round']['5'][0]:.1%}-{b['per_round']['5'][0]:.1%}"
-            f", Λ {a['lambda']:.2f}-{b['lambda']:.2f}"
+    total = 0.0
+    eps: dict = {}
+    for folder, prediction in prepared:
+        info = json.loads((folder / "run.json").read_text())
+        rep, seconds = info["rep"], run.qpu_seconds(info, shots)
+        total += seconds
+        low, high = (prediction[str(f)]["fits"] for f in run.ENDS)
+        spots = ", ".join(
+            f"d={d} at {tuple(origin)} facing {tuple(direction)}"
+            for d, (origin, direction) in sorted(rep["spots"].items())
         )
+        lines.append(
+            f"Rep {rep['rep']}, {rep['pairing']}: {folder.name} ({spots}; ~{seconds:.0f} s)"
+        )
+        for basis in BASES:
+            a, b = low[basis], high[basis]
+            parts = [
+                f"d={d} {a['per_round'][d][0]:.1%}-{b['per_round'][d][0]:.1%}"
+                for d in a["per_round"]
+            ]
+            for d in a["per_round"]:
+                eps.setdefault((rep["rep"], basis), {})[d] = (
+                    a["per_round"][d][0],
+                    b["per_round"][d][0],
+                )
+            if "lambda" in a:
+                parts.append(f"Λ {a['lambda']:.2f}-{b['lambda']:.2f}")
+            lines.append(f"  {basis} memory: {', '.join(parts)}")
+    for (r, basis), found in sorted(eps.items()):
+        pairing = next(
+            json.loads((f / "run.json").read_text())["rep"]["pairing"]
+            for f, _ in prepared
+            if json.loads((f / "run.json").read_text())["rep"]["rep"] == r
+        )
+        if pairing == "split" and {"3", "5"} <= set(found):
+            ends = [found["3"][k] / found["5"][k] for k in (0, 1)]
+            lines.append(
+                f"Rep {r} {basis} memory Λ, across its two jobs: {ends[0]:.2f}-{ends[1]:.2f}"
+            )
     lines += [
+        f"The day's jobs need about {total:.0f} s of QPU time by IBM's rule at {shots} shots; "
+        f"{run.qpu_committed():.0f} of {run.QPU_TOTAL_SECONDS} s are counted so far",
         "Redraw the blueprint with: python docs/figures/draw_blueprint.py",
-        "Commit and push the run folder, so the prediction is on record before the run.",
+        "Commit and push the run folders, so the predictions are on record before the run.",
         "Offline runs can't be sent; prepare again without --offline on the run day."
         if args.offline
-        else f"Sending it uses the QPU: heavyhex experiment submit --run {folder}",
+        else "Send them in this order; each uses the QPU: heavyhex experiment submit --run <folder>",
     ]
-    payload = {"run": str(folder), "prediction": {f: p["fits"] for f, p in prediction.items()}}
+    payload = {
+        "runs": [str(folder) for folder, _ in prepared],
+        "prediction": {
+            folder.name: {f: p["fits"] for f, p in prediction.items()}
+            for folder, prediction in prepared
+        },
+    }
     return _emit(payload, lines, as_json=args.json)
 
 
 def _emit_analysis(args: argparse.Namespace, analysis: dict, folder: Path) -> int:
-    from .experiment.circuits import SETTINGS
-    from .experiment.run import DRIFT_BAR, LEAKAGE_BAR
+    from .experiment.run import DRIFT_BAR, LEAKAGE_BAR, SETTINGS  # the circuits analyze used
 
     seen, expected = analysis["observed"], analysis["predicted_at_measured_dephasing"]
     after = analysis["predicted_from_calibration_after"]
@@ -399,25 +459,34 @@ def _emit_analysis(args: argparse.Namespace, analysis: dict, folder: Path) -> in
         ]
         if unmeasured:
             lines.append(f"The idle test can't pin these down: {', '.join(unmeasured)}")
-    lines.append(f"{'':28s} {'observed':>18s} {'predicted':>18s}")
+    patches = analysis["patches"]
+    rep = analysis.get("rep") or {}
+    if rep:
+        lines.append(
+            f"Rep {rep['rep']} of {rep['day']}, {rep['pairing']}"
+            + ("; combine gives its Λ once both its jobs are analyzed" if len(patches) < 2 else "")
+        )
+    heads = " ".join(f"{'d=' + p:>8s}" for p in patches)
+    lines.append(f"{'':28s} observed {heads}  predicted {heads}")
     for setting, got, want in zip(SETTINGS, seen["settings"], expected["settings"]):
         if setting.decoded:
-            got3, got5 = got["logical_error"]
-            want3, want5 = want["logical_error"]
-            lines.append(f"{setting!s:28s} {got3:8.1%} {got5:8.1%}  {want3:8.1%} {want5:8.1%}")
+            mine = " ".join(f"{v:8.1%}" for v in got["logical_error"])
+            theirs = " ".join(f"{v:8.1%}" for v in want["logical_error"])
+            lines.append(f"{setting!s:28s}          {mine}            {theirs}")
     for basis in BASES:
         got, want = seen["fits"][basis], expected["fits"][basis]
-        later = (
-            f", {after['fits'][basis]['lambda']:.2f} from the later calibration" if after else ""
-        )
-        verdict = f", {got['verdict']}" if basis == "X" else ""
-        lines.append(
-            f"{basis} memory per round: d=3 {got['per_round']['3'][0]:.2%}, "
-            f"d=5 {got['per_round']['5'][0]:.2%}, Λ {got['lambda']:.2f} ± "
-            f"{got['lambda_uncertainty']:.2f}{verdict} "
-            f"(predicted {want['per_round']['3'][0]:.2%}, {want['per_round']['5'][0]:.2%}, "
-            f"Λ {want['lambda']:.2f}{later})"
-        )
+        each = ", ".join(f"d={d} {got['per_round'][d][0]:.2%}" for d in patches)
+        wanted = ", ".join(f"{want['per_round'][d][0]:.2%}" for d in patches)
+        if "lambda" in got:
+            later = (
+                f", {after['fits'][basis]['lambda']:.2f} from the later calibration"
+                if after
+                else ""
+            )
+            verdict = f", {got['verdict']}" if basis == "X" else ""
+            each += f", Λ {got['lambda']:.2f} ± {got['lambda_uncertainty']:.2f}{verdict}"
+            wanted += f", Λ {want['lambda']:.2f}{later}"
+        lines.append(f"{basis} memory per round: {each} (predicted {wanted})")
     agreement = analysis["agreement"]
     gaps = [row["calibration_gap"] for row in agreement["tests"].values()]
     lines.append(
@@ -434,15 +503,17 @@ def _emit_analysis(args: argparse.Namespace, analysis: dict, folder: Path) -> in
     )
     for basis in BASES:
         window = seen["fits"][basis]["from_round_2"]
-        lines.append(
-            f"{basis} memory from round 2 (exploratory): Λ {window['lambda']:.2f} ± "
-            f"{window['lambda_uncertainty']:.2f} (predicted "
-            f"{expected['fits'][basis]['from_round_2']['lambda']:.2f})"
-        )
+        if "lambda" in window:
+            lines.append(
+                f"{basis} memory from round 2 (exploratory): Λ {window['lambda']:.2f} ± "
+                f"{window['lambda_uncertainty']:.2f} (predicted "
+                f"{expected['fits'][basis]['from_round_2']['lambda']:.2f})"
+            )
     memory = analysis["dephasing_from_memory"]
     lines.append(
         f"f read off X memory (exploratory): {memory['from_eps3']:.2f} ± "
-        f"{memory['from_eps3_uncertainty']:.2f} from ε₃, {memory['from_detector_rates']:.2f} "
+        f"{memory['from_eps3_uncertainty']:.2f} from ε{'₃' if memory['from_eps'] == '3' else '₅'}, "
+        f"{memory['from_detector_rates']:.2f} "
         f"from detector rates; agree with the idle test: {memory['eps3_agrees']}, "
         f"{memory['detector_rates_agree']}"
     )
@@ -485,6 +556,46 @@ def _emit_analysis(args: argparse.Namespace, analysis: dict, folder: Path) -> in
     return _emit({"run": str(folder), **analysis}, lines, as_json=args.json)
 
 
+def _emit_combined(args: argparse.Namespace, combined: dict) -> int:
+    lines = []
+    if combined["shots_from"] != "shots.npz":
+        lines.append(f"REHEARSAL: these are simulated shots from {combined['shots_from']}")
+    lines.append(f"{len(combined['reps'])} reps over {combined['days']} days")
+    for entry in combined["reps"]:
+        row = entry["tests"]["X lambda"]
+        spots = ", ".join(
+            f"d={d} {tuple(origin)}" for d, (origin, _) in sorted(entry["spots"].items())
+        )
+        lines.append(
+            f"  {entry['day']} rep {entry['rep']} ({entry['pairing']}; {spots}): X Λ "
+            f"{row['observed']:.2f} ± {row['observed_uncertainty']:.2f}, predicted "
+            f"{row['predicted']:.2f}, {'agrees' if row['agrees'] else 'disagrees'}; "
+            f"{entry['verdict']}"
+        )
+    pooled = combined["pooled_x"]
+    if pooled:
+        lines.append(
+            f"X memory Λ over every rep: {pooled['lambda']:.2f} ± "
+            f"{pooled['lambda_uncertainty']:.2f}, {pooled['verdict']} "
+            f"(predicted {pooled['predicted']:.2f})"
+        )
+        lines.append(
+            "Simulation matches the chip over the reps: "
+            + ", ".join(
+                f"{basis} {'yes' if ok else 'no'}" for basis, ok in combined["matches"].items()
+            )
+            + " ("
+            + ", ".join(
+                f"{name} χ² {row['chi2']:.1f} of {row['bar']:.1f}"
+                for name, row in combined["model"].items()
+            )
+            + ")"
+        )
+    if combined["incomplete"]:
+        lines.append(f"Waiting for the other job of: {combined['incomplete']}")
+    return _emit(combined, lines, as_json=args.json)
+
+
 COMMANDS = {
     "info": _info_command,
     "circuit": _circuit_command,
@@ -520,18 +631,18 @@ def build_parser() -> argparse.ArgumentParser:
 
     experiment = sub.add_parser(
         "experiment",
-        help="The hardware run: prepare, rehearse, submit (uses the QPU) or analyze",
+        help="The hardware run: prepare a day, rehearse, submit (uses the QPU), analyze, combine",
     )
-    experiment.add_argument("step", choices=("prepare", "rehearse", "submit", "analyze"))
+    experiment.add_argument("step", choices=("prepare", "rehearse", "submit", "analyze", "combine"))
     experiment.add_argument(
-        "--run", default=None, help="run folder (default: runs/<backend>-<date>)"
+        "--run", default=None, help="a job's folder, as prepare lists them (runs/<folder>)"
     )
     experiment.add_argument("--backend", default="ibm_fez")
     experiment.add_argument(
         "--shots",
         type=int,
-        default=5000,
-        help="per memory circuit, a multiple of 4; each idle readout gets half",
+        default=None,
+        help="per memory circuit, a multiple of 4 (default 2,500); each idle readout gets half",
     )
     experiment.add_argument(
         "--offline",
@@ -544,7 +655,7 @@ def build_parser() -> argparse.ArgumentParser:
     experiment.add_argument(
         "--rehearsal",
         action="store_true",
-        help="with analyze: the rehearsal's simulated shots instead of the chip's",
+        help="with analyze or combine: the rehearsal's simulated shots instead of the chip's",
     )
     experiment.add_argument(
         "--dephasing",

@@ -1,7 +1,8 @@
-"""Draw the paper's Figure 1: both patches on ibm_fez.
+"""Draw the paper's Figure 1: the day's reps on ibm_fez.
 
-The patches go where heavyhex.patches.placement puts them for the given
-calibration, so redraw on run day after `heavyhex calibrate`. Runs offline.
+The patches go where heavyhex.patches.placement's day plan puts them for the
+given calibration, so redraw on run day after `heavyhex calibrate`. Rep 1 is
+drawn in full, the other reps are boxed on the chip. Runs offline.
 """
 
 from __future__ import annotations
@@ -21,6 +22,7 @@ from draw_blueprint import (
     X_RED,
     Z_BLUE,
     DeviceMap,
+    bounds,
     draw_chip_overview,
     draw_d3_device,
     draw_d5_device,
@@ -30,17 +32,19 @@ from draw_blueprint import (
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
+from matplotlib.patches import Rectangle
 from matplotlib.transforms import Bbox
 
 from heavyhex.patches.layout import HeavyHexLayout, build_layout
 from heavyhex.patches.placement import (
     WEAK_CZ,
     Calibration,
-    best_spots,
     broken_coupler,
+    day_plan,
 )
 
 WEAK_BAND = "#C8C8C8"
+OTHER_REP = "#1B7A3D"  # boxes of the reps after the first
 GAP = 3  # points between a label and anything else
 LABEL = dict(fontsize=9.5, fontweight="bold", color=INK, zorder=9, path_effects=HALO)
 
@@ -139,6 +143,7 @@ def draw_key(fig: Figure, below: Axes) -> None:
             Line2D(
                 [], [], color=WEAK_BAND, lw=10, label=f"coupler with CZ error above {WEAK_CZ:.0%}"
             ),
+            Line2D([], [], color=OTHER_REP, lw=1.8, ls=":", label="a later rep's patch, in (a)"),
         ],
         loc="upper center",
         ncol=4,
@@ -150,8 +155,48 @@ def draw_key(fig: Figure, below: Axes) -> None:
     )
 
 
+def box_later_reps(ax: Axes, device: DeviceMap, plan: list) -> None:
+    """(a) Box each patch of the reps after the first, labelled with its rep."""
+    for r, jobs in enumerate(plan[1:], start=2):
+        for job in jobs:
+            for d, spot in job.items():
+                layout = build_layout(
+                    d, device.coords, device.edges, origin=spot.origin, direction=spot.direction
+                )
+                x0, x1, y0, y1 = bounds(device.pos, layout.physical_qubits)
+                pad = 0.45  # inside rep 1's boxes, so the two stay apart
+                ax.add_patch(
+                    Rectangle(
+                        (x0 - pad, y0 - pad),
+                        x1 - x0 + 2 * pad,
+                        y1 - y0 + 2 * pad,
+                        facecolor="none",
+                        edgecolor=OTHER_REP,
+                        lw=1.8,
+                        linestyle=":",
+                        zorder=6,
+                    )
+                )
+                alone = "" if len(jobs) == 1 else ", own job"
+                ax.text(
+                    x0 - pad,
+                    y1 + pad + 0.25,
+                    f"rep {r}: d={d}{alone}",
+                    fontsize=8.5,
+                    color=OTHER_REP,
+                    fontweight="bold",
+                    va="top",
+                    path_effects=HALO,
+                    zorder=9,
+                )
+
+
 def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
-    spots = best_spots(device.coords, device.edges, calibration)
+    plan = day_plan(device.coords, device.edges, calibration)
+    if not plan:
+        raise ValueError("no clean place for the d=5 patch: no rep to draw")
+    (first, *_) = plan[0]
+    spots = first if len(plan[0]) == 1 else {**plan[0][1], **plan[0][0]}
     d3, d5 = (
         build_layout(
             d, device.coords, device.edges, origin=spots[d].origin, direction=spots[d].direction
@@ -181,17 +226,20 @@ def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
         ax.axis("off")
 
     draw_chip_overview(ax_chip, device, ((d3, d3_roles), (d5, d5_roles)))
+    box_later_reps(ax_chip, device, plan)
     draw_d3_device(ax_d3, device, d3, d3_roles)
     draw_d5_device(ax_d5, device, d5, d5_roles)
     for text in ax_d3.texts:
         if text.get_text().isdigit():
             text.set_text(f"q{text.get_text()}")
-    ax_chip.set_title(f"(a) both patches on the {len(device.pos)}-qubit chip", fontsize=12)
+    shown = "rep 1 drawn, the rest boxed" if len(plan) > 1 else "one rep"
+    ax_chip.set_title(f"(a) the day's reps on the chip: {shown}", fontsize=12)
     ax_d3.set_title(
-        f"(b) d = 3: {len(d3.data)} data qubits, {len(d3.physical_qubits)} in all", fontsize=12
+        f"(b) rep 1, d = 3: {len(d3.data)} data qubits, {len(d3.physical_qubits)} in all",
+        fontsize=12,
     )
     ax_d5.set_title(
-        f"(c) d = 5: {len(d5.data)} data qubits, {len(d5.physical_qubits)} in all",
+        f"(c) rep 1, d = 5: {len(d5.data)} data qubits, {len(d5.physical_qubits)} in all",
         fontsize=12,
     )
 

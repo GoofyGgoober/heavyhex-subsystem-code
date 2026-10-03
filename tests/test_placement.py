@@ -13,8 +13,12 @@ from heavyhex.patches.operators import build_operators
 from heavyhex.patches.placement import (
     Calibration,
     best_spots,
+    chip_qubits,
+    clean_places,
     cost,
+    day_plan,
     fez_qubits,
+    neighbourhood,
     problems,
     spots,
     todays_calibration,
@@ -25,6 +29,19 @@ FIGURES = Path(__file__).resolve().parents[1] / "docs" / "figures"
 DEVICE = json.loads((FIGURES / "fez_map.json").read_text())
 COORDS, EDGES = DEVICE["coords"], DEVICE["edges"]
 SAVED = Calibration.load(FIGURES / "fez_calibration.json")
+# IBM's calibration of 3 October 2026, 17:05 UTC: two clean places for the d=5 patch, and
+# none for the d=3 patch beside the second. Kept fixed, unlike the day's calibration.
+OCTOBER_3 = Calibration.load(Path(__file__).parent / "data" / "fez_calibration_2026-10-03.json")
+# Every part working and alike, so every place is clean.
+ALL_GOOD = replace(
+    SAVED,
+    cz=dict.fromkeys(SAVED.cz, 0.003),
+    readout=dict.fromkeys(SAVED.readout, 0.01),
+    t1_us=dict.fromkeys(SAVED.t1_us, 150.0),
+    t2_us=dict.fromkeys(SAVED.t2_us, 100.0),
+    single_qubit=None,
+    broken_qubits=(),
+)
 
 
 def pulled(days_ago: int) -> str:
@@ -176,3 +193,64 @@ def test_a_past_calibration_comes_from_ibms_history():
     then = Calibration.from_device(Then(), at=datetime.now())
     assert then.readout == now.readout and then.single_qubit == pytest.approx(now.single_qubit)
     assert then.cz.keys() == now.cz.keys()
+
+
+def layout_at(distance, spot):
+    return build_layout(distance, COORDS, EDGES, origin=spot.origin, direction=spot.direction)
+
+
+def test_a_place_is_listed_once_at_its_best_spot():
+    places = clean_places(3, COORDS, EDGES, ALL_GOOD)
+    footprints = [frozenset(layout.physical_qubits) for _, layout in places]
+    assert len(footprints) == len(set(footprints)) == 30
+    costs = [cost(layout, ALL_GOOD) for _, layout in places]
+    assert costs == sorted(costs)
+
+
+def test_the_day_has_a_rep_for_each_clean_d5_place_up_to_two():
+    plan = day_plan(COORDS, EDGES, OCTOBER_3)
+    assert len(plan) == 2 == len(clean_places(5, COORDS, EDGES, OCTOBER_3))
+    first, second = plan
+    assert first == [best_spots(COORDS, EDGES, OCTOBER_3)]  # the usual pair, in one job
+    # No clean d=3 place misses the second d=5 place, so d=3 runs alone straight after.
+    assert [set(job) for job in second] == [{5}, {3}]
+    assert day_plan(COORDS, EDGES, OCTOBER_3, reps=1) == [first]
+
+
+@pytest.mark.parametrize("calibration", [ALL_GOOD, OCTOBER_3], ids=["all good", "3 October"])
+def test_each_rep_puts_d3_on_a_place_of_its_own_beside_d5_when_it_can(calibration):
+    used = []
+    plan = day_plan(COORDS, EDGES, calibration)
+    assert len(plan) == 2
+    for jobs in plan:
+        five = layout_at(5, jobs[0][5])
+        three = layout_at(3, jobs[0][3] if len(jobs) == 1 else jobs[1][3])
+        place = frozenset(three.physical_qubits)
+        assert place not in used
+        beside = [
+            layout
+            for _, layout in clean_places(3, COORDS, EDGES, calibration)
+            if frozenset(layout.physical_qubits) not in used
+            and not layout.physical_qubits & neighbourhood(five, EDGES)
+        ]
+        if len(jobs) == 1:  # in one job: it doesn't touch d=5
+            assert not three.physical_qubits & neighbourhood(five, EDGES)
+            assert three.physical_qubits == beside[0].physical_qubits
+        else:  # alone, straight after: only when nothing fits beside
+            assert not beside and [set(job) for job in jobs] == [{5}, {3}]
+        used.append(place)
+
+
+def test_no_clean_d5_place_means_no_rep():
+    broken = replace(ALL_GOOD, broken_qubits=tuple(ALL_GOOD.t1_us)[::4])
+    assert not clean_places(5, COORDS, EDGES, broken) or day_plan(COORDS, EDGES, broken)
+    nothing = replace(ALL_GOOD, cz=dict.fromkeys(ALL_GOOD.cz, 1.0))
+    with pytest.raises(ValueError, match="no clean place for the d=3 patch"):
+        day_plan(COORDS, EDGES, nothing)
+
+
+def test_a_given_spot_gets_its_own_qubits():
+    (job,) = day_plan(COORDS, EDGES, OCTOBER_3)[0]
+    assert fez_qubits(5, OCTOBER_3) == fez_qubits(5, OCTOBER_3, job[5])
+    alone = day_plan(COORDS, EDGES, OCTOBER_3)[1][0][5]
+    assert fez_qubits(5, OCTOBER_3, alone) == chip_qubits(layout_at(5, alone))
