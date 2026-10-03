@@ -5,6 +5,7 @@ import shutil
 from collections import Counter
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -27,6 +28,12 @@ SAVED = Calibration.load(LAST_CALIBRATION)
 # Every CZ working, so both patches can be placed, and FakeFez's gate times, as TARGET has.
 WORKING = replace(SAVED, cz=dict.fromkeys(SAVED.cz, 0.003), durations_ns=None)
 pytestmark = pytest.mark.filterwarnings("ignore:.*weak parts")
+
+
+@pytest.fixture(autouse=True)
+def scratch_runs(tmp_path, monkeypatch):
+    """Run folders go to a scratch place, so the repository's own runs and jobs never count."""
+    monkeypatch.setattr(run, "RUNS", tmp_path / "runs")
 
 
 def chips():
@@ -226,7 +233,7 @@ def test_submit_refuses_a_run_prepared_offline(tmp_path, capsys):
     assert "prepared offline" in capsys.readouterr().err
 
 
-def prepared_today(folder):
+def prepared_today(folder, seconds=1e-4):
     from dataclasses import asdict
 
     from heavyhex.experiment.circuits import SETTINGS, job_order
@@ -237,6 +244,7 @@ def prepared_today(folder):
         "settings": [asdict(s) for s in SETTINGS],
         "order": job_order(SETTINGS),
         "code": CLEAN,
+        "seconds": [seconds] * len(SETTINGS),  # each circuit's length
     }
     (folder / "run.json").write_text(json.dumps(info))
 
@@ -304,6 +312,144 @@ def test_submit_refuses_yesterdays_run(tmp_path, capsys):
     (tmp_path / "run.json").write_text(json.dumps({"offline": False, "prepared": prepared}))
     assert main(["experiment", "submit", "--run", str(tmp_path)]) == 2
     assert "prepare it again" in capsys.readouterr().err
+
+
+QPU = SimpleNamespace(
+    name="ibm_fez", configuration=lambda: SimpleNamespace(default_rep_delay=250e-6)
+)
+
+
+def fake_ibm(monkeypatch, tmp_path, ibm_estimate=None, reply_lost=False):
+    """IBM's sampler and jobs stood in for, recording what submit asks. No QPU is involved."""
+    import qiskit_ibm_runtime
+    from qiskit_ibm_runtime.exceptions import IBMRuntimeError, RuntimeJobMaxTimeoutError
+
+    from heavyhex.experiment.circuits import SETTINGS
+
+    sent = SimpleNamespace(options=None, circuits=None, cancelled=False)
+
+    class Job:  # as IBM leaves a job it stopped at the limit
+        usage_estimation = {"quantum_seconds": ibm_estimate}
+
+        def job_id(self):
+            return "fake"
+
+        def cancel(self):
+            sent.cancelled = True
+
+        def result(self):
+            raise RuntimeJobMaxTimeoutError("Error code 1305; Ran too long")
+
+        def metrics(self):
+            return {"timestamps": {}, "usage": {"quantum_seconds": 50, "status": "complete"}}
+
+        def status(self):
+            return "ERROR"
+
+        def error_message(self):
+            return "Ran too long"
+
+    class Sampler:
+        def __init__(self, mode):
+            self.options = sent.options = SimpleNamespace(
+                default_shots=None,
+                max_execution_time=None,
+                environment=SimpleNamespace(job_tags=None),
+                dynamical_decoupling=SimpleNamespace(enable=True),
+                twirling=SimpleNamespace(enable_gates=True, enable_measure=True),
+            )
+
+        def run(self, circuits):
+            sent.circuits = circuits
+            if reply_lost:  # IBM took the job, but its reply never came
+                raise IBMRuntimeError("Failed to run program: read timed out")
+            return Job()
+
+    class Service:
+        def job(self, job_id):
+            return Job()
+
+    monkeypatch.setattr(qiskit_ibm_runtime, "SamplerV2", Sampler)
+    monkeypatch.setattr(qiskit_ibm_runtime, "QiskitRuntimeService", Service)
+    monkeypatch.setattr(run, "load_circuits", lambda folder: list(range(len(SETTINGS))))
+    monkeypatch.setattr(run, "commit", lambda: CLEAN)
+    folder = run.RUNS / "today"
+    folder.mkdir(parents=True)
+    return sent, folder
+
+
+def test_ibm_cancels_the_job_past_50_s_of_qpu_time_and_it_is_never_sent_again(
+    tmp_path, monkeypatch
+):
+    from qiskit_ibm_runtime.exceptions import RuntimeJobMaxTimeoutError
+
+    sent, folder = fake_ibm(monkeypatch, tmp_path, ibm_estimate=30.0)
+    prepared_today(folder)  # 2 s + 68 pieces x 1,250 shots x 350 us: about 32 s
+    with pytest.raises(RuntimeJobMaxTimeoutError, match="Ran too long"):
+        run.submit(folder, QPU, 5000)
+    assert sent.options.max_execution_time == run.QPU_SECONDS_LIMIT == 50
+    assert sent.options.environment.job_tags == ["heavyhex:today"]
+    assert not sent.options.dynamical_decoupling.enable
+    record = json.loads((folder / "job.json").read_text())
+    assert record["job"] == "fake" and record["qpu_seconds_limit"] == 50
+    assert record["qpu_seconds_estimate"] == pytest.approx(2 + 68 * 1250 * 350e-6)
+    assert record["status"] == "ERROR" and record["reason"] == "Ran too long"
+    assert record["usage"]["quantum_seconds"] == 50
+    with pytest.raises(ValueError, match="already has a job"):
+        run.submit(folder, QPU, 5000)
+    with pytest.raises(ValueError, match="ended ERROR without shots .Ran too long."):
+        run.fetch(folder)  # analyze says so, and sends nothing
+
+
+def test_a_job_estimated_past_the_limit_is_not_sent(tmp_path, monkeypatch):
+    sent, folder = fake_ibm(monkeypatch, tmp_path)
+    prepared_today(folder, seconds=1e-3)  # about 108 s
+    with pytest.raises(ValueError, match="over the 50 s limit; not sent"):
+        run.submit(folder, QPU, 5000)
+    assert sent.circuits is None and not (folder / "job.json").exists()
+
+
+def test_a_job_ibm_estimates_past_the_limit_is_cancelled_before_it_runs(tmp_path, monkeypatch):
+    sent, folder = fake_ibm(monkeypatch, tmp_path, ibm_estimate=80.0)
+    prepared_today(folder)
+    with pytest.raises(ValueError, match="cancelled before it ran"):
+        run.submit(folder, QPU, 5000)
+    assert sent.cancelled
+    assert json.loads((folder / "job.json").read_text())["qpu_seconds_ibm_estimate"] == 80.0
+
+
+def test_a_job_whose_reply_from_ibm_is_lost_is_never_sent_again(tmp_path, monkeypatch):
+    from qiskit_ibm_runtime.exceptions import IBMRuntimeError
+
+    sent, folder = fake_ibm(monkeypatch, tmp_path, reply_lost=True)
+    prepared_today(folder)
+    with pytest.raises(IBMRuntimeError):
+        run.submit(folder, QPU, 5000)
+    record = json.loads((folder / "job.json").read_text())
+    assert record["job"] is None and record["tag"] == "heavyhex:today"
+    with pytest.raises(ValueError, match="already has a job"):
+        run.submit(folder, QPU, 5000)
+    with pytest.raises(ValueError, match="reply never came.*job_tags"):
+        run.fetch(folder)
+
+
+def test_no_second_job_goes_to_the_qpu_from_another_folder(tmp_path, monkeypatch):
+    sent, folder = fake_ibm(monkeypatch, tmp_path)
+    prepared_today(folder)
+    (tmp_path / "runs" / "earlier").mkdir()
+    (tmp_path / "runs" / "earlier" / "job.json").write_text("{}")
+    with pytest.raises(ValueError, match="runs/earlier already sent a job"):
+        run.submit(folder, QPU, 5000)
+    assert sent.circuits is None and not (folder / "job.json").exists()
+
+
+def test_drift_sets_the_first_half_of_every_pieces_shots_against_the_second(tmp_path):
+    import numpy as np
+
+    ran = np.array([[0], [0], [1], [1]], dtype=bool)  # shots in the order they ran
+    np.savez(tmp_path / run.SHOTS, **{"0/0/0/m": ran, "1/0/1/m": ran})
+    first, second = (run.load_shots(tmp_path, half=half)[0]["m"] for half in (0, 1))
+    assert not first.any() and second.all() and len(first) == len(second) == 4
 
 
 def test_default_folder_is_under_runs():

@@ -3,12 +3,14 @@
 prepare: place the patches from the day's calibration, translate the circuits
 for the chip, and freeze the simulator's prediction. rehearse: fake the chip's
 shots with the simulator, into rehearsal.npz. submit: send the circuits (uses
-the QPU), then save the shots and IBM's calibration as the job finished. analyze:
-decode the shots and compare with the prediction.
+the QPU, at most QPU_SECONDS_LIMIT of it), then save the shots and IBM's
+calibration as the job finished. analyze: decode the shots and compare with the
+prediction.
 
-The job runs every circuit's shots in BLOCKS blocks, each block in its own
-shuffled order, so the blocks show drift during the job. Every piece of the job
-takes the same number of shots.
+The job lists every circuit's pieces in BLOCKS blocks, each in its own shuffled
+order, and every piece takes the same number of shots. IBM runs a job shot by shot
+across all its circuits, so the first and second halves of each piece's shots are
+the job's first and second halves in time: comparing them shows drift during the job.
 """
 
 from __future__ import annotations
@@ -16,6 +18,7 @@ from __future__ import annotations
 import gzip
 import json
 import subprocess
+from contextlib import suppress
 from dataclasses import asdict
 from datetime import datetime, timezone
 from math import log, sqrt
@@ -28,7 +31,6 @@ from ..patches.placement import Calibration, fez_qubits
 from ..simulation.noisy import add_detectors, fit_per_round
 from ..simulation.scheduled import noisy_scheduled
 from .circuits import (
-    BLOCKS,
     DISTANCES,
     ROUNDS,
     SETTINGS,
@@ -60,9 +62,19 @@ LOOSEST_F = 0.5
 # A rise in detection rate over the rounds, beyond the prediction, by more than this
 # many standard errors counts as leakage or heating. Set before the run.
 LEAKAGE_BAR = 3.0
-# A change between the job's early and late blocks beyond this many standard errors, in
-# any of the four ε, counts as drift. Set before the run; a drift-free rehearsal reached 3.1.
+# A change between the first and second halves of the job's shots beyond this many
+# standard errors, in any of the four ε, counts as drift. Set before the run; a drift-free
+# rehearsal reached 3.1.
 DRIFT_BAR = 3.5
+# The job may use this much QPU time and no more: IBM cancels it there, whatever has
+# happened by then, and a run folder that had a job is never sent again. Set by the author.
+QPU_SECONDS_LIMIT = 50
+# Jobs the author approved, across every run folder: one more is refused.
+QPU_JOBS_LIMIT = 1
+# IBM's rule for a sampler job's QPU time: about 2 s to load it, then the repetition delay
+# and the circuit for every shot (quantum.cloud.ibm.com/docs/guides/estimate-job-run-time).
+LOAD_SECONDS = 2.0
+REP_DELAY = 250e-6  # IBM's default, when the backend doesn't say
 
 
 SHOTS, REHEARSAL = "shots.npz", "rehearsal.npz"
@@ -161,39 +173,113 @@ def submit(folder: Path, backend: Any, shots: int) -> None:
     """Send the run's circuits and save every shot. Uses QPU time on a real backend.
 
     shots is per memory circuit; each idle readout gets half. Refuses a run that
-    already has a job: analyze fetches its shots.
+    already has a job: analyze fetches its shots. On the QPU the job is capped at
+    QPU_SECONDS_LIMIT: it isn't sent if it's estimated to need more, it's cancelled
+    before it runs if IBM's estimate, read once as it's queued, is more, and IBM
+    cancels it if it uses more. job.json claims the folder before anything is sent,
+    so even a job whose reply from IBM is lost is never sent twice.
     """
     from qiskit_ibm_runtime import SamplerV2
 
     run = _read(folder / "run.json")
     check_settings(run)
-    if run["offline"] and not _is_local(backend):
+    on_qpu = not _is_local(backend)
+    if run["offline"] and on_qpu:
         raise ValueError("this run was prepared offline; prepare it again before using the QPU")
     refuse_resubmit(folder)
+    if on_qpu:
+        refuse_another_job()
     each = piece_shots(shots)
+    estimate = qpu_seconds(run, shots, backend) if on_qpu else 0.0
+    if estimate > QPU_SECONDS_LIMIT:
+        raise ValueError(
+            f"the job would need about {estimate:.0f} s of QPU time, "
+            f"over the {QPU_SECONDS_LIMIT} s limit; not sent"
+        )
     sampler = SamplerV2(mode=backend)
     sampler.options.default_shots = each
-    if not _is_local(backend):
+    tag = f"heavyhex:{folder.name}"  # finds the job in IBM's list if its reply is lost
+    if on_qpu:
+        sampler.options.max_execution_time = QPU_SECONDS_LIMIT  # IBM cancels the job past it
+        sampler.options.environment.job_tags = [tag]
         # IBM's own decoupling and twirling would change the circuit the prediction is for.
         sampler.options.dynamical_decoupling.enable = False
         sampler.options.twirling.enable_gates = False
         sampler.options.twirling.enable_measure = False
     circuits = load_circuits(folder)
-    job = sampler.run([circuits[i] for i, _ in run["order"]])
     record = {
-        "job": job.job_id(),
+        "job": None,  # until IBM's reply gives the job's id
+        "tag": tag,
         "backend": backend.name,
         "shots": shots,
         "shots_per_piece": each,
         "submitted": _now(),
         "submitted_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "code": commit(),
+        "qpu_seconds_limit": QPU_SECONDS_LIMIT if on_qpu else None,
+        "qpu_seconds_estimate": estimate if on_qpu else None,
     }
-    with open(folder / "job.json", "x") as f:  # never over an earlier job's record
+    with open(folder / "job.json", "x") as f:  # claims the folder, never over an earlier job
         f.write(json.dumps(record, indent=1) + "\n")
-    save_shots(folder, job.result())
-    if not _is_local(backend):
+    job = sampler.run([circuits[i] for i, _ in run["order"]])
+    record["job"] = job.job_id()
+    _write(folder / "job.json", record)
+    if on_qpu:
+        try:
+            ibm = (job.usage_estimation or {}).get("quantum_seconds")
+        except Exception:  # only a second look; IBM enforces the limit either way
+            ibm = None
+        record["qpu_seconds_ibm_estimate"] = ibm
+        _write(folder / "job.json", record)
+        if ibm is not None and ibm > QPU_SECONDS_LIMIT:
+            try:
+                job.cancel()
+                outcome = "cancelled before it ran"
+            except Exception as error:
+                outcome = f"cancelling failed ({error}), so IBM stops it at the limit"
+            with suppress(Exception):
+                finish(folder, job)
+            raise ValueError(
+                f"IBM estimates the job at {ibm:.0f} s of QPU time, over the "
+                f"{QPU_SECONDS_LIMIT} s limit; {outcome}"
+            )
+    try:
+        result = job.result()
+    except Exception:
+        if on_qpu:
+            with suppress(Exception):
+                finish(folder, job)  # what a cancelled or failed job used, and when
+        raise
+    save_shots(folder, result)
+    if on_qpu:
         finish(folder, job)
+
+
+def qpu_seconds(run: dict, shots: int, backend: Any = None) -> float:
+    """The job's QPU time by IBM's rule: loading, then rep delay and circuit per shot."""
+    each = piece_shots(shots)
+    configuration = getattr(backend, "configuration", None)
+    rest = getattr(configuration(), "default_rep_delay", None) if configuration else None
+    rest = rest or REP_DELAY
+    return LOAD_SECONDS + each * sum(run["seconds"][i] + rest for i, _ in run["order"])
+
+
+def refuse_another_job() -> None:
+    """Refuse once the run folders hold as many jobs as the author approved."""
+    sent = sorted(p.parent.name for p in RUNS.glob("*/job.json"))
+    if len(sent) >= QPU_JOBS_LIMIT:
+        raise ValueError(
+            f"runs/{sent[0]} already sent a job, and {QPU_JOBS_LIMIT} was approved in all; "
+            "nothing more goes to the QPU without the author's new approval"
+        )
+
+
+def usage_pending(folder: Path) -> bool:
+    """Whether IBM is still counting the QPU time of the folder's job."""
+    record = _read(folder / "job.json")
+    if record.get("qpu_seconds_limit") is None or record.get("job") is None:
+        return False  # a local run, or a job IBM's reply never named
+    return (record.get("usage") or {}).get("status") != "complete"
 
 
 def refuse_resubmit(folder: Path) -> None:
@@ -217,8 +303,13 @@ def finish(folder: Path, job: Any) -> None:
     from qiskit_ibm_runtime import QiskitRuntimeService
 
     record = _read(folder / "job.json")
-    stamps = (job.metrics() or {}).get("timestamps", {})
+    metrics = job.metrics() or {}
+    stamps = metrics.get("timestamps", {})
     record.update({f"{name}_utc": stamps.get(name) for name in ("created", "running", "finished")})
+    record["usage"] = metrics.get("usage")  # IBM's count of the QPU time; "status" says if final
+    record["status"] = str(job.status())
+    with suppress(Exception):
+        record["reason"] = job.error_message()  # why IBM stopped it, if it did
     _write(folder / "job.json", record)
     if stamps.get("finished"):
         when = datetime.fromisoformat(stamps["finished"].replace("Z", "+00:00"))
@@ -259,10 +350,27 @@ def rehearse(
 
 
 def fetch(folder: Path) -> None:
-    """Get the shots of a submitted job from IBM (read-only)."""
+    """Get the shots of a submitted job from IBM (read-only). Never sends anything."""
     from qiskit_ibm_runtime import QiskitRuntimeService
 
-    job = QiskitRuntimeService().job(_read(folder / "job.json")["job"])
+    record = _read(folder / "job.json")
+    if record.get("job") is None:
+        raise ValueError(
+            f"a job was sent at {record.get('submitted_utc')} UTC but IBM's reply never came. "
+            "Find it, read-only, with QiskitRuntimeService().jobs(job_tags="
+            f"[{record.get('tag')!r}]) and put its id in job.json; this folder is not sent again"
+        )
+    job = QiskitRuntimeService().job(record["job"])
+    status = str(job.status())
+    if status in ("CANCELLED", "ERROR"):
+        reason = None
+        with suppress(Exception):
+            reason = job.error_message()
+            finish(folder, job)
+        raise ValueError(
+            f"job {record['job']} ended {status} without shots ({reason}); "
+            "this folder is not sent again"
+        )
     save_shots(folder, job.result())
     if not (folder / "calibration_after.json").exists():
         finish(folder, job)
@@ -289,7 +397,7 @@ def analyze(
     The idle test gives decoupled_dephasing, unless one is given: the median over
     the data qubits, used for every qubit. The memory shots are decoded, and the
     simulator rerun, with that value. Each data qubit's own value, a prediction
-    from the calibration after the run, and the blocks of the job are side checks.
+    from the calibration after the run, and the two halves of the job are side checks.
     rehearsal analyzes rehearsal.npz instead of the chip's shots.
     """
     import numpy as np
@@ -299,7 +407,7 @@ def analyze(
     calibration = Calibration.load(folder / "calibration.json")
     circuits = load_circuits(folder)
     source = REHEARSAL if rehearsal else SHOTS
-    blocks = [load_shots(folder, block, source) for block in range(BLOCKS)]
+    halves_of_shots = [load_shots(folder, source=source, half=half) for half in (0, 1)]
     shots = load_shots(folder, source=source)
 
     measured_f = _idle_dephasing(shots, circuits, calibration, run["dt"])
@@ -311,17 +419,17 @@ def analyze(
     if decoupled_dephasing is None:
         table = _dephasing_table(measured_f, run["chips"], calibration, f)
 
-    observed, by_block = [], [[] for _ in range(BLOCKS)]
+    observed, by_half = [], [[], []]
     for i, (setting, circuit) in enumerate(zip(SETTINGS, circuits)):
         if not setting.decoded:
             observed.append({"x": x_values(shots[i])})
-            for part in by_block:
+            for part in by_half:
                 part.append({})
             continue
         model, records, labels = simulated(setting, circuit, calibration, run["dt"], f)
         failed, detectors = [], []
-        for part, block in zip(by_block, blocks):
-            measurements = in_record_order(block[i], records)
+        for part, half in zip(by_half, halves_of_shots):
+            measurements = in_record_order(half[i], records)
             fired, flips = model.compile_m2d_converter().convert(
                 measurements=measurements, separate_observables=True
             )
@@ -333,7 +441,9 @@ def analyze(
         )
     count = _memory_shots(shots)
     seen = {"settings": observed, **_fits(observed, count)}
-    halves = [_fits(part, _memory_shots(block))["fits"] for part, block in zip(by_block, blocks)]
+    halves = [
+        _fits(part, _memory_shots(half))["fits"] for part, half in zip(by_half, halves_of_shots)
+    ]
 
     expected = predict(circuits, calibration, run["dt"], decoupled_dephasing=f)
     after = None
@@ -452,17 +562,24 @@ def load_circuits(folder: Path) -> list[QuantumCircuit]:
 
 
 def load_shots(
-    folder: Path, block: int | None = None, source: str = SHOTS
+    folder: Path, source: str = SHOTS, half: int | None = None
 ) -> list[dict[str, np.ndarray]]:
-    """Per circuit, each register's bits as shots x bits: one block's, or all of them."""
+    """Per circuit, each register's bits as shots x bits, from every piece of the job.
+
+    half 0 or 1 keeps the first or second half of every piece's shots, in the order
+    they ran: IBM runs the job shot by shot across all its pieces.
+    """
     import numpy as np
 
     saved = np.load(folder / source)
     parts: list[dict[str, list[tuple[int, np.ndarray]]]] = [{} for _ in SETTINGS]
     for key in saved.files:
-        k, i, b, name = key.split("/")
-        if block is None or int(b) == block:
-            parts[int(i)].setdefault(name, []).append((int(k), saved[key]))
+        k, i, _, name = key.split("/")
+        bits = saved[key]
+        if half is not None:
+            middle = len(bits) // 2
+            bits = bits[:middle] if half == 0 else bits[middle:]
+        parts[int(i)].setdefault(name, []).append((int(k), bits))
     return [
         {name: np.concatenate([bits for _, bits in sorted(found)]) for name, found in part.items()}
         for part in parts
@@ -992,7 +1109,7 @@ def _dephasing_from_memory(
 
 
 def _drift(halves: list[dict]) -> dict:
-    """ε per round in each block of the job, and the late block's change in standard errors."""
+    """ε per round in each half of the job's shots, and the second half's change in standard errors."""
     found = {}
     for basis in "XZ":
         for d in map(str, DISTANCES):
