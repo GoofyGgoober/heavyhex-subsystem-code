@@ -24,8 +24,10 @@ Data qubit ids are 0-based; the paper's Q label is id + 1.
 
 The hardware run is X and Z memory at 1-8 rounds with both patches at once, and
 an idle test, read in X and in Y, that measures f, how much of the calibrated
-dephasing the decoupling pulses leave. Every circuit's shots are split into an
-early and a late block, to show drift during the job. Each run keeps its calibration, circuits, prediction and shots in
+dephasing the decoupling pulses leave. IBM runs a job shot by shot across all its
+circuits, so each circuit's first and second halves of shots are the job's first
+and second halves in time, and comparing them shows drift during the job. Each run
+keeps its calibration, circuits, prediction and shots in
 `runs/<backend>-<date>`:
 
 ```bash
@@ -52,6 +54,12 @@ credentials. Do it all on one day: submit refuses a run prepared on another.
    `docs/figures/` (submit refuses a run that isn't committed and pushed). Note
    the commit hash (`git rev-parse HEAD`) and the UTC time (`date -u`) for the paper.
 5. `heavyhex experiment submit --run runs/<folder>` uses the QPU, and asks first.
+   The job may use at most 50 s of QPU time (`QPU_SECONDS_LIMIT` in run.py): submit
+   won't send a job estimated to need more, cancels it before it runs if IBM's own
+   estimate, read as it's queued, is higher, and IBM cancels it if it uses more. The
+   run day's job is about 27 s by IBM's rule. job.json claims the folder before
+   anything is sent, so a folder is never sent twice, and once one job has gone
+   (`QPU_JOBS_LIMIT`) no other folder is sent either.
    It saves the shots and IBM's calibration as the job finished; if the wait is
    cut short, `analyze` fetches both later. It refuses a run that already has a job.
 6. Commit the shots (`shots.npz`, `job.json`) and `calibration_after.json`.

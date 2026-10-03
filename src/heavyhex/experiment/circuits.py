@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 DISTANCES = (3, 5)
 ROUNDS = (1, 2, 3, 4, 6, 8)
 IDLE_ROUNDS = (1, 2, 4, 8, 16)
-BLOCKS = 2  # the job runs every circuit's shots in an early and a late block
+BLOCKS = 2  # the job lists every circuit's pieces twice, each time in its own shuffled order
 H_FRAME = "h frame"  # marks a wait the target spends between the H gates of a waited-out CX
 
 
@@ -73,7 +73,8 @@ SETTINGS = (
 
 def job_order(settings: tuple[Setting, ...], seed: int = 0) -> list[tuple[int, int]]:
     """(setting, block) for each piece of the job: each block holds every circuit's
-    pieces, shuffled. Comparing the blocks shows drift during the job.
+    pieces, shuffled. IBM runs the job shot by shot across all the pieces, so the
+    blocks are not early and late; drift shows in the order of each piece's shots.
     """
     import numpy as np
 

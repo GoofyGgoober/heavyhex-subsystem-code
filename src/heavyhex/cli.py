@@ -111,6 +111,36 @@ def _emit(payload: dict[str, Any], lines: Sequence[str], *, as_json: bool) -> in
     return 0
 
 
+def _usage(folder: Path) -> str:
+    """The QPU time IBM counted for the run's job, against its limit."""
+    record = json.loads((folder / "job.json").read_text()) if (folder / "job.json").exists() else {}
+    usage = record.get("usage") or {}
+    used = next(
+        (usage[key] for key in ("qpu_charge_time_seconds", "quantum_seconds") if key in usage),
+        None,
+    )
+    limit = record.get("qpu_seconds_limit")
+    if used is None:
+        return f"IBM hasn't reported the QPU time used yet (limit {limit} s)"
+    if usage.get("status") != "complete":
+        return (
+            f"IBM has counted {used} s of QPU time so far and is still counting (limit {limit} s)"
+        )
+    return f"IBM counted {used} s of QPU time (limit {limit} s)"
+
+
+def _not_sent_again(folder: Path) -> str:
+    """What a failed submit left behind."""
+    if not (folder / "job.json").exists():
+        return "Nothing was sent."
+    if json.loads((folder / "job.json").read_text()).get("job") is None:
+        return (
+            "A job may have been sent, but IBM's reply never came; analyze explains how to "
+            "find it. This folder is not sent again."
+        )
+    return f"No shots. {_usage(folder)}; this folder is not sent again."
+
+
 def _info_command(args: argparse.Namespace) -> int:
     patch = _patch(args)
     code = patch.code
@@ -396,6 +426,7 @@ def _experiment_command(args: argparse.Namespace) -> int:
             raise ValueError(f"prepared on {prepared}; Fez recalibrates daily, prepare it again")
         run.check_settings(info)
         run.refuse_resubmit(folder)
+        run.refuse_another_job()
         then, now = info.get("code"), run.commit()
         if not then or then["changed"] or not now or now["code"] != then["code"]:
             raise ValueError(
@@ -413,14 +444,16 @@ def _experiment_command(args: argparse.Namespace) -> int:
         from .experiment.circuits import piece_shots
 
         each = piece_shots(args.shots)
-        backend = QiskitRuntimeService().backend(info["backend"])
-        rest = getattr(backend.configuration(), "default_rep_delay", 250e-6)
-        seconds = each * sum(info["seconds"][i] + rest for i, _ in info["order"])
+        backend = QiskitRuntimeService().backend(info["backend"])  # read-only
+        seconds = run.qpu_seconds(info, args.shots, backend)
         print(
             f"About to send {len(info['seconds'])} circuits ({len(info['order'])} pieces of "
-            f"{each} shots) to {info['backend']}: about {seconds:.0f} s of QPU time, "
-            "plus IBM's overhead."
+            f"{each} shots) to {info['backend']}: about {seconds:.0f} s of QPU time by "
+            f"IBM's rule. Limit {run.QPU_SECONDS_LIMIT} s: IBM cancels the job if it uses "
+            "more, whatever has happened by then, and this folder is never sent again."
         )
+        if seconds > run.QPU_SECONDS_LIMIT:
+            raise ValueError(f"over the {run.QPU_SECONDS_LIMIT} s limit; not sent")
         if input("Type yes to send: ").strip() != "yes":
             print("Not sent.")
             return 1
@@ -428,9 +461,10 @@ def _experiment_command(args: argparse.Namespace) -> int:
             run.submit(folder, backend, args.shots)
         except Exception as error:  # the shots may be in; finish() can be retried by analyze
             if not (folder / run.SHOTS).exists():
+                print(_not_sent_again(folder))
                 raise
             print(f"Shots saved, but the calibration after the job wasn't: {error}")
-        print(f"Done; shots saved in {folder / run.SHOTS}")
+        print(f"Done; shots saved in {folder / run.SHOTS}. {_usage(folder)}")
         if (folder / "calibration_after.json").exists():
             after = json.loads((folder / "calibration_after.json").read_text())["calibrated"]
             before = json.loads((folder / "calibration.json").read_text())["calibrated"]
@@ -445,7 +479,9 @@ def _experiment_command(args: argparse.Namespace) -> int:
         if not (folder / "job.json").exists():
             raise ValueError(f"no shots in {folder}; submit first, or analyze --rehearsal")
         run.fetch(folder)
-    elif (folder / "job.json").exists() and not (folder / "calibration_after.json").exists():
+    elif (folder / "job.json").exists() and (
+        not (folder / "calibration_after.json").exists() or run.usage_pending(folder)
+    ):
         from qiskit_ibm_runtime import QiskitRuntimeService
 
         job_id = json.loads((folder / "job.json").read_text())["job"]
@@ -613,7 +649,7 @@ def _emit_analysis(args: argparse.Namespace, analysis: dict, folder: Path) -> in
         )
     )
     lines.append(
-        "Late block against early, in standard errors: "
+        "Second half of the shots against the first, in standard errors: "
         + ", ".join(f"{name} {row['change']:+.1f}" for name, row in analysis["drift"].items())
         + (
             "; DRIFT"
