@@ -22,12 +22,10 @@ heavyhex --help
 
 Data qubit ids are 0-based; the paper's Q label is id + 1.
 
-The hardware run is X and Z memory at 1-8 rounds with both patches at once; a
-placement test, X memory with a second d=3 patch on qubits of the d=5 patch
-beside the usual one; and an idle test, read in X and in Y, that measures f,
-how much of the calibrated dephasing the decoupling pulses leave. Every
-circuit's shots are split into an early and a late block, to show drift during
-the job. Each run keeps its calibration, circuits, prediction and shots in
+The hardware run is X and Z memory at 1-8 rounds with both patches at once, and
+an idle test, read in X and in Y, that measures f, how much of the calibrated
+dephasing the decoupling pulses leave. Every circuit's shots are split into an
+early and a late block, to show drift during the job. Each run keeps its calibration, circuits, prediction and shots in
 `runs/<backend>-<date>`:
 
 ```bash

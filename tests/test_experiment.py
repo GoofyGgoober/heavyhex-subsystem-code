@@ -20,12 +20,7 @@ import heavyhex.simulation.noisy as noisy  # noqa: E402
 from heavyhex.cli import main  # noqa: E402
 from heavyhex.experiment import run  # noqa: E402
 from heavyhex.experiment.circuits import Setting, for_fez, logical_circuit  # noqa: E402
-from heavyhex.patches.placement import (  # noqa: E402
-    LAST_CALIBRATION,
-    Calibration,
-    fez_qubits,
-    inside_qubits,
-)
+from heavyhex.patches.placement import LAST_CALIBRATION, Calibration, fez_qubits  # noqa: E402
 
 TARGET = FakeFez().target
 SAVED = Calibration.load(LAST_CALIBRATION)
@@ -34,7 +29,7 @@ pytestmark = pytest.mark.filterwarnings("ignore:.*weak parts")
 
 
 def chips():
-    return {"3": fez_qubits(3, WORKING), "5": fez_qubits(5, WORKING), "3in": inside_qubits(WORKING)}
+    return {"3": fez_qubits(3, WORKING), "5": fez_qubits(5, WORKING)}
 
 
 def data_qubits(patches=("3", "5")):
@@ -45,9 +40,7 @@ def native(setting):
     return for_fez(logical_circuit(setting, chips(), TARGET.num_qubits)[0], TARGET)
 
 
-@pytest.mark.parametrize(
-    "setting", [Setting("memory", "X", 2), Setting("inside", "X", 2), Setting("idle", "X", 2)]
-)
+@pytest.mark.parametrize("setting", [Setting("memory", "X", 2), Setting("idle", "X", 2)])
 def test_native_circuits_use_only_the_chips_instructions(setting):
     circuit = native(setting)
     for item in circuit.data:
@@ -104,7 +97,6 @@ def test_a_rehearsal_gives_back_its_dephasing(tmp_path, monkeypatch):
             Setting("memory", "Z", 1),
             Setting("memory", "Z", 2),
         )
-        + (Setting("inside", "X", 1), Setting("inside", "X", 2))
         + tuple(Setting("idle", "X", n, readout=r) for r in "XY" for n in (1, 4, 8))
     )
     monkeypatch.setattr(run, "SETTINGS", settings)
@@ -136,12 +128,11 @@ def test_a_rehearsal_gives_back_its_dephasing(tmp_path, monkeypatch):
     # Six 2σ checks: by chance one misses about one rehearsal in four, so ask for 3σ here.
     rows = analysis["agreement"]["tests"].values()
     assert all(abs(row["observed"] - row["predicted"]) < 1.5 * row["bound"] for row in rows)
-    assert set(analysis["agreement"]["matches"]) == {"X", "Z", "inside"}
+    assert set(analysis["agreement"]["matches"]) == {"X", "Z"}
     assert not any(row["calibration_gap"] for row in rows)  # the same calibration after
     assert set(analysis["drift"]) == {f"{b} eps{d}" for b in "XZ" for d in (3, 5)}
     assert analysis["dephasing_from_memory"]["from_eps3"] == pytest.approx(0.5, abs=0.15)
     assert analysis["detectors_beyond_chance"] < 10
-    assert "inside ratio" in analysis["agreement"]["tests"]
     assert not any(row["drift"] for row in analysis["drift"].values())
     assert not any(row["rises"] for row in analysis["leakage"].values())
     assert analysis["idle_test"]["uniformity"]["qubits"] > 25
@@ -347,14 +338,6 @@ def test_an_offline_run_can_take_the_calibrations_gate_times():
     assert timed["measure"][(0,)].duration == pytest.approx(1.66e-6)
     assert timed["sx"][(0,)].duration == pytest.approx(24e-9)
     assert TARGET["measure"][(0,)].duration == pytest.approx(1.56e-6)  # left as it was
-
-
-def test_the_placement_test_puts_a_d3_patch_on_d5_qubits_beside_the_usual_one():
-    found = chips()
-    assert set(found["3in"]) <= set(found["5"])
-    assert not set(found["3in"]) & set(found["3"])
-    circuit = native(Setting("inside", "X", 2))
-    assert {r.name for r in circuit.cregs} == {"m3", "d3", "m3in", "d3in"}
 
 
 def test_a_wait_in_the_h_frame_does_not_decay():

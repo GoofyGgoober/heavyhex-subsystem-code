@@ -24,13 +24,12 @@ from typing import TYPE_CHECKING, Any
 
 from ..circuits.flagged import memory_circuit_flagged
 from ..patches.operators import build_operators
-from ..patches.placement import Calibration, fez_qubits, inside_qubits
+from ..patches.placement import Calibration, fez_qubits
 from ..simulation.noisy import add_detectors, fit_per_round
 from ..simulation.scheduled import noisy_scheduled
 from .circuits import (
     BLOCKS,
     DISTANCES,
-    INSIDE,
     ROUNDS,
     SETTINGS,
     Setting,
@@ -73,7 +72,6 @@ def prepare(folder: Path, calibration: Calibration, target: Any, *, offline: boo
     from qiskit import qpy
 
     chips = {str(d): fez_qubits(d, calibration) for d in DISTANCES}
-    chips[INSIDE] = inside_qubits(calibration)
     circuits = [for_fez(logical_circuit(s, chips, target.num_qubits)[0], target) for s in SETTINGS]
     folder.mkdir(parents=True)
     calibration.save(folder / "calibration.json")
@@ -808,22 +806,6 @@ def _fits(settings: list[dict], shots: int) -> dict:
             "verdict": verdict,  # one-sided 5% each way
             "from_round_2": _window(rows, shots),
         }
-    rows = [r for s, r in zip(SETTINGS, settings) if s.kind == "inside"]
-    if rows:
-        per_round = {}
-        for k, patch in enumerate(("3", INSIDE)):
-            fit = fit_per_round(ROUNDS, [r["logical_error"][k] for r in rows], shots)
-            per_round[patch] = [fit.per_round, fit.uncertainty]
-        (e3, u3), (e_in, u_in) = per_round["3"], per_round[INSIDE]
-        e5, u5 = fits["X"]["per_round"]["5"]
-        ratio = e_in / e3  # the d=3 patch's error, moved onto d=5 qubits
-        fits["inside"] = {
-            "per_round": per_round,
-            "ratio": ratio,
-            "ratio_uncertainty": ratio * sqrt((u_in / e_in) ** 2 + (u3 / e3) ** 2),
-            "lambda": e_in / e5,
-            "lambda_uncertainty": e_in / e5 * sqrt((u_in / e_in) ** 2 + (u5 / e5) ** 2),
-        }
     return {"fits": fits}
 
 
@@ -849,12 +831,7 @@ def _window(rows: list[dict], shots: int, first: int = 2) -> dict:
 
 
 def _quantities(fits: dict, basis: str) -> dict[str, tuple[float, float]]:
-    """What the agreement rule compares: (value, standard error) of Λ in X, ε₃ and ε₅.
-
-    For the placement test, the ratio of the d=3 patch's ε inside the d=5 patch to its own.
-    """
-    if basis == "inside":
-        return {"ratio": (fits[basis]["ratio"], fits[basis]["ratio_uncertainty"])}
+    """What the agreement rule compares: (value, standard error) of Λ in X, ε₃ and ε₅."""
     found = {f"eps{d}": tuple(fits[basis]["per_round"][d]) for d in map(str, DISTANCES)}
     if basis == "X":
         found["lambda"] = (fits[basis]["lambda"], fits[basis]["lambda_uncertainty"])
@@ -905,7 +882,7 @@ def _slopes(frozen: dict, expected: dict, f: float) -> dict[str, float]:
         known.insert(1, (f, expected["fits"]))
     at = np.array([point for point, _ in known])
     found = {}
-    for basis in ("X", "Z", "inside"):
+    for basis in "XZ":
         if all(basis in fits for _, fits in known):
             values = [_quantities(fits, basis) for _, fits in known]
             for name in values[0]:
@@ -926,11 +903,11 @@ def _agreement(
     Var_pred adds the simulator's shot noise; the measured f's uncertainty times the
     quantity's slope in f; and, for the calibration, Δ²/2, Δ being the gap between the
     predictions from IBM's calibrations before and after the job (zero if IBM didn't
-    recalibrate in between). X memory matches if its Λ, ε₃ and ε₅ all do; Z memory and
-    the placement test are judged on their own.
+    recalibrate in between). X memory matches if its Λ, ε₃ and ε₅ all do; Z memory is
+    judged on its own.
     """
     found: dict = {}
-    for basis in ("X", "Z", "inside"):
+    for basis in "XZ":
         if basis not in observed:
             continue
         seen, want = _quantities(observed, basis), _quantities(predicted, basis)
@@ -949,7 +926,7 @@ def _agreement(
             }
     verdicts = {
         basis: all(row["agrees"] for name, row in found.items() if name.startswith(f"{basis} "))
-        for basis in ("X", "Z", "inside")
+        for basis in "XZ"
         if any(name.startswith(f"{basis} ") for name in found)
     }
     return {"tests": found, "matches": verdicts}

@@ -488,11 +488,6 @@ def _emit_prepared(args: argparse.Namespace, run: Any, folder: Path) -> int:
             f", d=5 {a['per_round']['5'][0]:.1%}-{b['per_round']['5'][0]:.1%}"
             f", Λ {a['lambda']:.2f}-{b['lambda']:.2f}"
         )
-    a, b = low["inside"], high["inside"]
-    lines.append(
-        f"  d=3 on d=5 qubits: ε {a['ratio']:.2f}-{b['ratio']:.2f} times its own spot's, "
-        f"Λ {a['lambda']:.2f}-{b['lambda']:.2f}"
-    )
     lines += [
         "Redraw the blueprint with: python docs/figures/draw_blueprint.py",
         "Commit and push the run folder, so the prediction is on record before the run.",
@@ -582,12 +577,6 @@ def _emit_analysis(args: argparse.Namespace, analysis: dict, folder: Path) -> in
             f"(predicted {want['per_round']['3'][0]:.2%}, {want['per_round']['5'][0]:.2%}, "
             f"Λ {want['lambda']:.2f}{later})"
         )
-    got, want = seen["fits"]["inside"], expected["fits"]["inside"]
-    lines.append(
-        f"Placement test: d=3 on d=5 qubits errs {got['ratio']:.2f} ± "
-        f"{got['ratio_uncertainty']:.2f} times as often as on its own spot, Λ "
-        f"{got['lambda']:.2f} (predicted {want['ratio']:.2f}, Λ {want['lambda']:.2f})"
-    )
     agreement = analysis["agreement"]
     gaps = [row["calibration_gap"] for row in agreement["tests"].values()]
     lines.append(
