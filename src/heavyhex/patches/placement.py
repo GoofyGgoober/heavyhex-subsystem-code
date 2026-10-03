@@ -314,29 +314,6 @@ def fez_qubits(distance: int, calibration: Calibration | None = None) -> list[in
     return chip_qubits(layout)
 
 
-def inside_qubits(calibration: Calibration | None = None) -> list[int]:
-    """A d=3 patch on qubits of today's d=5 patch, for the placement test.
-
-    Of the d=3 spots inside the d=5 footprint without broken parts, the one the
-    score rates worst: where the d=5 patch's weak parts sit, so the test shows
-    what they cost. Ties go to the spots' order. Refuses if every spot has broken parts.
-    """
-    calibration = calibration or todays_calibration()
-    device = json.loads(FEZ_MAP.read_text())
-    coords, edges = device["coords"], device["edges"]
-    big = best_spots(coords, edges, calibration)[5]
-    footprint = build_layout(5, coords, edges, origin=big.origin, direction=big.direction)
-    inside = [
-        (-round(cost(layout, calibration), 9), spot, layout)
-        for spot, layout in spots(3, coords, edges).items()
-        if layout.physical_qubits <= footprint.physical_qubits and not problems(layout, calibration)
-    ]
-    if not inside:
-        raise ValueError(f"no d=3 spot inside the d=5 patch on {calibration.backend} is clean")
-    *_, layout = min(inside, key=lambda row: row[:2])
-    return chip_qubits(layout)
-
-
 def chip_qubits(layout: HeavyHexLayout) -> list[int]:
     """The chip qubit for each qubit of the flagged circuit."""
     roles = qubit_roles(build_operators(layout.distance))

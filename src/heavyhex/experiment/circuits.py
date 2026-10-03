@@ -1,13 +1,11 @@
 """What runs on the chip: both patches side by side, in Fez's native gates.
 
-Memory in X and Z at each number of rounds; a placement test, X memory with a
-second d=3 patch on qubits of the d=5 patch beside the usual one; and an idle
-test: X memory with
+Memory in X and Z at each number of rounds, and an idle test: X memory with
 the CZ of every CX replaced by a wait of the same length, so the data qubits
 wait in |+>, with the same waits, pulses and H gates, while their ancillas are
 reset and read out. Half the idle test reads the data in Y instead of X, so a
 frequency offset, which turns X into Y, isn't taken for dephasing.
-Patch p writes registers m{p} (gauges) and d{p} (data), p being "3", "5" or "3in".
+Patch p writes registers m{p} (gauges) and d{p} (data), p being "3" or "5".
 """
 
 from __future__ import annotations
@@ -25,7 +23,6 @@ if TYPE_CHECKING:
     from qiskit.transpiler import Target
 
 DISTANCES = (3, 5)
-INSIDE = "3in"  # the placement test's d=3 patch, on qubits of the d=5 patch
 ROUNDS = (1, 2, 3, 4, 6, 8)
 IDLE_ROUNDS = (1, 2, 4, 8, 16)
 BLOCKS = 2  # the job runs every circuit's shots in an early and a late block
@@ -36,7 +33,7 @@ H_FRAME = "h frame"  # marks a wait the target spends between the H gates of a w
 class Setting:
     """One circuit of the run."""
 
-    kind: str  # "memory", "inside" (the placement test) or "idle"
+    kind: str  # "memory" or "idle"
     basis: str
     rounds: int
     readout: str = "X"  # the idle test reads its data in X or in Y
@@ -45,23 +42,21 @@ class Setting:
         rounds = f"{self.rounds} round{'s' * (self.rounds > 1)}"
         if self.kind == "idle":
             return f"idle, {rounds}, read in {self.readout}"
-        if self.kind == "inside":
-            return f"X memory, d=3 inside d=5, {rounds}"
         return f"{self.basis} {self.kind}, {rounds}"
 
     @property
     def patches(self) -> tuple[str, ...]:
-        """The patches it runs, by register suffix; the first is the usual d=3."""
-        return ("3", INSIDE) if self.kind == "inside" else tuple(map(str, DISTANCES))
+        """The patches it runs, by register suffix."""
+        return tuple(map(str, DISTANCES))
 
     @property
     def decoded(self) -> bool:
-        """Memory and the placement test are decoded; the idle test isn't."""
+        """Memory is decoded; the idle test isn't."""
         return self.kind != "idle"
 
     @property
     def copies(self) -> int:
-        """Pieces per block: two for memory and the placement test, one per idle readout.
+        """Pieces per block: two for memory, one per idle readout.
 
         Every piece takes the same shots, so the idle test splits a memory circuit's
         share between its X and Y readouts.
@@ -71,7 +66,6 @@ class Setting:
 
 SETTINGS = (
     tuple(Setting("memory", basis, n) for basis in "XZ" for n in ROUNDS)
-    + tuple(Setting("inside", "X", n) for n in ROUNDS)
     + tuple(Setting("idle", "X", n) for n in IDLE_ROUNDS)
     + tuple(Setting("idle", "X", n, readout="Y") for n in IDLE_ROUNDS)
 )
@@ -107,7 +101,7 @@ def logical_circuit(
 ) -> tuple[QuantumCircuit, dict[str, FlaggedSchedule]]:
     """Both patches on their chip qubits, before translation to native gates.
 
-    chips maps each patch ("3", "5", "3in") to its chip qubits.
+    chips maps each patch ("3", "5") to its chip qubits.
     """
     from qiskit import ClassicalRegister, QuantumCircuit
     from qiskit.circuit import Instruction

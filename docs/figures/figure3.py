@@ -5,8 +5,8 @@ given calibration, both in one circuit, translated by for_fez with the
 calibration's gate times, simulated by run.simulated and decoded by MWPM. A
 scenario changes only the calibration; the qubits and circuits stay as placed.
 Λ in X memory at each end of decoupled_dephasing, and in Z memory averaged over
-the two. The d=3 patch on qubits of the d=5 patch is the run's placement test, at
-every d=3 spot inside the d=5 footprint. The average over placements simulates
+the two. The d=3 patch is also moved onto the d=5 patch's qubits, beside the usual
+d=3, at every d=3 spot inside the d=5 footprint. The average over placements simulates
 every clean d=3 and d=5 spot, each patch alone, in X memory. Runs offline.
 
     python docs/figures/figure3.py --calibration PATH [--out PATH.json] [--shots N]
@@ -29,7 +29,6 @@ from typing import Any
 from heavyhex.experiment import run
 from heavyhex.experiment.circuits import (
     DISTANCES,
-    INSIDE,
     ROUNDS,
     Setting,
     for_fez,
@@ -43,6 +42,7 @@ from heavyhex.simulation.noisy import fit_per_round, typical
 HERE = Path(__file__).resolve().parent
 OUT_NAME = "figure3.json"
 ALONE = "each placement simulated alone"
+MOVED = "3in"  # the d=3 patch moved onto the d=5 patch's qubits
 
 
 @dataclass(frozen=True)
@@ -54,6 +54,15 @@ class Alone(Setting):
     @property
     def patches(self) -> tuple[str, ...]:
         return (self.patch,)
+
+
+@dataclass(frozen=True)
+class Beside(Setting):
+    """Memory of the usual d=3 patch and a second one moved onto the d=5 patch's qubits."""
+
+    @property
+    def patches(self) -> tuple[str, ...]:
+        return ("3", MOVED)
 
 
 def weak_at_median(calibration: pl.Calibration, qubits: set[int]) -> pl.Calibration:
@@ -157,7 +166,7 @@ def ratio(a: list[float], b: list[float]) -> list[float]:
 
 
 def figure3(calibration: pl.Calibration, shots: int) -> dict:
-    """Every row, the placement test at each inside spot, and the average over placements."""
+    """Every row, the d=3 patch at each spot inside the d=5 patch, and the average over placements."""
     from qiskit_ibm_runtime.fake_provider import FakeFez
 
     side = min(run.SIDE_SHOTS, shots)
@@ -195,11 +204,11 @@ def figure3(calibration: pl.Calibration, shots: int) -> dict:
                     setting = Setting("memory", basis, n)
                     jobs["memory", name, basis, f, n] = (setting, chips, changed, f, shots)
     for k, layout in enumerate(inside.values()):
-        test = {**chips, INSIDE: pl.chip_qubits(layout)}
+        test = {**chips, MOVED: pl.chip_qubits(layout)}
         for basis in "XZ":
             for f in run.ENDS:
                 for n in ROUNDS:
-                    setting = Setting("inside", basis, n)
+                    setting = Beside("memory", basis, n)
                     jobs["inside", k, basis, f, n] = (setting, test, calibration, f, side)
     for d, found in clean.items():
         for k, layout in enumerate(found.values()):
@@ -223,12 +232,10 @@ def figure3(calibration: pl.Calibration, shots: int) -> dict:
                 row[basis][str(f)] = {"eps3": e3, "eps5": e5, "lambda": ratio(e3, e5)}
         table.append(row)
 
-    run_spot = pl.inside_qubits(calibration)
     spots = []
     for k, (spot, layout) in enumerate(inside.items()):
         chip = pl.chip_qubits(layout)
         entry: dict = {"origin": spot.origin, "direction": spot.direction, "chip": chip}
-        entry["run's spot"] = chip == run_spot
         for basis in "XZ":
             entry[basis] = {}
             for f in run.ENDS:
@@ -339,7 +346,7 @@ def report(figure: dict) -> str:
         lines.append(
             f"  {str(tuple(s['origin'])):9s}{str(tuple(s['direction'])):9s}"
             f"{low['eps3in'][0]:7.2%}{high['eps3in'][0]:7.2%}"
-            f"{low['ratio'][0]:7.2f}{high['ratio'][0]:6.2f}" + ("  run's" * s["run's spot"])
+            f"{low['ratio'][0]:7.2f}{high['ratio'][0]:6.2f}"
         )
     average = figure["average"]
     lines.append(
