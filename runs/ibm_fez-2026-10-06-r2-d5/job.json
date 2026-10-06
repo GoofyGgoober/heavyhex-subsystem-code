@@ -1,0 +1,42 @@
+{
+ "job": "db2jgtu8v0ts73c2ubh0",
+ "tag": "heavyhex:ibm_fez-2026-10-06-r2-d5",
+ "backend": "ibm_fez",
+ "shots": 2500,
+ "shots_per_piece": 625,
+ "submitted": "2026-10-06T21:05:26+03:00",
+ "submitted_utc": "2026-10-06T18:05:26+00:00",
+ "code": {
+  "commit": "f5f36da93f8463519137533072ba24f8c25495f8",
+  "code": [
+   "a233d4069719d0cc396c71f29f6429bffd40f113",
+   "f8e44350df9165b40fb5a3259f75ba9c9f697fee"
+  ],
+  "changed": false
+ },
+ "local": false,
+ "qpu_seconds_limit": 50,
+ "qpu_seconds_estimate": 14.44076,
+ "qpu_seconds_ibm_estimate": null,
+ "created_utc": "2026-10-06T18:05:43.268748Z",
+ "running_utc": "2026-10-06T18:05:45.193004Z",
+ "finished_utc": "2026-10-06T18:06:37.226818Z",
+ "usage": {
+  "qpu_charge_time_seconds": 15,
+  "value": 0.2429,
+  "unit": "resource_units",
+  "status": "complete",
+  "details": [
+   {
+    "value": 0.2429,
+    "unit": "resource_units",
+    "metric": {
+     "id": "caffe3ca-729c-5750-8777-df63bbf8bfd9",
+     "value": 15
+    }
+   }
+  ]
+ },
+ "status": "DONE",
+ "reason": null
+}
