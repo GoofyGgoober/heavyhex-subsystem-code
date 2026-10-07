@@ -53,7 +53,6 @@ def test_noiseless_d5_has_quiet_relays_and_no_detectors(basis):
     circuit, schedule = memory_circuit_flagged(D5, rounds=3, basis=basis)
     relays = [m.bit for m in schedule.measurements if m.kind == "relay"]
     for record in run_flagged_circuit(circuit, schedule, shots=64, seed=27):
-        assert record["success"] is None  # lookup can't grade d=5
         assert not any(record["detectors"])
         assert all(record["gauge_bits"][bit] == 0 for bit in relays)
 

@@ -17,7 +17,6 @@ from typing import TYPE_CHECKING
 from .._validation import validate_binary_bits
 from ..core import Pauli
 from ..patches.operators import D3, HeavyHexOperators
-from .ideal import _apply_pauli, _checks, _halves
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
@@ -188,6 +187,17 @@ def memory_circuit_flagged(
     )
 
 
+def one_round(patch: HeavyHexOperators = D3) -> list[tuple]:
+    """Every gate, reset and measurement of one round, as (name, *circuit qubits)."""
+    roles = qubit_roles(patch)
+    gates: list[tuple] = []
+    for half, names in (("X", roles.x_ancillas), ("Z", roles.z_ancillas)):
+        for name in names:
+            steps, reads = _gadget(patch, roles, half, name)
+            gates += steps + [("measure", qubit) for _, _, qubit in reads]
+    return gates
+
+
 def _gadget(
     patch: HeavyHexOperators, roles: Roles, half: str, name: str
 ) -> tuple[list[tuple], list[tuple[str, str, int]]]:
@@ -216,27 +226,6 @@ def _gadget(
     for data, relay in ((data_a, relay_a), (data_b, relay_b)):
         gates += [("cx", data, relay), ("cx", relay, ancilla), ("cx", data, relay)]
     return gates, [("relay", name, relay_a), ("relay", name, relay_b), ("z_syn", name, ancilla)]
-
-
-def with_fault(circuit: QuantumCircuit, index: int, fault: dict[int, str]) -> QuantumCircuit:
-    """Copy of the circuit with `fault` inserted after instruction `index` (-1 puts it first)."""
-    from qiskit import QuantumCircuit
-
-    if any(axis not in ("X", "Y", "Z") for axis in fault.values()):
-        raise ValueError(f"fault Paulis must be X, Y or Z, got {fault!r}")
-    new = QuantumCircuit(*circuit.qregs, *circuit.cregs)
-
-    def append_fault() -> None:
-        for qubit, axis in fault.items():
-            getattr(new, axis.lower())(new.qubits[qubit])
-
-    if index == -1:
-        append_fault()
-    for position, instruction in enumerate(circuit.data):
-        new.append(instruction.operation, instruction.qubits, instruction.clbits)
-        if position == index:
-            append_fault()
-    return new
 
 
 def single_faults(circuit: QuantumCircuit, gadget: Gadget) -> Iterator[tuple[int, dict[int, str]]]:
@@ -331,3 +320,57 @@ def propagate_fault(
 def _instruction(circuit: QuantumCircuit, position: int) -> tuple[str, list[int]]:
     item = circuit.data[position]
     return item.operation.name, [circuit.find_bit(qubit).index for qubit in item.qubits]
+
+
+def _halves(
+    patch: HeavyHexOperators,
+    rounds: int,
+    basis: str,
+    error: Pauli | None,
+    inject_at: str,
+) -> tuple[str, tuple[str, str]]:
+    """Check the options; return the prep half and the order of halves in a round."""
+    if basis not in ("X", "Z"):
+        raise ValueError(f"basis must be X or Z, got {basis!r}")
+    if not isinstance(rounds, int) or isinstance(rounds, bool) or rounds < 1:
+        raise ValueError(f"rounds must be a positive integer, got {rounds!r}")
+    prep_half = "X" if basis == "Z" else "Z"
+    halves = ("Z", "X") if basis == "Z" else ("X", "Z")
+    stages = ["after_prep"] + [f"after_{half.lower()}{r}" for r in range(rounds) for half in halves]
+    if inject_at not in stages:
+        raise ValueError(f"inject_at must be one of {stages}, got {inject_at!r}")
+    if error is not None:
+        patch.code.validate_data_pauli(error, name="error")
+    return prep_half, halves
+
+
+def _checks(
+    patch: HeavyHexOperators, outcomes: dict[tuple[int, str, str], int]
+) -> dict[tuple[int, str], int]:
+    """XOR each stabilizer's gauge outcomes, round by round.
+
+    outcomes is keyed by (round, half, gauge). The prep half measures only one
+    basis, so round -1 has only those stabilizers.
+    """
+    checks: dict[tuple[int, str], int] = {}
+    rounds = sorted({round for round, _, _ in outcomes})
+    for stab_name, gauge_names in patch.stabilizer_gauge_factors.items():
+        half = "X" if stab_name.startswith("X") else "Z"
+        for round in rounds:
+            try:
+                bits = [outcomes[round, half, name] for name in gauge_names]
+            except KeyError:
+                continue
+            checks[round, stab_name] = sum(bits) % 2
+    return checks
+
+
+def _apply_pauli(circuit: QuantumCircuit, error: Pauli | None) -> None:
+    if error is None:
+        return
+    for qubit in error.x - error.z:
+        circuit.x(qubit)
+    for qubit in error.z - error.x:
+        circuit.z(qubit)
+    for qubit in error.x & error.z:
+        circuit.y(qubit)
