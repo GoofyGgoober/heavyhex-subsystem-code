@@ -1,1 +1,1 @@
-"""Memory circuits: ideal, and flagged as they would run on the chip."""
+"""The flagged memory circuits, as they run on the chip, and how to read their shots."""

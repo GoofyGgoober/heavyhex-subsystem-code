@@ -1,8 +1,9 @@
 """The flagged memory circuits on Fez, simulated in stim with noise from the calibration.
 
 Each CZ gets its coupler's error, each measurement and reset its qubit's readout
-error, and each qubit decays (T1, T2) while idle. MWPM matches on the circuit's
-error model, so flag and hook errors are included.
+error, and each qubit decays (T1, T2) while idle. With decoupling, long idles get
+a pair of X pulses. MWPM matches on the circuit's error model, so flag and hook
+errors are included.
 """
 
 from __future__ import annotations
@@ -20,9 +21,32 @@ from ..patches.placement import Calibration, broken_coupler, broken_qubit, fez_q
 if TYPE_CHECKING:
     import stim
 
-# Fez durations in ns. A CX runs as a CZ with an H on each side of the target.
-CZ_NS, H_NS, MEASURE_NS, RESET_NS = 84, 24, 1560, 1584
-H_ERROR = 2.3e-4  # Fez's median single-qubit gate error; the calibration file doesn't keep it
+# Fez's durations in ns, for calibrations saved without the device's own. H and X
+# take one SX pulse; a CX runs as a CZ with an H on each side of the target.
+FEZ_NS = {"x": 24, "cz": 84, "measure": 1560, "reset": 1584}
+# Median X and SX error on Fez, Kingston and Marrakesh, for calibrations saved without each
+# qubit's own.
+SINGLE_QUBIT_ERROR = 2.3e-4
+# Idles at least this long get pulses: the waits through readout and reset.
+# Padding the gaps between gates as well changes little.
+DECOUPLE_NS = 500
+
+
+def single_qubit_error(calibration: Calibration, q: int) -> float:
+    """The qubit's SX (and X) error from the calibration, or SINGLE_QUBIT_ERROR if it has none."""
+    error = (calibration.single_qubit or {}).get(q)
+    return SINGLE_QUBIT_ERROR if error is None else error
+
+
+def idle_error(t: float, t1: float, t2: float) -> tuple[float, float]:
+    """(px, pz) of an idle of t ns, Pauli-twirled from T1 and T2 decay; py = px."""
+    px = (1 - exp(-t / t1)) / 4
+    return px, max((1 - exp(-t / t2)) / 2 - px, 0)
+
+
+def decoupled_t2(t1: float, t2: float, decoupled_dephasing: float) -> float:
+    """T2 under decoupling, keeping that share of the pure dephasing."""
+    return 1 / (1 / (2 * t1) + decoupled_dephasing * (1 / t2 - 1 / (2 * t1)))
 
 
 def typical(calibration: Calibration) -> Calibration:
@@ -69,11 +93,15 @@ def noisy_circuit(
     *,
     scale: float = 1.0,
     decoupling: bool = False,
+    decoupled_dephasing: float = 0.0,
 ) -> stim.Circuit:
     """The flagged memory circuit on its Fez qubits, with noise, detectors and the logical.
 
     scale multiplies every error probability (for idling, the idle time).
-    decoupling stands in for dynamical decoupling: T2 = 2 T1.
+    decoupling puts two X pulses, each with a single-qubit gate error, in every
+    idle of at least DECOUPLE_NS. decoupled_dephasing is the share of the qubit's
+    pure dephasing they leave: 0 leaves only T1 decay, 1 dephases at IBM's T2.
+    IBM measures T2 with a Hahn echo, so idles without pulses flatter a bare qubit.
     """
     import stim
 
@@ -84,6 +112,7 @@ def noisy_circuit(
         warnings.filterwarnings("ignore", message=".* uses weak parts")
         chip = fez_qubits(distance, calibration)
 
+    ns = calibration.durations_ns or FEZ_NS
     out = stim.Circuit()
     free: dict[int, float] = {}  # when each qubit is next free, in ns
     just_reset: set[int] = set()  # not in a CX since its reset; on the chip the reset waits instead
@@ -94,12 +123,21 @@ def noisy_circuit(
 
     def wait(q: int, until: float) -> None:
         if q in free and q not in just_reset and until > free[q]:
-            t = scale * (until - free[q])
+            idle = until - free[q]
             t1 = calibration.t1_us[chip[q]] * 1e3
-            t2 = 2 * t1 if decoupling else calibration.t2_us[chip[q]] * 1e3
-            px = (1 - exp(-t / t1)) / 4
-            pz = max((1 - exp(-t / t2)) / 2 - px, 0)
+            t2 = min(calibration.t2_us[chip[q]] * 1e3, 2 * t1)  # IBM's fit can exceed 2 T1
+            pulses = 2 if decoupling and idle >= DECOUPLE_NS else 0
+            if pulses:
+                idle -= pulses * ns["x"]
+                t2 = decoupled_t2(t1, t2, decoupled_dephasing)
+            px, pz = idle_error(scale * idle, t1, t2)
             out.append("PAULI_CHANNEL_1", [q], [px, px, pz])
+            # Pauli noise commutes with the pulses, so where they sit in the idle doesn't matter.
+            for _ in range(pulses):
+                out.append("X", [q])
+                out.append(
+                    "DEPOLARIZE1", [q], scaled(1.5 * single_qubit_error(calibration, chip[q]))
+                )
         free[q] = until
 
     for item in circuit.data:
@@ -113,36 +151,41 @@ def noisy_circuit(
             continue
         if name == "h":
             out.append("H", qubits)
-            out.append("DEPOLARIZE1", qubits, scaled(1.5 * H_ERROR))
-            duration = H_NS
+            for q in qubits:
+                out.append(
+                    "DEPOLARIZE1", [q], scaled(1.5 * single_qubit_error(calibration, chip[q]))
+                )
+            duration = ns["x"]
         elif name == "cx":
             control, target = qubits
             error = calibration.cz[tuple(sorted((chip[control], chip[target])))]
             out.append("CX", qubits)
             # IBM quotes average gate infidelity; a depolarizing channel needs 5/4 of it.
             out.append("DEPOLARIZE2", qubits, scaled(1.25 * error))
-            out.append("DEPOLARIZE1", [target], scaled(3 * H_ERROR))
+            out.append(
+                "DEPOLARIZE1", [target], scaled(3 * single_qubit_error(calibration, chip[target]))
+            )
             just_reset.difference_update(qubits)
-            duration = CZ_NS + 2 * H_NS
+            duration = ns["cz"] + 2 * ns["x"]
         elif name == "reset":
             (q,) = qubits
             out.append("R", [q])
             out.append("X_ERROR", [q], scaled(calibration.readout[chip[q]]))
             just_reset.add(q)
-            duration = RESET_NS
+            duration = ns["reset"]
         elif name == "measure":
             (q,) = qubits
             out.append("M", [q], scaled(calibration.readout[chip[q]]))
             bit = circuit.find_bit(item.clbits[0])
             register, index = bit.registers[0]
             records[register.name, index] = len(records)
-            duration = MEASURE_NS
+            duration = ns["measure"]
         else:
             raise ValueError(f"unexpected instruction: {name}")
         for q in qubits:
             free[q] = start + duration
 
-    _add_detectors(out, schedule, records)
+    add_detectors(out, schedule, records)
     return out
 
 
@@ -166,7 +209,8 @@ class Decay:
     rounds: tuple[int, ...]
     logical_error: tuple[float, ...]
     per_round: float
-    uncertainty: float  # one standard error of per_round, from shot noise
+    uncertainty: float  # one standard error of per_round, widened by a poor fit
+    chi2_red: float = float("nan")  # reduced chi-squared of the fit
 
 
 def decay(
@@ -179,7 +223,25 @@ def decay(
     seed: int | None = None,
     scale: float = 1.0,
     decoupling: bool = False,
+    decoupled_dephasing: float = 0.0,
 ) -> Decay:
+    """Simulate each number of rounds and fit the error per round."""
+    errors = []
+    for n in rounds:
+        circuit = noisy_circuit(
+            distance,
+            basis,
+            n,
+            calibration,
+            scale=scale,
+            decoupling=decoupling,
+            decoupled_dephasing=decoupled_dephasing,
+        )
+        errors.append(logical_errors(circuit, shots, None if seed is None else seed + n) / shots)
+    return fit_per_round(rounds, errors, shots)
+
+
+def fit_per_round(rounds: tuple[int, ...], logical_error: list[float], shots: int) -> Decay:
     """Fit log(1 - 2 p_L) = a + b n, each point weighted by its shot noise.
 
     The error per round is (1 - e^b) / 2; a takes up prep and readout error.
@@ -187,32 +249,44 @@ def decay(
     """
     import numpy as np
 
-    errors = []
-    for n in rounds:
-        circuit = noisy_circuit(distance, basis, n, calibration, scale=scale, decoupling=decoupling)
-        errors.append(logical_errors(circuit, shots, None if seed is None else seed + n) / shots)
-    p, n = np.array(errors), np.array(rounds, dtype=float)
+    p, n = np.array(logical_error), np.array(rounds, dtype=float)
     keep = (p > 0) & (p < 0.5)
     if keep.sum() < 2:
-        return Decay(tuple(rounds), tuple(errors), 0.5, float("nan"))
+        return Decay(tuple(rounds), tuple(logical_error), 0.5, float("nan"))
     p, n = p[keep], n[keep]
     sigma = 2 * np.sqrt(p * (1 - p) / shots) / (1 - 2 * p)  # shot noise on log(1 - 2p)
-    (b, _), cov = np.polyfit(n, np.log(1 - 2 * p), 1, w=1 / sigma, cov="unscaled")
-    return Decay(tuple(rounds), tuple(errors), (1 - exp(b)) / 2, exp(b) / 2 * sqrt(cov[0, 0]))
+    y = np.log(1 - 2 * p)
+    (b, a), cov = np.polyfit(n, y, 1, w=1 / sigma, cov="unscaled")
+    # Shot noise alone, unless the points scatter more than it allows.
+    chi2_red = float(np.sum(((y - a - b * n) / sigma) ** 2) / (len(n) - 2)) if len(n) > 2 else 1.0
+    spread = sqrt(max(chi2_red, 1.0))
+    return Decay(
+        tuple(rounds),
+        tuple(logical_error),
+        (1 - exp(b)) / 2,
+        exp(b) / 2 * sqrt(cov[0, 0]) * spread,
+        chi2_red,
+    )
 
 
-def _add_detectors(
-    out: stim.Circuit, schedule: FlaggedSchedule, records: dict[tuple[str, int], int]
+def add_detectors(
+    out: stim.Circuit,
+    schedule: FlaggedSchedule,
+    records: dict[tuple[str, int], int],
+    observable: int = 0,
+    labels: list | None = None,
 ) -> None:
-    """Detectors on the memory-basis stabilizers, and the logical.
+    """Detectors on the memory-basis stabilizers, and the logical as that observable.
 
-    A detector is a stabilizer's value XOR its value the round before. In Z
-    memory every flag and relay is a detector too: each should read 0.
+    records maps (register "m" or "d", bit) to its measurement in out. A detector
+    is a stabilizer's value XOR its value the round before. In Z memory every
+    flag and relay is a detector too: each should read 0. labels, if given, gets
+    (round, stabilizer or "kind gauge") for each detector.
     """
     import stim
 
     patch, basis, rounds = schedule.patch, schedule.basis, schedule.rounds
-    total = len(records)
+    total = out.num_measurements
 
     def rec(register: str, bit: int) -> stim.GateTarget:
         return stim.target_rec(records[register, bit] - total)
@@ -224,16 +298,24 @@ def _add_detectors(
     def outcomes(r: int, name: str) -> list[stim.GateTarget]:
         return [rec("m", bits[r, basis, kind, g]) for g in patch.stabilizer_gauge_factors[name]]
 
+    found = []
     for r in range(rounds):
         for name in stabilizers:
             previous = outcomes(r - 1, name) if r else []
             out.append("DETECTOR", outcomes(r, name) + previous)
-    for name, labels in stabilizers.items():
-        data = [rec("d", q - 1) for q in sorted(labels)]
+            found.append((r, name))
+    for name, support in stabilizers.items():
+        data = [rec("d", q - 1) for q in sorted(support)]
         out.append("DETECTOR", data + outcomes(rounds - 1, name))
+        found.append((rounds, name))
     if basis == "Z":
         for m in schedule.measurements:
             if m.kind in ("z_flag", "relay"):
                 out.append("DETECTOR", [rec("m", m.bit)])
+                found.append((m.round, f"{m.kind} {m.gauge}"))
+    if labels is not None:
+        labels += found
     logical = patch.code.logical_x if basis == "X" else patch.code.logical_z
-    out.append("OBSERVABLE_INCLUDE", [rec("d", q) for q in sorted(logical.x or logical.z)], 0)
+    out.append(
+        "OBSERVABLE_INCLUDE", [rec("d", q) for q in sorted(logical.x or logical.z)], observable
+    )

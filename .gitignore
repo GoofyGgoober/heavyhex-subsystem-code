@@ -7,8 +7,13 @@ __pycache__/
 dist/
 build/
 
-# Personal Claude Code overrides
+# Rehearsals are simulated; only the chip's shots belong to a run's record
+runs/*/rehearsal*
+runs/rehearsal_combined.json
+
+# Local tool and editor settings
 .claude/settings.local.json
+.vscode/
 
 # Never commit credentials
 apikey*.json

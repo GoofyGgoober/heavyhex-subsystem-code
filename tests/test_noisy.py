@@ -1,6 +1,7 @@
 """The stim version of the flagged circuit: gates, detectors, noise and the fit."""
 
 from dataclasses import replace
+from math import exp, log
 
 import pytest
 
@@ -10,12 +11,13 @@ pytest.importorskip("qiskit")
 
 import heavyhex.simulation.noisy as noisy  # noqa: E402
 from heavyhex.circuits.flagged import memory_circuit_flagged  # noqa: E402
-from heavyhex.decoders.shots import Memory, read_shot  # noqa: E402
+from heavyhex.circuits.shots import Memory, read_shot  # noqa: E402
 from heavyhex.patches.operators import build_operators  # noqa: E402
 from heavyhex.patches.placement import LAST_CALIBRATION, Calibration  # noqa: E402
 
 SAVED = Calibration.load(LAST_CALIBRATION)
-TYPICAL = noisy.typical(SAVED)
+# FakeFez's gate times and the default √X error, whatever the saved calibration carries.
+TYPICAL = replace(noisy.typical(SAVED), durations_ns=None, single_qubit=None)
 CASES = [(d, basis) for d in (3, 5) for basis in ("Z", "X")]
 
 
@@ -48,9 +50,25 @@ def test_gates_are_the_qiskit_circuit(distance, basis):
     assert got == expected
 
 
+def idles_in(circuit):
+    """(idle in ns, px, pz, pulses after it) per qubit, on TYPICAL's T1."""
+    t1 = TYPICAL.t1_us[0] * 1e3
+    found = []
+    instructions = list(circuit.flattened())
+    for i, item in enumerate(instructions):
+        if item.name == "PAULI_CHANNEL_1":
+            px, _, pz = item.gate_args_copy()
+            after = [x.name for x in instructions[i + 1 : i + 5]]
+            pulses = 2 if after == ["X", "DEPOLARIZE1", "X", "DEPOLARIZE1"] else 0
+            found += [(-t1 * log(1 - 4 * px), px, pz, pulses)] * len(item.targets_copy())
+    return found
+
+
 @pytest.mark.parametrize("distance, basis", CASES)
-def test_noiseless_detectors_and_logical_never_fire(distance, basis):
-    circuit = noisy.noisy_circuit(distance, basis, 3, TYPICAL).without_noise()
+@pytest.mark.parametrize("decoupling", [False, True])
+def test_noiseless_detectors_and_logical_never_fire(distance, basis, decoupling):
+    circuit = noisy.noisy_circuit(distance, basis, 3, TYPICAL, decoupling=decoupling)
+    circuit = circuit.without_noise()
     detectors, logical = circuit.compile_detector_sampler(seed=1).sample(
         200, separate_observables=True
     )
@@ -116,12 +134,58 @@ def test_idle_channels_are_valid(scale):
     assert idles and all(px == py and pz >= 0 and px + py + pz <= 1 for px, py, pz in idles)
 
 
-def test_decoupling_leaves_almost_no_dephasing():
-    circuit = noisy.noisy_circuit(3, "X", 2, TYPICAL, decoupling=True)
-    for i in circuit.flattened():
-        if i.name == "PAULI_CHANNEL_1":
-            px, _, pz = i.gate_args_copy()
-            assert pz < 2 * px * px + 1e-12  # second order in t / T1
+def test_pulses_go_in_pairs_into_long_idles_only():
+    bare = idles_in(noisy.noisy_circuit(3, "X", 2, TYPICAL))
+    decoupled = noisy.noisy_circuit(3, "X", 2, TYPICAL, decoupling=True)
+    long_idles = sum(t >= noisy.DECOUPLE_NS for t, *_ in bare)
+    assert long_idles
+    x_gates = sum(len(i.targets_copy()) for i in decoupled.flattened() if i.name == "X")
+    assert x_gates == 2 * long_idles
+    assert sum(pulses for *_, pulses in idles_in(decoupled)) == 2 * long_idles
+
+
+def test_pulses_take_time_and_add_gate_error():
+    bare = sorted(t for t, *_ in idles_in(noisy.noisy_circuit(3, "Z", 2, TYPICAL)))
+    decoupled = idles_in(noisy.noisy_circuit(3, "Z", 2, TYPICAL, decoupling=True))
+    shortened = sorted(t + noisy.FEZ_NS["x"] * pulses for t, _, _, pulses in decoupled)
+    assert shortened == pytest.approx(bare)
+    instructions = list(noisy.noisy_circuit(3, "Z", 2, TYPICAL, decoupling=True).flattened())
+    for i, item in enumerate(instructions):
+        if item.name == "X":
+            error = instructions[i + 1]
+            assert error.name == "DEPOLARIZE1"
+            assert error.gate_args_copy() == pytest.approx([1.5 * noisy.SINGLE_QUBIT_ERROR])
+
+
+@pytest.mark.parametrize("decoupled_dephasing", [0, 0.5, 1])
+def test_decoupled_dephasing_runs_from_t1_only_to_t2(decoupled_dephasing):
+    t1, t2 = TYPICAL.t1_us[0] * 1e3, TYPICAL.t2_us[0] * 1e3
+    rate = 1 / (2 * t1) + decoupled_dephasing * (1 / t2 - 1 / (2 * t1))
+    circuit = noisy.noisy_circuit(
+        3, "X", 2, TYPICAL, decoupling=True, decoupled_dephasing=decoupled_dephasing
+    )
+    for t, px, pz, pulses in idles_in(circuit):
+        decay = exp(-t / t2) if not pulses else exp(-t * rate)
+        assert pz == pytest.approx((1 - decay) / 2 - px, abs=1e-12)
+
+
+def test_t2_above_2t1_counts_as_2t1():
+    t1 = TYPICAL.t1_us[0] * 1e3
+    over = replace(TYPICAL, t2_us={q: 3 * t for q, t in TYPICAL.t1_us.items()})
+    circuit = noisy.noisy_circuit(3, "X", 2, over)
+    for t, px, pz, _ in idles_in(circuit):
+        assert pz == pytest.approx((1 - exp(-t / (2 * t1))) / 2 - px, abs=1e-12)
+    circuit.detector_error_model(decompose_errors=True)
+
+
+def test_durations_come_from_the_calibration():
+    def idle_ns(calibration):
+        return sum(t for t, *_ in idles_in(noisy.noisy_circuit(3, "X", 2, calibration)))
+
+    fez = replace(TYPICAL, durations_ns=noisy.FEZ_NS)
+    kingston = replace(TYPICAL, durations_ns={"x": 32, "cz": 68, "measure": 2280, "reset": 2312})
+    assert idle_ns(TYPICAL) == pytest.approx(idle_ns(fez))
+    assert idle_ns(kingston) > 1.3 * idle_ns(fez)
 
 
 def test_no_idle_noise_between_a_reset_and_the_first_cx():
