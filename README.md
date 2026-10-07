@@ -17,7 +17,7 @@ heavyhex --distance 5 circuit          # draw its flagged memory circuit
 heavyhex --help
 ```
 
-Data qubit ids are 0-based; the paper's Q label is id + 1.
+Data qubit ids are 0-based; Sundaresan et al.'s Q label is id + 1.
 
 The hardware run is X and Z memory at 1-8 rounds, and an idle test, read in X
 and in Y, that measures f, how much of the calibrated dephasing the decoupling
@@ -51,11 +51,10 @@ credentials. Do it all on one day: submit refuses a job prepared on another.
    skipped.
 2. `heavyhex experiment prepare` prepares a folder for each job: it places the
    patches, translates the circuits and freezes the prediction.
-3. Redraw the layout with `python docs/figures/draw_blueprint.py`, and the
-   paper's Figure 1 with `python docs/figures/figure1.py --out docs/figures/figure1.png`.
+3. Redraw the layout with `python docs/figures/draw_blueprint.py`, and Figure 1
+   with `python docs/figures/figure1.py --out docs/figures/figure1.png`.
 4. Commit and push the day's `runs/` folders, with the new calibration and layout in
-   `docs/figures/` (submit refuses a job that isn't committed and pushed). Note
-   the commit hash (`git rev-parse HEAD`) and the UTC time (`date -u`) for the paper.
+   `docs/figures/` (submit refuses a job that isn't committed and pushed).
 5. `heavyhex experiment submit --run runs/<folder>` for each job, in the order
    prepare lists them; each uses the QPU and asks first. A job may use at most 50 s
    of QPU time (`QPU_SECONDS_LIMIT` in run.py), and every job together at most
@@ -69,9 +68,6 @@ credentials. Do it all on one day: submit refuses a job prepared on another.
 6. Commit the shots (`shots.npz`, `job.json`) and `calibration_after.json`.
 7. `heavyhex experiment analyze --run runs/<folder>` for each job, then
    `heavyhex experiment combine`, and commit `analysis.json` and `runs/combined.json`.
-8. Regenerate Figure 3 with `python docs/figures/figure3.py --calibration
-   runs/<folder>/calibration.json --out docs/figures/figure3.json`.
-9. Publish a release on GitHub (a release, not just a tag), so Zenodo mints a DOI.
 
 ## License
 
