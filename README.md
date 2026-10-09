@@ -73,6 +73,26 @@ credentials. Do it all on one day: submit refuses a job prepared on another.
    runs/<folder>/calibration.json --out docs/figures/figure3.json`.
 9. Publish a release on GitHub (a release, not just a tag), so Zenodo mints a DOI.
 
+## The run, 4–8 October 2026
+
+All five days ran: fifteen jobs, 225 s of QPU time, every day's folders committed and
+pushed before its first job (`runs/`, with `runs/combined.json` pooling the ten reps).
+Day 1 was sent by hand; days 2–5 were prepared and sent unattended by
+`scripts/daily_run.sh`, under the author's written approval and the same caps. Only
+day 1's design was released (v0.2.0, archived by Zenodo four minutes before the first
+job); the later days rest on the git history and GitHub's push log.
+
+`docs/diagnosis/` holds the exploratory analysis, done after the run, of why the
+simulation from IBM's calibration under-predicts the chip's errors (mostly leakage),
+with a leakage-aware simulator; see its README.
+
+## History
+
+Two force-pushes rewrote `main` before any run data: on 24 September 2026, replacing
+three earlier commits with a new line of work, and on 2 October 2026, rewording commit
+messages only (the files are identical). From 3 October the history matches GitHub's
+push events.
+
 ## License
 
 MIT, see [LICENSE](LICENSE). [CITATION.cff](CITATION.cff) says how to cite it.
