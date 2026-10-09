@@ -189,12 +189,12 @@ def fig_leakage() -> None:
         rows = [r for r in why if r["role"] == role]
         x = np.array([r["cz_per_round"] for r in rows]) + rng.uniform(-0.35, 0.35, len(rows))
         y = np.array([r["leak_per_round"] for r in rows]) * 100
-        b.plot(x, y, marker, ms=2.2, color=colour, alpha=0.45, mew=0, label=f"{name} ({len(rows)})")
+        b.plot(x, y, marker, ms=2.2, color=colour, alpha=0.45, mew=0, label=f"{name} ({len(rows)} series)")
         b.plot(np.mean([r["cz_per_round"] for r in rows]), np.median(y), marker, ms=5, color=colour, mec=INK, mew=0.6)
-    b.set_xlabel("CZ gates per round")
-    b.set_ylabel("leak rate per round (%)")
+    b.set_ylabel("onset rate (% per round)")
     b.set_xlim(1.5, 9.8)
-    b.set_xticks([3, 8.25], ["3", "8.25"])
+    b.set_xticks([3, 8.25], ["relays\n3 CZ, 1 readout, 1 reset", "flags\n8 CZ, 2 readouts, 2 resets"])
+    b.tick_params(axis="x", length=0, labelsize=6.5)
     b.set_ylim(0, None)
     b.legend(loc="upper left", handletextpad=0.2)
     label(b, "(b)")
