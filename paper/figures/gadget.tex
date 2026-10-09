@@ -1,0 +1,19 @@
+% Fig. 1: the bulk Z-gauge gadget, gate for gate as in Z4_GATES (src/heavyhex/circuits/flagged.py).
+% Build: latexmk -pdf gadget.tex
+\documentclass[border=1pt]{standalone}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{quantikz}
+\begin{document}
+\begin{quantikz}[row sep={0.68cm,between origins}, column sep=0.2cm]
+\lstick{$q_1$} & \ctrl{2} & \qw & \qw & \qw & \ctrl{2} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw \\
+\lstick{$q_3$} & \qw & \qw & \qw & \qw & \qw & \ctrl{1} & \qw & \qw & \qw & \qw & \ctrl{1} & \qw & \qw \\
+\lstick{$f_1$: $\ket{0}$} & \targ{} & \ctrl{1} & \qw & \qw & \targ{} & \targ{} & \ctrl{1} & \qw & \qw & \qw & \targ{} & \qw & \meter{} \\
+\lstick{$a$: $\ket{0}$} & \qw & \targ{} & \qw & \targ{} & \qw & \qw & \targ{} & \qw & \qw & \targ{} & \qw & \qw & \meter{} \\
+\lstick{$f_2$: $\ket{0}$} & \qw & \qw & \targ{} & \ctrl{-1} & \qw & \qw & \qw & \targ{} & \targ{} & \ctrl{-1} & \qw & \targ{} & \meter{} \\
+\lstick{$q_2$} & \qw & \qw & \ctrl{-1} & \qw & \qw & \qw & \qw & \ctrl{-1} & \qw & \qw & \qw & \qw & \qw \\
+\lstick{$q_4$} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{-2} & \qw & \qw & \ctrl{-2} & \qw \\
+\end{quantikz}
+\end{document}

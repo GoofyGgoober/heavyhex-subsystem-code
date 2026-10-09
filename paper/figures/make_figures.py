@@ -113,7 +113,7 @@ def fig_lambda() -> None:
     ax.plot(pooled["predicted"], py, marker="D", ms=3.4, mfc="white", mec=MUTED, mew=0.8, ls="none")
     ax.axhline(1.0, color=GRID, lw=0.6)
 
-    labels = [f"{int(r['day'][-2:])} Oct" for r in reps] + ["all 10"]
+    labels = [f"day {DAYS.index(r['day']) + 1}" for r in reps] + ["all 10"]
     ax.set_yticks(list(y) + [py], labels)
     ax.tick_params(axis="y", length=0)
     ax.set_ylim(-0.8, y.max() + 1.5)
@@ -130,7 +130,7 @@ def fig_lambda() -> None:
 
 def fig_pn() -> None:
     """P(n) on each placement, X and Z memory, mean over the five days."""
-    fig, axes = plt.subplots(2, 2, figsize=(PAGE * 0.72, 3.6), sharex=True, sharey=True)
+    fig, axes = plt.subplots(2, 2, figsize=(PAGE, 3.4), sharex=True, sharey=True)
     n = np.array(ROUNDS)
     for col, rep in enumerate((1, 2)):
         for row, basis in enumerate(("X", "Z")):
@@ -169,7 +169,7 @@ def fig_leakage() -> None:
     """(a) A flag that fired fires again: excess over the model by lag. (b) Leak rate by role."""
     repeats = load(DIAG / "repeats.json")
     why = load(DIAG / "why.json")
-    fig, (a, b) = plt.subplots(1, 2, figsize=(PAGE * 0.72, 1.9))
+    fig, (a, b) = plt.subplots(1, 2, figsize=(PAGE, 2.1))
 
     lags = sorted(repeats["lags"], key=int)
     t = np.array([int(k) for k in lags]) * ROUND_US
@@ -213,10 +213,10 @@ def fig_scale() -> None:
         ax.plot(s, lam, marker + "-", color=colour, ms=3.2, label=f"{basis} memory")
         cross = data[basis]["crosses_at"]
         ax.plot([cross], [1.0], marker="|", ms=7, color=colour, mew=1.2)
-        ax.annotate(f"{cross:.2f}", (cross, 1.0), xytext=(0, 6), textcoords="offset points", ha="center", color=colour, fontsize=7)
+        ax.annotate(f"{cross:.2f}", (cross, 1.0), xytext=(3, 5), textcoords="offset points", ha="left", color=colour, fontsize=7)
     ax.axhline(1.0, color=MUTED, lw=0.6, ls=(0, (3, 2)))
     ax.axvline(1.0, color=GRID, lw=0.6)
-    ax.set_xlabel("error rates relative to Fez's 8 October medians")
+    ax.set_xlabel("error rates relative to Fez's day-5 medians")
     ax.set_ylabel(r"$\Lambda$")
     ax.set_xlim(0.15, 1.05)
     ax.legend(loc="upper right")
@@ -228,8 +228,14 @@ def fig_layout() -> None:
     """The chip figure, drawn by the repository's own script from day 1's calibration."""
     calibration = RUNS / "ibm_fez-2026-10-04-r1" / "calibration.json"
     env_path = str(ROOT / "src")
+    # Embed TrueType fonts rather than Type 3, as arXiv and journals prefer.
+    driver = (
+        "import matplotlib, runpy, sys; matplotlib.rcParams['pdf.fonttype'] = 42; "
+        "sys.argv = ['figure1.py', '--calibration', sys.argv[1], '--out', sys.argv[2]]; "
+        "runpy.run_path('figure1.py', run_name='__main__')"
+    )
     subprocess.run(
-        [sys.executable, "figure1.py", "--calibration", str(calibration), "--out", str(OUT / "layout.pdf")],
+        [sys.executable, "-c", driver, str(calibration), str(OUT / "layout.pdf")],
         cwd=ROOT / "docs" / "figures",
         check=True,
         env={"PYTHONPATH": env_path, "PATH": "/usr/bin:/bin"},
