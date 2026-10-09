@@ -17,6 +17,7 @@ Run from the repository root, in this order (each writes to `results/`):
 | `readout_bins.py` | Flags against IBM's quoted readout, by the day's own and the other days' quotes |
 | `stats.py` | Λ by placement, other estimators, and the agreement test with the calibration's day-to-day scatter |
 | `uniform_scale.py` | Where these circuits would reach Λ = 1 on a uniform chip, every error scaled together |
+| `no_reset.py` | What the resets cost: the calibration model with every reset taking no time |
 | `leaky.py` | A Pauli-frame simulator for the stim model with a leaked state per qubit (matches stim without leakage) |
 | `fit_leak.py`, `fit_leak2.py` | Fit the leakage model's inputs to detection statistics only |
 | `rerun.py`, `rerun_summary.py` | Rerun every job's memory circuits with the fitted model, decoded as the chip's shots were |
