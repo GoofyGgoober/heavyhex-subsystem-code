@@ -25,7 +25,7 @@ a pre-registered test of a calibration-based noise model}
 \begin{abstract}
 We report a pre-registered quantum-memory experiment with the heavy-hex subsystem code at distances 3 and 5 on IBM's 156-qubit Heron~r2 processor \texttt{ibm\_fez}, and use it to test whether a circuit-level noise model built from IBM's published calibration predicts the hardware.
 The circuits, qubit placement, analysis and decision rules were fixed in code before the first job, and a prediction for every job was committed before the job was submitted.
-Over five days and ten repetitions on the only two placements available each day, the distance-5 patch fails more often than the distance-3 patch at every number of rounds in X memory, and the error-suppression factor is $\Lambda = 0.55 \pm 0.03$, against $0.51$ predicted.
+Over five days and ten repetitions on the only two distance-5 placements available each day, the distance-5 patch fails more often than the distance-3 patch in X memory at 59 of 60 combinations of repetition and round count (the sixtieth differs by one shot in 2,500), and the error-suppression factor is $\Lambda = 0.55 \pm 0.03$, against $0.51$ predicted.
 The model reproduces $\Lambda$ once the day-to-day scatter of the calibration is allowed for, but underestimates the logical error rates behind it, by about a factor of two in Z memory, and fails the pre-registered agreement test.
 Flag and relay qubits, which should read zero, fire in persistent streaks lasting about $30\us$, more often on qubits that take part in more two-qubit gates and in correlated pairs, as expected for leakage out of the computational subspace that IBM's measure-and-flip reset does not remove.
 A leakage-aware Pauli-frame simulation fitted only to detection statistics closes a third to a half of the Z-memory gap.
@@ -45,12 +45,12 @@ The standard figure of merit is the error-suppression factor
   \label{eq:lambda}
 \end{equation}
 the ratio of the logical error per round at code distances 3 and 5; $\Lambda > 1$ means the larger code is better~\cite{google2023suppressing,google2025below}.
-Google's surface code reached $\Lambda \approx 1.04$ on Sycamore~\cite{google2023suppressing} and $\Lambda = 2.14 \pm 0.02$ on Willow~\cite{google2025below}, and on IBM's square-lattice Nighthawk processor a distance-5 surface code recently beat distance~3 in Z memory ($\Lambda \approx 1.29$), after defective components were excluded and leaked shots post-selected away~\cite{drouet2026error}.
+Google's surface code reached $\Lambda \approx 1.04$ on Sycamore~\cite{google2023suppressing} and $\Lambda = 2.14 \pm 0.02$ on Willow~\cite{google2025below}, and on IBM's square-lattice Nighthawk processor a distance-5 surface code recently beat distance~3 in Z memory, $0.98\%$ against $1.26\%$ per round, after defective components were excluded and leaked shots post-selected away~\cite{drouet2026error}.
 
 IBM's Heron processors instead use a heavy-hex lattice, in which no qubit has more than three neighbours.
 The heavy-hex subsystem code was designed for this connectivity~\cite{chamberland2020topological}, using flag qubits~\cite{chao2018quantum} to measure its weight-four gauge operators.
 It has been run at distance~3 on a 27-qubit Falcon processor~\cite{sundaresan2023demonstrating} and on Heron~r2~\cite{harper2026characterising}, and at distance~5 on Heron~r3 in an appendix of a study of the dynamic compass code~\cite{lee2026scalable}.
-Other codes embedded in heavy-hex hardware have generally performed worse at larger distance~\cite{hall2024artificial,hetenyi2024creating}; a SWAP-embedded surface code reached $\Lambda \approx 1.2$--$1.5$ in the basis protected by its enlarged distance but $0.67$--$0.77$ averaged over bases~\cite{vezvaee2026surface}.
+Other codes embedded in heavy-hex hardware have generally performed worse at larger distance~\cite{hall2024artificial,hetenyi2024creating}; a SWAP-embedded surface code reached $\Lambda \approx 1.2$--$1.5$ in the basis protected by its enlarged distance (1.0--1.1 against the best distance-3 sub-patch) but $0.67$--$0.77$ averaged over bases~\cite{vezvaee2026surface}.
 A comparative study found SWAP-embedded surface codes more promising than the native heavy-hex code for this lattice~\cite{benito2025comparative}.
 
 On such hardware the sign of $\Lambda$ is rarely in doubt: simulations from the device calibration put it below one before any data are taken (Sec.~\ref{sec:predicted}).
@@ -178,7 +178,7 @@ Appendix~\ref{app:stats} gives the details and the simulated error rates of thes
 
 \subsection{Record}
 
-The design, code and decision rules were fixed in code before the first job: the multi-day design and the pooling rule were committed 31 and 13 minutes before it, and the code was released as v0.2.0 and archived by Zenodo~\cite{zenodo} four minutes before it.
+The design, code and decision rules were fixed in code before the first job: the multi-day design and the pooling rule were committed 31 and 13 minutes before it, and the code was released as v0.2.0 and archived by Zenodo~\cite{zenodo} four minutes before it, the run's one third-party timestamp.
 Each day's folder of calibration, compiled circuits and prediction was committed and pushed before that day's first job, and the submission software refuses a job whose folder is not.
 The analysis code did not change during the run: all fifteen jobs record the same version.
 Every planned job was run and none was repeated or excluded.
@@ -199,7 +199,7 @@ Appendix~\ref{app:record} gives the timeline.
 All ten reps call distance~5 worse in X memory, with $\Lambda$ between 0.46 and 0.75 (Fig.~\ref{fig:lambda}).
 Pooled over the reps, $\Lambda = 0.55 \pm 0.03$, against $0.51$ predicted.
 The reps scatter more than their errors ($\chi^2/\nu = 3.9$); with the error widened accordingly and $t_9 = 1.83$, the pooled rule calls distance~5 worse.
-The result does not depend on the fitting procedure: the distance-5 patch has the higher logical error at every round count in every rep (Fig.~\ref{fig:pn}).
+The result does not depend on the fitting procedure: in X memory the distance-5 patch has the higher logical error in 59 of the 60 combinations of rep and round count, and in the sixtieth (7 October, rep~1, one round) the two differ by a single shot in 2,500 (Fig.~\ref{fig:pn}).
 
 \begin{figure*}[t]
 \centering
@@ -229,9 +229,9 @@ Z, placement 2 & obs. & $15.6\pm1.3$ & $26.3\pm1.0$ & $0.63\pm0.05$ \\
 \end{ruledtabular}
 \end{table*}
 
-The ten reps are two placements measured on five days each, and they behave that way.
-$\Lambda$ is $0.68\pm0.03$ on placement~1 and $0.50\pm0.02$ on placement~2 (predicted 0.64 and 0.45 on average), and within each placement the five days agree ($\chi^2/\nu = 0.4$ and $0.8$; Table~\ref{tab:placement}).
-The chip's $\Lambda$ is therefore stable from day to day, and the excess scatter between reps reflects placement.
+The ten reps are essentially two placements measured on five days each: the distance-5 patches occupied the same two places every day, and rep~1's distance-3 patch one place, while rep~2's distance-3 patch occupied three different places over the run, all within rep~1's distance-5 footprint.
+In X memory, $\Lambda$ is $0.68\pm0.03$ on placement~1 and $0.50\pm0.02$ on placement~2 (predicted 0.64 and 0.45 on average), and within each placement the five days agree ($\chi^2/\nu = 0.4$ and $0.8$; Table~\ref{tab:placement}).
+The device's X-memory $\Lambda$ is therefore stable from day to day, and the excess scatter between reps reflects placement; Z memory varies more ($\chi^2/\nu = 1.9$ and $2.7$ within placements).
 Because the pooled rule treats reps as independent, its error bar is too narrow for a statement about the device as a whole: taking the placement as the unit ($n=2$) gives $\Lambda = 0.59 \pm 0.09$, which the same test leaves undecided (one-sided $p \approx 0.07$).
 The conclusion that distance~5 is worse is firm for these two placements, which were the only clean ones on every run day, and suggestive for Fez in general.
 Other reasonable estimators give 0.55--0.60 (Appendix~\ref{app:stats}).
@@ -249,10 +249,13 @@ Because Z memory does not depend on $f$, its miss points at the calibrated CZ, r
 Part of the X-memory disagreement reflects the calibration rather than the chip.
 On placement~1 the predicted $\Lambda$ moved between 0.54 and 0.82 over the five days while the measured value stayed between 0.65 and 0.75.
 The pre-registered bound allows for shot noise, the uncertainty in $f$ and recalibration during a job, but not for this day-to-day scatter of IBM's numbers.
-Adding it ($16\%$ of the predicted $\Lambda$, estimated from the spread of the predictions themselves) brings $\Lambda$ ($\chi^2 = 7.8$) and $\eps_5$ (13.4) within the bound, while $\eps_3$ (35.3) and all Z-memory tests still fail.
+As a post hoc check, we add to each predicted quantity its relative standard deviation over the five days of predictions on placement~1 (16\% for $\Lambda$, 9\% for $\eps_3$, 8\% for $\eps_5$).
+$\Lambda$ then passes ($\chi^2 = 7.8$ against 18.3), robustly so: any relative scatter above about 6\% suffices.
+$\eps_5$ passes marginally (13.4), and would fail with placement~2's smaller prediction scatter; $\eps_3$ (35.3) and all Z-memory tests still fail.
+This treats the calibration's daily changes as noise in the prediction rather than as changes of the device, an interpretation suggested, but not proven, by the device's own day-to-day stability.
 
 The decoupling pulses removed little dephasing.
-The idle tests give $f$ between 0.72 and 1.52 across the fifteen jobs (median 0.98), with a spread across qubits far exceeding the per-qubit uncertainties ($\chi^2/\nu$ of 12--80 about the weighted mean in every job).
+The idle tests give $f$ between 0.72 and 1.52 across the fifteen jobs (median 0.99), with a spread across qubits far exceeding the per-qubit uncertainties ($\chi^2/\nu$ of 12--80 about the weighted mean in every job).
 Values of $f$ read back from the memory runs agree with the idle test in ten of fifteen jobs and are higher in the other five, as expected if the idle test, which omits the CZ pulses and keeps neighbouring ancillas in $|0\rangle$, underestimates the dephasing during memory.
 The detection rate rises over the rounds beyond the prediction in 25 of the 40 eight-round runs, and is flagged in every job; drift within jobs is absent (largest change between the first and second halves of a job's shots: 2.5$\sigma$).
 
@@ -298,8 +301,8 @@ Outside it, flags fire in 4.1\% of rounds against the model's 4.4\%.
 \end{figure*}
 
 \paragraph{Consistent with leakage.}
-A transmon excited out of $\{|0\rangle,|1\rangle\}$ is not returned by a measure-and-flip reset, reads out at random, decays back over tens of microseconds and is most often produced by two-qubit gates~\cite{mcewen2021removing,miao2023overcoming}.
-The persistent state shows these features.
+In transmon processors, leakage out of $\{|0\rangle,|1\rangle\}$ arises in two-qubit gates and in measurement, persists for tens of microseconds, and spreads to neighbours through two-qubit gates~\cite{mcewen2021removing,miao2023overcoming}; a reset that measures and conditionally flips the qubit acts only within $\{|0\rangle,|1\rangle\}$ and does not return a leaked qubit~\cite{drouet2026error}.
+These observations come from processors with tunable-frequency qubits and a different CZ gate, so their rates need not carry over to Heron, but the persistent state shows the same qualitative features.
 Its onset rate is about twice as high on flags, which take part in 8.25 CZs per round, as on relays, which take part in three (Fig.~\ref{fig:leak}b); a linear fit attributes $\approx 0.31\%$ per CZ and $\approx 0.94\%$ per round to readout and reset, although with only two roles the CZ count cannot be separated from other differences between flags and relays.
 The rate barely tracks IBM's reported CZ error for the qubit's couplers (Spearman $\rho = 0.15$) and not at all the number of simultaneous CZs on neighbouring couplers ($\rho = 0.02$), so we see no sign of crosstalk from parallel gates, although the circuit varies little in that respect.
 IBM's binary readout cannot distinguish $|2\rangle$, so the identification rests on the persistence, lifetime, gate dependence and spatial correlations rather than on direct observation.
@@ -343,24 +346,25 @@ Z memory, $d=5$ & 27.3\% & 16.6\% & 21.5\% \\
 \label{sec:discussion}
 %======================================================================
 
-$\Lambda$ for the heavy-hex code at distances 3 and 5 on Fez is below one in both bases, as the calibration model predicted, and is set mainly by placement: the two placements give $0.68$ and $0.50$, each stable over five days.
+$\Lambda$ for the heavy-hex code at distances 3 and 5 on Fez is below one in both bases, as the calibration model predicted, and is set mainly by placement: in X memory the two placements give $0.68$ and $0.50$, each stable over five days.
 With only two placements, this is firm for them and suggestive for the device.
 
 The calibration model captures the ordering of the placements and, once its own day-to-day scatter is admitted, $\Lambda$ in X memory.
 It does not capture the logical error rates.
 The discrepancies point in one direction: decoupling with two $X$ pulses leaves about echo-level dephasing, the memory runs imply more dephasing than the idle test, and the flags reveal persistent excitations, consistent with leakage, that the resets do not clear and that spread through CZ gates.
 
-Our distance-3 error of 10--14\% per round is roughly three times the 3--4\% reported for heavy-hex memory in Refs.~\cite{sundaresan2023demonstrating,harper2026characterising}.
-In Ref.~\cite{harper2026characterising}, on the same processor generation, the error per round fell from above 10\% to 3--4\% when the circuit dropped its resets, among other changes.
-Our circuit keeps two readouts and two resets per round, which occupy $6.7\us$ of every $7.9\us$, and twelve CNOTs per bulk Z gauge, and leakage grows with both.
-The natural next steps are to remove the resets or replace them with leakage-removing operations~\cite{miao2023overcoming}, to shorten the Z gauge, to use longer decoupling sequences, and to twirl gates and readout so that the noise is closer to the Pauli channels a stabilizer model assumes.
+Our distance-3 errors are comparable to earlier heavy-hex experiments in X memory and worse in Z memory.
+Without leakage post-selection, Ref.~\cite{sundaresan2023demonstrating} reports 11.3\% per round in X memory and 5.9\% in Z memory at distance~3 on a Falcon processor (about 3--4\% in Z memory after post-selection), against our 10--14\% and 13--24\%.
+On Heron~r2, Ref.~\cite{harper2026characterising} reduced the error per round from above 10\% to 3--4\% by measuring the X and Z gauges in parallel and without resets, shortening the round from 11.1 to $3.2\us$; it attributes the gain mainly to reduced relaxation during measurement and found resets alone to make a negligible difference.
+Our round spends $6.7\us$ of its $7.9\us$ on two readouts and two resets, and uses twelve CNOTs per bulk Z gauge; idle decay grows with the first and, in our diagnosis, leakage with both.
+The natural next steps are a shorter round with parallel gauge measurements, a shorter Z gauge, resets that remove leakage~\cite{miao2023overcoming}, longer decoupling sequences, and twirled gates and readout so that the noise is closer to the Pauli channels a stabilizer model assumes.
 A calibration-based model of such circuits needs, at a minimum, IBM's reset errors, readout errors resolved by outcome, the calibration's day-to-day scatter in its error budget, and a leakage term with its spread.
 
 \paragraph{Limitations.}
 Only two placements were available, they overlap on 51 of 65 qubits, and they were the same every day.
 One calibration serves all reps of a day, and a split rep's two patches run minutes apart.
 The pre-registered error bars include shot noise, the measured $f$ and recalibration during a job, but not day-to-day calibration scatter.
-$\eps$ and $\Lambda$ describe one to eight rounds, not asymptotic rates; the distance-5 eight-round points lie near 50\% and drop out of the fit in four of ten reps in each basis.
+$\eps$ and $\Lambda$ describe one to eight rounds, not asymptotic rates; the distance-5 eight-round points lie near 50\% and drop out of the fit in four of ten reps in each basis, and in Z memory on two occasions the six-round point as well, leaving $\eps_5$ to rounds one to four.
 The idle test likely underestimates $f$ during memory.
 The diagnosis is exploratory, fitted to the run's own data, with a leakage model whose form is assumed.
 
@@ -383,8 +387,11 @@ The code, every job's calibration, compiled circuits, prediction, shots and anal
 
 The repository's history before the run was rewritten twice by force-pushes (24 September and 2 October 2026; the second changed only commit messages); from 3 October onward it matches GitHub's record of pushes.
 On 3 October two single-job designs were released (v0.1.0 and v0.1.1) and then replaced; a folder prepared for a single job that day was deleted without being submitted.
-The final multi-day design (commit \texttt{1c86fce}) and pooling rule (\texttt{cd4a68e}) were committed 31 and 13 minutes before the first job, at 21:33~UTC on 3 October, and released as v0.2.0, archived by Zenodo~\cite{zenodo}, at 21:29~UTC.
-Days 2--5 were not released separately; their record is the git history, in which each day's folder was pushed before its first job.
+The final multi-day design (commit \texttt{1c86fce}) and pooling rule (\texttt{cd4a68e}) were committed 31 and 13 minutes before the first job, at 21:33~UTC on 3 October, and released as v0.2.0 at 21:29~UTC and archived by Zenodo~\cite{zenodo}; the archive matches that commit file for file.
+Days 2--5 were not released separately.
+Their record is the git history and GitHub's log of pushes, which shows each day's folder pushed 14--15~s before that day's first submission (and 8~min before on day~1), and the IBM job identifiers, whose embedded timestamps match the recorded submission times.
+On day~2 the folder was prepared twice, because IBM published a new calibration between preparation and submission; only the calibration's timestamp changed, and the prediction was identical.
+Days 2--5 were prepared and submitted by a script added after day~1, which enforces the same per-job and total QPU limits through the unchanged submission code.
 No copy of the manuscript text was archived before the run: the design and decision rules it describes are those of the code as released.
 The code under \texttt{src/} and its configuration are unchanged from \texttt{cd4a68e} to the end of the run, and each job's recorded code hash is identical.
 
