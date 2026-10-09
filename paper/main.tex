@@ -449,8 +449,10 @@ Our errors per round are comparable to earlier heavy-hex experiments in X memory
 Without leakage post-selection, Ref.~\cite{sundaresan2023demonstrating} reports 11.3\% per round in X memory and 5.9\% in Z memory at distance~3 on a Falcon processor (about 3--4\% in Z memory after post-selection), against our 10--14\% and 13--24\%.
 On Heron~r2, Ref.~\cite{harper2026characterising} reduced the error per round from above 10\% to 3--4\% by measuring the X and Z gauges in parallel and without resets, shortening the round from 11.1 to $3.2\us$; it attributes the gain mainly to reduced relaxation during measurement and found resets alone to make a negligible difference.
 Our round spends $6.7\us$ of its $7.9\us$ on two readouts and two resets, and uses twelve CX gates per bulk Z gauge.
+The resets were not needed: a measured qubit is left in a known state, and its outcome could have been tracked in software instead.
+In the calibration model, giving every reset zero duration while keeping its error shortens the round to $4.5\us$ and lowers $\eps$ by a third to a half, but leaves $\Lambda$ nearly unchanged on a placement we ran (repetition~1 of day~1: $\LX$ from 0.55 to 0.54, $\LZ$ from 0.39 to 0.36); on a uniform chip at the day-5 medians it raises $\LX$ from 0.83 to 0.95.
 The readout and reset time sets the idle decay, and the persistent state is twice as frequent on flags, which undergo more gates, readouts and resets.
-The natural next steps are a shorter round with parallel gauge measurements, a shorter Z gauge, resets that remove leakage~\cite{miao2023overcoming}, longer decoupling sequences, and twirled gates and readout, so that the noise is closer to the Pauli channels a stabilizer model assumes.
+The natural next steps are a shorter round, without resets and with parallel gauge measurements, a shorter Z gauge, resets that remove leakage~\cite{miao2023overcoming}, longer decoupling sequences, and twirled gates and readout, so that the noise is closer to the Pauli channels a stabilizer model assumes.
 A calibration-based model of such circuits needs, at a minimum, a leakage term with its spread and the calibration's day-to-day scatter in its error budget; IBM's separate reset errors and outcome-resolved readout errors improve agreement at the detector level.
 
 \paragraph*{Limitations.}
