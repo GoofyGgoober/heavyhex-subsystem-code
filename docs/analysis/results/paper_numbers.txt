@@ -41,7 +41,7 @@
    Lambda_X calibrated 0.554 +- 0.030, uniform 0.517 +- 0.032; edge p 0.0014-0.50
 12. Leakage
    fires in 9.1% of rounds (model 6.9%); HMM onset 2.5%, lifetime 31 us, e_L 0.51
-   onset per round = 0.31% per CZ x CZs + 0.94% (two CZ counts only)
+   onset per round = 0.32% per CZ x CZs + 0.89% (two CZ counts only)
 13. IBM's reset and readout errors
    init_error / the model's reset error, medians by day: 0.23, 0.22, 0.19, 0.23, 0.24
    in the calibration model, change in Z eps (pp, mean over patches): d3 -0.58 +- 0.10; d5 -0.48 +- 0.17
@@ -49,3 +49,20 @@
    Z memory, jobs of 15: model's mean detector rate below the device's 15, lowered further 15, per-detector deviation larger 14
 14. Operating characteristics (power.py; 5 and 10 reps, f = 0 and 1)
    Lambda = 1 called, scatter 1x/2x/4x: 2.2-6.0%, 5.9-19.4%, 10.3-38.4%; X tests fail when right 5.8-11.8%; gap 0.06 caught 82.1-98.2%
+15. Effect sizes (effect_sizes.py; binomial O/M, 95%: placements t4, all ten DL-HKSJ)
+   X eps3    placement 1 1.259 (1.081-1.466); placement 2 1.303 (1.089-1.560); all ten 1.260 (1.148-1.382); tau 0.054
+   X eps5    placement 1 1.202 (1.064-1.356); placement 2 1.187 (1.127-1.249); all ten 1.206 (1.145-1.270); tau 0.000
+   X lambda  placement 1 1.048 (0.820-1.339); placement 2 1.098 (0.941-1.282); all ten 1.058 (0.937-1.195); tau 0.143
+   Z eps3    placement 1 1.964 (1.765-2.185); placement 2 2.156 (1.541-3.015); all ten 2.044 (1.785-2.340); tau 0.154
+   Z eps5    placement 1 1.865 (1.706-2.037); placement 2 1.810 (1.552-2.110); all ten 1.827 (1.709-1.953); tau 0.060
+   Z lambda  placement 1 1.053 (0.956-1.161); placement 2 1.191 (0.807-1.757); all ten 1.112 (0.949-1.302); tau 0.189
+   prespecified chi2 (p, Holm; bias, scatter): X eps3 52.1 (1.1e-07, 3.3e-07; 40.4, 11.7), X eps5 19.8 (0.031, 0.031; 15.0, 4.8), X lambda 25.0 (0.0054, 0.011; 3.8, 21.1)
+   placement 1 Lambda_X, constant vs follows the prediction (4 dof): binomial 2.6 vs 21.1 (r -0.50; without day 2 4.6), wls 1.5 vs 21.1 (r -0.65; without day 2 4.2); power at 0.06 0.38, 80% at 0.092 (eps 16%, 15%)
+16. Placements (searched / all embeddings) and calibration inputs
+   d3 sets 30 / 74 (148 embeddings); usable by day 18/44, 18/44, 18/44, 18/44, 18/44; rep-2 d3 rank among all usable 1, 2, 2, 2, 3
+   d5 stricter bars passing (day 1): {'usable_all': 2, 'stricter (usable distance-5 placements passing)': {'CZ error < 5%': 0, 'readout error < 10%': 0, 'T2 > 10 us': 1, 'all three': 0}}
+   q51 readout by day 3.4%, 4.8%, 12.2%, 48.6%, 3.2%; readout gap P(0|1)-P(1|0) median 0.76 points
+17. Diagnostics after the first review
+   detection-event fraction device/model, median (share above 1): all 1.20 (76%), X weight 4 1.15 (78%), X weight 2 0.98 (47%), Z 1.19 (99%), flag 1.55 (82%), relay 1.16 (66%)
+   f vs T2: rho 0.66 [0.35, 0.85]; f_mem > f_idle in 15/15 (medians 1.45, 0.99)
+   miscorrected single faults: 5-61% of predicted eps3

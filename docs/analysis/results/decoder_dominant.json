@@ -1,0 +1,149 @@
+{
+ "rounds": 8,
+ "patches": {
+  "2026-10-04-r1": {
+   "predicted_eps3": 0.09736389071282392,
+   "miscorrected_per_round": 0.039107216622142976,
+   "share_of_predicted_eps3": 0.4016603726066189,
+   "largest": {
+    "fault": "Z on q44 (DEPOLARIZE1)",
+    "p_per_round": 0.03315398009546664,
+    "share_of_miscorrected": 0.8477714079169332,
+    "decoder_chose_edges_p": [
+     0.10952248534535096,
+     0.2041876075032077
+    ]
+   }
+  },
+  "2026-10-04-r2-d3": {
+   "predicted_eps3": 0.08066946798416152,
+   "miscorrected_per_round": 0.008547030073896416,
+   "share_of_predicted_eps3": 0.10595123889467725,
+   "largest": {
+    "fault": "Z on q126 (DEPOLARIZE1)",
+    "p_per_round": 0.006597907273716621,
+    "share_of_miscorrected": 0.7719532067480804,
+    "decoder_chose_edges_p": [
+     0.059795460866084324,
+     0.15092676095378887
+    ]
+   }
+  },
+  "2026-10-05-r1": {
+   "predicted_eps3": 0.11767979426872083,
+   "miscorrected_per_round": 0.0054140787377859505,
+   "share_of_predicted_eps3": 0.04600686780113625,
+   "largest": {
+    "fault": "Z on q24 (DEPOLARIZE1)",
+    "p_per_round": 0.0030032186645866476,
+    "share_of_miscorrected": 0.5547053912656602,
+    "decoder_chose_edges_p": [
+     0.09105070180762523,
+     0.1440413969040114
+    ]
+   }
+  },
+  "2026-10-05-r2-d3": {
+   "predicted_eps3": 0.07699965885880461,
+   "miscorrected_per_round": 0.009407715632962851,
+   "share_of_predicted_eps3": 0.12217866640440467,
+   "largest": {
+    "fault": "Z on q126 (DEPOLARIZE1)",
+    "p_per_round": 0.007322722018495266,
+    "share_of_miscorrected": 0.778374081890596,
+    "decoder_chose_edges_p": [
+     0.07271633115067988,
+     0.11590686247444344
+    ]
+   }
+  },
+  "2026-10-06-r1": {
+   "predicted_eps3": 0.10421187396907933,
+   "miscorrected_per_round": 0.004917323739199031,
+   "share_of_predicted_eps3": 0.0471858297132057,
+   "largest": {
+    "fault": "Z on q44 (DEPOLARIZE1)",
+    "p_per_round": 0.002577836818227959,
+    "share_of_miscorrected": 0.5242357336935997,
+    "decoder_chose_edges_p": [
+     0.10192324167942338,
+     0.2008189100509404
+    ]
+   }
+  },
+  "2026-10-06-r2-d3": {
+   "predicted_eps3": 0.10218901394103408,
+   "miscorrected_per_round": 0.06212877918718264,
+   "share_of_predicted_eps3": 0.6079790458006835,
+   "largest": {
+    "fault": "Z on q124 (DEPOLARIZE1)",
+    "p_per_round": 0.04514671532964069,
+    "share_of_miscorrected": 0.7266634870391047,
+    "decoder_chose_edges_p": [
+     0.1591162937605875,
+     0.3088047403894273
+    ]
+   }
+  },
+  "2026-10-07-r1": {
+   "predicted_eps3": 0.09730269699406924,
+   "miscorrected_per_round": 0.0387858745465912,
+   "share_of_predicted_eps3": 0.3986104778673839,
+   "largest": {
+    "fault": "Z on q44 (PAULI_CHANNEL_1)",
+    "p_per_round": 0.030532275249695588,
+    "share_of_miscorrected": 0.7872008974045165,
+    "decoder_chose_edges_p": [
+     0.14465722318747237,
+     0.2089284947159006
+    ]
+   }
+  },
+  "2026-10-07-r2-d3": {
+   "predicted_eps3": 0.08788901735040122,
+   "miscorrected_per_round": 0.010528705778710451,
+   "share_of_predicted_eps3": 0.11979546587412593,
+   "largest": {
+    "fault": "Z on q126 (DEPOLARIZE1)",
+    "p_per_round": 0.006771677732918099,
+    "share_of_miscorrected": 0.6431633550450955,
+    "decoder_chose_edges_p": [
+     0.0570189355367991,
+     0.1849383986381408
+    ]
+   }
+  },
+  "2026-10-08-r1": {
+   "predicted_eps3": 0.09570654872316164,
+   "miscorrected_per_round": 0.036168000249875196,
+   "share_of_predicted_eps3": 0.3779051771524417,
+   "largest": {
+    "fault": "Z on q44 (PAULI_CHANNEL_1)",
+    "p_per_round": 0.028623460426214928,
+    "share_of_miscorrected": 0.7914029039057446,
+    "decoder_chose_edges_p": [
+     0.1439647020159693,
+     0.19906836225560223
+    ]
+   }
+  },
+  "2026-10-08-r2-d3": {
+   "predicted_eps3": 0.08225532351674242,
+   "miscorrected_per_round": 0.006198625043849358,
+   "share_of_predicted_eps3": 0.07535834495365734,
+   "largest": {
+    "fault": "Z on q108 (DEPOLARIZE1)",
+    "p_per_round": 0.002860681407128359,
+    "share_of_miscorrected": 0.46150257305317993,
+    "decoder_chose_edges_p": [
+     0.08584328497133414,
+     0.09706710562421131
+    ]
+   }
+  }
+ },
+ "share_range": [
+  0.04600686780113625,
+  0.6079790458006835
+ ]
+}
