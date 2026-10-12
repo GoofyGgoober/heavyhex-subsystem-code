@@ -1,6 +1,0 @@
-# Large or regenerable intermediates (rebuild with the scripts in each folder)
-*.npz
-*.pkl
-*.pickle
-cache/
-**/cache/

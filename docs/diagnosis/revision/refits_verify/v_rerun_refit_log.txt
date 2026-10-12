@@ -1,5 +1,0 @@
-(a) my WLS on their regenerated counts vs stored eps: max |diff| = 6.11e-16
-
-(c) table means, MLE (WLS):
-  model        X3 9.38 (9.36) X5 17.73 (17.64) Z3 7.64 (7.63) Z5 16.67 (16.61) LX 0.5404 (0.5418) LZ 0.4607 (0.4616)
-  fit-bitflip  X3 13.24 (13.20) X5 23.80 (23.28) Z3 10.22 (10.19) Z5 21.59 (21.46) LX 0.5588 (0.5689) LZ 0.4752 (0.4765)

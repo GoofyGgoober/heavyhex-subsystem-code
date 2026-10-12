@@ -9,13 +9,13 @@ predictions at f = 0, 0.5 and 1, as analyze does. Both directions are run.
 
 The preview used IBM's calibration of 3 October 2026 against the day before's:
 
-    git show 9414ac1:runs/ibm_fez-2026-10-02-offline/calibration.json > before.json
-    git show d021f1e:runs/ibm_fez-2026-10-03-offline/calibration.json > after.json
+    git show 8cc0523:runs/ibm_fez-2026-10-02-offline/calibration.json > before.json
+    git show 5136246:runs/ibm_fez-2026-10-03-offline/calibration.json > after.json
     python docs/calibration_scatter.py after.json before.json
 
 (The two offline preview folders are no longer in the tree; git keeps them.)
 
-Local simulation only; it uses no QPU time.
+Local simulation only, and heavy: 200,000 shots per circuit by default (--shots, --workers).
 """
 
 from __future__ import annotations
@@ -96,8 +96,9 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("day", type=Path, help="one calibration file")
     parser.add_argument("other_day", type=Path, help="another day's calibration file")
     parser.add_argument("--shots", type=int, default=run.SIMULATED_SHOTS, metavar="N")
+    parser.add_argument("--workers", type=int, default=2, metavar="N")
     args = parser.parse_args(argv)
-    with ProcessPoolExecutor(4) as pool:
+    with ProcessPoolExecutor(args.workers) as pool:
         for model_day, chip_day in ((args.day, args.other_day), (args.other_day, args.day)):
             r = read_off(model_day, chip_day, args.shots, pool)
             print(

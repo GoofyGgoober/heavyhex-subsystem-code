@@ -13,10 +13,12 @@ Reports, for 5 and 10 reps:
 - how often the X-memory model test fails when the model is exactly right;
 - the gap in Λ the test catches 80% of the time.
 
-    python docs/power.py runs/<rep 1 folder> runs/<rep 2 folder> [runs/<rep 2's other job>] ...
+    python docs/power.py runs/<rep 1 folder> runs/<rep 2 folder> [runs/<rep 2's other job>] ... [--out FILE.json]
 
 Folders of a split rep's two jobs go next to each other; a rep's patches are
-found from the folders' predictions.
+found from the folders' predictions. --out also writes the numbers, with the folders and
+seed they came from (docs/analysis/results/power.json by convention). The numbers in the
+paper were printed before the first job; the folders that run read were not recorded.
 """
 
 from __future__ import annotations
@@ -118,13 +120,22 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("folders", nargs="+", type=Path)
     parser.add_argument("--trials", type=int, default=2000)
     parser.add_argument("--seed", type=int, default=1)
+    parser.add_argument("--out", type=Path, help="also write the numbers to this JSON file")
     args = parser.parse_args(argv)
     rng = np.random.default_rng(args.seed)
+    found: dict = {
+        "folders": [str(f) for f in args.folders],
+        "trials": args.trials,
+        "seed": args.seed,
+        "f": {},
+    }
     for end in map(str, run.ENDS):
         models = curves(args.folders, end)
         lam = [m["X", "3"][1] / m["X", "5"][1] for m in models]
         print(f"f = {end}: predicted Λ per rep {', '.join(f'{v:.2f}' for v in lam)}")
+        found["f"][end] = {"predicted_lambda": lam}
         for reps in (5, 10):
+            row = found["f"][end][f"{reps} reps"] = {}
 
             def rate(truths, check, scatter=1.0):  # called within this iteration only
                 hits = sum(
@@ -136,19 +147,25 @@ def main(argv: list[str] | None = None) -> None:
             one = rep_test(models[0], models[0], rng, 1.0)["lambda"][1]
             sigma = campaign(models, models, reps, rng)["sigma"]
             print(f"  {reps} reps: σ(Λ) {one:.3f} for one rep, {sigma:.3f} pooled")
+            row.update(sigma_one_rep=one, sigma_pooled=sigma, called_at_lambda_1={})
             for scatter in (1.0, 2.0, 4.0):
                 called = rate(at_one(models), lambda c: c["call"] != "undecided", scatter)
                 print(f"    Λ = 1, scatter {scatter:.0f}x shot noise: called {called:.1%}")
+                row["called_at_lambda_1"][f"scatter {scatter:g}"] = called
             worse = rate(models, lambda c: c["call"] == "d = 5 worse")
             print(f"    at the predicted Λ: d = 5 called worse {worse:.1%}")
             fails = rate(models, lambda c: not all(c["passes"].values()))
             print(f"    model exactly right: the X tests fail {fails:.1%}")
+            row.update(worse_at_predicted=worse, x_tests_fail_when_right=fails)
             for gap in np.arange(0.02, 0.31, 0.02):
                 factor = 1 + gap / float(np.mean(lam))
                 caught = rate(scaled(models, factor), lambda c: not c["passes"]["lambda"])
                 if caught >= 0.8:
                     print(f"    a gap in Λ of {gap:.2f} is caught {caught:.0%} of the time")
+                    row["gap_caught_80pct"] = {"gap": float(gap), "caught": caught}
                     break
+    if args.out:
+        args.out.write_text(json.dumps(found, indent=1) + "\n")
 
 
 if __name__ == "__main__":

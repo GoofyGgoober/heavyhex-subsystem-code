@@ -12,19 +12,20 @@ allowed-confusables = ["σ"]
 
 [lint.isort]
 # Sibling modules of the docs scripts, imported from their own folder.
-known-local-folder = ["common", "draw_blueprint", "leaky", "rerun", "where"]
+known-local-folder = [
+  "common", "draw_blueprint", "exact_sim", "fitting", "frame_sim", "hmm_bootstrap", "idle_f",
+  "leakage", "leakage_fit", "leakage_frame_rerun", "leakage_grid", "matching", "perqubit_f",
+  "placements", "tableau_ref",
+]
 
 [lint.per-file-ignores]
 # The code that prepared and analysed the runs, frozen at tag v0.2.0: checked by the
 # rules it was written to.
 "src/**" = ["B", "UP", "SIM", "C4", "RUF"]
-# The post hoc analysis scripts: pyflakes only. They run at import and share module
-# state with their siblings, so they keep their own layout.
-"docs/diagnosis/revision/**" = ["E", "I", "B", "UP", "SIM", "C4", "RUF"]
 # The other analysis and figure scripts zip arrays that are equal in length by
-# construction, and were run as they are: zip(strict=) is not added to them.
-"docs/**" = ["B905"]
+# construction, and were run as they are: zip(strict=) is not added to them. O is the
+# matrix of observable flips, as in the decoder code.
+"docs/**" = ["B905", "E741"]
+# These set one BLAS thread per process before numpy is imported (worker pools).
+"docs/analysis/{hmm_bootstrap,leakage,leakage_checks,leakage_grid,leakage_grid_bootstrap,leakage_rerun}.py" = ["E402"]
 "paper/**" = ["B905"]
-
-[format]
-exclude = ["docs/diagnosis/revision/**"]

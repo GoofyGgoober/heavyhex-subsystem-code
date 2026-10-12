@@ -1,6 +1,7 @@
 """The pre-run planning figure: simulated Λ on Fez as placed, and with parts made better.
 
-Simulated for the write-up before the run (figure3.json); the paper does not use it.
+Simulated before the run (figure3.json, which the paper's pre-run section quotes). Its
+code.commit, 1c86fce, is the commit before the history was rewritten (now 375462e).
 
 Every row runs what the run runs: the patches where fez_qubits puts them on the
 given calibration, both in one circuit, translated by for_fez with the
@@ -9,7 +10,8 @@ scenario changes only the calibration; the qubits and circuits stay as placed.
 Λ in X memory at each end of decoupled_dephasing, and in Z memory averaged over
 the two. The d=3 patch is also moved onto the d=5 patch's qubits, beside the usual
 d=3, at every d=3 spot inside the d=5 footprint. The average over placements simulates
-every clean d=3 and d=5 spot, each patch alone, in X memory. Runs offline.
+every usable d=3 and d=5 spot, each patch alone, in X memory. Runs offline, and is heavy
+(200,000 shots per circuit by default).
 
     python docs/figures/figure3.py --calibration PATH [--out PATH.json] [--shots N]
 """
