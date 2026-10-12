@@ -11,7 +11,7 @@ has been re-analysed. Nothing under runs/ is written: `heavyhex experiment analy
 repository's own, is refused. The fifteen jobs take about 15 minutes with four workers,
 each needing 1-2 GB of memory. combine only pools the stored analyses.
 
-compare sets each re-analysed job, and combined.json, against runs/ in three tiers:
+compare sets each re-analysed job, and combined.json, against runs/ in four tiers:
 
   A  decoded from the chip's shots, and the record (patches, rep, frozen prediction):
      equal.
@@ -23,6 +23,11 @@ compare sets each re-analysed job, and combined.json, against runs/ in three tie
      independent samples); what is derived from the samples (agreement, leakage, f read
      off the memory runs, the detectors beyond chance) is not compared. 5.5 standard
      errors keeps a false alarm over the fifteen jobs' 53,760 values below 0.3%.
+  D  the decisions in combined.json: each agreement test's chi2 within 25% relative,
+     about five times what the simulator's noise in the predictions moves it (3-5%
+     between two 200,000-shot samples), and each verdict, and whether the model matches
+     the device in each basis, equal unless the stored chi2 lies within that 25% of the
+     bound. The per-repetition Lambda verdicts are tier A.
 
 A job that was asked for but not re-analysed counts as a failure. combined.json is
 compared when no --job is named.
@@ -64,6 +69,7 @@ ABSOLUTE = 1e-15  # tier B, for values at zero up to float noise
 STANDARD_ERRORS = 5.5  # tier C, each value
 MEAN_SQUARE = 1.3  # tier C, over a file's values (about 1 for independent samples)
 ULPS = 4  # combine over the stored analyses: scipy's t and chi2 quantiles move by an ulp
+DECISION_RELATIVE = 0.25  # tier D: each agreement test's chi2, and the band around its bound
 
 JsonPath = tuple[Any, ...]  # keys and indices from the top of a JSON document
 
@@ -381,10 +387,33 @@ def compare_combined(
     """A combined.json against the stored one: by tier, or by `rule` if one is given."""
     report = Report(identical=_lf(got) == _lf(want))
     rule_of = strict_rule if strict else (rule or combined_rule)
-    walk(json.loads(got.read_text()), json.loads(want.read_text()), rule_of, report)
+    new, old = json.loads(got.read_text()), json.loads(want.read_text())
+    walk(new, old, rule_of, report)
+    if not strict and rule is None:
+        compare_decisions(new, old, report)
     if strict and not report.identical and report.passed:
         report.failures.append("equal values, but the bytes differ")
     return report
+
+
+def compare_decisions(new: dict, old: dict, report: Report) -> None:
+    """Tier D: the model-agreement tests and verdicts of a combined.json."""
+    near_bound = {"X": False, "Z": False}
+    for name, want in old.get("model", {}).items():
+        got = new.get("model", {}).get(name)
+        if got is None:
+            continue  # the walk reports the missing key
+        off = abs(got["chi2"] - want["chi2"]) / max(abs(got["chi2"]), abs(want["chi2"]))
+        near = abs(want["chi2"] - want["bar"]) <= DECISION_RELATIVE * want["bar"]
+        near_bound[name.split()[0]] |= near
+        if off > DECISION_RELATIVE:
+            report.failures.append(f"model/{name}/chi2: {got['chi2']!r} != {want['chi2']!r}")
+        if got["agrees"] != want["agrees"] and not near:
+            report.failures.append(f"model/{name}/agrees: {got['agrees']} != {want['agrees']}")
+    for basis, want in old.get("matches", {}).items():
+        got = new.get("matches", {}).get(basis)
+        if got is not None and got != want and not near_bound.get(basis, False):
+            report.failures.append(f"matches/{basis}: {got} != {want}")
 
 
 def _compare_command(args: argparse.Namespace, out: Path, names: list[str]) -> int:

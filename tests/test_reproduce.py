@@ -134,6 +134,38 @@ def test_what_depends_on_the_samples_is_not_compared(one_job):
     assert compare(analysis, path).passed
 
 
+def test_the_decisions_are_compared(run_folders, tmp_path):
+    """combined.json's chi2 within 25%, and its verdicts equal away from the bound."""
+    combined = json.loads((reproduce.RUNS / reproduce.COMBINED).read_text())
+
+    def passes(change) -> bool:
+        document = json.loads(json.dumps(combined))
+        change(document)
+        path = tmp_path / reproduce.COMBINED
+        path.write_text(json.dumps(document, indent=1) + "\n")
+        return reproduce.compare_combined(path, reproduce.RUNS / reproduce.COMBINED).passed
+
+    def scale(name, factor):
+        return lambda d: d["model"][name].update(chi2=d["model"][name]["chi2"] * factor)
+
+    def flip(*keys):
+        def change(d):
+            *head, last = keys
+            target = d
+            for key in head:
+                target = target[key]
+            target[last] = not target[last]
+
+        return change
+
+    assert passes(lambda d: None)
+    assert passes(scale("X eps3", 1.10))
+    assert not passes(scale("X eps3", 1.50))
+    assert not passes(flip("model", "X eps3", "agrees"))  # chi2 52, far from the bound
+    assert passes(flip("model", "X eps5", "agrees"))  # chi2 19.8, within 25% of 18.31
+    assert not passes(flip("matches", "Z"))
+
+
 def test_a_missing_or_extra_key_fails(one_job):
     analysis, path = one_job
     analysis["leakage"]["extra"] = {}
