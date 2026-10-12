@@ -4,7 +4,9 @@ code is still the code in this tree.
 The fifteen jobs ran from tag v0.2.0. Each run.json, job.json and analysis.json stores the
 git hash of src/ and of pyproject.toml (heavyhex.experiment.run.commit), and
 `heavyhex experiment analyze` says so when the code differs from a job's, so src/ and
-pyproject.toml stay byte-identical to v0.2.0.
+pyproject.toml stay byte-identical to v0.2.0. The history was rewritten on 12 October 2026;
+the jobs keep the commit hashes they recorded, and docs/commit-map.tsv gives each one's
+commit now.
 """
 
 from __future__ import annotations
@@ -19,6 +21,7 @@ import pytest
 
 TAG = "v0.2.0"
 FROZEN = ("src", "pyproject.toml")  # heavyhex.experiment.run.CODE
+COMMIT_MAP = Path("docs") / "commit-map.tsv"
 FILES = (
     "run.json",
     "calibration.json",
@@ -50,6 +53,13 @@ def git(repo: Path, *words: str) -> str:
     done = _git(repo, *words)
     assert done.returncode == 0, f"git {' '.join(words)}: {done.stderr.strip()}"
     return done.stdout.strip()
+
+
+def rewritten(repo: Path) -> dict[str, str]:
+    """Each commit runs/ records -> the same commit after the rewrite."""
+    lines = (repo / COMMIT_MAP).read_text().splitlines()
+    rows = (line.split("\t") for line in lines if line and not line.startswith(("#", "old\t")))
+    return dict(rows)
 
 
 @pytest.fixture(scope="module")
@@ -110,9 +120,14 @@ def test_each_recorded_commit_holds_the_recorded_code(history, run_folders, reco
         analysis = read(folder / "analysis.json")["code"]
         for code in (analysis["prepared"], read(folder / "job.json")["code"], analysis["analyzed"]):
             commits.add(code["commit"])
+    now = rewritten(history)
+    assert commits <= now.keys(), sorted(commits - now.keys())
     for commit in sorted(commits):
-        found = git(history, "rev-parse", *(f"{commit}:{path}" for path in FROZEN)).split()
+        found = git(history, "rev-parse", *(f"{now[commit]}:{path}" for path in FROZEN)).split()
         assert found == recorded, commit
+        assert not _git(history, "merge-base", "--is-ancestor", now[commit], "HEAD").returncode, (
+            commit
+        )
 
 
 @pytest.mark.git
