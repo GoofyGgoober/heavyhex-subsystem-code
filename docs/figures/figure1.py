@@ -51,7 +51,11 @@ WEAK_BAND = "#C8C8C8"
 OTHER_REP = "#1B7A3D"  # boxes of the reps after the first
 QUBIT_NUMBER = "#6B6B6B"  # the Fez qubit numbers, darker than the blueprint's grey for print
 GAP = 3  # points between a label and anything else
-LABEL = {"fontsize": 9.5, "fontweight": "bold", "color": INK, "zorder": 9, "path_effects": HALO}
+# The paper prints the figure at its text width, PRINT_WIDTH, so every size here is scaled by
+# PRINT_WIDTH / WIDTH; MIN_PT keeps the smallest label at 7 pt in print.
+WIDTH, HEIGHT, PRINT_WIDTH = 12.0, 7.05, 7.0
+MIN_PT = 7.0 * WIDTH / PRINT_WIDTH
+LABEL = {"fontsize": MIN_PT, "fontweight": "bold", "color": INK, "zorder": 9, "path_effects": HALO}
 TITLE = 13.5
 
 
@@ -107,10 +111,34 @@ def mark_weak_couplers(
             candidates = [
                 (mid, dx, dy, ha, "center")
                 for dx, ha in ((9, "left"), (-9, "right"))
-                for dy in (0, -8, 8)
+                for dy in (0, -8, 8, -16, 16)
             ]
         text = "broken" if broken_coupler(error) else f"{error:.1%}"
         place(ax, text, candidates, taken, **LABEL)
+
+
+def tidy_d3_labels(ax: Axes, device: DeviceMap, roles: dict) -> None:
+    """(b) Make room for print-size labels: drop the X-gauge names, which the drawing already
+    shows (each red diamond joins two data qubits), put the data and X-ancilla numbers under
+    their markers and the relay numbers on the outer side of theirs."""
+    middle = sum(device.pos[q][0] for q in roles) / len(roles)
+    for text in list(ax.texts):
+        content = text.get_text()
+        if content.startswith("$X"):
+            text.remove()
+        elif content.isdigit() and int(content) in roles:
+            q = int(content)
+            x, y = device.pos[q]
+            role = roles[q][0]
+            if role in ("data", "xanc"):
+                text.set_position((x, y + 0.2))
+                text.set_ha("center")
+                text.set_va("top")
+            elif role == "relay":
+                side = 1 if x > middle else -1
+                text.set_position((x + 0.24 * side, y))
+                text.set_ha("left" if side > 0 else "right")
+                text.set_va("center")
 
 
 def lift_z_labels(ax: Axes, layout: HeavyHexLayout) -> list[tuple[int, dict]]:
@@ -142,24 +170,20 @@ def draw_key(fig: Figure, below: Axes) -> None:
     fig.legend(
         handles=[
             marker("o", GOLD, INK, 11, "data qubit"),
-            marker("D", X_RED, "white", 9, "X ancilla, also a flag"),
+            marker("D", X_RED, "white", 9, "X ancilla (most are also flags)"),
             marker("o", Z_BLUE, "white", 10, "Z ancilla"),
             marker("o", "white", GREY, 10, "relay", lw=1.8),
             Line2D([], [], color=X_RED, lw=2.8, label="X-gauge CX"),
             Line2D([], [], color=Z_BLUE, lw=2.8, label="Z-gauge CX"),
-            Line2D(
-                [], [], color=WEAK_BAND, lw=10, label=f"coupler with CZ error above {WEAK_CZ:.0%}"
-            ),
-            Line2D(
-                [], [], color=OTHER_REP, lw=1.8, ls=":", label="later placements' patches, in (a)"
-            ),
+            Line2D([], [], color=WEAK_BAND, lw=10, label=f"CZ error above {WEAK_CZ:.0%}"),
+            Line2D([], [], color=OTHER_REP, lw=1.8, ls=":", label="placement 2, in (a)"),
         ],
         loc="upper center",
-        ncol=4,
+        ncol=3,
         frameon=False,
-        fontsize=11.5,
-        handlelength=2.6,
-        columnspacing=2.2,
+        fontsize=MIN_PT,
+        handlelength=2.2,
+        columnspacing=1.6,
         bbox_to_anchor=((box.x0 + box.x1) / 2, box.y0 - 0.01),
     )
 
@@ -203,7 +227,7 @@ def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
     )
     d3_roles, d5_roles = patch_roles(d3), patch_roles(d5)
 
-    fig = plt.figure(figsize=(16, 9.4))
+    fig = plt.figure(figsize=(WIDTH, HEIGHT))
     gs = fig.add_gridspec(
         2,
         2,
@@ -226,6 +250,7 @@ def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
     draw_chip_overview(ax_chip, device, ((d3, d3_roles), (d5, d5_roles)))
     box_later_reps(ax_chip, device, plan)
     draw_d3_device(ax_d3, device, d3, d3_roles)
+    tidy_d3_labels(ax_d3, device, d3_roles)
     draw_d5_device(ax_d5, device, d5, d5_roles)
     for text in ax_d3.texts:
         if text.get_text().isdigit():
@@ -234,11 +259,14 @@ def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
         for text in ax.texts:
             if text.get_color() == GREY:
                 text.set_color(QUBIT_NUMBER)
+    for ax in (ax_chip, ax_d3, ax_d5):
+        for text in ax.texts:
+            text.set_fontsize(max(text.get_fontsize(), MIN_PT))
     # Repetition r's patches are the paper's placement r.
-    shown = {1: "one placement", 2: "placement 1 drawn, placement 2 boxed"}.get(
-        len(plan), "placement 1 drawn, the others boxed"
+    shown = {1: "placement 1", 2: "placement 1, placement 2 boxed"}.get(
+        len(plan), "placement 1, the others boxed"
     )
-    ax_chip.set_title(f"(a) the chip: {shown}", fontsize=TITLE)
+    ax_chip.set_title(f"(a) Fez: {shown}", fontsize=TITLE)
     ax_d3.set_title(
         f"(b) placement 1, d = 3: {len(d3.data)} data qubits, {len(d3.physical_qubits)} in all",
         fontsize=TITLE,
