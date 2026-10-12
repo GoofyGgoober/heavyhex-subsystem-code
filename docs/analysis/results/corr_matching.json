@@ -1,0 +1,2511 @@
+{
+ "method": "The device's and the model's shots decoded with correlated matching (Sec. code, App. decoder).\n\nStim splits each fault that fires more than two detectors into edges for matching; at distance\n5 in Z memory, pieces of flag and relay faults form logical paths of only three edges. PyMatching\n2.4's correlated matching (enable_correlations) uses the split: once matching uses one piece of\na fault, the fault's other pieces become cheaper. Every memory circuit of every job is decoded\nwith it on the same detector error model as the paper's decoder (decomposed, at the job's\nmeasured f), and refitted with both fits (refit.py): the device's shots, and 10,000 shots\nsampled from the model (refit.sim_seed, the same shots as pij_decode.py's control).\n\nA few faults are split with a piece that holds only the logical observable, which correlated\nmatching refuses; those pieces are dropped (correlatable). Without correlations the graph is\nthen unchanged: it decodes every hardware shot exactly as the paper's decoder (checked).\n\nNear P = 1/2 the prespecified fit drops round counts, and a change of decoder can add or remove\nsuch a point; per repetition, Lambda_Z then moves through the fit as much as through the\ndecoder. The per-repetition values carry the number of points at or above 1/2 under each\ndecoder.\n\nAbout 3 minutes on 2 workers, 0.5 GB each.\n\n    python docs/analysis/corr_matching.py     # writes results/corr_matching.json\n",
+ "pieces_dropped": 240,
+ "device_correlated_minus_calibrated": {
+  "placement 1 X wls": {
+   "eps3": [
+    0.0,
+    0.0
+   ],
+   "eps5": [
+    0.0,
+    0.0
+   ],
+   "lambda": [
+    0.0,
+    0.0
+   ]
+  },
+  "placement 1 X binomial": {
+   "eps3": [
+    0.0,
+    0.0
+   ],
+   "eps5": [
+    0.0,
+    0.0
+   ],
+   "lambda": [
+    0.0,
+    0.0
+   ]
+  },
+  "placement 1 Z wls": {
+   "eps3": [
+    -0.007278339987240224,
+    0.0013470402391617016
+   ],
+   "eps5": [
+    -0.04394409206694703,
+    0.017510577741571335
+   ],
+   "lambda": [
+    0.0322082535135545,
+    0.045986211431445594
+   ]
+  },
+  "placement 1 Z binomial": {
+   "eps3": [
+    -0.007523568671002628,
+    0.0012459663482495408
+   ],
+   "eps5": [
+    -0.009711430402607024,
+    0.006982237597418848
+   ],
+   "lambda": [
+    -0.012790749856144423,
+    0.011425157551749195
+   ]
+  },
+  "placement 2 X wls": {
+   "eps3": [
+    0.0,
+    0.0
+   ],
+   "eps5": [
+    0.0,
+    0.0
+   ],
+   "lambda": [
+    0.0,
+    0.0
+   ]
+  },
+  "placement 2 X binomial": {
+   "eps3": [
+    0.0,
+    0.0
+   ],
+   "eps5": [
+    0.0,
+    0.0
+   ],
+   "lambda": [
+    0.0,
+    0.0
+   ]
+  },
+  "placement 2 Z wls": {
+   "eps3": [
+    -0.006143389938693511,
+    0.006074110653988833
+   ],
+   "eps5": [
+    0.0013407300374701058,
+    0.01434938428037762
+   ],
+   "lambda": [
+    -0.050308978832010465,
+    0.03888154491325834
+   ]
+  },
+  "placement 2 Z binomial": {
+   "eps3": [
+    -0.0073445199015347296,
+    0.002762003433799469
+   ],
+   "eps5": [
+    -0.008783461950333925,
+    0.0053410305621971535
+   ],
+   "lambda": [
+    -0.011669069353390626,
+    0.011945833499543262
+   ]
+  }
+ },
+ "model_correlated_minus_calibrated": {
+  "placement 1 X wls": {
+   "eps3": [
+    0.0,
+    0.0
+   ],
+   "eps5": [
+    0.0,
+    0.0
+   ],
+   "lambda": [
+    0.0,
+    0.0
+   ]
+  },
+  "placement 1 X binomial": {
+   "eps3": [
+    0.0,
+    0.0
+   ],
+   "eps5": [
+    0.0,
+    0.0
+   ],
+   "lambda": [
+    0.0,
+    0.0
+   ]
+  },
+  "placement 1 Z wls": {
+   "eps3": [
+    -0.007352277243770955,
+    0.00033398624097890207
+   ],
+   "eps5": [
+    -0.016525959206439688,
+    0.0012213037317843577
+   ],
+   "lambda": [
+    0.006894787168804817,
+    0.004284413659729564
+   ]
+  },
+  "placement 1 Z binomial": {
+   "eps3": [
+    -0.00735712208046532,
+    0.00033719342879565063
+   ],
+   "eps5": [
+    -0.016588749450111174,
+    0.0011406567864736769
+   ],
+   "lambda": [
+    -0.0012232320325400448,
+    0.0037840414722808
+   ]
+  },
+  "placement 2 X wls": {
+   "eps3": [
+    0.0,
+    0.0
+   ],
+   "eps5": [
+    0.0,
+    0.0
+   ],
+   "lambda": [
+    0.0,
+    0.0
+   ]
+  },
+  "placement 2 X binomial": {
+   "eps3": [
+    0.0,
+    0.0
+   ],
+   "eps5": [
+    0.0,
+    0.0
+   ],
+   "lambda": [
+    0.0,
+    0.0
+   ]
+  },
+  "placement 2 Z wls": {
+   "eps3": [
+    -0.009898370889306129,
+    0.0004373930424016796
+   ],
+   "eps5": [
+    -0.011384275868534577,
+    0.000840919300967444
+   ],
+   "lambda": [
+    -0.03625907771491721,
+    0.004383350290967446
+   ]
+  },
+  "placement 2 Z binomial": {
+   "eps3": [
+    -0.009994450052023896,
+    0.00042982144294386105
+   ],
+   "eps5": [
+    -0.011394778225355728,
+    0.0008315262058792679
+   ],
+   "lambda": [
+    -0.0256165882518104,
+    0.004032766100020092
+   ]
+  }
+ },
+ "lambda_change_per_rep": {
+  "X wls": {
+   "device_per_rep_range": [
+    0.0,
+    0.0
+   ],
+   "model_per_rep_range": [
+    0.0,
+    0.0
+   ],
+   "reps_whose_points_at_half_changed": 0
+  },
+  "X binomial": {
+   "device_per_rep_range": [
+    0.0,
+    0.0
+   ],
+   "model_per_rep_range": [
+    0.0,
+    0.0
+   ],
+   "reps_whose_points_at_half_changed": 0
+  },
+  "Z wls": {
+   "device_per_rep_range": [
+    -0.10788500828823189,
+    0.17791463039875266
+   ],
+   "model_per_rep_range": [
+    -0.05004712706116293,
+    0.01841947971915936
+   ],
+   "reps_whose_points_at_half_changed": 4
+  },
+  "Z binomial": {
+   "device_per_rep_range": [
+    -0.05125326339193709,
+    0.05499492401813322
+   ],
+   "model_per_rep_range": [
+    -0.051985627188774586,
+    0.014687035163075901
+   ],
+   "reps_whose_points_at_half_changed": 4
+  }
+ },
+ "placements": {
+  "placement 1 calibrated X wls": {
+   "eps3": [
+    0.12675556212222414,
+    0.003375161507706501
+   ],
+   "eps5": [
+    0.1848785175362063,
+    0.004192691144702445
+   ],
+   "lambda": [
+    0.6822639457308591,
+    0.027439025720793906
+   ],
+   "lambda_chi2_per_dof": 0.3827307241246129,
+   "lambda_plain_mean": 0.686256563946026
+  },
+  "placement 1 calibrated X binomial": {
+   "eps3": [
+    0.12881390077094307,
+    0.0037877474677752354
+   ],
+   "eps5": [
+    0.19328453550065267,
+    0.004673009432306487
+   ],
+   "lambda": [
+    0.6565216011539337,
+    0.025608815765593648
+   ],
+   "lambda_chi2_per_dof": 0.6604492179170223,
+   "lambda_plain_mean": 0.6673457230059828
+  },
+  "placement 1 calibrated Z wls": {
+   "eps3": [
+    0.1373724567966593,
+    0.0032395306747147485
+   ],
+   "eps5": [
+    0.2897879229276282,
+    0.019315607429724543
+   ],
+   "lambda": [
+    0.44399804743970184,
+    0.02555509574214712
+   ],
+   "lambda_chi2_per_dof": 1.9046980957683457,
+   "lambda_plain_mean": 0.4839982497232251
+  },
+  "placement 1 calibrated Z binomial": {
+   "eps3": [
+    0.13868683966662748,
+    0.0030434514180995224
+   ],
+   "eps5": [
+    0.3110265573435598,
+    0.013642013985039477
+   ],
+   "lambda": [
+    0.44564699058516116,
+    0.0211995319628818
+   ],
+   "lambda_chi2_per_dof": 1.6879188203648943,
+   "lambda_plain_mean": 0.44893907972929065
+  },
+  "placement 1 correlated X wls": {
+   "eps3": [
+    0.12675556212222414,
+    0.003375161507706501
+   ],
+   "eps5": [
+    0.1848785175362063,
+    0.004192691144702445
+   ],
+   "lambda": [
+    0.6822639457308591,
+    0.027439025720793906
+   ],
+   "lambda_chi2_per_dof": 0.3827307241246129,
+   "lambda_plain_mean": 0.686256563946026
+  },
+  "placement 1 correlated X binomial": {
+   "eps3": [
+    0.12881390077094307,
+    0.0037877474677752354
+   ],
+   "eps5": [
+    0.19328453550065267,
+    0.004673009432306487
+   ],
+   "lambda": [
+    0.6565216011539337,
+    0.025608815765593648
+   ],
+   "lambda_chi2_per_dof": 0.6604492179170223,
+   "lambda_plain_mean": 0.6673457230059828
+  },
+  "placement 1 correlated Z wls": {
+   "eps3": [
+    0.1300941168094191,
+    0.0028319558089013827
+   ],
+   "eps5": [
+    0.24584383086068123,
+    0.01813259691543232
+   ],
+   "lambda": [
+    0.47620630095325633,
+    0.03463407664541758
+   ],
+   "lambda_chi2_per_dof": 1.3087320927187518,
+   "lambda_plain_mean": 0.5432750183771244
+  },
+  "placement 1 correlated Z binomial": {
+   "eps3": [
+    0.1311632709956248,
+    0.002779276624335714
+   ],
+   "eps5": [
+    0.30131512694095275,
+    0.013009872782092972
+   ],
+   "lambda": [
+    0.43285624072901674,
+    0.02018803850871813
+   ],
+   "lambda_chi2_per_dof": 1.2801829676242564,
+   "lambda_plain_mean": 0.43870246960510323
+  },
+  "placement 2 calibrated X wls": {
+   "eps3": [
+    0.11113107054274114,
+    0.003827231183645767
+   ],
+   "eps5": [
+    0.21957935258694014,
+    0.0034693514586566563
+   ],
+   "lambda": [
+    0.500686436840914,
+    0.017797091619463357
+   ],
+   "lambda_chi2_per_dof": 0.7673353531260708,
+   "lambda_plain_mean": 0.5060045210121371
+  },
+  "placement 2 calibrated X binomial": {
+   "eps3": [
+    0.11178005660581433,
+    0.0037545681324643904
+   ],
+   "eps5": [
+    0.22819208914046873,
+    0.0027679537579694664
+   ],
+   "lambda": [
+    0.48544256539096664,
+    0.016940814323046855
+   ],
+   "lambda_chi2_per_dof": 0.9026125680368166,
+   "lambda_plain_mean": 0.48981376922790254
+  },
+  "placement 2 calibrated Z wls": {
+   "eps3": [
+    0.17860843586840408,
+    0.018038441901409276
+   ],
+   "eps5": [
+    0.2559979692168122,
+    0.009879891495479905
+   ],
+   "lambda": [
+    0.6318809936914626,
+    0.05463625439278197
+   ],
+   "lambda_chi2_per_dof": 2.654313748863795,
+   "lambda_plain_mean": 0.6951658646616836
+  },
+  "placement 2 calibrated Z binomial": {
+   "eps3": [
+    0.1844507331367989,
+    0.02069002982513632
+   ],
+   "eps5": [
+    0.2987419770950629,
+    0.01176512703829903
+   ],
+   "lambda": [
+    0.5399972217750639,
+    0.05473162883588802
+   ],
+   "lambda_chi2_per_dof": 6.013377097237427,
+   "lambda_plain_mean": 0.6208866807255375
+  },
+  "placement 2 correlated X wls": {
+   "eps3": [
+    0.11113107054274114,
+    0.003827231183645767
+   ],
+   "eps5": [
+    0.21957935258694014,
+    0.0034693514586566563
+   ],
+   "lambda": [
+    0.500686436840914,
+    0.017797091619463357
+   ],
+   "lambda_chi2_per_dof": 0.7673353531260708,
+   "lambda_plain_mean": 0.5060045210121371
+  },
+  "placement 2 correlated X binomial": {
+   "eps3": [
+    0.11178005660581433,
+    0.0037545681324643904
+   ],
+   "eps5": [
+    0.22819208914046873,
+    0.0027679537579694664
+   ],
+   "lambda": [
+    0.48544256539096664,
+    0.016940814323046855
+   ],
+   "lambda_chi2_per_dof": 0.9026125680368166,
+   "lambda_plain_mean": 0.48981376922790254
+  },
+  "placement 2 correlated Z wls": {
+   "eps3": [
+    0.17246504592971057,
+    0.021789920963823862
+   ],
+   "eps5": [
+    0.2573386992542823,
+    0.01133370191517811
+   ],
+   "lambda": [
+    0.5815720148594521,
+    0.052107372358493546
+   ],
+   "lambda_chi2_per_dof": 3.41809716127975,
+   "lambda_plain_mean": 0.6780400633027954
+  },
+  "placement 2 correlated Z binomial": {
+   "eps3": [
+    0.17710621323526418,
+    0.02313487110144173
+   ],
+   "eps5": [
+    0.2899585151447289,
+    0.013413624601046956
+   ],
+   "lambda": [
+    0.5283281524216733,
+    0.057297779550713614
+   ],
+   "lambda_chi2_per_dof": 7.74699461507207,
+   "lambda_plain_mean": 0.6170786163521597
+  }
+ },
+ "model_placements": {
+  "placement 1 calibrated X wls": {
+   "eps3": [
+    0.10255770746005592,
+    0.0028397156686322395
+   ],
+   "eps5": [
+    0.1605095147059981,
+    0.006430126390259423
+   ],
+   "lambda": [
+    0.6240735670833818,
+    0.03510994170989342
+   ],
+   "lambda_chi2_per_dof": 17.064415550222304,
+   "lambda_plain_mean": 0.6442645566316723
+  },
+  "placement 1 calibrated X binomial": {
+   "eps3": [
+    0.10268736252829531,
+    0.002861509220221129
+   ],
+   "eps5": [
+    0.16111878530478677,
+    0.00640661241706836
+   ],
+   "lambda": [
+    0.6426317393106261,
+    null
+   ],
+   "lambda_plain_mean": 0.6426317393106261
+  },
+  "placement 1 calibrated Z wls": {
+   "eps3": [
+    0.07083638596204371,
+    0.0037195378568629757
+   ],
+   "eps5": [
+    0.16335397019595418,
+    0.00371857615127508
+   ],
+   "lambda": [
+    0.41024243889628637,
+    0.02761877193391301
+   ],
+   "lambda_chi2_per_dof": 26.949813534416457,
+   "lambda_plain_mean": 0.4361556360986481
+  },
+  "placement 1 calibrated Z binomial": {
+   "eps3": [
+    0.07093171425585736,
+    0.003746817934653986
+   ],
+   "eps5": [
+    0.16382926439909803,
+    0.0036598033566351564
+   ],
+   "lambda": [
+    0.4353450530223967,
+    null
+   ],
+   "lambda_plain_mean": 0.4353450530223967
+  },
+  "placement 1 correlated X wls": {
+   "eps3": [
+    0.10255770746005592,
+    0.0028397156686322395
+   ],
+   "eps5": [
+    0.1605095147059981,
+    0.006430126390259423
+   ],
+   "lambda": [
+    0.6240735670833818,
+    0.03510994170989342
+   ],
+   "lambda_chi2_per_dof": 17.064415550222304,
+   "lambda_plain_mean": 0.6442645566316723
+  },
+  "placement 1 correlated X binomial": {
+   "eps3": [
+    0.10268736252829531,
+    0.002861509220221129
+   ],
+   "eps5": [
+    0.16111878530478677,
+    0.00640661241706836
+   ],
+   "lambda": [
+    0.6426317393106261,
+    null
+   ],
+   "lambda_plain_mean": 0.6426317393106261
+  },
+  "placement 1 correlated Z wls": {
+   "eps3": [
+    0.06348410871827276,
+    0.0033244131480938844
+   ],
+   "eps5": [
+    0.14682801098951448,
+    0.003431022447703642
+   ],
+   "lambda": [
+    0.4171372260650912,
+    0.031265747375285154
+   ],
+   "lambda_chi2_per_dof": 28.18173931238311,
+   "lambda_plain_mean": 0.43471221625374057
+  },
+  "placement 1 correlated Z binomial": {
+   "eps3": [
+    0.06357459217539205,
+    0.0033436909569084755
+   ],
+   "eps5": [
+    0.14724051494898688,
+    0.003381538781892375
+   ],
+   "lambda": [
+    0.43412182098985663,
+    null
+   ],
+   "lambda_plain_mean": 0.43412182098985663
+  },
+  "placement 2 calibrated X wls": {
+   "eps3": [
+    0.08513225027888864,
+    0.004512021839313999
+   ],
+   "eps5": [
+    0.19077532687673754,
+    0.002643934212718399
+   ],
+   "lambda": [
+    0.4365019519450895,
+    0.022639594067864227
+   ],
+   "lambda_chi2_per_dof": 11.509437755182118,
+   "lambda_plain_mean": 0.4468127255147342
+  },
+  "placement 2 calibrated X binomial": {
+   "eps3": [
+    0.08531902221362582,
+    0.004573715687614141
+   ],
+   "eps5": [
+    0.19203911813962088,
+    0.002757941172470227
+   ],
+   "lambda": [
+    0.4449333960942896,
+    null
+   ],
+   "lambda_plain_mean": 0.4449333960942896
+  },
+  "placement 2 calibrated Z wls": {
+   "eps3": [
+    0.08322120219746715,
+    0.001967726558177169
+   ],
+   "eps5": [
+    0.16435075236631494,
+    0.004456570788045796
+   ],
+   "lambda": [
+    0.5040659787067403,
+    0.020655818072980475
+   ],
+   "lambda_chi2_per_dof": 7.90259856163109,
+   "lambda_plain_mean": 0.5088015620152294
+  },
+  "placement 2 calibrated Z binomial": {
+   "eps3": [
+    0.0833986372349133,
+    0.0019973455914999924
+   ],
+   "eps5": [
+    0.16496896644169665,
+    0.004592560286600806
+   ],
+   "lambda": [
+    0.508092494111425,
+    null
+   ],
+   "lambda_plain_mean": 0.508092494111425
+  },
+  "placement 2 correlated X wls": {
+   "eps3": [
+    0.08513225027888864,
+    0.004512021839313999
+   ],
+   "eps5": [
+    0.19077532687673754,
+    0.002643934212718399
+   ],
+   "lambda": [
+    0.4365019519450895,
+    0.022639594067864227
+   ],
+   "lambda_chi2_per_dof": 11.509437755182118,
+   "lambda_plain_mean": 0.4468127255147342
+  },
+  "placement 2 correlated X binomial": {
+   "eps3": [
+    0.08531902221362582,
+    0.004573715687614141
+   ],
+   "eps5": [
+    0.19203911813962088,
+    0.002757941172470227
+   ],
+   "lambda": [
+    0.4449333960942896,
+    null
+   ],
+   "lambda_plain_mean": 0.4449333960942896
+  },
+  "placement 2 correlated Z wls": {
+   "eps3": [
+    0.07332283130816102,
+    0.0020810622619963515
+   ],
+   "eps5": [
+    0.15296647649778036,
+    0.005475949083494368
+   ],
+   "lambda": [
+    0.4678069009918231,
+    0.02993515778619864
+   ],
+   "lambda_chi2_per_dof": 25.461121453216407,
+   "lambda_plain_mean": 0.48354279514819354
+  },
+  "placement 2 correlated Z binomial": {
+   "eps3": [
+    0.0734041871828894,
+    0.00209525531438893
+   ],
+   "eps5": [
+    0.15357418821634092,
+    0.005768354931954206
+   ],
+   "lambda": [
+    0.4824759058596146,
+    null
+   ],
+   "lambda_plain_mean": 0.4824759058596146
+  }
+ },
+ "per_rep": [
+  {
+   "day": "2026-10-04",
+   "placement": 1,
+   "X calibrated": {
+    "lambda_wls": [
+     0.7514306589603149,
+     0.06824729106793398
+    ],
+    "lambda_binomial": [
+     0.7177383382677373,
+     0.06725566039526433
+    ],
+    "eps5_wls": [
+     0.17583215364117033,
+     0.012829227101130452
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.7514306589603149,
+     0.06824729106793398
+    ],
+    "lambda_binomial": [
+     0.7177383382677373,
+     0.06725566039526433
+    ],
+    "eps5_wls": [
+     0.17583215364117033,
+     0.012829227101130452
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.48448416514768294,
+     0.045120652867036586
+    ],
+    "lambda_binomial": [
+     0.4588793252568012,
+     0.040044185447652925
+    ],
+    "eps5_wls": [
+     0.2663023836729258,
+     0.022937549344704027
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.5852805724181503,
+     0.10585198663682611
+    ],
+    "lambda_binomial": [
+     0.4524123849005555,
+     0.04662676150467507
+    ],
+    "eps5_wls": [
+     0.21142916398154837,
+     0.03750543506202402
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "Z change": {
+    "lambda_wls": 0.1007964072704674,
+    "lambda_binomial": -0.006466940356245676,
+    "points_at_or_above_half_changed": true
+   }
+  },
+  {
+   "day": "2026-10-04",
+   "placement": 2,
+   "X calibrated": {
+    "lambda_wls": [
+     0.4570876457683537,
+     0.03355375978431788
+    ],
+    "lambda_binomial": [
+     0.4381375092234253,
+     0.03247788575342314
+    ],
+    "eps5_wls": [
+     0.2200421378076251,
+     0.013165567871839659
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.4570876457683537,
+     0.03355375978431788
+    ],
+    "lambda_binomial": [
+     0.4381375092234253,
+     0.03247788575342314
+    ],
+    "eps5_wls": [
+     0.2200421378076251,
+     0.013165567871839659
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.5887778689537074,
+     0.10818941006662965
+    ],
+    "lambda_binomial": [
+     0.4412013616716289,
+     0.03407616243920351
+    ],
+    "eps5_wls": [
+     0.23252356487041265,
+     0.04192484950144667
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.48336261156662336,
+     0.05711640556881478
+    ],
+    "lambda_binomial": [
+     0.41326861368379497,
+     0.033709923828427336
+    ],
+    "eps5_wls": [
+     0.26489314167779865,
+     0.02942401342029347
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "Z change": {
+    "lambda_wls": -0.10541525738708407,
+    "lambda_binomial": -0.027932747987833906,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-05",
+   "placement": 1,
+   "X calibrated": {
+    "lambda_wls": [
+     0.6538599400465774,
+     0.05424870319978346
+    ],
+    "lambda_binomial": [
+     0.6339846877215884,
+     0.05195539235739371
+    ],
+    "eps5_wls": [
+     0.18180065566839276,
+     0.012147472521827112
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.6538599400465774,
+     0.05424870319978346
+    ],
+    "lambda_binomial": [
+     0.6339846877215884,
+     0.05195539235739371
+    ],
+    "eps5_wls": [
+     0.18180065566839276,
+     0.012147472521827112
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.4152659323606036,
+     0.03684775182222932
+    ],
+    "lambda_binomial": [
+     0.42336367227168537,
+     0.038653061578999906
+    ],
+    "eps5_wls": [
+     0.3262826748323835,
+     0.021100153795034642
+    ],
+    "points_at_or_above_half": [
+     0,
+     2
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.5013598692519527,
+     0.08477990813642473
+    ],
+    "lambda_binomial": [
+     0.4145480532293533,
+     0.03856394238751673
+    ],
+    "eps5_wls": [
+     0.25917047165875895,
+     0.04177143629573533
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "Z change": {
+    "lambda_wls": 0.08609393689134914,
+    "lambda_binomial": -0.008815619042332079,
+    "points_at_or_above_half_changed": true
+   }
+  },
+  {
+   "day": "2026-10-05",
+   "placement": 2,
+   "X calibrated": {
+    "lambda_wls": [
+     0.5442152214200967,
+     0.042314859486916864
+    ],
+    "lambda_binomial": [
+     0.527348306988013,
+     0.039463907797290323
+    ],
+    "eps5_wls": [
+     0.22026917301886972,
+     0.013762017325330464
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.5442152214200967,
+     0.042314859486916864
+    ],
+    "lambda_binomial": [
+     0.527348306988013,
+     0.039463907797290323
+    ],
+    "eps5_wls": [
+     0.22026917301886972,
+     0.013762017325330464
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.718815305381776,
+     0.10572649801994864
+    ],
+    "lambda_binomial": [
+     0.6092105330736526,
+     0.06644905694488236
+    ],
+    "eps5_wls": [
+     0.2795280044822869,
+     0.038761726601141785
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.6109302970935441,
+     0.06124718757398278
+    ],
+    "lambda_binomial": [
+     0.588863977505239,
+     0.052805120495171165
+    ],
+    "eps5_wls": [
+     0.29856093500122716,
+     0.02398470006122019
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "Z change": {
+    "lambda_wls": -0.10788500828823189,
+    "lambda_binomial": -0.020346555568413582,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-06",
+   "placement": 1,
+   "X calibrated": {
+    "lambda_wls": [
+     0.6904537528021618,
+     0.06158318191342642
+    ],
+    "lambda_binomial": [
+     0.6943126101261914,
+     0.06067381356375278
+    ],
+    "eps5_wls": [
+     0.19826851152177755,
+     0.011970653515971536
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.6904537528021618,
+     0.06158318191342642
+    ],
+    "lambda_binomial": [
+     0.6943126101261914,
+     0.06067381356375278
+    ],
+    "eps5_wls": [
+     0.19826851152177755,
+     0.011970653515971536
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.6298077791442831,
+     0.0988041566225288
+    ],
+    "lambda_binomial": [
+     0.5008885074408584,
+     0.03552180620341206
+    ],
+    "eps5_wls": [
+     0.2364800174358599,
+     0.03601674157969639
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.7177613108759086,
+     0.13765699450985758
+    ],
+    "lambda_binomial": [
+     0.5173025990472508,
+     0.04604533642199709
+    ],
+    "eps5_wls": [
+     0.19512509712296333,
+     0.036724164120869485
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z change": {
+    "lambda_wls": 0.08795353173162546,
+    "lambda_binomial": 0.0164140916063924,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-06",
+   "placement": 2,
+   "X calibrated": {
+    "lambda_wls": [
+     0.5199646377346377,
+     0.04356715663759779
+    ],
+    "lambda_binomial": [
+     0.487973168845362,
+     0.0374765619037311
+    ],
+    "eps5_wls": [
+     0.21409397932364954,
+     0.015009549897172918
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.5199646377346377,
+     0.04356715663759779
+    ],
+    "lambda_binomial": [
+     0.487973168845362,
+     0.0374765619037311
+    ],
+    "eps5_wls": [
+     0.21409397932364954,
+     0.015009549897172918
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.5605132572061622,
+     0.04349574487103985
+    ],
+    "lambda_binomial": [
+     0.5716755713573979,
+     0.04639211730514783
+    ],
+    "eps5_wls": [
+     0.2664550174439152,
+     0.013009812028599941
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.5659035673087419,
+     0.04354112608181971
+    ],
+    "lambda_binomial": [
+     0.5681301161664092,
+     0.041565308302180665
+    ],
+    "eps5_wls": [
+     0.24365026153685865,
+     0.01241996054498353
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "Z change": {
+    "lambda_wls": 0.005390310102579732,
+    "lambda_binomial": -0.0035454551909887,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-07",
+   "placement": 1,
+   "X calibrated": {
+    "lambda_wls": [
+     0.6821735169274737,
+     0.06247345063766216
+    ],
+    "lambda_binomial": [
+     0.6837243249880874,
+     0.06653859086870119
+    ],
+    "eps5_wls": [
+     0.1779143529947857,
+     0.009621142326527849
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.6821735169274737,
+     0.06247345063766216
+    ],
+    "lambda_binomial": [
+     0.6837243249880874,
+     0.06653859086870119
+    ],
+    "eps5_wls": [
+     0.1779143529947857,
+     0.009621142326527849
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.48658331006441297,
+     0.042439993782077225
+    ],
+    "lambda_binomial": [
+     0.4742585592824547,
+     0.03796392060443519
+    ],
+    "eps5_wls": [
+     0.2789155735001284,
+     0.021896457528925956
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.4371835842570072,
+     0.038913733318618464
+    ],
+    "lambda_binomial": [
+     0.4230052958905176,
+     0.03234783110739036
+    ],
+    "eps5_wls": [
+     0.28737559583131056,
+     0.023160880404548362
+    ],
+    "points_at_or_above_half": [
+     0,
+     2
+    ]
+   },
+   "Z change": {
+    "lambda_wls": -0.04939972580740576,
+    "lambda_binomial": -0.05125326339193709,
+    "points_at_or_above_half_changed": true
+   }
+  },
+  {
+   "day": "2026-10-07",
+   "placement": 2,
+   "X calibrated": {
+    "lambda_wls": [
+     0.49466457797761904,
+     0.04090901489514736
+    ],
+    "lambda_binomial": [
+     0.4869808171707323,
+     0.043816671655459216
+    ],
+    "eps5_wls": [
+     0.21173169097937972,
+     0.013770455587491761
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.49466457797761904,
+     0.04090901489514736
+    ],
+    "lambda_binomial": [
+     0.4869808171707323,
+     0.043816671655459216
+    ],
+    "eps5_wls": [
+     0.21173169097937972,
+     0.013770455587491761
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.7298895063811974,
+     0.11081367894992586
+    ],
+    "lambda_binomial": [
+     0.5891913750838599,
+     0.05353798651348222
+    ],
+    "eps5_wls": [
+     0.23226290091043122,
+     0.033756868185871314
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.6742558247607395,
+     0.09257091853153994
+    ],
+    "lambda_binomial": [
+     0.5669808879460737,
+     0.047192691224775624
+    ],
+    "eps5_wls": [
+     0.24200229567018422,
+     0.03155896560753513
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z change": {
+    "lambda_wls": -0.0556336816204579,
+    "lambda_binomial": -0.022210487137786172,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-08",
+   "placement": 1,
+   "X calibrated": {
+    "lambda_wls": [
+     0.653364950993602,
+     0.06276983948594984
+    ],
+    "lambda_binomial": [
+     0.6069686539263097,
+     0.04790312429685669
+    ],
+    "eps5_wls": [
+     0.19057691385490516,
+     0.015875694730467616
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.653364950993602,
+     0.06276983948594984
+    ],
+    "lambda_binomial": [
+     0.6069686539263097,
+     0.04790312429685669
+    ],
+    "eps5_wls": [
+     0.19057691385490516,
+     0.015875694730467616
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.40385006189914274,
+     0.03114029597108834
+    ],
+    "lambda_binomial": [
+     0.38730533439465364,
+     0.032001449411108364
+    ],
+    "eps5_wls": [
+     0.34095896519684366,
+     0.023183108226627374
+    ],
+    "points_at_or_above_half": [
+     0,
+     2
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.4747897550826033,
+     0.0817811160338007
+    ],
+    "lambda_binomial": [
+     0.38624401495783894,
+     0.041472834464500875
+    ],
+    "eps5_wls": [
+     0.2761188257088249,
+     0.046487022287373
+    ],
+    "points_at_or_above_half": [
+     0,
+     2
+    ]
+   },
+   "Z change": {
+    "lambda_wls": 0.07093969318346055,
+    "lambda_binomial": -0.0010613194368147005,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-08",
+   "placement": 2,
+   "X calibrated": {
+    "lambda_wls": [
+     0.5140905221599785,
+     0.041305396465292965
+    ],
+    "lambda_binomial": [
+     0.5086290439119799,
+     0.038882690551281664
+    ],
+    "eps5_wls": [
+     0.2317597818051766,
+     0.01536543624366256
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.5140905221599785,
+     0.041305396465292965
+    ],
+    "lambda_binomial": [
+     0.5086290439119799,
+     0.038882690551281664
+    ],
+    "eps5_wls": [
+     0.2317597818051766,
+     0.01536543624366256
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.8778333853855753,
+     0.09792790811001188
+    ],
+    "lambda_binomial": [
+     0.8931545624411484,
+     0.09701153154282677
+    ],
+    "eps5_wls": [
+     0.2692203583770151,
+     0.018999604784334146
+    ],
+    "points_at_or_above_half": [
+     0,
+     1
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     1.055748015784328,
+     0.1550378048145585
+    ],
+    "lambda_binomial": [
+     0.9481494864592817,
+     0.10355433011725171
+    ],
+    "eps5_wls": [
+     0.23758686238534288,
+     0.0289318657974171
+    ],
+    "points_at_or_above_half": [
+     2,
+     1
+    ]
+   },
+   "Z change": {
+    "lambda_wls": 0.17791463039875266,
+    "lambda_binomial": 0.05499492401813322,
+    "points_at_or_above_half_changed": true
+   }
+  }
+ ],
+ "model_per_rep": [
+  {
+   "day": "2026-10-04",
+   "placement": 1,
+   "X calibrated": {
+    "lambda_wls": [
+     0.5395656415923977,
+     0.015757408021009042
+    ],
+    "lambda_binomial": [
+     0.5385077337669648,
+     null
+    ],
+    "eps5_wls": [
+     0.18303075393356283,
+     0.003998892315474157
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.5395656415923977,
+     0.015757408021009042
+    ],
+    "lambda_binomial": [
+     0.5385077337669648,
+     null
+    ],
+    "eps5_wls": [
+     0.18303075393356283,
+     0.003998892315474157
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.398213535158811,
+     0.010012928621578121
+    ],
+    "lambda_binomial": [
+     0.39795855713697087,
+     null
+    ],
+    "eps5_wls": [
+     0.1635157967296792,
+     0.003127243652260702
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.4166330148779704,
+     0.01426405327500393
+    ],
+    "lambda_binomial": [
+     0.41264559230004677,
+     null
+    ],
+    "eps5_wls": [
+     0.14522673291245614,
+     0.004334681626488421
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z change": {
+    "lambda_wls": 0.01841947971915936,
+    "lambda_binomial": 0.014687035163075901,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-04",
+   "placement": 2,
+   "X calibrated": {
+    "lambda_wls": [
+     0.4002569054397449,
+     0.013637837696226784
+    ],
+    "lambda_binomial": [
+     0.39710237454395386,
+     null
+    ],
+    "eps5_wls": [
+     0.20023507523588457,
+     0.004819075078196815
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.4002569054397449,
+     0.013637837696226784
+    ],
+    "lambda_binomial": [
+     0.39710237454395386,
+     null
+    ],
+    "eps5_wls": [
+     0.20023507523588457,
+     0.004819075078196815
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.5758254358285522,
+     0.023143035674980324
+    ],
+    "lambda_binomial": [
+     0.5780824556177355,
+     null
+    ],
+    "eps5_wls": [
+     0.152230799713447,
+     0.002800114957898888
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.5664554839711756,
+     0.01735827989026269
+    ],
+    "lambda_binomial": [
+     0.5668623162615821,
+     null
+    ],
+    "eps5_wls": [
+     0.13895221191549656,
+     0.0025303516725571932
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z change": {
+    "lambda_wls": -0.009369951857376546,
+    "lambda_binomial": -0.011220139356153402,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-05",
+   "placement": 1,
+   "X calibrated": {
+    "lambda_wls": [
+     0.7725797275653192,
+     0.024464761928940888
+    ],
+    "lambda_binomial": [
+     0.7715069923727808,
+     null
+    ],
+    "eps5_wls": [
+     0.14421739138342238,
+     0.0034968258656430306
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.7725797275653192,
+     0.024464761928940888
+    ],
+    "lambda_binomial": [
+     0.7715069923727808,
+     null
+    ],
+    "eps5_wls": [
+     0.14421739138342238,
+     0.0034968258656430306
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.4088356530249407,
+     0.011987606919378342
+    ],
+    "lambda_binomial": [
+     0.40812505434509777,
+     null
+    ],
+    "eps5_wls": [
+     0.169229665728106,
+     0.003262459660114099
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.4163995808059534,
+     0.01307867114326466
+    ],
+    "lambda_binomial": [
+     0.4167751470178696,
+     null
+    ],
+    "eps5_wls": [
+     0.14978777666389959,
+     0.0028314647785142658
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z change": {
+    "lambda_wls": 0.007563927781012725,
+    "lambda_binomial": 0.008650092672771836,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-05",
+   "placement": 2,
+   "X calibrated": {
+    "lambda_wls": [
+     0.406750008572601,
+     0.013224827470370522
+    ],
+    "lambda_binomial": [
+     0.4041908907867351,
+     null
+    ],
+    "eps5_wls": [
+     0.18465204845908118,
+     0.004505752367015145
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.406750008572601,
+     0.013224827470370522
+    ],
+    "lambda_binomial": [
+     0.4041908907867351,
+     null
+    ],
+    "eps5_wls": [
+     0.18465204845908118,
+     0.004505752367015145
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.512519382658844,
+     0.013076145373965677
+    ],
+    "lambda_binomial": [
+     0.5120727693918791,
+     null
+    ],
+    "eps5_wls": [
+     0.1644759259938789,
+     0.0030960411678208166
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.49385465500593717,
+     0.012647154899385409
+    ],
+    "lambda_binomial": [
+     0.4934535474335415,
+     null
+    ],
+    "eps5_wls": [
+     0.15080535445221366,
+     0.002783069182056459
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z change": {
+    "lambda_wls": -0.018664727652906832,
+    "lambda_binomial": -0.018619221958337595,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-06",
+   "placement": 1,
+   "X calibrated": {
+    "lambda_wls": [
+     0.6542767113957167,
+     0.020051634684865052
+    ],
+    "lambda_binomial": [
+     0.6531113360648217,
+     null
+    ],
+    "eps5_wls": [
+     0.1636679353924962,
+     0.003882726247553263
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.6542767113957167,
+     0.020051634684865052
+    ],
+    "lambda_binomial": [
+     0.6531113360648217,
+     null
+    ],
+    "eps5_wls": [
+     0.1636679353924962,
+     0.003882726247553263
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.508848266351665,
+     0.019511487842679844
+    ],
+    "lambda_binomial": [
+     0.5053951704157459,
+     null
+    ],
+    "eps5_wls": [
+     0.1598682928996767,
+     0.004406923157116355
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.4895580795390571,
+     0.014600197918953433
+    ],
+    "lambda_binomial": [
+     0.48948387377378616,
+     null
+    ],
+    "eps5_wls": [
+     0.14776576771309874,
+     0.0027007462467747135
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z change": {
+    "lambda_wls": -0.019290186812607912,
+    "lambda_binomial": -0.015911296641959727,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-06",
+   "placement": 2,
+   "X calibrated": {
+    "lambda_wls": [
+     0.5389932208149666,
+     0.01902918504603219
+    ],
+    "lambda_binomial": [
+     0.5392353290743624,
+     null
+    ],
+    "eps5_wls": [
+     0.18744865847951953,
+     0.0043650595671689075
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.5389932208149666,
+     0.01902918504603219
+    ],
+    "lambda_binomial": [
+     0.5392353290743624,
+     null
+    ],
+    "eps5_wls": [
+     0.18744865847951953,
+     0.0043650595671689075
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.532266933973551,
+     0.01613403232615574
+    ],
+    "lambda_binomial": [
+     0.5290569837397641,
+     null
+    ],
+    "eps5_wls": [
+     0.1631313212494615,
+     0.003927451487453708
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.49120749806177366,
+     0.013529621171447062
+    ],
+    "lambda_binomial": [
+     0.48953307657812173,
+     null
+    ],
+    "eps5_wls": [
+     0.15163650131358003,
+     0.003048249927224288
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z change": {
+    "lambda_wls": -0.0410594359117773,
+    "lambda_binomial": -0.039523907161642335,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-07",
+   "placement": 1,
+   "X calibrated": {
+    "lambda_wls": [
+     0.6198369198162003,
+     0.01838125476433781
+    ],
+    "lambda_binomial": [
+     0.6168627798120341,
+     null
+    ],
+    "eps5_wls": [
+     0.15617103947931454,
+     0.0033237999454462323
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.6198369198162003,
+     0.01838125476433781
+    ],
+    "lambda_binomial": [
+     0.6168627798120341,
+     null
+    ],
+    "eps5_wls": [
+     0.15617103947931454,
+     0.0033237999454462323
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.5097721284207432,
+     0.014454610756067698
+    ],
+    "lambda_binomial": [
+     0.5099450387069343,
+     null
+    ],
+    "eps5_wls": [
+     0.15143379386911565,
+     0.0026993092012871055
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.5095843282351833,
+     0.015723250625475117
+    ],
+    "lambda_binomial": [
+     0.51021125095119,
+     null
+    ],
+    "eps5_wls": [
+     0.13517755004804682,
+     0.002582952155744945
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z change": {
+    "lambda_wls": -0.000187800185559861,
+    "lambda_binomial": 0.00026621224425571466,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-07",
+   "placement": 2,
+   "X calibrated": {
+    "lambda_wls": [
+     0.4660202482688177,
+     0.014600931056901932
+    ],
+    "lambda_binomial": [
+     0.4632843089413045,
+     null
+    ],
+    "eps5_wls": [
+     0.18983244578365843,
+     0.0045142406478695185
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.4660202482688177,
+     0.014600931056901932
+    ],
+    "lambda_binomial": [
+     0.4632843089413045,
+     null
+    ],
+    "eps5_wls": [
+     0.18983244578365843,
+     0.0045142406478695185
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.4316156130006895,
+     0.0170819376476425
+    ],
+    "lambda_binomial": [
+     0.42987117870490643,
+     null
+    ],
+    "eps5_wls": [
+     0.17994442674784705,
+     0.0035342797553265244
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.3815684859395266,
+     0.011055937002006742
+    ],
+    "lambda_binomial": [
+     0.37788555151613185,
+     null
+    ],
+    "eps5_wls": [
+     0.1727568796993334,
+     0.0037009322400156715
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z change": {
+    "lambda_wls": -0.05004712706116293,
+    "lambda_binomial": -0.051985627188774586,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-08",
+   "placement": 1,
+   "X calibrated": {
+    "lambda_wls": [
+     0.6350637827887274,
+     0.019252323469984463
+    ],
+    "lambda_binomial": [
+     0.6331698545365292,
+     null
+    ],
+    "eps5_wls": [
+     0.15546045334119457,
+     0.00356805897647349
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.6350637827887274,
+     0.019252323469984463
+    ],
+    "lambda_binomial": [
+     0.6331698545365292,
+     null
+    ],
+    "eps5_wls": [
+     0.15546045334119457,
+     0.00356805897647349
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.3551085975370808,
+     0.009541411187130469
+    ],
+    "lambda_binomial": [
+     0.35530144450723466,
+     null
+    ],
+    "eps5_wls": [
+     0.17272230175319336,
+     0.00344779455104214
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.3413860778105387,
+     0.010351832025234636
+    ],
+    "lambda_binomial": [
+     0.34149324090639077,
+     null
+    ],
+    "eps5_wls": [
+     0.15618222761007117,
+     0.003093871191283105
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z change": {
+    "lambda_wls": -0.013722519726542093,
+    "lambda_binomial": -0.013808203600843894,
+    "points_at_or_above_half_changed": false
+   }
+  },
+  {
+   "day": "2026-10-08",
+   "placement": 2,
+   "X calibrated": {
+    "lambda_wls": [
+     0.422043244477541,
+     0.01599520511449737
+    ],
+    "lambda_binomial": [
+     0.4208540771250921,
+     null
+    ],
+    "eps5_wls": [
+     0.191708406425544,
+     0.0046127187966751165
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X correlated": {
+    "lambda_wls": [
+     0.422043244477541,
+     0.01599520511449737
+    ],
+    "lambda_binomial": [
+     0.4208540771250921,
+     null
+    ],
+    "eps5_wls": [
+     0.191708406425544,
+     0.0046127187966751165
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "X change": {
+    "lambda_wls": 0.0,
+    "lambda_binomial": 0.0,
+    "points_at_or_above_half_changed": false
+   },
+   "Z calibrated": {
+    "lambda_wls": [
+     0.49178044461451037,
+     0.016812869865172886
+    ],
+    "lambda_binomial": [
+     0.4913790831028398,
+     null
+    ],
+    "eps5_wls": [
+     0.16197128812694023,
+     0.0033069117779293963
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z correlated": {
+    "lambda_wls": [
+     0.4846278527625544,
+     0.013870126931794189
+    ],
+    "lambda_binomial": [
+     0.48464503750869564,
+     null
+    ],
+    "eps5_wls": [
+     0.15068143510827814,
+     0.003044794298996123
+    ],
+    "points_at_or_above_half": [
+     0,
+     0
+    ]
+   },
+   "Z change": {
+    "lambda_wls": -0.007152591851955992,
+    "lambda_binomial": -0.006734045594144145,
+    "points_at_or_above_half_changed": false
+   }
+  }
+ ],
+ "seconds": 197.3329155445099
+}

@@ -16,7 +16,7 @@ from pathlib import Path
 
 import numpy as np
 
-from heavyhex.circuits.flagged import qubit_roles
+from heavyhex.circuits.flagged import memory_circuit_flagged, qubit_roles
 from heavyhex.experiment import run as R
 from heavyhex.experiment.circuits import SETTINGS
 from heavyhex.patches.operators import build_operators
@@ -143,6 +143,35 @@ def readout_series(labels) -> dict:
         seen[(patch, rnd, name)] += 1
         out[(str(patch), name, k)][rnd] = col
     return {key: [cols[r] for r in sorted(cols)] for key, cols in out.items()}
+
+
+def readout_model(job: Job, idx: int):
+    """job.model(idx) with a detector on every flag and relay readout, in either basis.
+
+    Flags and relays are uncomputed, so they read 0 without faults in X memory as well as in Z
+    memory, where the analysis already made each readout a detector. In X memory they are added
+    here for rounds 1..n; the preparation half's readouts are left out, so that a series has n
+    readouts in both bases. Labels as job.model's, (patch, round, "kind gauge").
+    """
+    import stim
+
+    model, records, labels = job.model(idx)
+    setting = SETTINGS[idx]
+    if setting.basis == "Z":
+        return model, records, labels
+    labels = list(labels)
+    for patch in ("3", "5"):
+        if (f"m{patch}", 0) not in records:
+            continue
+        _, schedule = memory_circuit_flagged(
+            build_operators(int(patch)), rounds=setting.rounds, basis="X"
+        )
+        for m in schedule.measurements:
+            if m.kind in ("z_flag", "relay") and m.round >= 0:
+                k = records[f"m{patch}", m.bit] - model.num_measurements
+                model.append("DETECTOR", [stim.target_rec(k)])
+                labels.append((patch, m.round, f"{m.kind} {m.gauge}"))
+    return model, records, labels
 
 
 def data_read(patch: str, name: str, k: int) -> set[int]:

@@ -9,6 +9,7 @@ results/paper_numbers.txt. Run it after the scripts whose results it reads; it t
 
 from __future__ import annotations
 
+import re
 import sys
 
 from common import REPO, RESULTS, read, result, write_json
@@ -40,6 +41,51 @@ def model_vs_device() -> dict:
         "selection_check (reported errors on the chosen day / other days)": m["selection"],
         "prespecified_drift_check": m["drift"],
         "model_curves_day1_rep1": m["model_curves"],
+    }
+
+
+def effect_sizes() -> dict:
+    """The model-versus-device effect sizes (effect_sizes.py), without the per-repetition and
+    per-curve detail that results/effect_sizes.json keeps."""
+    e = take("effect_sizes.json")
+    shown = ("placement 1", "placement 2", "all ten")
+    chi2_keys = ("chi2", "p", "agree", "z_positive", "mean_z", "bias", "scatter")
+    return {
+        "headline": e["headline"],
+        "O_over_M": {
+            fit: {q: {k: v[k] for k in shown} for q, v in by_q.items()}
+            for fit, by_q in e["ratios"].items()
+        },
+        "chi2": {
+            fit: {
+                q: {
+                    **{k: v[k] for k in chi2_keys},
+                    "p_holm_over_the_three_X_tests": v.get("p_holm_over_the_three_X_tests"),
+                    "per_placement": v["per_placement"],
+                    "without_f_term": {
+                        k: v["without_f_term"][k] for k in ("chi2", "p", "agree", "per_placement")
+                    },
+                }
+                for q, v in by_q.items()
+            }
+            for fit, by_q in e["chi2"].items()
+        },
+        "sigma_M_budget (WL)": {
+            q: {p: v[p] for p in ("placement 1", "placement 2")}
+            for q, v in e["budget"]["wls"].items()
+        },
+        "sigma_f_by_job_kind": e["budget"]["sigma_f_by_job_kind"],
+        "power": {k: e["power"][k] for k in ("wls", "binomial", "idealized_power_json")},
+        "tracking": e["tracking"],
+        "prejob": {
+            k: {kk: vv for kk, vv in v.items() if kk != "per_repetition"} if k in FITS else v
+            for k, v in e["prejob"].items()
+        },
+        "table_one_convention": e["table"],
+        "errors": {k: v for k, v in e["errors"].items() if k != "per_curve"},
+        "window": e["window"],
+        "selection": e["selection"],
+        "prespecified_pool": e["pool"],
     }
 
 
@@ -274,6 +320,146 @@ def leakage() -> dict:
     }
 
 
+def placements_and_inputs() -> dict:
+    """Placement counts and ranks, relay q51, and the calibration medians the paper quotes."""
+    pc = take("placement_counts.json")
+    cal = take("calibration_inputs.json")
+    run_py = (REPO / "src/heavyhex/experiment/run.py").read_text(encoding="utf-8")
+    rehearsal = re.search(r"rehearsal reached (\d+\.\d+)", run_py)
+    d3, d5 = pc["d3"], pc["d5"]
+    return {
+        "d3": {
+            k: d3[k] for k in ("searched_sets", "embeddings", "all_sets", "searched_subset_of_all")
+        }
+        | {
+            "usable (searched, all) by day": {
+                day: [v["usable_searched"], v["usable_all"]] for day, v in d3["per_day"].items()
+            },
+            "rank of repetition 2's d3 patch among all usable, by day": {
+                day: v["rank_d3_rep2"] for day, v in d3["per_day"].items()
+            },
+        },
+        "d5": {k: d5[k] for k in ("searched_sets", "all_sets")}
+        | {
+            "usable and stricter bars by day": {
+                day: {k: v for k, v in x.items() if k != "usable_searched"}
+                for day, x in d5["per_day"].items()
+            }
+        },
+        "relay_q51": {
+            day: {
+                "reported_readout_error": v["reported_readout_error"],
+                "read_1_range": [
+                    min(v["read_1_fraction_by_round"]),
+                    max(v["read_1_fraction_by_round"]),
+                ],
+                "stabilizer_range_after_round_1": [
+                    min(v["stabilizer_detection_fraction_by_round"][1:]),
+                    max(v["stabilizer_detection_fraction_by_round"][1:]),
+                ],
+            }
+            for day, v in pc["relay_q51"].items()
+        },
+        "single_qubit_error_median_by_day": cal["single_qubit"],
+        "readout_gap_P01_minus_P10_flags_relays": cal["readout_gap"],
+        "drift_rehearsal_largest_change_se (comment above DRIFT_BAR, src/heavyhex/experiment/run.py)": (
+            float(rehearsal.group(1)) if rehearsal else None
+        ),
+    }
+
+
+def diagnostics() -> dict:
+    """The detector, decoder-prior, dephasing and flag-record analyses after the first review."""
+    de = take("detection_events.json")
+    pij = take("pij.json")
+    pd = take("pij_decode.json")
+    cm = take("corr_matching.json")
+    rh = take("reset_harper.json")
+    dom = take("decoder_dominant.json")
+    idle = take("idle_f_t2.json")
+    flags = take("flags_summary.json")
+    hmm_x = take("hmm_x_summary.json")
+    f = idle["f_vs_t2"]
+    return {
+        "detection_event_fraction": {
+            "detectors": de["detectors"],
+            "per_detector (device / model)": {
+                k: de["per_detector"][k]
+                for k in ("all", "X weight 4", "X weight 2", "Z", "flag", "relay")
+            },
+            "bulk rounds": de["bulk"],
+            "rise from t = 2 to t = 8": de["rise"],
+        },
+        "pij": {
+            "classes (median device / model)": {
+                c: {k: v[k] for k in ("types", "median_ratio", "median_ratio_se", "share_above_1")}
+                for c, v in pij["classes"]["X dboth"].items()
+            },
+            "classes Z d3 (median device / model)": {
+                c: {k: v[k] for k in ("types", "median_ratio", "median_ratio_se")}
+                for c, v in pij["classes"]["Z d3"].items()
+            },
+            "pairs with no model edge": pij[
+                "unmodelled_pairs [patch basis same-detector lag(3 = 3+)], mean and SE over jobs"
+            ],
+            "edges above p = 0.1": pij["high_p_types"],
+            "by class and leading fault": pij["high_p_types_by_class_and_leading_fault"],
+        },
+        "learned_priors": {
+            "gaps": pd["gaps"],
+            "device_minus_calibrated": pd[
+                "device_minus_calibrated [variant][placement basis fit quantity]"
+            ],
+            "edges_keeping_the_calibrated_p": pd["edges_keeping_the_calibrated_p"],
+        },
+        "correlated_matching": {
+            "device": cm["device_correlated_minus_calibrated"],
+            "model": cm["model_correlated_minus_calibrated"],
+            "pieces_dropped": cm["pieces_dropped"],
+        },
+        "harper_reset_readout_day1": {
+            "time_like_edges": rh["time_like_edges_day1"],
+            "eps": rh["eps_day1 (wls unless named)"],
+        },
+        "miscorrected_single_faults_X_d3": {
+            "share_of_predicted_eps3_range": dom["share_range"],
+            "largest_by_patch": {k: v["largest"] for k, v in dom["patches"].items()},
+        },
+        "idle_f_against_T2": {
+            k: f[k]
+            for k in (
+                "qubit_jobs_used",
+                "physical_qubits",
+                "median_f_over_qubit_jobs",
+                "spearman_f_t2",
+                "beta_gamma_dd_on_gamma_phi",
+                "leverage (the short-T2 qubits left out)",
+                "t2_bins",
+            )
+        }
+        | {
+            "ratio_artefact": {
+                k: v for k, v in f["ratio_artefact"].items() if "by_qubit" not in str(v)
+            }
+        },
+        "f_memory_against_idle": {k: v for k, v in idle["memory"].items() if k != "jobs"},
+        "per_qubit_f_decoding": {k: v for k, v in idle["decode"].items() if k != "rows"},
+        "flag_records_both_bases": {
+            "refiring": {
+                b: {k: v for k, v in r.items() if k not in ("lags", "lag_us")}
+                for b, r in flags["refiring"].items()
+                if b in ("Z", "X")
+            }
+            | {"X_minus_Z": flags["refiring"]["X_minus_Z"]},
+            "hmm": flags["hmm"],
+            "alternatives": flags["alternatives"],
+            "roles_x_memory": flags["roles_x_memory"],
+            "streak_covariance": flags["costreak"],
+        },
+        "hmm_x_memory": hmm_x,
+    }
+
+
 def other() -> dict:
     out = {
         "readout": take("readout.json"),
@@ -492,6 +678,82 @@ def digest(res: dict) -> str:
             + f"; X tests fail when right {span([r['x_tests_fail_when_right'] for r in rows])}; "
             f"gap 0.06 caught {span([r['gap_caught_80pct']['caught'] for r in rows])}"
         )
+    h = res["effect_sizes"]["headline"]
+    L.append(
+        "15. Effect sizes (effect_sizes.py; binomial O/M, 95%: placements t4, all ten DL-HKSJ)"
+    )
+    for q, v in h["O_over_M (binomial) [ratio, 95% low, high]"].items():
+        L.append(
+            f"   {q:9s} "
+            + "; ".join(
+                f"{k} {v[k][0]:.3f} ({v[k][1]:.3f}-{v[k][2]:.3f})"
+                for k in ("placement 1", "placement 2", "all ten")
+            )
+            + f"; tau {v['tau']:.3f}"
+        )
+    c = h["prespecified chi2 (WL) [chi2, p, Holm p over the three X tests]"]
+    bs = h["bias and scatter (WL) [bias chi2, p, scatter chi2, p]"]
+    L.append(
+        "   prespecified chi2 (p, Holm; bias, scatter): "
+        + ", ".join(
+            f"{q} {c[q][0]:.1f} ({c[q][1]:.2g}, {c[q][2]:.2g}; {bs[q][0]:.1f}, {bs[q][2]:.1f})"
+            for q in ("X eps3", "X eps5", "X lambda")
+        )
+    )
+    t = h["tracking, placement 1 Lambda_X"]
+    pw = h[
+        "power (WL bounds) [Lambda_X at 0.06, Lambda_X found at 80%, eps3 and eps5 relative at 80%]"
+    ]
+    L.append(
+        "   placement 1 Lambda_X, constant vs follows the prediction (4 dof): "
+        + ", ".join(
+            f"{fit} {v['constant'][0]:.1f} vs {v['follows_prediction'][0]:.1f} (r {v['pearson_r']:+.2f}; "
+            f"without day 2 {v['without day 2 (3 dof)'][0]:.1f})"
+            for fit, v in t.items()
+        )
+        + f"; power at 0.06 {pw[0]:.2f}, 80% at {pw[1]:.3f} (eps {100 * pw[2]:.0f}%, {100 * pw[3]:.0f}%)"
+    )
+    pi = res["placements_and_calibration_inputs"]
+    d3 = pi["d3"]
+    L.append("16. Placements (searched / all embeddings) and calibration inputs")
+    L.append(
+        f"   d3 sets {d3['searched_sets']} / {d3['all_sets']} ({d3['embeddings']} embeddings); usable by day "
+        + ", ".join(f"{a}/{b}" for a, b in d3["usable (searched, all) by day"].values())
+        + "; rep-2 d3 rank among all usable "
+        + ", ".join(
+            str(v["rank_among_all_usable"])
+            for v in d3["rank of repetition 2's d3 patch among all usable, by day"].values()
+        )
+    )
+    L.append(
+        "   d5 stricter bars passing (day 1): "
+        + str(next(iter(pi["d5"]["usable and stricter bars by day"].values())))
+    )
+    L.append(
+        "   q51 readout by day "
+        + ", ".join(f"{100 * v['reported_readout_error']:.1f}%" for v in pi["relay_q51"].values())
+        + f"; readout gap P(0|1)-P(1|0) median {100 * pi['readout_gap_P01_minus_P10_flags_relays']['median']:.2f} points"
+    )
+    dg = res["diagnostics"]
+    pdet = dg["detection_event_fraction"]["per_detector (device / model)"]
+    L.append("17. Diagnostics after the first review")
+    L.append(
+        "   detection-event fraction device/model, median (share above 1): "
+        + ", ".join(
+            f"{k} {v['median_ratio']:.2f} ({100 * v['share_above_1']:.0f}%)"
+            for k, v in pdet.items()
+        )
+    )
+    t = dg["idle_f_against_T2"]["spearman_f_t2"]
+    m = dg["f_memory_against_idle"]
+    L.append(
+        f"   f vs T2: rho {t['rho']:.2f} [{t['ci95_bootstrap_over_qubits'][0]:.2f}, {t['ci95_bootstrap_over_qubits'][1]:.2f}]; "
+        f"f_mem > f_idle in {m['above']}/{m['of']} (medians {m['median_f_mem']:.2f}, {m['median_f_idle']:.2f})"
+    )
+    ms = dg["miscorrected_single_faults_X_d3"]["share_of_predicted_eps3_range"]
+    L.append(
+        f"   miscorrected single faults: {100 * ms[0]:.0f}-{100 * ms[1]:.0f}% of predicted eps3"
+    )
     return "\n".join(L) + "\n"
 
 
@@ -519,11 +781,14 @@ def main() -> None:
             )
         },
         "model_vs_device": model_vs_device(),
+        "effect_sizes": effect_sizes(),
         "xy_variance_correction": take("idle_f.json")["correction"],
         "per_qubit_f_side_prediction": per_qubit_f_side(),
         "heating_exploratory": heating(),
         "decoder_audit": take("decoder.json")["paper"],
         "leakage": leakage(),
+        "placements_and_calibration_inputs": placements_and_inputs(),
+        "diagnostics": diagnostics(),
         **other(),
     }
     res["about"]["inputs"] = sorted(INPUTS | {"docs/analysis/results/placements.json"})

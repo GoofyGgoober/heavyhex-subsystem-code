@@ -1,0 +1,5347 @@
+{
+ "method": "The device's shots decoded with priors learned from its own detection events (Sec. agreement, App. decoder).\n\nHow much of the underprediction is the decoder's? The decoder's priors come from the\ncalibration model, which the device does not follow; simulated shots are decoded with priors\nthat match them exactly. Here every hardware shot, at every round count, is decoded on the\nsame matching graph with learned edge probabilities, and refitted with both fits (refit.py).\nThe change of eps, learned - calibrated, is set against the gap, observed (calibrated priors)\n- predicted (fits.json). The learned values are pij.json's: p_ij of each edge type, averaged\nover the rounds of the job's 6- and 8-round circuits (detectors.priors). Three ways to use them:\n\n  learned             each edge takes its type's learned p (the usual p_ij priors)\n  learned, scaled     each edge's calibrated p times its type's learned / model ratio, both as\n                      the estimator sees them; this keeps the model's split of faults that\n                      fire three or more detectors, which the pair estimator cannot resolve\n  learned pair edges  as \"learned\", but every boundary edge keeps its calibrated p: a check\n                      of how much the boundary estimates, the remainder of p_i, matter\n\nControl: the estimator's own effect. For each circuit, 10,000 shots sampled from the model\n(refit.sim_seed) are decoded with the calibrated priors and with priors learned the same way\nfrom the model's own shots: from 2500 shots of each learning circuit (as many as the device\nhas), in each of the three ways, and directly from all 10,000. On the model the calibrated\npriors are exact, so any change there comes from the estimator: its noise, the round averaging\nand, for the direct priors, the pair projection of faults that fire three or more detectors.\nEach device change is also given net of its control.\n\nThe changes' uncertainties are paired bootstraps over shots with the priors held fixed\n(refit.py); the priors' own noise is what the control measures.\n\nAbout 5 minutes on 2 workers, 0.5 GB each.\n\n    python docs/analysis/pij.py           # first: the learned priors\n    python docs/analysis/pij_decode.py    # writes results/pij_decode.json\n",
+ "edges_keeping_the_calibrated_p": {
+  "edges": 36600,
+  "kept_calibrated": 9043,
+  "share_of_calibrated_p_on_kept_edges": 0.33684521448060867
+ },
+ "gaps": {
+  "placement 1 X wls eps3": {
+   "observed": 0.12675556212222414,
+   "predicted": 0.10245296093357101,
+   "gap": 0.024302601188653128
+  },
+  "placement 1 X wls eps5": {
+   "observed": 0.1848785175362063,
+   "predicted": 0.16103488546042719,
+   "gap": 0.02384363207577911
+  },
+  "placement 1 X binomial eps3": {
+   "observed": 0.12881390078031066,
+   "predicted": 0.10246293780773108,
+   "gap": 0.026350962972579578
+  },
+  "placement 1 X binomial eps5": {
+   "observed": 0.19328453550065267,
+   "predicted": 0.1610989410165964,
+   "gap": 0.03218559448405628
+  },
+  "placement 1 Z wls eps3": {
+   "observed": 0.1373724567966593,
+   "predicted": 0.0709155051544603,
+   "gap": 0.066456951642199
+  },
+  "placement 1 Z wls eps5": {
+   "observed": 0.2897879229276282,
+   "predicted": 0.16629578971452139,
+   "gap": 0.12349213321310684
+  },
+  "placement 1 Z binomial eps3": {
+   "observed": 0.13868684040004622,
+   "predicted": 0.0709206097878501,
+   "gap": 0.06776623061219612
+  },
+  "placement 1 Z binomial eps5": {
+   "observed": 0.3110265599700722,
+   "predicted": 0.16634001510143573,
+   "gap": 0.1446865448686365
+  },
+  "placement 2 X wls eps3": {
+   "observed": 0.11113107054274114,
+   "predicted": 0.08600049633022877,
+   "gap": 0.02513057421251237
+  },
+  "placement 2 X wls eps5": {
+   "observed": 0.21957935258694014,
+   "predicted": 0.1922228325359355,
+   "gap": 0.02735652005100464
+  },
+  "placement 2 X binomial eps3": {
+   "observed": 0.11178005785018046,
+   "predicted": 0.08600652946837069,
+   "gap": 0.025773528381809768
+  },
+  "placement 2 X binomial eps5": {
+   "observed": 0.22819208913622235,
+   "predicted": 0.19233359370992995,
+   "gap": 0.03585849542629241
+  },
+  "placement 2 Z wls eps3": {
+   "observed": 0.17860843586840408,
+   "predicted": 0.08363765482042096,
+   "gap": 0.09497078104798312
+  },
+  "placement 2 Z wls eps5": {
+   "observed": 0.2559979692168122,
+   "predicted": 0.1647454569173657,
+   "gap": 0.09125251229944653
+  },
+  "placement 2 Z binomial eps3": {
+   "observed": 0.18445073316469512,
+   "predicted": 0.08365576910457671,
+   "gap": 0.10079496406011841
+  },
+  "placement 2 Z binomial eps5": {
+   "observed": 0.2987419771326609,
+   "predicted": 0.1648307217316675,
+   "gap": 0.13391125540099338
+  }
+ },
+ "device_minus_calibrated [variant][placement basis fit quantity]": {
+  "learned": {
+   "placement 1 X wls eps3": {
+    "change": 0.026364065634269573,
+    "se": 0.0034442264643952188,
+    "gap": 0.024302601188653128,
+    "share_of_gap_closed": -1.0848248477442384,
+    "control_change": -3.7678731060553085e-05,
+    "control_se": 0.000653923171124041,
+    "share_closed_net_of_control": -1.086375246846296
+   },
+   "placement 1 X wls eps5": {
+    "change": 0.008680467283785132,
+    "se": 0.007197183386478173,
+    "gap": 0.02384363207577911,
+    "share_of_gap_closed": -0.36405809551989116,
+    "control_change": 0.004656141558777282,
+    "control_se": 0.0013438215776341012,
+    "share_closed_net_of_control": -0.16877989528683632
+   },
+   "placement 1 X wls lambda": {
+    "change": 0.10563657308994434,
+    "se": 0.035510795787953034
+   },
+   "placement 1 X binomial eps3": {
+    "change": 0.026011360706687046,
+    "se": 0.0033838347679068714,
+    "gap": 0.026350962972579578,
+    "share_of_gap_closed": -0.987112339452417,
+    "control_change": 5.425419080965499e-05,
+    "control_se": 0.0006434818977748791,
+    "share_closed_net_of_control": -0.9850534321226883
+   },
+   "placement 1 X binomial eps5": {
+    "change": 0.007324568475112736,
+    "se": 0.005935969674631858,
+    "gap": 0.03218559448405628,
+    "share_of_gap_closed": -0.22757288136284368,
+    "control_change": 0.004785923343678067,
+    "control_se": 0.0013024161266473357,
+    "share_closed_net_of_control": -0.07887519780603192
+   },
+   "placement 1 X binomial lambda": {
+    "change": 0.11673361897004475,
+    "se": 0.02894745923101283
+   },
+   "placement 1 Z wls eps3": {
+    "change": 0.016495039503547516,
+    "se": 0.002753251528290875,
+    "gap": 0.066456951642199,
+    "share_of_gap_closed": -0.24820638166426903,
+    "control_change": 0.018453888139164355,
+    "control_se": 0.0005523921721564863,
+    "share_closed_net_of_control": 0.029475451208824405
+   },
+   "placement 1 Z wls eps5": {
+    "change": 0.00031855528136226496,
+    "se": 0.005262582556575822,
+    "gap": 0.12349213321310684,
+    "share_of_gap_closed": -0.0025795593053084868,
+    "control_change": -6.553224736898234e-05,
+    "control_se": 0.00038174186405815066,
+    "share_closed_net_of_control": -0.0031102185923733167
+   },
+   "placement 1 Z wls lambda": {
+    "change": 0.04827255394482555,
+    "se": 0.01913822838062373
+   },
+   "placement 1 Z binomial eps3": {
+    "change": 0.017130556645782113,
+    "se": 0.0025250690479637185,
+    "gap": 0.06776623061219612,
+    "share_of_gap_closed": -0.25278898488267204,
+    "control_change": 0.018449738160113978,
+    "control_se": 0.000550161718599147,
+    "share_closed_net_of_control": 0.019466650312618197
+   },
+   "placement 1 Z binomial eps5": {
+    "change": 0.0018117695673695589,
+    "se": 0.0016396419320779411,
+    "gap": 0.1446865448686365,
+    "share_of_gap_closed": -0.012522032155889111,
+    "control_change": -0.00020071207830703043,
+    "control_se": 0.0003365965310824464,
+    "share_closed_net_of_control": -0.013909252221785776
+   },
+   "placement 1 Z binomial lambda": {
+    "change": 0.04347205351769634,
+    "se": 0.008842034956874651
+   },
+   "placement 2 X wls eps3": {
+    "change": 0.02134043236497578,
+    "se": 0.0026039592224043197,
+    "gap": 0.02513057421251237,
+    "share_of_gap_closed": -0.8491820435344649,
+    "control_change": -0.0015905855064899722,
+    "control_se": 0.0003805990865535564,
+    "share_closed_net_of_control": -0.9124748872649527
+   },
+   "placement 2 X wls eps5": {
+    "change": 0.012779948307298571,
+    "se": 0.012857388643290113,
+    "gap": 0.02735652005100464,
+    "share_of_gap_closed": -0.4671627927627893,
+    "control_change": 0.001074747514023311,
+    "control_se": 0.001867163281160434,
+    "share_closed_net_of_control": -0.42787608845904357
+   },
+   "placement 2 X wls lambda": {
+    "change": 0.06611328587031651,
+    "se": 0.041234452916840095
+   },
+   "placement 2 X binomial eps3": {
+    "change": 0.022089911804073093,
+    "se": 0.00251531015605412,
+    "gap": 0.025773528381809768,
+    "share_of_gap_closed": -0.8570775206573397,
+    "control_change": -0.0016147647691561573,
+    "control_se": 0.0003812374374881835,
+    "share_closed_net_of_control": -0.91972958541289
+   },
+   "placement 2 X binomial eps5": {
+    "change": 0.017877657520462154,
+    "se": 0.00806076076856014,
+    "gap": 0.03585849542629241,
+    "share_of_gap_closed": -0.49856128395598487,
+    "control_change": 0.0014184839674587168,
+    "control_se": 0.0017443338595153526,
+    "share_closed_net_of_control": -0.45900346228512234
+   },
+   "placement 2 X binomial lambda": {
+    "change": 0.05340526158244863,
+    "se": 0.02088583108818074
+   },
+   "placement 2 Z wls eps3": {
+    "change": 7.201813139674495e-05,
+    "se": 0.00756044097551684,
+    "gap": 0.09497078104798312,
+    "share_of_gap_closed": -0.0007583188281915724,
+    "control_change": -0.0006343592904805683,
+    "control_se": 0.0005178487689155365,
+    "share_closed_net_of_control": -0.007437839450013815
+   },
+   "placement 2 Z wls eps5": {
+    "change": 0.009190361599535013,
+    "se": 0.013232508841984455,
+    "gap": 0.09125251229944653,
+    "share_of_gap_closed": -0.10071351865225035,
+    "control_change": -2.7597173317606137e-05,
+    "control_se": 3.5995118643426176e-05,
+    "share_closed_net_of_control": -0.10101594510191396
+   },
+   "placement 2 Z wls lambda": {
+    "change": -0.07205390026917524,
+    "se": 0.035810674282225154
+   },
+   "placement 2 Z binomial eps3": {
+    "change": -0.0037487757120932995,
+    "se": 0.005595633008364391,
+    "gap": 0.10079496406011841,
+    "share_of_gap_closed": 0.03719209334562955,
+    "control_change": -0.0004885661759643723,
+    "control_se": 0.0005032233892002091,
+    "share_closed_net_of_control": 0.03234496451811223
+   },
+   "placement 2 Z binomial eps5": {
+    "change": 0.011340631273333568,
+    "se": 0.008488327196342961,
+    "gap": 0.13391125540099338,
+    "share_of_gap_closed": -0.08468766303007447,
+    "control_change": -3.07808777498142e-05,
+    "control_se": 3.294490410025862e-05,
+    "share_closed_net_of_control": -0.08491752330326542
+   },
+   "placement 2 Z binomial lambda": {
+    "change": -0.03380350210921479,
+    "se": 0.016267272290544466
+   }
+  },
+  "learned, scaled": {
+   "placement 1 X wls eps3": {
+    "change": 0.02644097687874546,
+    "se": 0.003468850866893317,
+    "gap": 0.024302601188653128,
+    "share_of_gap_closed": -1.0879895807651545,
+    "control_change": -0.00019612330814472445,
+    "control_se": 0.0006426847172835242,
+    "share_closed_net_of_control": -1.0960596349384621
+   },
+   "placement 1 X wls eps5": {
+    "change": 0.0051770172004776075,
+    "se": 0.007488286572040844,
+    "gap": 0.02384363207577911,
+    "share_of_gap_closed": -0.21712368250039124,
+    "control_change": 0.0051719555417891975,
+    "control_se": 0.0012865856988890781,
+    "share_closed_net_of_control": -0.00021228555583827202
+   },
+   "placement 1 X wls lambda": {
+    "change": 0.12978320813996824,
+    "se": 0.03722322043532939
+   },
+   "placement 1 X binomial eps3": {
+    "change": 0.026287528983197618,
+    "se": 0.003388652291607698,
+    "gap": 0.026350962972579578,
+    "share_of_gap_closed": -0.99759272594903,
+    "control_change": -8.146734631151454e-05,
+    "control_se": 0.0006366400189555649,
+    "share_closed_net_of_control": -1.0006843528621068
+   },
+   "placement 1 X binomial eps5": {
+    "change": 0.004315966890744161,
+    "se": 0.006085485096413812,
+    "gap": 0.03218559448405628,
+    "share_of_gap_closed": -0.1340962303145326,
+    "control_change": 0.005042708132659645,
+    "control_se": 0.0012733191666901116,
+    "share_closed_net_of_control": 0.022579705410614336
+   },
+   "placement 1 X binomial lambda": {
+    "change": 0.1344270984333118,
+    "se": 0.030303531853068524
+   },
+   "placement 1 Z wls eps3": {
+    "change": -0.00010895865682059025,
+    "se": 0.0023215093813155167,
+    "gap": 0.066456951642199,
+    "share_of_gap_closed": 0.0016395373866562276,
+    "control_change": 0.010015166707570222,
+    "control_se": 0.00043761107455483666,
+    "share_closed_net_of_control": 0.1523411037403372
+   },
+   "placement 1 Z wls eps5": {
+    "change": 0.00011424908965359525,
+    "se": 0.0037865511716742555,
+    "gap": 0.12349213321310684,
+    "share_of_gap_closed": -0.0009251527743588239,
+    "control_change": 3.443710871668948e-05,
+    "control_se": 6.729374410478887e-05,
+    "share_closed_net_of_control": -0.0006462920257371902
+   },
+   "placement 1 Z wls lambda": {
+    "change": -0.010503445394435373,
+    "se": 0.013665750255646465
+   },
+   "placement 1 Z binomial eps3": {
+    "change": 0.0004421588903635476,
+    "se": 0.0022853752691077496,
+    "gap": 0.06776623061219612,
+    "share_of_gap_closed": -0.006524767371139139,
+    "control_change": 0.01007930195566296,
+    "control_se": 0.0004326553620400307,
+    "share_closed_net_of_control": 0.14221158500683942
+   },
+   "placement 1 Z binomial eps5": {
+    "change": 0.002215260638945571,
+    "se": 0.0013986568161955583,
+    "gap": 0.1446865448686365,
+    "share_of_gap_closed": -0.015310757755372802,
+    "control_change": 1.6067943646380644e-05,
+    "control_se": 6.0550714485253054e-05,
+    "share_closed_net_of_control": -0.015199704280006665
+   },
+   "placement 1 Z binomial lambda": {
+    "change": -0.008061788213121202,
+    "se": 0.007625733950851416
+   },
+   "placement 2 X wls eps3": {
+    "change": 0.020458335616199263,
+    "se": 0.002637458486587371,
+    "gap": 0.02513057421251237,
+    "share_of_gap_closed": -0.8140815026030394,
+    "control_change": -0.0008804829750621246,
+    "control_se": 0.00039198059828650774,
+    "share_closed_net_of_control": -0.8491178279816984
+   },
+   "placement 2 X wls eps5": {
+    "change": 0.011793664093049916,
+    "se": 0.013495301883139315,
+    "gap": 0.02735652005100464,
+    "share_of_gap_closed": -0.4311098074996862,
+    "control_change": 0.0011442776169104606,
+    "control_se": 0.0019154616084339575,
+    "share_closed_net_of_control": -0.3892814749933213
+   },
+   "placement 2 X wls lambda": {
+    "change": 0.06372484216511698,
+    "se": 0.04209428412857042
+   },
+   "placement 2 X binomial eps3": {
+    "change": 0.0214730767967014,
+    "se": 0.0025184365028759863,
+    "gap": 0.025773528381809768,
+    "share_of_gap_closed": -0.8331446311346526,
+    "control_change": -0.0008756469156997682,
+    "control_se": 0.00038809690800894575,
+    "share_closed_net_of_control": -0.8671192931494109
+   },
+   "placement 2 X binomial eps5": {
+    "change": 0.01763612099986195,
+    "se": 0.008108747190904693,
+    "gap": 0.03585849542629241,
+    "share_of_gap_closed": -0.4918254597746082,
+    "control_change": 0.0013560322825098559,
+    "control_se": 0.0018295573590048034,
+    "share_closed_net_of_control": -0.4540092528649458
+   },
+   "placement 2 X binomial lambda": {
+    "change": 0.05261841406240009,
+    "se": 0.02094779150510488
+   },
+   "placement 2 Z wls eps3": {
+    "change": -0.007929015694353603,
+    "se": 0.007304519444813996,
+    "gap": 0.09497078104798312,
+    "share_of_gap_closed": 0.08348900163669856,
+    "control_change": 0.0023190715496024692,
+    "control_se": 0.0003602297105603689,
+    "share_closed_net_of_control": 0.10790779154252002
+   },
+   "placement 2 Z wls eps5": {
+    "change": 0.009165883175940203,
+    "se": 0.013231551789249816,
+    "gap": 0.09125251229944653,
+    "share_of_gap_closed": -0.10044526934077404,
+    "control_change": 0.0,
+    "control_se": 0.0,
+    "share_closed_net_of_control": -0.10044526934077404
+   },
+   "placement 2 Z wls lambda": {
+    "change": -0.09915714884545002,
+    "se": 0.033646824990966426
+   },
+   "placement 2 Z binomial eps3": {
+    "change": -0.008925970309187148,
+    "se": 0.005168016969728617,
+    "gap": 0.10079496406011841,
+    "share_of_gap_closed": 0.08855571696878943,
+    "control_change": 0.00238629224307762,
+    "control_se": 0.0003561977608626989,
+    "share_closed_net_of_control": 0.11223043390855969
+   },
+   "placement 2 Z binomial eps5": {
+    "change": 0.011406755969763437,
+    "se": 0.008487561762068399,
+    "gap": 0.13391125540099338,
+    "share_of_gap_closed": -0.08518145794097917,
+    "control_change": 0.0,
+    "control_se": 0.0,
+    "share_closed_net_of_control": -0.08518145794097917
+   },
+   "placement 2 Z binomial lambda": {
+    "change": -0.061124860872300235,
+    "se": 0.014724578686593978
+   }
+  },
+  "learned pair edges": {
+   "placement 1 X wls eps3": {
+    "change": 0.0016882778011166999,
+    "se": 0.0028260792367366086,
+    "gap": 0.024302601188653128,
+    "share_of_gap_closed": -0.06946901642384502,
+    "control_change": -0.001310825427493656,
+    "control_se": 0.00047220786287484985,
+    "share_closed_net_of_control": -0.12340667590803554
+   },
+   "placement 1 X wls eps5": {
+    "change": 0.0011128636114582924,
+    "se": 0.006758986364971722,
+    "gap": 0.02384363207577911,
+    "share_of_gap_closed": -0.0466734098195033,
+    "control_change": 0.0028853402976616203,
+    "control_se": 0.001169334772690571,
+    "share_closed_net_of_control": 0.07433752880308236
+   },
+   "placement 1 X wls lambda": {
+    "change": -0.000560323196319712,
+    "se": 0.030227576802046796
+   },
+   "placement 1 X binomial eps3": {
+    "change": 0.0010678200192706544,
+    "se": 0.0027331954636835745,
+    "gap": 0.026350962972579578,
+    "share_of_gap_closed": -0.04052299797854872,
+    "control_change": -0.0012115280966865205,
+    "control_se": 0.0004603385388282896,
+    "share_closed_net_of_control": -0.08649961363192042
+   },
+   "placement 1 X binomial eps5": {
+    "change": 0.001631611600163696,
+    "se": 0.005334435668838667,
+    "gap": 0.03218559448405628,
+    "share_of_gap_closed": -0.05069384693117738,
+    "control_change": 0.0027491465546362836,
+    "control_se": 0.0011793903026890793,
+    "share_closed_net_of_control": 0.0347215881013532
+   },
+   "placement 1 X binomial lambda": {
+    "change": 0.009683021048403795,
+    "se": 0.02425936885240213
+   },
+   "placement 1 Z wls eps3": {
+    "change": 0.008098901892695997,
+    "se": 0.0023244020368303844,
+    "gap": 0.066456951642199,
+    "share_of_gap_closed": -0.12186688815189856,
+    "control_change": 0.008318969132339116,
+    "control_se": 0.00034116003609928244,
+    "share_closed_net_of_control": 0.0033114254296217204
+   },
+   "placement 1 Z wls eps5": {
+    "change": 0.0,
+    "se": 0.0,
+    "gap": 0.12349213321310684,
+    "share_of_gap_closed": -0.0,
+    "control_change": 0.0,
+    "control_se": 0.0,
+    "share_closed_net_of_control": -0.0
+   },
+   "placement 1 Z wls lambda": {
+    "change": 0.02060109464992549,
+    "se": 0.009270491086709047
+   },
+   "placement 1 Z binomial eps3": {
+    "change": 0.008197423398403347,
+    "se": 0.0021973278816634243,
+    "gap": 0.06776623061219612,
+    "share_of_gap_closed": -0.12096619989555725,
+    "control_change": 0.00828323735224023,
+    "control_se": 0.0003437143347668597,
+    "share_closed_net_of_control": 0.0012663232566079757
+   },
+   "placement 1 Z binomial eps5": {
+    "change": 0.0,
+    "se": 0.0,
+    "gap": 0.1446865448686365,
+    "share_of_gap_closed": -0.0,
+    "control_change": 0.0,
+    "control_se": 0.0,
+    "share_closed_net_of_control": -0.0
+   },
+   "placement 1 Z binomial lambda": {
+    "change": 0.021943971221308645,
+    "se": 0.0070267064667200035
+   },
+   "placement 2 X wls eps3": {
+    "change": -0.002711993245717825,
+    "se": 0.0018231111665735651,
+    "gap": 0.02513057421251237,
+    "share_of_gap_closed": 0.10791608750298826,
+    "control_change": -0.00045436698743790417,
+    "control_se": 0.00034728154471922227,
+    "share_closed_net_of_control": 0.08983584056570668
+   },
+   "placement 2 X wls eps5": {
+    "change": -0.01278919998695861,
+    "se": 0.009848567070599187,
+    "gap": 0.02735652005100464,
+    "share_of_gap_closed": 0.46750098196385687,
+    "control_change": 0.0007736182389492252,
+    "control_se": 0.0017393124947609724,
+    "share_closed_net_of_control": 0.4957800992458379
+   },
+   "placement 2 X wls lambda": {
+    "change": 0.018659815283542436,
+    "se": 0.02926323726338856
+   },
+   "placement 2 X binomial eps3": {
+    "change": -0.0023976439891471857,
+    "se": 0.001804593823872822,
+    "gap": 0.025773528381809768,
+    "share_of_gap_closed": 0.09302738661266788,
+    "control_change": -0.0004682168108253337,
+    "control_se": 0.0003412276047918755,
+    "share_closed_net_of_control": 0.07486080872355791
+   },
+   "placement 2 X binomial eps5": {
+    "change": -0.010524320897986139,
+    "se": 0.006109140080772891,
+    "gap": 0.03585849542629241,
+    "share_of_gap_closed": 0.29349588634077,
+    "control_change": 0.0011515344520756198,
+    "control_se": 0.0015541543037809029,
+    "share_closed_net_of_control": 0.32560918162508035
+   },
+   "placement 2 X binomial lambda": {
+    "change": 0.012051755768199834,
+    "se": 0.015771119267301282
+   },
+   "placement 2 Z wls eps3": {
+    "change": 0.0019091928981285421,
+    "se": 0.007316373375577897,
+    "gap": 0.09497078104798312,
+    "share_of_gap_closed": -0.02010295037127198,
+    "control_change": 0.0009337243247318882,
+    "control_se": 0.0003523006010184991,
+    "share_closed_net_of_control": -0.010271249353038461
+   },
+   "placement 2 Z wls eps5": {
+    "change": 0.0,
+    "se": 0.0,
+    "gap": 0.09125251229944653,
+    "share_of_gap_closed": -0.0,
+    "control_change": 0.0,
+    "control_se": 0.0,
+    "share_closed_net_of_control": -0.0
+   },
+   "placement 2 Z wls lambda": {
+    "change": -0.0172517754954421,
+    "se": 0.023916104501317856
+   },
+   "placement 2 Z binomial eps3": {
+    "change": -0.001953280757405951,
+    "se": 0.0053683473812094215,
+    "gap": 0.10079496406011841,
+    "share_of_gap_closed": 0.019378753448842257,
+    "control_change": 0.0010058058199481524,
+    "control_se": 0.00035389296925913337,
+    "share_closed_net_of_control": 0.02935748432420868
+   },
+   "placement 2 Z binomial eps5": {
+    "change": 0.0,
+    "se": 0.0,
+    "gap": 0.13391125540099338,
+    "share_of_gap_closed": -0.0,
+    "control_change": 0.0,
+    "control_se": 0.0,
+    "share_closed_net_of_control": -0.0
+   },
+   "placement 2 Z binomial lambda": {
+    "change": -0.007899170011973045,
+    "se": 0.011387006762490343
+   }
+  }
+ },
+ "control_minus_calibrated [variant][placement basis fit quantity]": {
+  "learned (2500 shots)": {
+   "placement 1 X wls eps3": {
+    "change": -3.7678731060553085e-05,
+    "se": 0.000653923171124041,
+    "gap": 0.024302601188653128,
+    "share_of_gap_closed": 0.001550399102057654
+   },
+   "placement 1 X wls eps5": {
+    "change": 0.004656141558777282,
+    "se": 0.0013438215776341012,
+    "gap": 0.02384363207577911,
+    "share_of_gap_closed": -0.19527820023305487
+   },
+   "placement 1 X wls lambda": {
+    "change": -0.02148641004986318,
+    "se": 0.006698810336339841
+   },
+   "placement 1 X binomial eps3": {
+    "change": 5.425419080965499e-05,
+    "se": 0.0006434818977748791,
+    "gap": 0.026350962972579578,
+    "share_of_gap_closed": -0.0020589073297287504
+   },
+   "placement 1 X binomial eps5": {
+    "change": 0.004785923343678067,
+    "se": 0.0013024161266473357,
+    "gap": 0.03218559448405628,
+    "share_of_gap_closed": -0.14869768355681176
+   },
+   "placement 1 X binomial lambda": {
+    "change": -0.018584247565021417,
+    "se": 0.0064234147960096815
+   },
+   "placement 1 Z wls eps3": {
+    "change": 0.018453888139164355,
+    "se": 0.0005523921721564863,
+    "gap": 0.066456951642199,
+    "share_of_gap_closed": -0.27768183287309345
+   },
+   "placement 1 Z wls eps5": {
+    "change": -6.553224736898234e-05,
+    "se": 0.00038174186405815066,
+    "gap": 0.12349213321310684,
+    "share_of_gap_closed": 0.0005306592870648304
+   },
+   "placement 1 Z wls lambda": {
+    "change": 0.1287613698634263,
+    "se": 0.00421251727412332
+   },
+   "placement 1 Z binomial eps3": {
+    "change": 0.018449738160113978,
+    "se": 0.000550161718599147,
+    "gap": 0.06776623061219612,
+    "share_of_gap_closed": -0.2722556351952902
+   },
+   "placement 1 Z binomial eps5": {
+    "change": -0.00020071207830703043,
+    "se": 0.0003365965310824464,
+    "gap": 0.1446865448686365,
+    "share_of_gap_closed": 0.0013872200658966631
+   },
+   "placement 1 Z binomial lambda": {
+    "change": 0.11261967824181252,
+    "se": 0.0036699245567467366
+   },
+   "placement 2 X wls eps3": {
+    "change": -0.0015905855064899722,
+    "se": 0.0003805990865535564,
+    "gap": 0.02513057421251237,
+    "share_of_gap_closed": 0.06329284373048781
+   },
+   "placement 2 X wls eps5": {
+    "change": 0.001074747514023311,
+    "se": 0.001867163281160434,
+    "gap": 0.02735652005100464,
+    "share_of_gap_closed": -0.03928670430374575
+   },
+   "placement 2 X wls lambda": {
+    "change": -0.009214663891922437,
+    "se": 0.00527110454992348
+   },
+   "placement 2 X binomial eps3": {
+    "change": -0.0016147647691561573,
+    "se": 0.0003812374374881835,
+    "gap": 0.025773528381809768,
+    "share_of_gap_closed": 0.06265206475555023
+   },
+   "placement 2 X binomial eps5": {
+    "change": 0.0014184839674587168,
+    "se": 0.0017443338595153526,
+    "gap": 0.03585849542629241,
+    "share_of_gap_closed": -0.03955782167086259
+   },
+   "placement 2 X binomial lambda": {
+    "change": -0.011944011378272612,
+    "se": 0.0045519001111814445
+   },
+   "placement 2 Z wls eps3": {
+    "change": -0.0006343592904805683,
+    "se": 0.0005178487689155365,
+    "gap": 0.09497078104798312,
+    "share_of_gap_closed": 0.006679520621822243
+   },
+   "placement 2 Z wls eps5": {
+    "change": -2.7597173317606137e-05,
+    "se": 3.5995118643426176e-05,
+    "gap": 0.09125251229944653,
+    "share_of_gap_closed": 0.00030242644966360584
+   },
+   "placement 2 Z wls lambda": {
+    "change": -0.022642682039854367,
+    "se": 0.003980841064328444
+   },
+   "placement 2 Z binomial eps3": {
+    "change": -0.0004885661759643723,
+    "se": 0.0005032233892002091,
+    "gap": 0.10079496406011841,
+    "share_of_gap_closed": 0.004847128827517321
+   },
+   "placement 2 Z binomial eps5": {
+    "change": -3.07808777498142e-05,
+    "se": 3.294490410025862e-05,
+    "gap": 0.13391125540099338,
+    "share_of_gap_closed": 0.0002298602731909409
+   },
+   "placement 2 Z binomial lambda": {
+    "change": -0.0019624085116520806,
+    "se": 0.0030713188263159085
+   }
+  },
+  "learned, scaled (2500 shots)": {
+   "placement 1 X wls eps3": {
+    "change": -0.00019612330814472445,
+    "se": 0.0006426847172835242,
+    "gap": 0.024302601188653128,
+    "share_of_gap_closed": 0.008070054173307766
+   },
+   "placement 1 X wls eps5": {
+    "change": 0.0051719555417891975,
+    "se": 0.0012865856988890781,
+    "gap": 0.02384363207577911,
+    "share_of_gap_closed": -0.21691139694455297
+   },
+   "placement 1 X wls lambda": {
+    "change": -0.007653839031724452,
+    "se": 0.006758769807861034
+   },
+   "placement 1 X binomial eps3": {
+    "change": -8.146734631151454e-05,
+    "se": 0.0006366400189555649,
+    "gap": 0.026350962972579578,
+    "share_of_gap_closed": 0.003091626913076697
+   },
+   "placement 1 X binomial eps5": {
+    "change": 0.005042708132659645,
+    "se": 0.0012733191666901116,
+    "gap": 0.03218559448405628,
+    "share_of_gap_closed": -0.15667593572514693
+   },
+   "placement 1 X binomial lambda": {
+    "change": -0.020534960824013404,
+    "se": 0.006231474108789335
+   },
+   "placement 1 Z wls eps3": {
+    "change": 0.010015166707570222,
+    "se": 0.00043761107455483666,
+    "gap": 0.066456951642199,
+    "share_of_gap_closed": -0.15070156635368098
+   },
+   "placement 1 Z wls eps5": {
+    "change": 3.443710871668948e-05,
+    "se": 6.729374410478887e-05,
+    "gap": 0.12349213321310684,
+    "share_of_gap_closed": -0.0002788607486216336
+   },
+   "placement 1 Z wls lambda": {
+    "change": 0.04139671907905895,
+    "se": 0.0038529340906293978
+   },
+   "placement 1 Z binomial eps3": {
+    "change": 0.01007930195566296,
+    "se": 0.0004326553620400307,
+    "gap": 0.06776623061219612,
+    "share_of_gap_closed": -0.14873635237797855
+   },
+   "placement 1 Z binomial eps5": {
+    "change": 1.6067943646380644e-05,
+    "se": 6.0550714485253054e-05,
+    "gap": 0.1446865448686365,
+    "share_of_gap_closed": -0.00011105347536613732
+   },
+   "placement 1 Z binomial lambda": {
+    "change": 0.06273916770367244,
+    "se": 0.0027748694471585286
+   },
+   "placement 2 X wls eps3": {
+    "change": -0.0008804829750621246,
+    "se": 0.00039198059828650774,
+    "gap": 0.02513057421251237,
+    "share_of_gap_closed": 0.03503632537865916
+   },
+   "placement 2 X wls eps5": {
+    "change": 0.0011442776169104606,
+    "se": 0.0019154616084339575,
+    "gap": 0.02735652005100464,
+    "share_of_gap_closed": -0.041828332506364904
+   },
+   "placement 2 X wls lambda": {
+    "change": -0.004206986707248006,
+    "se": 0.005083252687094348
+   },
+   "placement 2 X binomial eps3": {
+    "change": -0.0008756469156997682,
+    "se": 0.00038809690800894575,
+    "gap": 0.025773528381809768,
+    "share_of_gap_closed": 0.033974662014758336
+   },
+   "placement 2 X binomial eps5": {
+    "change": 0.0013560322825098559,
+    "se": 0.0018295573590048034,
+    "gap": 0.03585849542629241,
+    "share_of_gap_closed": -0.03781620690966238
+   },
+   "placement 2 X binomial lambda": {
+    "change": -0.00779894977672313,
+    "se": 0.004726094843743521
+   },
+   "placement 2 Z wls eps3": {
+    "change": 0.0023190715496024692,
+    "se": 0.0003602297105603689,
+    "gap": 0.09497078104798312,
+    "share_of_gap_closed": -0.02441878990582145
+   },
+   "placement 2 Z wls eps5": {
+    "change": 0.0,
+    "se": 0.0,
+    "gap": 0.09125251229944653,
+    "share_of_gap_closed": -0.0
+   },
+   "placement 2 Z wls lambda": {
+    "change": -0.0027226421195351014,
+    "se": 0.0036764346831468574
+   },
+   "placement 2 Z binomial eps3": {
+    "change": 0.00238629224307762,
+    "se": 0.0003561977608626989,
+    "gap": 0.10079496406011841,
+    "share_of_gap_closed": -0.02367471693977026
+   },
+   "placement 2 Z binomial eps5": {
+    "change": 0.0,
+    "se": 0.0,
+    "gap": 0.13391125540099338,
+    "share_of_gap_closed": -0.0
+   },
+   "placement 2 Z binomial lambda": {
+    "change": 0.014894261187248792,
+    "se": 0.0021906301667225206
+   }
+  },
+  "learned pair edges (2500 shots)": {
+   "placement 1 X wls eps3": {
+    "change": -0.001310825427493656,
+    "se": 0.00047220786287484985,
+    "gap": 0.024302601188653128,
+    "share_of_gap_closed": 0.05393765948419051
+   },
+   "placement 1 X wls eps5": {
+    "change": 0.0028853402976616203,
+    "se": 0.001169334772690571,
+    "gap": 0.02384363207577911,
+    "share_of_gap_closed": -0.12101093862258565
+   },
+   "placement 1 X wls lambda": {
+    "change": -0.013428326829405202,
+    "se": 0.005958653900127106
+   },
+   "placement 1 X binomial eps3": {
+    "change": -0.0012115280966865205,
+    "se": 0.0004603385388282896,
+    "gap": 0.026350962972579578,
+    "share_of_gap_closed": 0.04597661565337171
+   },
+   "placement 1 X binomial eps5": {
+    "change": 0.0027491465546362836,
+    "se": 0.0011793903026890793,
+    "gap": 0.03218559448405628,
+    "share_of_gap_closed": -0.08541543503253057
+   },
+   "placement 1 X binomial lambda": {
+    "change": -0.018077882521876476,
+    "se": 0.00530690651352598
+   },
+   "placement 1 Z wls eps3": {
+    "change": 0.008318969132339116,
+    "se": 0.00034116003609928244,
+    "gap": 0.066456951642199,
+    "share_of_gap_closed": -0.1251783135815203
+   },
+   "placement 1 Z wls eps5": {
+    "change": 0.0,
+    "se": 0.0,
+    "gap": 0.12349213321310684,
+    "share_of_gap_closed": -0.0
+   },
+   "placement 1 Z wls lambda": {
+    "change": 0.058119450330079925,
+    "se": 0.0023489868125477972
+   },
+   "placement 1 Z binomial eps3": {
+    "change": 0.00828323735224023,
+    "se": 0.0003437143347668597,
+    "gap": 0.06776623061219612,
+    "share_of_gap_closed": -0.12223252315216522
+   },
+   "placement 1 Z binomial eps5": {
+    "change": 0.0,
+    "se": 0.0,
+    "gap": 0.1446865448686365,
+    "share_of_gap_closed": -0.0
+   },
+   "placement 1 Z binomial lambda": {
+    "change": 0.05054499070486801,
+    "se": 0.0021928014156028935
+   },
+   "placement 2 X wls eps3": {
+    "change": -0.00045436698743790417,
+    "se": 0.00034728154471922227,
+    "gap": 0.02513057421251237,
+    "share_of_gap_closed": 0.018080246937281576
+   },
+   "placement 2 X wls eps5": {
+    "change": 0.0007736182389492252,
+    "se": 0.0017393124947609724,
+    "gap": 0.02735652005100464,
+    "share_of_gap_closed": -0.028279117281981004
+   },
+   "placement 2 X wls lambda": {
+    "change": 0.000753050181790893,
+    "se": 0.004700954428005029
+   },
+   "placement 2 X binomial eps3": {
+    "change": -0.0004682168108253337,
+    "se": 0.0003412276047918755,
+    "gap": 0.025773528381809768,
+    "share_of_gap_closed": 0.018166577889109973
+   },
+   "placement 2 X binomial eps5": {
+    "change": 0.0011515344520756198,
+    "se": 0.0015541543037809029,
+    "gap": 0.03585849542629241,
+    "share_of_gap_closed": -0.03211329528431034
+   },
+   "placement 2 X binomial lambda": {
+    "change": -0.005453873639763185,
+    "se": 0.003968694441958007
+   },
+   "placement 2 Z wls eps3": {
+    "change": 0.0009337243247318882,
+    "se": 0.0003523006010184991,
+    "gap": 0.09497078104798312,
+    "share_of_gap_closed": -0.009831701018233519
+   },
+   "placement 2 Z wls eps5": {
+    "change": 0.0,
+    "se": 0.0,
+    "gap": 0.09125251229944653,
+    "share_of_gap_closed": -0.0
+   },
+   "placement 2 Z wls lambda": {
+    "change": 0.0010543451660689485,
+    "se": 0.0024217742578752353
+   },
+   "placement 2 Z binomial eps3": {
+    "change": 0.0010058058199481524,
+    "se": 0.00035389296925913337,
+    "gap": 0.10079496406011841,
+    "share_of_gap_closed": -0.009978730875366422
+   },
+   "placement 2 Z binomial eps5": {
+    "change": 0.0,
+    "se": 0.0,
+    "gap": 0.13391125540099338,
+    "share_of_gap_closed": -0.0
+   },
+   "placement 2 Z binomial lambda": {
+    "change": 0.006558173044810323,
+    "se": 0.0021787239248928945
+   }
+  },
+  "learned (10,000 shots)": {
+   "placement 1 X wls eps3": {
+    "change": 0.0012565992832992868,
+    "se": 0.0005383214264733945,
+    "gap": 0.024302601188653128,
+    "share_of_gap_closed": -0.05170636976448399
+   },
+   "placement 1 X wls eps5": {
+    "change": 0.0016239090876306816,
+    "se": 0.0010454082428594364,
+    "gap": 0.02384363207577911,
+    "share_of_gap_closed": -0.06810661573998554
+   },
+   "placement 1 X wls lambda": {
+    "change": 0.0018445403603337684,
+    "se": 0.005640757504579213
+   },
+   "placement 1 X binomial eps3": {
+    "change": 0.001346458220855673,
+    "se": 0.0005331947914336183,
+    "gap": 0.026350962972579578,
+    "share_of_gap_closed": -0.05109711634663133
+   },
+   "placement 1 X binomial eps5": {
+    "change": 0.0017945381958991314,
+    "se": 0.0010475952891513473,
+    "gap": 0.03218559448405628,
+    "share_of_gap_closed": -0.0557559437588791
+   },
+   "placement 1 X binomial lambda": {
+    "change": 0.0013383966527328317,
+    "se": 0.005450950997161638
+   },
+   "placement 1 Z wls eps3": {
+    "change": 0.016106731765433636,
+    "se": 0.0005622183652130242,
+    "gap": 0.066456951642199,
+    "share_of_gap_closed": -0.24236338513014405
+   },
+   "placement 1 Z wls eps5": {
+    "change": -1.6477055797214923e-05,
+    "se": 0.0003597858785583635,
+    "gap": 0.12349213321310684,
+    "share_of_gap_closed": 0.0001334259549050055
+   },
+   "placement 1 Z wls lambda": {
+    "change": 0.10461968827730334,
+    "se": 0.003996030487597392
+   },
+   "placement 1 Z binomial eps3": {
+    "change": 0.016125425066399007,
+    "se": 0.0005597692924371075,
+    "gap": 0.06776623061219612,
+    "share_of_gap_closed": -0.23795664773918912
+   },
+   "placement 1 Z binomial eps5": {
+    "change": -0.00012391592906694227,
+    "se": 0.00032521899925686145,
+    "gap": 0.1446865448686365,
+    "share_of_gap_closed": 0.0008564440403179698
+   },
+   "placement 1 Z binomial lambda": {
+    "change": 0.09886342994055275,
+    "se": 0.0037056572143998557
+   },
+   "placement 2 X wls eps3": {
+    "change": -0.000380613533524532,
+    "se": 0.00018040608450853584,
+    "gap": 0.02513057421251237,
+    "share_of_gap_closed": 0.015145437199561745
+   },
+   "placement 2 X wls eps5": {
+    "change": 3.5800878649883126e-05,
+    "se": 0.0014941827920286661,
+    "gap": 0.02735652005100464,
+    "share_of_gap_closed": -0.0013086780987908722
+   },
+   "placement 2 X wls lambda": {
+    "change": -0.003917402437977946,
+    "se": 0.0038813769562843583
+   },
+   "placement 2 X binomial eps3": {
+    "change": -0.00039898684710474306,
+    "se": 0.00017950471446299225,
+    "gap": 0.025773528381809768,
+    "share_of_gap_closed": 0.015480489950546964
+   },
+   "placement 2 X binomial eps5": {
+    "change": 8.849553523160303e-05,
+    "se": 0.0012634415342803415,
+    "gap": 0.03585849542629241,
+    "share_of_gap_closed": -0.002467909882429583
+   },
+   "placement 2 X binomial lambda": {
+    "change": -0.0020015689921421,
+    "se": 0.0030820874011290335
+   },
+   "placement 2 Z wls eps3": {
+    "change": -0.0009377739533845131,
+    "se": 0.0005458712373149509,
+    "gap": 0.09497078104798312,
+    "share_of_gap_closed": 0.009874341803198516
+   },
+   "placement 2 Z wls eps5": {
+    "change": -3.337223318706783e-05,
+    "se": 2.729789106202505e-05,
+    "gap": 0.09125251229944653,
+    "share_of_gap_closed": 0.00036571303459083225
+   },
+   "placement 2 Z wls lambda": {
+    "change": -0.012482350839312983,
+    "se": 0.0037278250622703865
+   },
+   "placement 2 Z binomial eps3": {
+    "change": -0.0008118780118500646,
+    "se": 0.0005344529624246213,
+    "gap": 0.10079496406011841,
+    "share_of_gap_closed": 0.00805474776860703
+   },
+   "placement 2 Z binomial eps5": {
+    "change": -2.6145759561557735e-05,
+    "se": 2.525614866667716e-05,
+    "gap": 0.13391125540099338,
+    "share_of_gap_closed": 0.00019524691545355925
+   },
+   "placement 2 Z binomial lambda": {
+    "change": -0.0044211186152604,
+    "se": 0.0032932394432533016
+   }
+  }
+ },
+ "placements": {
+  "placement 1 calibrated X wls": {
+   "eps3": [
+    0.12675556212222414,
+    0.003375161507706501
+   ],
+   "eps5": [
+    0.1848785175362063,
+    0.004192691144702445
+   ],
+   "lambda": [
+    0.6822639457308591,
+    0.027439025720793906
+   ],
+   "lambda_chi2_per_dof": 0.3827307241246129,
+   "lambda_plain_mean": 0.686256563946026
+  },
+  "placement 1 calibrated X binomial": {
+   "eps3": [
+    0.12881390077094307,
+    0.0037877474677752354
+   ],
+   "eps5": [
+    0.19328453550065267,
+    0.004673009432306487
+   ],
+   "lambda": [
+    0.6565216011539337,
+    0.025608815765593648
+   ],
+   "lambda_chi2_per_dof": 0.6604492179170223,
+   "lambda_plain_mean": 0.6673457230059828
+  },
+  "placement 1 calibrated Z wls": {
+   "eps3": [
+    0.1373724567966593,
+    0.0032395306747147485
+   ],
+   "eps5": [
+    0.2897879229276282,
+    0.019315607429724543
+   ],
+   "lambda": [
+    0.44399804743970184,
+    0.02555509574214712
+   ],
+   "lambda_chi2_per_dof": 1.9046980957683457,
+   "lambda_plain_mean": 0.4839982497232251
+  },
+  "placement 1 calibrated Z binomial": {
+   "eps3": [
+    0.13868683966662748,
+    0.0030434514180995224
+   ],
+   "eps5": [
+    0.3110265573435598,
+    0.013642013985039477
+   ],
+   "lambda": [
+    0.44564699058516116,
+    0.0211995319628818
+   ],
+   "lambda_chi2_per_dof": 1.6879188203648943,
+   "lambda_plain_mean": 0.44893907972929065
+  },
+  "placement 1 learned X wls": {
+   "eps3": [
+    0.15311962775649374,
+    0.004969271543851198
+   ],
+   "eps5": [
+    0.19355898481999143,
+    0.006125478890861023
+   ],
+   "lambda": [
+    0.7879005188208035,
+    0.02906716709809894
+   ],
+   "lambda_chi2_per_dof": 0.856113445299472,
+   "lambda_plain_mean": 0.7928123146853009
+  },
+  "placement 1 learned X binomial": {
+   "eps3": [
+    0.15482526147763012,
+    0.00455340288293222
+   ],
+   "eps5": [
+    0.20060910397576542,
+    0.007250132975774751
+   ],
+   "lambda": [
+    0.7732552201239784,
+    0.03011729707703858
+   ],
+   "lambda_chi2_per_dof": 1.1659591047801652,
+   "lambda_plain_mean": 0.7748812900620689
+  },
+  "placement 1 learned Z wls": {
+   "eps3": [
+    0.15386749630020682,
+    0.0029695196877680507
+   ],
+   "eps5": [
+    0.2901064782089905,
+    0.01965835087714985
+   ],
+   "lambda": [
+    0.4922706013845274,
+    0.03154550470687423
+   ],
+   "lambda_chi2_per_dof": 2.455529041848319,
+   "lambda_plain_mean": 0.5418692765009239
+  },
+  "placement 1 learned Z binomial": {
+   "eps3": [
+    0.15581739631240957,
+    0.0033969319197864035
+   ],
+   "eps5": [
+    0.31283832691092933,
+    0.013204139721967125
+   ],
+   "lambda": [
+    0.4891190441028575,
+    0.028174537786902015
+   ],
+   "lambda_chi2_per_dof": 2.4917176803756655,
+   "lambda_plain_mean": 0.5023961896473037
+  },
+  "placement 1 learned, scaled X wls": {
+   "eps3": [
+    0.15319653900096958,
+    0.004326921306927229
+   ],
+   "eps5": [
+    0.1900555347366839,
+    0.005013994528928795
+   ],
+   "lambda": [
+    0.8120471538708274,
+    0.030247808488106806
+   ],
+   "lambda_chi2_per_dof": 0.37146977289627503,
+   "lambda_plain_mean": 0.8068334183876074
+  },
+  "placement 1 learned, scaled X binomial": {
+   "eps3": [
+    0.1551014297541407,
+    0.003925340828833698
+   ],
+   "eps5": [
+    0.19760050239139684,
+    0.006206717117628711
+   ],
+   "lambda": [
+    0.7909486995872455,
+    0.02887028160775607
+   ],
+   "lambda_chi2_per_dof": 0.8894165119030302,
+   "lambda_plain_mean": 0.7874373038416818
+  },
+  "placement 1 learned, scaled Z wls": {
+   "eps3": [
+    0.1372634981398387,
+    0.006206921562468682
+   ],
+   "eps5": [
+    0.2899021720172818,
+    0.01963142154657483
+   ],
+   "lambda": [
+    0.43349460204526646,
+    0.031668026377956904
+   ],
+   "lambda_chi2_per_dof": 2.6991958640289493,
+   "lambda_plain_mean": 0.48506730252239727
+  },
+  "placement 1 learned, scaled Z binomial": {
+   "eps3": [
+    0.139128998556991,
+    0.006454501608299347
+   ],
+   "eps5": [
+    0.3132418179825053,
+    0.013361087275811149
+   ],
+   "lambda": [
+    0.43758520237203996,
+    0.03029914760718435
+   ],
+   "lambda_chi2_per_dof": 3.280876261287898,
+   "lambda_plain_mean": 0.4478729403310947
+  },
+  "placement 1 learned pair edges X wls": {
+   "eps3": [
+    0.12844383992334085,
+    0.003175721001769048
+   ],
+   "eps5": [
+    0.1859913811476646,
+    0.004618358605253754
+   ],
+   "lambda": [
+    0.6817036225345394,
+    0.025360471641326158
+   ],
+   "lambda_chi2_per_dof": 0.7884441315603264,
+   "lambda_plain_mean": 0.6919090504685996
+  },
+  "placement 1 learned pair edges X binomial": {
+   "eps3": [
+    0.12988172079021373,
+    0.003036512405726767
+   ],
+   "eps5": [
+    0.19491614710081637,
+    0.005887584376783601
+   ],
+   "lambda": [
+    0.6662046222023374,
+    0.024588669157967515
+   ],
+   "lambda_chi2_per_dof": 0.8567881074790433,
+   "lambda_plain_mean": 0.6684194802581038
+  },
+  "placement 1 learned pair edges Z wls": {
+   "eps3": [
+    0.1454713586893553,
+    0.004414657134968637
+   ],
+   "eps5": [
+    0.2897879229276282,
+    0.019315607429724543
+   ],
+   "lambda": [
+    0.4645991420896273,
+    0.03140111100205401
+   ],
+   "lambda_chi2_per_dof": 2.6670232221040733,
+   "lambda_plain_mean": 0.5127335578485244
+  },
+  "placement 1 learned pair edges Z binomial": {
+   "eps3": [
+    0.14688426306503083,
+    0.004609007655098428
+   ],
+   "eps5": [
+    0.3110265573435598,
+    0.013642013985039477
+   ],
+   "lambda": [
+    0.4675909618064698,
+    0.02808280116772138
+   ],
+   "lambda_chi2_per_dof": 2.71140192305463,
+   "lambda_plain_mean": 0.4759868786167368
+  },
+  "placement 2 calibrated X wls": {
+   "eps3": [
+    0.11113107054274114,
+    0.003827231183645767
+   ],
+   "eps5": [
+    0.21957935258694014,
+    0.0034693514586566563
+   ],
+   "lambda": [
+    0.500686436840914,
+    0.017797091619463357
+   ],
+   "lambda_chi2_per_dof": 0.7673353531260708,
+   "lambda_plain_mean": 0.5060045210121371
+  },
+  "placement 2 calibrated X binomial": {
+   "eps3": [
+    0.11178005660581433,
+    0.0037545681324643904
+   ],
+   "eps5": [
+    0.22819208914046873,
+    0.0027679537579694664
+   ],
+   "lambda": [
+    0.48544256539096664,
+    0.016940814323046855
+   ],
+   "lambda_chi2_per_dof": 0.9026125680368166,
+   "lambda_plain_mean": 0.48981376922790254
+  },
+  "placement 2 calibrated Z wls": {
+   "eps3": [
+    0.17860843586840408,
+    0.018038441901409276
+   ],
+   "eps5": [
+    0.2559979692168122,
+    0.009879891495479905
+   ],
+   "lambda": [
+    0.6318809936914626,
+    0.05463625439278197
+   ],
+   "lambda_chi2_per_dof": 2.654313748863795,
+   "lambda_plain_mean": 0.6951658646616836
+  },
+  "placement 2 calibrated Z binomial": {
+   "eps3": [
+    0.1844507331367989,
+    0.02069002982513632
+   ],
+   "eps5": [
+    0.2987419770950629,
+    0.01176512703829903
+   ],
+   "lambda": [
+    0.5399972217750639,
+    0.05473162883588802
+   ],
+   "lambda_chi2_per_dof": 6.013377097237427,
+   "lambda_plain_mean": 0.6208866807255375
+  },
+  "placement 2 learned X wls": {
+   "eps3": [
+    0.1324715029077169,
+    0.003294472120860403
+   ],
+   "eps5": [
+    0.2323593008942387,
+    0.00504167940963509
+   ],
+   "lambda": [
+    0.5667997227112305,
+    0.0221887097560593
+   ],
+   "lambda_chi2_per_dof": 0.4645600622825714,
+   "lambda_plain_mean": 0.570750167986462
+  },
+  "placement 2 learned X binomial": {
+   "eps3": [
+    0.13386996840988746,
+    0.0027220493648932045
+   ],
+   "eps5": [
+    0.2460697466609309,
+    0.008107992126021465
+   ],
+   "lambda": [
+    0.5388478269734153,
+    0.019862159530889607
+   ],
+   "lambda_chi2_per_dof": 0.7895755730684342,
+   "lambda_plain_mean": 0.5460779955775958
+  },
+  "placement 2 learned Z wls": {
+   "eps3": [
+    0.17868045399980084,
+    0.02284620251355172
+   ],
+   "eps5": [
+    0.26518833081634724,
+    0.009146002204720031
+   ],
+   "lambda": [
+    0.5598270934222873,
+    0.07027821440427441
+   ],
+   "lambda_chi2_per_dof": 7.218339484974543,
+   "lambda_plain_mean": 0.6736377643295416
+  },
+  "placement 2 learned Z binomial": {
+   "eps3": [
+    0.1807019574247056,
+    0.02365036266867024
+   ],
+   "eps5": [
+    0.31008260836839646,
+    0.01028423202256916
+   ],
+   "lambda": [
+    0.5061937196658491,
+    0.05458900128285196
+   ],
+   "lambda_chi2_per_dof": 7.135622266237258,
+   "lambda_plain_mean": 0.5888314609448402
+  },
+  "placement 2 learned, scaled X wls": {
+   "eps3": [
+    0.13158940615894038,
+    0.004485044963860416
+   ],
+   "eps5": [
+    0.23137301667999005,
+    0.005980601456152069
+   ],
+   "lambda": [
+    0.5644112790060309,
+    0.022536365761670632
+   ],
+   "lambda_chi2_per_dof": 0.47864608381187845,
+   "lambda_plain_mean": 0.5689741833291506
+  },
+  "placement 2 learned, scaled X binomial": {
+   "eps3": [
+    0.13325313340251574,
+    0.004106958244800553
+   ],
+   "eps5": [
+    0.24582821014033068,
+    0.0076981243604383335
+   ],
+   "lambda": [
+    0.5380609794533667,
+    0.020849279578372917
+   ],
+   "lambda_chi2_per_dof": 1.12545049880277,
+   "lambda_plain_mean": 0.5438292247214628
+  },
+  "placement 2 learned, scaled Z wls": {
+   "eps3": [
+    0.1706794201740505,
+    0.02519050185148882
+   ],
+   "eps5": [
+    0.26516385239275236,
+    0.00913635327884206
+   ],
+   "lambda": [
+    0.5327238448460125,
+    0.07306932774031077
+   ],
+   "lambda_chi2_per_dof": 8.04795278294346,
+   "lambda_plain_mean": 0.6434620228187888
+  },
+  "placement 2 learned, scaled Z binomial": {
+   "eps3": [
+    0.17552476282761176,
+    0.024974333321131074
+   ],
+   "eps5": [
+    0.3101487330648263,
+    0.010325206362883409
+   ],
+   "lambda": [
+    0.4788723609027637,
+    0.05767506434997223
+   ],
+   "lambda_chi2_per_dof": 8.626270170061789,
+   "lambda_plain_mean": 0.5720510666722489
+  },
+  "placement 2 learned pair edges X wls": {
+   "eps3": [
+    0.10841907729702331,
+    0.003229579376436056
+   ],
+   "eps5": [
+    0.2067901525999815,
+    0.005112651728841631
+   ],
+   "lambda": [
+    0.5193462521244564,
+    0.022709841366011813
+   ],
+   "lambda_chi2_per_dof": 1.3195451899049044,
+   "lambda_plain_mean": 0.5256904637996952
+  },
+  "placement 2 learned pair edges X binomial": {
+   "eps3": [
+    0.10938241261666715,
+    0.0034331702451499786
+   ],
+   "eps5": [
+    0.21766776824248263,
+    0.005064350769812076
+   ],
+   "lambda": [
+    0.4974943211591665,
+    0.024714397863588703
+   ],
+   "lambda_chi2_per_dof": 1.773420497617587,
+   "lambda_plain_mean": 0.5044603508767718
+  },
+  "placement 2 learned pair edges Z wls": {
+   "eps3": [
+    0.18051762876653263,
+    0.0229141899896356
+   ],
+   "eps5": [
+    0.2559979692168122,
+    0.009879891495479905
+   ],
+   "lambda": [
+    0.6146292181960205,
+    0.0692328692991321
+   ],
+   "lambda_chi2_per_dof": 4.92098556743055,
+   "lambda_plain_mean": 0.7028583405216994
+  },
+  "placement 2 learned pair edges Z binomial": {
+   "eps3": [
+    0.18249745237939297,
+    0.023159463001409652
+   ],
+   "eps5": [
+    0.2987419770950629,
+    0.01176512703829903
+   ],
+   "lambda": [
+    0.5320980517630909,
+    0.05757395390597656
+   ],
+   "lambda_chi2_per_dof": 7.144886246578733,
+   "lambda_plain_mean": 0.6155921606014771
+  }
+ },
+ "control_placements": {
+  "placement 1 calibrated X wls": {
+   "eps3": [
+    0.10255770746005592,
+    0.0028397156686322395
+   ],
+   "eps5": [
+    0.1605095147059981,
+    0.006430126390259423
+   ],
+   "lambda": [
+    0.6240735670833818,
+    0.03510994170989342
+   ],
+   "lambda_chi2_per_dof": 17.064415550222304,
+   "lambda_plain_mean": 0.6442645566316723
+  },
+  "placement 1 calibrated X binomial": {
+   "eps3": [
+    0.10268736252829531,
+    0.002861509220221129
+   ],
+   "eps5": [
+    0.16111878530478677,
+    0.00640661241706836
+   ],
+   "lambda": [
+    0.6426317393106261,
+    null
+   ],
+   "lambda_plain_mean": 0.6426317393106261
+  },
+  "placement 1 calibrated Z wls": {
+   "eps3": [
+    0.07083638596204371,
+    0.0037195378568629757
+   ],
+   "eps5": [
+    0.16335397019595418,
+    0.00371857615127508
+   ],
+   "lambda": [
+    0.41024243889628637,
+    0.02761877193391301
+   ],
+   "lambda_chi2_per_dof": 26.949813534416457,
+   "lambda_plain_mean": 0.4361556360986481
+  },
+  "placement 1 calibrated Z binomial": {
+   "eps3": [
+    0.07093171425585736,
+    0.003746817934653986
+   ],
+   "eps5": [
+    0.16382926439909803,
+    0.0036598033566351564
+   ],
+   "lambda": [
+    0.4353450530223967,
+    null
+   ],
+   "lambda_plain_mean": 0.4353450530223967
+  },
+  "placement 1 learned (2500 shots) X wls": {
+   "eps3": [
+    0.10252002872899538,
+    0.003699601649567463
+   ],
+   "eps5": [
+    0.16516565626477536,
+    0.006308729786897157
+   ],
+   "lambda": [
+    0.6025871570335186,
+    0.0327170629237547
+   ],
+   "lambda_chi2_per_dof": 11.524596655474154,
+   "lambda_plain_mean": 0.6259608924429245
+  },
+  "placement 1 learned (2500 shots) X binomial": {
+   "eps3": [
+    0.10274161671910495,
+    0.003697322856825337
+   ],
+   "eps5": [
+    0.16590470864846482,
+    0.006103441135154218
+   ],
+   "lambda": [
+    0.6240474917456047,
+    null
+   ],
+   "lambda_plain_mean": 0.6240474917456047
+  },
+  "placement 1 learned (2500 shots) Z wls": {
+   "eps3": [
+    0.08929027410120807,
+    0.003611150783708388
+   ],
+   "eps5": [
+    0.1632884379485852,
+    0.0035512207089982376
+   ],
+   "lambda": [
+    0.5390038087597127,
+    0.029336173124499796
+   ],
+   "lambda_chi2_per_dof": 21.41127143964668,
+   "lambda_plain_mean": 0.5486068570059528
+  },
+  "placement 1 learned (2500 shots) Z binomial": {
+   "eps3": [
+    0.08938145241597134,
+    0.003626095309707889
+   ],
+   "eps5": [
+    0.16362855232079102,
+    0.0034957457566319335
+   ],
+   "lambda": [
+    0.5479647312642092,
+    null
+   ],
+   "lambda_plain_mean": 0.5479647312642092
+  },
+  "placement 1 learned, scaled (2500 shots) X wls": {
+   "eps3": [
+    0.10236158415191121,
+    0.003276347712716062
+   ],
+   "eps5": [
+    0.16568147024778732,
+    0.0061376234451672
+   ],
+   "lambda": [
+    0.6164197280516573,
+    0.03820043013112438
+   ],
+   "lambda_chi2_per_dof": 16.071777872039224,
+   "lambda_plain_mean": 0.6224978546681088
+  },
+  "placement 1 learned, scaled (2500 shots) X binomial": {
+   "eps3": [
+    0.10260589518198379,
+    0.0032558911601842685
+   ],
+   "eps5": [
+    0.1661614934374464,
+    0.006108734347578347
+   ],
+   "lambda": [
+    0.6220967784866127,
+    null
+   ],
+   "lambda_plain_mean": 0.6220967784866127
+  },
+  "placement 1 learned, scaled (2500 shots) Z wls": {
+   "eps3": [
+    0.08085155266961394,
+    0.005198038146865427
+   ],
+   "eps5": [
+    0.16338840730467089,
+    0.003715496569668537
+   ],
+   "lambda": [
+    0.4516391579753453,
+    0.043063337970117285
+   ],
+   "lambda_chi2_per_dof": 35.86540254912635,
+   "lambda_plain_mean": 0.4986059439944069
+  },
+  "placement 1 learned, scaled (2500 shots) Z binomial": {
+   "eps3": [
+    0.08101101621152032,
+    0.005228801580416333
+   ],
+   "eps5": [
+    0.1638453323427444,
+    0.0036645553451858147
+   ],
+   "lambda": [
+    0.4980842207260691,
+    null
+   ],
+   "lambda_plain_mean": 0.4980842207260691
+  },
+  "placement 1 learned pair edges (2500 shots) X wls": {
+   "eps3": [
+    0.10124688203256227,
+    0.0031614814129570083
+   ],
+   "eps5": [
+    0.16339485500365972,
+    0.006271028566331097
+   ],
+   "lambda": [
+    0.6106452402539766,
+    0.03816615819789951
+   ],
+   "lambda_chi2_per_dof": 16.93589808111598,
+   "lambda_plain_mean": 0.6250882268917506
+  },
+  "placement 1 learned pair edges (2500 shots) X binomial": {
+   "eps3": [
+    0.10147583443160876,
+    0.003155480590800873
+   ],
+   "eps5": [
+    0.16386793185942305,
+    0.006199277307558389
+   ],
+   "lambda": [
+    0.6245538567887496,
+    null
+   ],
+   "lambda_plain_mean": 0.6245538567887496
+  },
+  "placement 1 learned pair edges (2500 shots) Z wls": {
+   "eps3": [
+    0.07915535509438283,
+    0.0034699656049795922
+   ],
+   "eps5": [
+    0.16335397019595418,
+    0.00371857615127508
+   ],
+   "lambda": [
+    0.4683618892263663,
+    0.028113305710930823
+   ],
+   "lambda_chi2_per_dof": 25.043113188342087,
+   "lambda_plain_mean": 0.4870673950940982
+  },
+  "placement 1 learned pair edges (2500 shots) Z binomial": {
+   "eps3": [
+    0.07921495160809759,
+    0.003476029844883585
+   ],
+   "eps5": [
+    0.16382926439909803,
+    0.0036598033566351564
+   ],
+   "lambda": [
+    0.4858900437272647,
+    null
+   ],
+   "lambda_plain_mean": 0.4858900437272647
+  },
+  "placement 1 learned (10,000 shots) X wls": {
+   "eps3": [
+    0.1038143067433552,
+    0.0028563062083464138
+   ],
+   "eps5": [
+    0.1621334237936288,
+    0.0063443082590351
+   ],
+   "lambda": [
+    0.6259181074437156,
+    0.034653489926433495
+   ],
+   "lambda_chi2_per_dof": 14.409172691544974,
+   "lambda_plain_mean": 0.6458389294048892
+  },
+  "placement 1 learned (10,000 shots) X binomial": {
+   "eps3": [
+    0.10403382074915098,
+    0.0028434933149187143
+   ],
+   "eps5": [
+    0.16291332350068588,
+    0.006273391682607645
+   ],
+   "lambda": [
+    0.643970135963359,
+    null
+   ],
+   "lambda_plain_mean": 0.643970135963359
+  },
+  "placement 1 learned (10,000 shots) Z wls": {
+   "eps3": [
+    0.08694311772747734,
+    0.00412421010799602
+   ],
+   "eps5": [
+    0.16333749314015694,
+    0.0035747910310910767
+   ],
+   "lambda": [
+    0.5148621271735897,
+    0.03138356147211773
+   ],
+   "lambda_chi2_per_dof": 25.789016918569573,
+   "lambda_plain_mean": 0.53479433240203
+  },
+  "placement 1 learned (10,000 shots) Z binomial": {
+   "eps3": [
+    0.08705713932225638,
+    0.004145110698476253
+   ],
+   "eps5": [
+    0.1637053484700311,
+    0.0035200550189715737
+   ],
+   "lambda": [
+    0.5342084829629494,
+    null
+   ],
+   "lambda_plain_mean": 0.5342084829629494
+  },
+  "placement 2 calibrated X wls": {
+   "eps3": [
+    0.08513225027888864,
+    0.004512021839313999
+   ],
+   "eps5": [
+    0.19077532687673754,
+    0.002643934212718399
+   ],
+   "lambda": [
+    0.4365019519450895,
+    0.022639594067864227
+   ],
+   "lambda_chi2_per_dof": 11.509437755182118,
+   "lambda_plain_mean": 0.4468127255147342
+  },
+  "placement 2 calibrated X binomial": {
+   "eps3": [
+    0.08531902221362582,
+    0.004573715687614141
+   ],
+   "eps5": [
+    0.19203911813962088,
+    0.002757941172470227
+   ],
+   "lambda": [
+    0.4449333960942896,
+    null
+   ],
+   "lambda_plain_mean": 0.4449333960942896
+  },
+  "placement 2 calibrated Z wls": {
+   "eps3": [
+    0.08322120219746715,
+    0.001967726558177169
+   ],
+   "eps5": [
+    0.16435075236631494,
+    0.004456570788045796
+   ],
+   "lambda": [
+    0.5040659787067403,
+    0.020655818072980475
+   ],
+   "lambda_chi2_per_dof": 7.90259856163109,
+   "lambda_plain_mean": 0.5088015620152294
+  },
+  "placement 2 calibrated Z binomial": {
+   "eps3": [
+    0.0833986372349133,
+    0.0019973455914999924
+   ],
+   "eps5": [
+    0.16496896644169665,
+    0.004592560286600806
+   ],
+   "lambda": [
+    0.508092494111425,
+    null
+   ],
+   "lambda_plain_mean": 0.508092494111425
+  },
+  "placement 2 learned (2500 shots) X wls": {
+   "eps3": [
+    0.08354166477239867,
+    0.003410721932901968
+   ],
+   "eps5": [
+    0.19185007439076088,
+    0.0030517646225077886
+   ],
+   "lambda": [
+    0.42728728805316707,
+    0.016646824729595725
+   ],
+   "lambda_chi2_per_dof": 5.487763791669765,
+   "lambda_plain_mean": 0.43570296157267174
+  },
+  "placement 2 learned (2500 shots) X binomial": {
+   "eps3": [
+    0.08370425744446966,
+    0.003482176827503651
+   ],
+   "eps5": [
+    0.19345760210707957,
+    0.0026387628854130938
+   ],
+   "lambda": [
+    0.432989384716017,
+    null
+   ],
+   "lambda_plain_mean": 0.432989384716017
+  },
+  "placement 2 learned (2500 shots) Z wls": {
+   "eps3": [
+    0.08258684290698658,
+    0.003218674556647768
+   ],
+   "eps5": [
+    0.1643231551929973,
+    0.0044447657167059
+   ],
+   "lambda": [
+    0.48142329666688594,
+    0.027849006860087844
+   ],
+   "lambda_chi2_per_dof": 15.332116419468223,
+   "lambda_plain_mean": 0.5058866773022828
+  },
+  "placement 2 learned (2500 shots) Z binomial": {
+   "eps3": [
+    0.08291007105894892,
+    0.0033227196672681136
+   ],
+   "eps5": [
+    0.16493818556394685,
+    0.00458475199894708
+   ],
+   "lambda": [
+    0.5061300855997729,
+    null
+   ],
+   "lambda_plain_mean": 0.5061300855997729
+  },
+  "placement 2 learned, scaled (2500 shots) X wls": {
+   "eps3": [
+    0.08425176730382652,
+    0.0037319106765443697
+   ],
+   "eps5": [
+    0.19191960449364798,
+    0.002822772585284352
+   ],
+   "lambda": [
+    0.4322949652378415,
+    0.018453857602204853
+   ],
+   "lambda_chi2_per_dof": 6.671656236938219,
+   "lambda_plain_mean": 0.439358107208584
+  },
+  "placement 2 learned, scaled (2500 shots) X binomial": {
+   "eps3": [
+    0.08444337529792605,
+    0.0038212849658033044
+   ],
+   "eps5": [
+    0.19339515042213073,
+    0.002646337392128225
+   ],
+   "lambda": [
+    0.4371344463175665,
+    null
+   ],
+   "lambda_plain_mean": 0.4371344463175665
+  },
+  "placement 2 learned, scaled (2500 shots) Z wls": {
+   "eps3": [
+    0.08554027374706961,
+    0.002799722397662251
+   ],
+   "eps5": [
+    0.16435075236631494,
+    0.004456570788045796
+   ],
+   "lambda": [
+    0.5013433365872052,
+    0.024577670242342586
+   ],
+   "lambda_chi2_per_dof": 11.826081835525965,
+   "lambda_plain_mean": 0.5233027578327821
+  },
+  "placement 2 learned, scaled (2500 shots) Z binomial": {
+   "eps3": [
+    0.0857849294779909,
+    0.0029046924868302896
+   ],
+   "eps5": [
+    0.16496896644169665,
+    0.004592560286600806
+   ],
+   "lambda": [
+    0.5229867552986738,
+    null
+   ],
+   "lambda_plain_mean": 0.5229867552986738
+  },
+  "placement 2 learned pair edges (2500 shots) X wls": {
+   "eps3": [
+    0.08467788329145073,
+    0.003963463531450219
+   ],
+   "eps5": [
+    0.1915489451156868,
+    0.003587636152626293
+   ],
+   "lambda": [
+    0.4372550021268804,
+    0.018548127120520237
+   ],
+   "lambda_chi2_per_dof": 6.421139137721167,
+   "lambda_plain_mean": 0.4422937688666863
+  },
+  "placement 2 learned pair edges (2500 shots) X binomial": {
+   "eps3": [
+    0.08485080540280047,
+    0.0040562366328864286
+   ],
+   "eps5": [
+    0.19319065259169652,
+    0.0031547513592701843
+   ],
+   "lambda": [
+    0.43947952245452643,
+    null
+   ],
+   "lambda_plain_mean": 0.43947952245452643
+  },
+  "placement 2 learned pair edges (2500 shots) Z wls": {
+   "eps3": [
+    0.08415492652219904,
+    0.002297770389772651
+   ],
+   "eps5": [
+    0.16435075236631494,
+    0.004456570788045796
+   ],
+   "lambda": [
+    0.5051203238728093,
+    0.0239597750327887
+   ],
+   "lambda_chi2_per_dof": 9.64897407099964,
+   "lambda_plain_mean": 0.5149077862020961
+  },
+  "placement 2 learned pair edges (2500 shots) Z binomial": {
+   "eps3": [
+    0.08440444305486143,
+    0.002386971351663651
+   ],
+   "eps5": [
+    0.16496896644169665,
+    0.004592560286600806
+   ],
+   "lambda": [
+    0.5146506671562353,
+    null
+   ],
+   "lambda_plain_mean": 0.5146506671562353
+  },
+  "placement 2 learned (10,000 shots) X wls": {
+   "eps3": [
+    0.08475163674536411,
+    0.004645231352565762
+   ],
+   "eps5": [
+    0.19081112775538742,
+    0.003419705034691887
+   ],
+   "lambda": [
+    0.43258454950711156,
+    0.024342527018566425
+   ],
+   "lambda_chi2_per_dof": 13.625842834482786,
+   "lambda_plain_mean": 0.4452022929685434
+  },
+  "placement 2 learned (10,000 shots) X binomial": {
+   "eps3": [
+    0.08492003536652107,
+    0.004713531363177234
+   ],
+   "eps5": [
+    0.19212761367485248,
+    0.0030644790605358066
+   ],
+   "lambda": [
+    0.4429318271021475,
+    null
+   ],
+   "lambda_plain_mean": 0.4429318271021475
+  },
+  "placement 2 learned (10,000 shots) Z wls": {
+   "eps3": [
+    0.08228342824408263,
+    0.0031412846054663665
+   ],
+   "eps5": [
+    0.16431738013312785,
+    0.004453400210994387
+   ],
+   "lambda": [
+    0.4915836278674273,
+    0.02894414663779947
+   ],
+   "lambda_chi2_per_dof": 15.290896072409561,
+   "lambda_plain_mean": 0.5036321049779436
+  },
+  "placement 2 learned (10,000 shots) Z binomial": {
+   "eps3": [
+    0.08258675922306322,
+    0.003135588000663464
+   ],
+   "eps5": [
+    0.1649428206821351,
+    0.004590044519413734
+   ],
+   "lambda": [
+    0.5036713754961646,
+    null
+   ],
+   "lambda_plain_mean": 0.5036713754961646
+  }
+ },
+ "reps": [
+  {
+   "day": "2026-10-04",
+   "placement": 1,
+   "jobs": {
+    "3": "2026-10-04-r1",
+    "5": "2026-10-04-r1"
+   },
+   "decoders": {
+    "calibrated": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.13212567107699597,
+        0.007146099787959185
+       ],
+       "binomial": [
+        0.13316110953571542,
+        0.006793371368353424
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.17583215364117033,
+        0.012829227101130452
+       ],
+       "binomial": [
+        0.185528767847486,
+        0.014582577035107486
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.7514306589603149,
+        0.06824729106793398
+       ],
+       "binomial": [
+        0.7177383382677373,
+        0.06725566039526433
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.1290192880306154,
+        0.004569666944569313
+       ],
+       "binomial": [
+        0.130148045808116,
+        0.00479617943926601
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2663023836729258,
+        0.022937549344704027
+       ],
+       "binomial": [
+        0.28362150710381573,
+        0.022435091839573096
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.48448416514768294,
+        0.045120652867036586
+       ],
+       "binomial": [
+        0.4588793252568012,
+        0.040044185447652925
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     }
+    },
+    "learned": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.14243743898186884,
+        0.010490572267563702
+       ],
+       "binomial": [
+        0.1440305555581321,
+        0.00956808977750695
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.19160448701817073,
+        0.01733568546166042
+       ],
+       "binomial": [
+        0.2043829864055614,
+        0.018882171214125276
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.743393023819744,
+        0.0867267911506598
+       ],
+       "binomial": [
+        0.7047091252122585,
+        0.08018923304353885
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.1475292441789104,
+        0.006117298375502627
+       ],
+       "binomial": [
+        0.1497615372298996,
+        0.006372833764058963
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.26180762084913567,
+        0.022902698472632127
+       ],
+       "binomial": [
+        0.2872683553141232,
+        0.022561530879999875
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.563502482091317,
+        0.054551989542208974
+       ],
+       "binomial": [
+        0.521329740848545,
+        0.04656796575468343
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    },
+    "learned, scaled": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.14147157315054976,
+        0.010669978954665638
+       ],
+       "binomial": [
+        0.14320690948957088,
+        0.00972350010587529
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.18749273821067958,
+        0.014633706675335577
+       ],
+       "binomial": [
+        0.1989175005764902,
+        0.015005715686279883
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.7545442799580999,
+        0.08189534570586364
+       ],
+       "binomial": [
+        0.7199311728457154,
+        0.0730682146388698
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.12113769961993287,
+        0.004872345111353408
+       ],
+       "binomial": [
+        0.1213345669512477,
+        0.005134870279852009
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.25794067718219466,
+        0.025458733483987358
+       ],
+       "binomial": [
+        0.28737590998042506,
+        0.02276373834560877
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.4696339520515722,
+        0.05005393334189452
+       ],
+       "binomial": [
+        0.4222155119387444,
+        0.03791857846954934
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    },
+    "learned pair edges": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.12883130650365776,
+        0.00662966963450868
+       ],
+       "binomial": [
+        0.12922790874377288,
+        0.006471737337729877
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.18579833535712448,
+        0.017298319124856666
+       ],
+       "binomial": [
+        0.20788353863406872,
+        0.02021790252961761
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6933932225820542,
+        0.07376167460826104
+       ],
+       "binomial": [
+        0.6216360833228309,
+        0.0680023310261927
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.134594324088661,
+        0.005280745361643769
+       ],
+       "binomial": [
+        0.13608937296983475,
+        0.005289465576164304
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2663023836729258,
+        0.022937549344704027
+       ],
+       "binomial": [
+        0.28362150710381573,
+        0.022435091839573096
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.505419148834847,
+        0.04783712494614289
+       ],
+       "binomial": [
+        0.4798274092804292,
+        0.04228978708454363
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     }
+    }
+   }
+  },
+  {
+   "day": "2026-10-04",
+   "placement": 2,
+   "jobs": {
+    "3": "2026-10-04-r2-d3",
+    "5": "2026-10-04-r2-d5"
+   },
+   "decoders": {
+    "calibrated": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.10057854274032302,
+        0.004277628968398016
+       ],
+       "binomial": [
+        0.10096937010858734,
+        0.0043084840585103715
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2200421378076251,
+        0.013165567871839659
+       ],
+       "binomial": [
+        0.2304513263143117,
+        0.01396847493226304
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.4570876457683537,
+        0.03355375978431788
+       ],
+       "binomial": [
+        0.4381375092234253,
+        0.03247788575342314
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.1369047290059207,
+        0.004851094649637961
+       ],
+       "binomial": [
+        0.138598015599894,
+        0.004705461879398298
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.23252356487041265,
+        0.04192484950144667
+       ],
+       "binomial": [
+        0.3141377784392419,
+        0.02179266178894043
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5887778689537074,
+        0.10818941006662965
+       ],
+       "binomial": [
+        0.4412013616716289,
+        0.03407616243920351
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    },
+    "learned": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.13121629606606044,
+        0.005601713182668304
+       ],
+       "binomial": [
+        0.1320918750621058,
+        0.0054097631320473155
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2393250663625568,
+        0.015277400651906099
+       ],
+       "binomial": [
+        0.24810606810774316,
+        0.014318000459212166
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5482764428331093,
+        0.04210479984315215
+       ],
+       "binomial": [
+        0.5324008238474169,
+        0.03767512068163777
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.13741852077797484,
+        0.005575303505833329
+       ],
+       "binomial": [
+        0.13881674019121337,
+        0.005238640216036719
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.23252356487041265,
+        0.04192484950144667
+       ],
+       "binomial": [
+        0.3141377784392419,
+        0.02179266178894043
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5909875020820334,
+        0.10922157770930783
+       ],
+       "binomial": [
+        0.44189763129066706,
+        0.034898017612771524
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    },
+    "learned, scaled": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.13135141949022638,
+        0.005537811043324766
+       ],
+       "binomial": [
+        0.13202222930513946,
+        0.005463205990970388
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2422181223459428,
+        0.014875802681815407
+       ],
+       "binomial": [
+        0.25536585689153823,
+        0.015000125558720462
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5422856812613985,
+        0.040396747699879346
+       ],
+       "binomial": [
+        0.5169924864356998,
+        0.03714705683269394
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.12845282664783658,
+        0.004997226910232844
+       ],
+       "binomial": [
+        0.12876156784220988,
+        0.004813035592870822
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.23252356487041265,
+        0.04192484950144667
+       ],
+       "binomial": [
+        0.3141377784392419,
+        0.02179266178894043
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5524292848315155,
+        0.1018971785009277
+       ],
+       "binomial": [
+        0.40988883438963375,
+        0.032300248588027984
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    },
+    "learned pair edges": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.10047924314432277,
+        0.0042794417600304745
+       ],
+       "binomial": [
+        0.10082276586506042,
+        0.00419486288256124
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.19916375081771853,
+        0.019576933312851996
+       ],
+       "binomial": [
+        0.22209552293625157,
+        0.01729936546070808
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5045056780251382,
+        0.05404565659134585
+       ],
+       "binomial": [
+        0.4539612709527681,
+        0.04008809339299972
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.1359165507263636,
+        0.005176191441719211
+       ],
+       "binomial": [
+        0.13660028337330032,
+        0.005011565047635336
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.23252356487041265,
+        0.04192484950144667
+       ],
+       "binomial": [
+        0.3141377784392419,
+        0.02179266178894043
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5845280705295872,
+        0.10771786609898519
+       ],
+       "binomial": [
+        0.43484194754283745,
+        0.03412498293798241
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    }
+   }
+  },
+  {
+   "day": "2026-10-05",
+   "placement": 1,
+   "jobs": {
+    "3": "2026-10-05-r1",
+    "5": "2026-10-05-r1"
+   },
+   "decoders": {
+    "calibrated": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.11887216581576376,
+        0.005846426920322467
+       ],
+       "binomial": [
+        0.11947025638560119,
+        0.005473417113278492
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.18180065566839276,
+        0.012147472521827112
+       ],
+       "binomial": [
+        0.18844344145747888,
+        0.012804401765648288
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6538599400465774,
+        0.05424870319978346
+       ],
+       "binomial": [
+        0.6339846877215884,
+        0.05195539235739371
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.13549407917738138,
+        0.008232350835890724
+       ],
+       "binomial": [
+        0.13890123197958848,
+        0.008826043210083359
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.3262826748323835,
+        0.021100153795034642
+       ],
+       "binomial": [
+        0.328089633279757,
+        0.02150953112925158
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.4152659323606036,
+        0.03684775182222932
+       ],
+       "binomial": [
+        0.42336367227168537,
+        0.038653061578999906
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     }
+    },
+    "learned": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.1547298579291393,
+        0.007180715185717463
+       ],
+       "binomial": [
+        0.1555185544449959,
+        0.007004572032600562
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.18675887818614534,
+        0.011301504468344905
+       ],
+       "binomial": [
+        0.19355601200041134,
+        0.011476514689069697
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.8285006819055625,
+        0.06318174327044053
+       ],
+       "binomial": [
+        0.8034808779004261,
+        0.05982706817671641
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.15494584940889006,
+        0.005790951008360636
+       ],
+       "binomial": [
+        0.15509352372316265,
+        0.005866923732781776
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.32815193272681875,
+        0.021105658245388785
+       ],
+       "binomial": [
+        0.3307850522463614,
+        0.021643528717634475
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.47217716537991566,
+        0.035123950074879326
+       ],
+       "binomial": [
+        0.468864970378566,
+        0.03543629468705048
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     }
+    },
+    "learned, scaled": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.1544699748083571,
+        0.007231961639197635
+       ],
+       "binomial": [
+        0.15564339476973726,
+        0.006983775978346721
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.18660597397281503,
+        0.011664808843313655
+       ],
+       "binomial": [
+        0.19402409730218306,
+        0.012236330327149492
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.8277868683392766,
+        0.06464937780715048
+       ],
+       "binomial": [
+        0.8021858982151597,
+        0.06208874458289226
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.13286300859926825,
+        0.007678773504461511
+       ],
+       "binomial": [
+        0.135633230352721,
+        0.008048196455667928
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.32882865307770404,
+        0.021188115226705283
+       ],
+       "binomial": [
+        0.3311230711233554,
+        0.02158619721334651
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.4040493653935686,
+        0.034973288570281404
+       ],
+       "binomial": [
+        0.4096157658014494,
+        0.03610859768441807
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     }
+    },
+    "learned pair edges": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.12607048677774801,
+        0.006642898808345693
+       ],
+       "binomial": [
+        0.12859626079909786,
+        0.006704053810593587
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.17376502212462602,
+        0.010036691627937777
+       ],
+       "binomial": [
+        0.1793390372199759,
+        0.0102085993702513
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.7255228079637857,
+        0.0567239803267861
+       ],
+       "binomial": [
+        0.7170567144361474,
+        0.055348631429029134
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.15225667826122985,
+        0.007905210344534846
+       ],
+       "binomial": [
+        0.15535927614532608,
+        0.008247929856403616
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.3262826748323835,
+        0.021100153795034642
+       ],
+       "binomial": [
+        0.328089633279757,
+        0.02150953112925158
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.4666404011167509,
+        0.03869939831528614
+       ],
+       "binomial": [
+        0.4735269279686555,
+        0.03994666904453247
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     }
+    }
+   }
+  },
+  {
+   "day": "2026-10-05",
+   "placement": 2,
+   "jobs": {
+    "3": "2026-10-05-r2-d3",
+    "5": "2026-10-05-r2-d5"
+   },
+   "decoders": {
+    "calibrated": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.11987383676648578,
+        0.005548160624001011
+       ],
+       "binomial": [
+        0.12024494688067858,
+        0.005269388881508123
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.22026917301886972,
+        0.013762017325330464
+       ],
+       "binomial": [
+        0.22801807702288085,
+        0.013831962956203023
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5442152214200967,
+        0.042314859486916864
+       ],
+       "binomial": [
+        0.527348306988013,
+        0.039463907797290323
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.20092900790469348,
+        0.009853436783046992
+       ],
+       "binomial": [
+        0.20458652307922198,
+        0.009697046862161232
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2795280044822869,
+        0.038761726601141785
+       ],
+       "binomial": [
+        0.33582236677199373,
+        0.03299025577536807
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.718815305381776,
+        0.10572649801994864
+       ],
+       "binomial": [
+        0.6092105330736526,
+        0.06644905694488236
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    },
+    "learned": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.1322024589477061,
+        0.005976180303651639
+       ],
+       "binomial": [
+        0.13399784101895673,
+        0.006259628654827903
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.23568960340546724,
+        0.02380863015637245
+       ],
+       "binomial": [
+        0.26661761140708773,
+        0.019014510863383238
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5609176520199424,
+        0.06207683993739908
+       ],
+       "binomial": [
+        0.5025843578440916,
+        0.042847861539901166
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.1815997287922273,
+        0.009447469151057958
+       ],
+       "binomial": [
+        0.1833090411863907,
+        0.009313945997940776
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2796503966002609,
+        0.038661122089874635
+       ],
+       "binomial": [
+        0.3354917432898444,
+        0.032924816045070165
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6493812667528963,
+        0.09592171778002959
+       ],
+       "binomial": [
+        0.5463891283548605,
+        0.06038260493501018
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    },
+    "learned, scaled": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.1262542419223257,
+        0.006483607788248032
+       ],
+       "binomial": [
+        0.12849452644871462,
+        0.0064160248197791675
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.22313264904121255,
+        0.029461072102073996
+       ],
+       "binomial": [
+        0.2601978072019102,
+        0.019194995560126313
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5658259446335286,
+        0.08016006297161261
+       ],
+       "binomial": [
+        0.49383400971171326,
+        0.043991050936031145
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.16292788732776609,
+        0.015689528392990478
+       ],
+       "binomial": [
+        0.17983430470286738,
+        0.014138321397464737
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2795280044822869,
+        0.038761726601141785
+       ],
+       "binomial": [
+        0.33582236677199373,
+        0.03299025577536807
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.582867851217714,
+        0.09840310492496997
+       ],
+       "binomial": [
+        0.5355042501530748,
+        0.06737876929741564
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    },
+    "learned pair edges": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.11792672640422841,
+        0.005004433938688844
+       ],
+       "binomial": [
+        0.11875237122407797,
+        0.005364219291974469
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.21123284739520182,
+        0.0126261467899557
+       ],
+       "binomial": [
+        0.21903423249708343,
+        0.012733342570368122
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5582783542352946,
+        0.040925137157522704
+       ],
+       "binomial": [
+        0.54216352334633,
+        0.039914530746512404
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.18687398430949514,
+        0.008897509995482724
+       ],
+       "binomial": [
+        0.18799240998498024,
+        0.009276517146993471
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2795280044822869,
+        0.038761726601141785
+       ],
+       "binomial": [
+        0.33582236677199373,
+        0.03299025577536807
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6685340334883583,
+        0.09801695385000184
+       ],
+       "binomial": [
+        0.5597971683423264,
+        0.06154077429186793
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    }
+   }
+  },
+  {
+   "day": "2026-10-06",
+   "placement": 1,
+   "jobs": {
+    "3": "2026-10-06-r1",
+    "5": "2026-10-06-r1"
+   },
+   "decoders": {
+    "calibrated": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.13689523784270996,
+        0.008987268651563188
+       ],
+       "binomial": [
+        0.14119595979902388,
+        0.009235225458454233
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.19826851152177755,
+        0.011970653515971536
+       ],
+       "binomial": [
+        0.2033607884110898,
+        0.011785054400212963
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6904537528021618,
+        0.06158318191342642
+       ],
+       "binomial": [
+        0.6943126101261914,
+        0.06067381356375278
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.14893695459328027,
+        0.005602336809871675
+       ],
+       "binomial": [
+        0.1491629346476025,
+        0.005382439172672629
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2364800174358599,
+        0.03601674157969639
+       ],
+       "binomial": [
+        0.29779668016282973,
+        0.018180794429071445
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6298077791442831,
+        0.0988041566225288
+       ],
+       "binomial": [
+        0.5008885074408584,
+        0.03552180620341206
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     }
+    },
+    "learned": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.1694138944811292,
+        0.008147480139260518
+       ],
+       "binomial": [
+        0.17034044431742634,
+        0.00810381876174808
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.1945806546562064,
+        0.013438287907849525
+       ],
+       "binomial": [
+        0.20178817737669857,
+        0.012930517787354961
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.8706615505043761,
+        0.07327292488036853
+       ],
+       "binomial": [
+        0.8441547296372793,
+        0.06737133273720933
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.16085072667446276,
+        0.007892192914471649
+       ],
+       "binomial": [
+        0.1656635559289129,
+        0.007174308457065917
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.23449276954995085,
+        0.03528140161380699
+       ],
+       "binomial": [
+        0.29391677232726987,
+        0.019656591828329018
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6859517544322359,
+        0.10855634438446085
+       ],
+       "binomial": [
+        0.5636410423847815,
+        0.044908191414191265
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     }
+    },
+    "learned, scaled": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.16637485430750726,
+        0.008020343091980632
+       ],
+       "binomial": [
+        0.16724693584068162,
+        0.007986903421059344
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.1960047841152362,
+        0.011093407308882672
+       ],
+       "binomial": [
+        0.19861093176124794,
+        0.011600251357468463
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.8488305785928738,
+        0.06310617399408773
+       ],
+       "binomial": [
+        0.8420832345811192,
+        0.063530826217285
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.1573533466566842,
+        0.006244608039718156
+       ],
+       "binomial": [
+        0.159190400730418,
+        0.005954556419330709
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.23824423361118502,
+        0.03511134569176097
+       ],
+       "binomial": [
+        0.29766954260436107,
+        0.01887530864522194
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6604707458040102,
+        0.10080444611669796
+       ],
+       "binomial": [
+        0.5347890124654149,
+        0.039371572502618066
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     }
+    },
+    "learned pair edges": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.14043885608398543,
+        0.006977002008788946
+       ],
+       "binomial": [
+        0.14148124811893448,
+        0.007314717249061423
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.19004104126271276,
+        0.014248985450578608
+       ],
+       "binomial": [
+        0.19805292411751163,
+        0.01301295242811333
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.7389922468896744,
+        0.0664677096969487
+       ],
+       "binomial": [
+        0.7143608141578802,
+        0.05972526651067534
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.15718050175252374,
+        0.005862837981746535
+       ],
+       "binomial": [
+        0.15837567718435452,
+        0.0059012741982072126
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2364800174358599,
+        0.03601674157969639
+       ],
+       "binomial": [
+        0.29779668016282973,
+        0.018180794429071445
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6646671607048387,
+        0.10422281604871408
+       ],
+       "binomial": [
+        0.5318248581473697,
+        0.03803803996759444
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     }
+    }
+   }
+  },
+  {
+   "day": "2026-10-06",
+   "placement": 2,
+   "jobs": {
+    "3": "2026-10-06-r2-d3",
+    "5": "2026-10-06-r2-d5"
+   },
+   "decoders": {
+    "calibrated": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.11132129840018845,
+        0.005108073249377235
+       ],
+       "binomial": [
+        0.11147257200701838,
+        0.0053505195457560495
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.21409397932364954,
+        0.015009549897172918
+       ],
+       "binomial": [
+        0.22843996171097652,
+        0.013695830576195417
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5199646377346377,
+        0.04356715663759779
+       ],
+       "binomial": [
+        0.487973168845362,
+        0.0374765619037311
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.14935156972641367,
+        0.009008020437043128
+       ],
+       "binomial": [
+        0.15374336877211242,
+        0.009706095032648812
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2664550174439152,
+        0.013009812028599941
+       ],
+       "binomial": [
+        0.26893464838293,
+        0.013712718572708338
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5605132572061622,
+        0.04349574487103985
+       ],
+       "binomial": [
+        0.5716755713573979,
+        0.04639211730514783
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    },
+    "learned": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.14294693522875734,
+        0.006338217088527533
+       ],
+       "binomial": [
+        0.14310654590300903,
+        0.006350603300742899
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.22669147177288768,
+        0.016182669996103332
+       ],
+       "binomial": [
+        0.23570423243430078,
+        0.016400795956764205
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6305792366638726,
+        0.05299121411971465
+       ],
+       "binomial": [
+        0.6071445744738502,
+        0.05010677326746694
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.13960639966140898,
+        0.005381307313805936
+       ],
+       "binomial": [
+        0.1405234233080841,
+        0.005869190124992055
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2841097901794244,
+        0.013918474633251689
+       ],
+       "binomial": [
+        0.28764063836069154,
+        0.014379153039716291
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.49138186886570534,
+        0.03063092524836874
+       ],
+       "binomial": [
+        0.4885381429722476,
+        0.031824241596999744
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     }
+    },
+    "learned, scaled": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.14724757646732162,
+        0.006537780934398888
+       ],
+       "binomial": [
+        0.1484181668963248,
+        0.0066072540095401255
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.23551933613022863,
+        0.01620758920997527
+       ],
+       "binomial": [
+        0.24187679766770748,
+        0.01443255298425454
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.625203768347505,
+        0.051202043020726354
+       ],
+       "binomial": [
+        0.613610599807192,
+        0.0456809475845765
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.13276469772025645,
+        0.005569712585899022
+       ],
+       "binomial": [
+        0.13389600804728324,
+        0.0055027330819769765
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2841097901794244,
+        0.013918474633251689
+       ],
+       "binomial": [
+        0.28764063836069154,
+        0.014379153039716291
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.4673006785032339,
+        0.030139800135305594
+       ],
+       "binomial": [
+        0.46549753473771055,
+        0.030124445842715664
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     }
+    },
+    "learned pair edges": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.11124214808912303,
+        0.0069673921419142635
+       ],
+       "binomial": [
+        0.11365285489884447,
+        0.0076921572326904206
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.20584654675205788,
+        0.012328198693036557
+       ],
+       "binomial": [
+        0.20688465637598213,
+        0.01175951547456594
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5404129913489109,
+        0.046831365678898625
+       ],
+       "binomial": [
+        0.549353716654063,
+        0.04855376518725829
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.14288789858160472,
+        0.0077377642238814215
+       ],
+       "binomial": [
+        0.1466644198607629,
+        0.008236181618159241
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2664550174439152,
+        0.013009812028599941
+       ],
+       "binomial": [
+        0.26893464838293,
+        0.013712718572708338
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5362552371965766,
+        0.03910050189290967
+       ],
+       "binomial": [
+        0.5453533813610015,
+        0.04136587361857262
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    }
+   }
+  },
+  {
+   "day": "2026-10-07",
+   "placement": 1,
+   "jobs": {
+    "3": "2026-10-07-r1",
+    "5": "2026-10-07-r1"
+   },
+   "decoders": {
+    "calibrated": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.12136845989432898,
+        0.00897021569460341
+       ],
+       "binomial": [
+        0.12539458569865009,
+        0.009724243044134391
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.1779143529947857,
+        0.009621142326527849
+       ],
+       "binomial": [
+        0.18339933378973294,
+        0.010783033342748341
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6821735169274737,
+        0.06247345063766216
+       ],
+       "binomial": [
+        0.6837243249880874,
+        0.06653859086870119
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.13571566298220655,
+        0.005157654054491978
+       ],
+       "binomial": [
+        0.1372707667784085,
+        0.005092548389658738
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2789155735001284,
+        0.021896457528925956
+       ],
+       "binomial": [
+        0.28944288741166185,
+        0.020531149202486526
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.48658331006441297,
+        0.042439993782077225
+       ],
+       "binomial": [
+        0.4742585592824547,
+        0.03796392060443519
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    },
+    "learned": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.14296679195794737,
+        0.00815188662784238
+       ],
+       "binomial": [
+        0.1475201228159032,
+        0.008106882134381765
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.17913029739305886,
+        0.009193959824946658
+       ],
+       "binomial": [
+        0.179481426802857,
+        0.008969075255422232
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.7981161983125653,
+        0.06122923647304051
+       ],
+       "binomial": [
+        0.8219241703373564,
+        0.061050793116388224
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.15951636885327114,
+        0.006176701582451741
+       ],
+       "binomial": [
+        0.16106419558621704,
+        0.006363510499978742
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2871947955460068,
+        0.023107696836564218
+       ],
+       "binomial": [
+        0.2961045674291527,
+        0.020674623408327236
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5554291767370054,
+        0.04959569719648771
+       ],
+       "binomial": [
+        0.5439436378324491,
+        0.04363801177829696
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     }
+    },
+    "learned, scaled": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.14644970770407878,
+        0.008354995717513983
+       ],
+       "binomial": [
+        0.15165823721407845,
+        0.008324347976817595
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.17510476798170688,
+        0.009449207303515743
+       ],
+       "binomial": [
+        0.17880669244273767,
+        0.008930594761877922
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.8363547685884734,
+        0.06567785229588233
+       ],
+       "binomial": [
+        0.8481686850879285,
+        0.0629438486907759
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.1440928663135615,
+        0.007181456477243122
+       ],
+       "binomial": [
+        0.14685447323416423,
+        0.00772126756932949
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2848280940353823,
+        0.022603731067481963
+       ],
+       "binomial": [
+        0.292913987679227,
+        0.020736475166589913
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5058941492466041,
+        0.047408025246486074
+       ],
+       "binomial": [
+        0.5013569833168432,
+        0.044210946481800455
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     }
+    },
+    "learned pair edges": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.12245200824319391,
+        0.0070323131962950055
+       ],
+       "binomial": [
+        0.1243036045662265,
+        0.007343831404481811
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.17955463539302863,
+        0.009025131560363848
+       ],
+       "binomial": [
+        0.1829801044339578,
+        0.008594977084737623
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6819763130879785,
+        0.05204767997559643
+       ],
+       "binomial": [
+        0.6793285256381021,
+        0.051273821571122084
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.14710860063906317,
+        0.005568506711694075
+       ],
+       "binomial": [
+        0.1478838498070636,
+        0.005516063303570046
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2789155735001284,
+        0.021896457528925956
+       ],
+       "binomial": [
+        0.28944288741166185,
+        0.020531149202486526
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5274305726029868,
+        0.04596821248054573
+       ],
+       "binomial": [
+        0.5109258380107814,
+        0.04094689149137741
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    }
+   }
+  },
+  {
+   "day": "2026-10-07",
+   "placement": 2,
+   "jobs": {
+    "3": "2026-10-07-r2-d3",
+    "5": "2026-10-07-r2-d5"
+   },
+   "decoders": {
+    "calibrated": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.10473616756280252,
+        0.005350291905804298
+       ],
+       "binomial": [
+        0.10640610633410813,
+        0.005548228723972461
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.21173169097937972,
+        0.013770455587491761
+       ],
+       "binomial": [
+        0.2185016382212091,
+        0.01602217933633797
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.49466457797761904,
+        0.04090901489514736
+       ],
+       "binomial": [
+        0.4869808171707323,
+        0.043816671655459216
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.1695262540961796,
+        0.007441113005834264
+       ],
+       "binomial": [
+        0.1707174839376291,
+        0.006989774106999816
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.23226290091043122,
+        0.033756868185871314
+       ],
+       "binomial": [
+        0.2897487830899269,
+        0.023504359389880686
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.7298895063811974,
+        0.11081367894992586
+       ],
+       "binomial": [
+        0.5891913750838599,
+        0.05353798651348222
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     }
+    },
+    "learned": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.12226762729889412,
+        0.008007351485935931
+       ],
+       "binomial": [
+        0.1261447219157939,
+        0.008471098721423272
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.21579872159607572,
+        0.01677934366801565
+       ],
+       "binomial": [
+        0.2211676259166031,
+        0.016808689726420786
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5665817961968759,
+        0.05759873425023311
+       ],
+       "binomial": [
+        0.570357987038121,
+        0.0578445361119256
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.17153875772852906,
+        0.0076282880606394895
+       ],
+       "binomial": [
+        0.1721880422929744,
+        0.007251006531668269
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.26043754405462305,
+        0.043797177416607394
+       ],
+       "binomial": [
+        0.3280765729609826,
+        0.04396900653449856
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6586560257708131,
+        0.11457193926533607
+       ],
+       "binomial": [
+        0.5248410172629191,
+        0.07373006739570175
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     }
+    },
+    "learned, scaled": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.12031151972923598,
+        0.008141770863331612
+       ],
+       "binomial": [
+        0.12413164807528912,
+        0.008410038776213477
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.212347383368093,
+        0.017133592003742905
+       ],
+       "binomial": [
+        0.2175058254762281,
+        0.016219861956667858
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5665787721089188,
+        0.05966557539992814
+       ],
+       "binomial": [
+        0.570704935389677,
+        0.05750029461544363
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.16195728854019104,
+        0.009450575272528669
+       ],
+       "binomial": [
+        0.16756047178784256,
+        0.010354598408716761
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.26043754405462305,
+        0.043797177416607394
+       ],
+       "binomial": [
+        0.3280765729609826,
+        0.04396900653449856
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6218661335027135,
+        0.11069453989780839
+       ],
+       "binomial": [
+        0.510735863507603,
+        0.07537513130206713
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     }
+    },
+    "learned pair edges": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.10189018120839616,
+        0.004525809785518898
+       ],
+       "binomial": [
+        0.10217696463524306,
+        0.004507610057259991
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.22360977162932927,
+        0.014818467669287506
+       ],
+       "binomial": [
+        0.23362996711995243,
+        0.016872512049381908
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.45566068274196997,
+        0.03635197609596667
+       ],
+       "binomial": [
+        0.43734528534510486,
+        0.037011335223498414
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.17275430937348785,
+        0.0076768160720334195
+       ],
+       "binomial": [
+        0.17370794576970172,
+        0.007188887244287331
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.23226290091043122,
+        0.033756868185871314
+       ],
+       "binomial": [
+        0.2897487830899269,
+        0.023504359389880686
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.7437877883050639,
+        0.11304143791415451
+       ],
+       "binomial": [
+        0.5995122530533267,
+        0.054595557900579364
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     }
+    }
+   }
+  },
+  {
+   "day": "2026-10-08",
+   "placement": 1,
+   "jobs": {
+    "3": "2026-10-08-r1",
+    "5": "2026-10-08-r1"
+   },
+   "decoders": {
+    "calibrated": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.12451627598132203,
+        0.005959000324729531
+       ],
+       "binomial": [
+        0.12484759243572477,
+        0.005963132058416143
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.19057691385490516,
+        0.015875694730467616
+       ],
+       "binomial": [
+        0.20569034599747577,
+        0.012923076864835764
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.653364950993602,
+        0.06276983948594984
+       ],
+       "binomial": [
+        0.6069686539263097,
+        0.04790312429685669
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.13769629919981297,
+        0.005007618744063347
+       ],
+       "binomial": [
+        0.13795121911942182,
+        0.004896036885144547
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.34095896519684366,
+        0.023183108226627374
+       ],
+       "binomial": [
+        0.35618207875973446,
+        0.02657658256833545
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.40385006189914274,
+        0.03114029597108834
+       ],
+       "binomial": [
+        0.38730533439465364,
+        0.032001449411108364
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     }
+    },
+    "learned": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.15605015543238387,
+        0.006815132452997679
+       ],
+       "binomial": [
+        0.15671663025169302,
+        0.007141448313401161
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.21572060684637584,
+        0.012939460180209448
+       ],
+       "binomial": [
+        0.22383691729329874,
+        0.013355473349350375
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.723390118884257,
+        0.05367342571176106
+       ],
+       "binomial": [
+        0.7001375472230238,
+        0.05256439617076411
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.1464952923854998,
+        0.005768807373294662
+       ],
+       "binomial": [
+        0.14750416909385566,
+        0.005754730895282084
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.3388852723730405,
+        0.02372207450368194
+       ],
+       "binomial": [
+        0.3561168872377394,
+        0.025807198158352918
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.4322858038641458,
+        0.034719662576889514
+       ],
+       "binomial": [
+        0.41420155679217663,
+        0.03408995471467218
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     }
+    },
+    "learned, scaled": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.1572165850343551,
+        0.006818751513056576
+       ],
+       "binomial": [
+        0.1577516714566352,
+        0.0071681008578134975
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.20506940940298185,
+        0.015609106671717131
+       ],
+       "binomial": [
+        0.2176432898743253,
+        0.016084578845354358
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.766650596459313,
+        0.06716306702219253
+       ],
+       "binomial": [
+        0.7248175284784862,
+        0.06288153675350905
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.1308705695097468,
+        0.006569274037282512
+       ],
+       "binomial": [
+        0.13263232151640408,
+        0.0063699457325067516
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.33966920217994323,
+        0.023317777151251197
+       ],
+       "binomial": [
+        0.3571265785251581,
+        0.02597060539752777
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.3852883001162312,
+        0.03276610528766226
+       ],
+       "binomial": [
+        0.37138742813302167,
+        0.03236604162280954
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     }
+    },
+    "learned pair edges": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.12442654200811909,
+        0.005698590023186115
+       ],
+       "binomial": [
+        0.1257995817230369,
+        0.005880673896547305
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.20079787160083107,
+        0.011889617757050506
+       ],
+       "binomial": [
+        0.20632513109856782,
+        0.012692950800599123
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.6196606618195056,
+        0.046385971616435206
+       ],
+       "binomial": [
+        0.6097152637355582,
+        0.04710945741990203
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.1362166887052988,
+        0.005153695641655235
+       ],
+       "binomial": [
+        0.13671313921857509,
+        0.005239654659156892
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.34095896519684366,
+        0.023183108226627374
+       ],
+       "binomial": [
+        0.35618207875973446,
+        0.02657658256833545
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.39951050598319854,
+        0.031086472355468946
+       ],
+       "binomial": [
+        0.3838293596764481,
+        0.03219661916670099
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       2
+      ]
+     }
+    }
+   }
+  },
+  {
+   "day": "2026-10-08",
+   "placement": 2,
+   "jobs": {
+    "3": "2026-10-08-r2-d3",
+    "5": "2026-10-08-r2-d5"
+   },
+   "decoders": {
+    "calibrated": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.11914550724390593,
+        0.005407700497325645
+       ],
+       "binomial": [
+        0.11980728769867927,
+        0.00561285878377607
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2317597818051766,
+        0.01536543624366256
+       ],
+       "binomial": [
+        0.2355494424329656,
+        0.014229149617435821
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5140905221599785,
+        0.041305396465292965
+       ],
+       "binomial": [
+        0.5086290439119799,
+        0.038882690551281664
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.236330618608813,
+        0.02041808975142341
+       ],
+       "binomial": [
+        0.2546082742951371,
+        0.02085028384481978
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2692203583770151,
+        0.018999604784334146
+       ],
+       "binomial": [
+        0.2850663087912219,
+        0.020340550077184605
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.8778333853855753,
+        0.09792790811001188
+       ],
+       "binomial": [
+        0.8931545624411484,
+        0.09701153154282677
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       1
+      ]
+     }
+    },
+    "learned": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.1337241969971666,
+        0.0059142140799877735
+       ],
+       "binomial": [
+        0.1340088581495717,
+        0.006143068589525388
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2442916413342061,
+        0.015664697075889012
+       ],
+       "binomial": [
+        0.2587531954389198,
+        0.016837271283953112
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5473957122185101,
+        0.042639892723712935
+       ],
+       "binomial": [
+        0.5179022346844999,
+        0.04122313643358425
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.263238863038864,
+        0.015021108580842721
+       ],
+       "binomial": [
+        0.2686725401448655,
+        0.01637651681821453
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2692203583770151,
+        0.018999604784334146
+       ],
+       "binomial": [
+        0.2850663087912219,
+        0.020340550077184605
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.9777821581762602,
+        0.08873959563084576
+       ],
+       "binomial": [
+        0.9424913848435069,
+        0.08844707965230919
+       ]
+      },
+      "points_at_or_above_half": [
+       1,
+       1
+      ]
+     }
+    },
+    "learned, scaled": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.13278227318559233,
+        0.00586632738873891
+       ],
+       "binomial": [
+        0.13319909628711069,
+        0.006126225887315734
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.24364759251447327,
+        0.015985035795785547
+       ],
+       "binomial": [
+        0.2541947634642695,
+        0.01670621811637632
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5449767502944021,
+        0.0431054946568481
+       ],
+       "binomial": [
+        0.524004092263032,
+        0.04203398919849765
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.2672944006342023,
+        0.014915075145193045
+       ],
+       "binomial": [
+        0.2675714617578558,
+        0.01518675411523554
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2692203583770151,
+        0.018999604784334146
+       ],
+       "binomial": [
+        0.2850663087912219,
+        0.020340550077184605
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.9928461660387671,
+        0.08932396099529728
+       ],
+       "binomial": [
+        0.938628850573222,
+        0.08557906935685249
+       ]
+      },
+      "points_at_or_above_half": [
+       1,
+       1
+      ]
+     }
+    },
+    "learned pair edges": {
+     "X": {
+      "eps3": {
+       "wls": [
+        0.1105570876390462,
+        0.005171465791464995
+       ],
+       "binomial": [
+        0.11150710646010983,
+        0.0053470658634362025
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.19409784640560013,
+        0.014257054348475752
+       ],
+       "binomial": [
+        0.20669446228314353,
+        0.013991505445812472
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.5695946126471623,
+        0.0496017377853989
+       ],
+       "binomial": [
+        0.5394779580855927,
+        0.0447527149744503
+       ]
+      },
+      "points_at_or_above_half": [
+       0,
+       0
+      ]
+     },
+     "Z": {
+      "eps3": {
+       "wls": [
+        0.26415540084171185,
+        0.018683527668484957
+       ],
+       "binomial": [
+        0.26752220290821965,
+        0.01886812065168851
+       ]
+      },
+      "eps5": {
+       "wls": [
+        0.2692203583770151,
+        0.018999604784334146
+       ],
+       "binomial": [
+        0.2850663087912219,
+        0.020340550077184605
+       ]
+      },
+      "lambda": {
+       "wls": [
+        0.9811865730889108,
+        0.0980359033359007
+       ],
+       "binomial": [
+        0.9384560527078937,
+        0.09415348787870984
+       ]
+      },
+      "points_at_or_above_half": [
+       1,
+       1
+      ]
+     }
+    }
+   }
+  }
+ ],
+ "seconds": 313.8053820133209
+}

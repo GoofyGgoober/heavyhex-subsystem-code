@@ -1,7 +1,7 @@
 """Leakage per readout qubit: a two-state hidden Markov model fitted to each flag's and relay's firings.
 
-In Z memory every flag and relay should read 0 each round, and the calibration model
-makes each round independent. A qubit that leaks out of {|0>, |1>} reads as 1 for as long
+In memory every flag and relay should read 0 each round, in either basis, and the calibration
+model makes each round independent. A qubit that leaks out of {|0>, |1>} reads as 1 for as long
 as it stays out, because a measure-and-flip reset cannot bring it back. Each readout
 qubit's 0/1 record over the rounds is fitted with two hidden states, normal (N) and
 leaked (L):
@@ -10,11 +10,13 @@ leaked (L):
     P(fires | N) = e_N,    P(fires | L) = e_L.
 
 The same fit on shots sampled from the calibration model is the control: there it
-should find no persistent state. Rounds 4, 6 and 8 of Z memory are pooled per job.
-hmm_bootstrap.py gives the medians' uncertainty.
+should find no persistent state. Rounds 4, 6 and 8 of one basis are pooled per job.
+Z memory is the paper's, and hmm_bootstrap.py gives its medians' uncertainty; X memory
+(common.readout_model) repeats the fit on the same qubits.
 
     python docs/analysis/hmm.py               # the medians from results/hmm.json: results/hmm_summary.json
-    python docs/analysis/hmm.py --recompute   # fit every series first (about 20 min): results/hmm.json
+    python docs/analysis/hmm.py --recompute   # fit every series first (2-3 min): results/hmm.json
+    python docs/analysis/hmm.py --basis X --recompute   # X memory: hmm_x.json, hmm_x_summary.json
 """
 
 from __future__ import annotations
@@ -25,20 +27,39 @@ from collections import defaultdict
 
 import numpy as np
 
-from common import RESULTS, ROUND_US, jobs, memory_index, readout_series, write_json
+from common import (
+    RESULTS,
+    ROUND_US,
+    Job,
+    job_folders,
+    memory_index,
+    readout_model,
+    readout_series,
+    write_json,
+)
 
 LENGTHS = (4, 6, 8)
+NAMES = {"Z": ("hmm.json", "hmm_summary.json"), "X": ("hmm_x.json", "hmm_x_summary.json")}
 
 
 def em(groups: list[np.ndarray], iters: int = 300, tol: float = 1e-7) -> dict:
-    """Baum-Welch on 0/1 sequences (one array of shots x rounds per length)."""
+    """Baum-Welch on 0/1 sequences (one array of shots x rounds per length).
+
+    Shots with the same 0/1 pattern enter once, weighted by their number: the same fit as shot
+    by shot, to rounding, in a fraction of the time. Stops when the log-likelihood rises by less
+    than tol, or after iters updates ("capped").
+    """
     pi, a, b, e0, e1 = 0.02, 0.01, 0.3, max(np.mean([g.mean() for g in groups]), 1e-3), 0.7
+    data = [np.unique(o, axis=0, return_counts=True) for o in groups]
     last = -np.inf
+    capped, iterations = True, 0
     for _ in range(iters):
+        iterations += 1
         n = defaultdict(float)
         ll = 0.0
-        for o in groups:
+        for o, w in data:
             S, T = o.shape
+            w = w.astype(float)
             A = np.array([[1 - a, a], [b, 1 - b]])
             B = np.stack([np.where(o, e0, 1 - e0), np.where(o, e1, 1 - e1)], axis=2)  # S x T x 2
             alpha = np.empty((S, T, 2))
@@ -61,17 +82,17 @@ def em(groups: list[np.ndarray], iters: int = 300, tol: float = 1e-7) -> dict:
                 * (B[:, 1:] * beta[:, 1:])[:, :, None, :]
                 / c[:, 1:, None, None]
             )
-            ll += np.log(c).sum()
-            n["pi"] += gamma[:, 0, 1].sum()
-            n["S"] += S
-            n["01"] += xi[:, :, 0, 1].sum()
-            n["0"] += gamma[:, :-1, 0].sum()
-            n["10"] += xi[:, :, 1, 0].sum()
-            n["1"] += gamma[:, :-1, 1].sum()
-            n["f0"] += (gamma[:, :, 0] * o).sum()
-            n["g0"] += gamma[:, :, 0].sum()
-            n["f1"] += (gamma[:, :, 1] * o).sum()
-            n["g1"] += gamma[:, :, 1].sum()
+            ll += w @ np.log(c).sum(1)
+            n["pi"] += w @ gamma[:, 0, 1]
+            n["S"] += w.sum()
+            n["01"] += w @ xi[:, :, 0, 1].sum(1)
+            n["0"] += w @ gamma[:, :-1, 0].sum(1)
+            n["10"] += w @ xi[:, :, 1, 0].sum(1)
+            n["1"] += w @ gamma[:, :-1, 1].sum(1)
+            n["f0"] += w @ (gamma[:, :, 0] * o).sum(1)
+            n["g0"] += w @ gamma[:, :, 0].sum(1)
+            n["f1"] += w @ (gamma[:, :, 1] * o).sum(1)
+            n["g1"] += w @ gamma[:, :, 1].sum(1)
         pi = n["pi"] / n["S"]
         a = n["01"] / max(n["0"], 1e-12)
         b = n["10"] / max(n["1"], 1e-12)
@@ -80,6 +101,7 @@ def em(groups: list[np.ndarray], iters: int = 300, tol: float = 1e-7) -> dict:
         a, b, pi = (float(np.clip(v, 1e-6, 1 - 1e-6)) for v in (a, b, pi))
         e0, e1 = float(np.clip(e0, 1e-6, 1 - 1e-6)), float(np.clip(e1, 1e-6, 1 - 1e-6))
         if ll - last < tol:
+            capped = False
             break
         last = ll
     # One state, an independent rate per round: the calibration model's shape.
@@ -98,16 +120,18 @@ def em(groups: list[np.ndarray], iters: int = 300, tol: float = 1e-7) -> dict:
         "e_L": e1,
         "llr": float(ll - ll1),
         "shots": int(sum(len(o) for o in groups)),
+        "iterations": iterations,
+        "capped": capped,
     }
 
 
-def fit_all() -> list[dict]:
+def fit_all(basis: str = "Z") -> list[dict]:
     rows = []
-    for job in jobs():
+    for job in map(Job, job_folders()):  # one job in memory at a time
         chip_groups, sim_groups = defaultdict(list), defaultdict(list)
         for rounds in LENGTHS:
-            idx = memory_index("Z", rounds)
-            model, records, labels = job.model(idx)
+            idx = memory_index(basis, rounds)
+            model, records, labels = readout_model(job, idx)
             chip, _ = job.chip_detectors(idx, model, records)
             sim = np.asarray(model.compile_detector_sampler(seed=rounds).sample(len(chip)))
             for key, cols in readout_series(labels).items():
@@ -127,7 +151,7 @@ def fit_all() -> list[dict]:
             row["model"] = em(sim_groups[key])
             rows.append(row)
         print(job.name, "done", flush=True)
-    (RESULTS / "hmm.json").write_text(json.dumps(rows, indent=1) + "\n")
+    (RESULTS / NAMES[basis][0]).write_text(json.dumps(rows, indent=1) + "\n")
     return rows
 
 
@@ -158,6 +182,8 @@ def summarize(rows: list[dict]) -> dict:
             "llr_max": float(v["llr"].max()),
             "llr_above_10": int((v["llr"] > 10).sum()),
         }
+        if all("capped" in r[src] for r in rows):  # recorded since the X-memory fits
+            out[src]["capped_at_300"] = sum(r[src]["capped"] for r in rows)
         s = out[src]
         print(
             f"{src:5s}: onset a {s['a_median']:.4f}; lifetime {s['lifetime_us_median']:.0f} us "
@@ -172,12 +198,13 @@ def summarize(rows: list[dict]) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
-    ap.add_argument(
-        "--recompute", action="store_true", help="fit every series again (about 20 min)"
-    )
+    ap.add_argument("--recompute", action="store_true", help="fit every series again (2-3 min)")
+    ap.add_argument("--basis", choices=("Z", "X"), default="Z", help="memory basis (default Z)")
     a = ap.parse_args()
-    rows = fit_all() if a.recompute else json.loads((RESULTS / "hmm.json").read_text())
-    write_json("hmm_summary.json", summarize(rows))
+    rows = (
+        fit_all(a.basis) if a.recompute else json.loads((RESULTS / NAMES[a.basis][0]).read_text())
+    )
+    write_json(NAMES[a.basis][1], summarize(rows))
 
 
 if __name__ == "__main__":

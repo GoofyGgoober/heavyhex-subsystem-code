@@ -1,0 +1,202 @@
+{
+ "method": "The calibration model with Harper et al.'s mid-circuit reset and readout errors, on day 1 (Sec. leakage, resets and readout).\n\nThe model gives each reset and each readout the qubit's reported readout error. Ref. harper2026\nfitted a noise model to Heron r2 data and found a reset error of 7.5% and a classical readout\nerror of 4.2%. Here every reset of day 1's three jobs gets 7.5% and every mid-circuit readout\n4.2% (the final readout of the data qubits keeps its reported error); the rest of the model is\nunchanged, at each job's measured f. 10,000 shots per memory circuit (refit.sim_seed) are\ndecoded with the calibration model's priors, as the device's shots are, and fitted with both\nfits. Against the device: eps, the detection-event fraction per detector class (8 rounds), and\nthe time-like edges (a stabilizer's consecutive rounds, its mid-circuit readout and reset),\nlearned from 2500 of the simulated shots exactly as pij.py learns them from the device's.\n\nUnder a minute on 2 workers.\n\n    python docs/analysis/reset_harper.py      # writes results/reset_harper.json\n",
+ "reset_error": 0.075,
+ "mid_circuit_readout_error": 0.042,
+ "eps_day1 (wls unless named)": {
+  "placement 1 X eps3": {
+   "device": 0.13212567107699597,
+   "model": 0.09736389071282398,
+   "harper": 0.1268908072437704,
+   "harper_binomial": 0.1271056562293209,
+   "device_binomial": 0.13316110953571542,
+   "model_binomial": 0.09737247344373917
+  },
+  "placement 1 X eps5": {
+   "device": 0.17583215364117033,
+   "model": 0.17919477045836096,
+   "harper": 0.23720420995321534,
+   "harper_binomial": 0.2438647572237269,
+   "device_binomial": 0.185528767847486,
+   "model_binomial": 0.179395107932165
+  },
+  "placement 1 X lambda": {
+   "device": 0.7514306589603149,
+   "model": 0.5433411391625861,
+   "harper": 0.5349433185388974
+  },
+  "placement 1 Z eps3": {
+   "device": 0.1290192880306154,
+   "model": 0.06513178670115671,
+   "harper": 0.08916639859021419,
+   "harper_binomial": 0.09015007842045913,
+   "device_binomial": 0.130148045808116,
+   "model_binomial": 0.06513640105795887
+  },
+  "placement 1 Z eps5": {
+   "device": 0.2663023836729258,
+   "model": 0.1672276340927632,
+   "harper": 0.2417196336493615,
+   "harper_binomial": 0.24587077630149062,
+   "device_binomial": 0.28362150710381573,
+   "model_binomial": 0.1672746280624241
+  },
+  "placement 1 Z lambda": {
+   "device": 0.48448416514768294,
+   "model": 0.38947980729684495,
+   "harper": 0.3688835583772188
+  },
+  "placement 2 X eps3": {
+   "device": 0.10057854274032302,
+   "model": 0.08066946798416152,
+   "harper": 0.12783652203835377,
+   "harper_binomial": 0.12826480390920608,
+   "device_binomial": 0.10096937010858734,
+   "model_binomial": 0.08067065176332333
+  },
+  "placement 2 X eps5": {
+   "device": 0.2200421378076251,
+   "model": 0.20125815002550612,
+   "harper": 0.2647640347500658,
+   "harper_binomial": 0.26777304220734544,
+   "device_binomial": 0.2304513263143117,
+   "model_binomial": 0.20142440792826954
+  },
+  "placement 2 X lambda": {
+   "device": 0.4570876457683537,
+   "model": 0.40082584468722393,
+   "harper": 0.4828319003335554
+  },
+  "placement 2 Z eps3": {
+   "device": 0.1369047290059207,
+   "model": 0.08789648303121184,
+   "harper": 0.1630617544613418,
+   "harper_binomial": 0.1654514746984982,
+   "device_binomial": 0.138598015599894,
+   "model_binomial": 0.08791486541601995
+  },
+  "placement 2 Z eps5": {
+   "device": 0.23252356487041265,
+   "model": 0.15420911184660457,
+   "harper": 0.21333775972943875,
+   "harper_binomial": 0.21623967423179846,
+   "device_binomial": 0.3141377784392419,
+   "model_binomial": 0.15422534385641012
+  },
+  "placement 2 Z lambda": {
+   "device": 0.5887778689537074,
+   "model": 0.569982421782213,
+   "harper": 0.7643361150325265
+  }
+ },
+ "detection_event_fraction_8_rounds": {
+  "X d3 X weight 4 placement 1": {
+   "harper": 0.37620000000000003,
+   "device": 0.34857777777777776,
+   "model": 0.2930269444444445
+  },
+  "X d3 X weight 2 placement 1": {
+   "harper": 0.27462222222222216,
+   "device": 0.1907333333333333,
+   "model": 0.20834472222222222
+  },
+  "X d5 X weight 4 placement 1": {
+   "harper": 0.40590000000000004,
+   "device": 0.3793555555555555,
+   "model": 0.33574861111111104
+  },
+  "X d5 X weight 2 placement 1": {
+   "harper": 0.2868638888888889,
+   "device": 0.17990000000000003,
+   "model": 0.20697249999999998
+  },
+  "Z d3 Z placement 1": {
+   "harper": 0.4289000000000001,
+   "device": 0.3901111111111112,
+   "model": 0.3107063888888888
+  },
+  "Z d3 relay placement 1": {
+   "harper": 0.131690625,
+   "device": 0.08592500000000002,
+   "model": 0.07331828125
+  },
+  "Z d3 flag placement 1": {
+   "harper": 0.12160937500000002,
+   "device": 0.07643750000000002,
+   "model": 0.04952640625000001
+  },
+  "Z d5 Z placement 1": {
+   "harper": 0.47476944444444436,
+   "device": 0.48173333333333335,
+   "model": 0.40715861111111107
+  },
+  "Z d5 relay placement 1": {
+   "harper": 0.12040937500000001,
+   "device": 0.06528749999999997,
+   "model": 0.06385945312499998
+  },
+  "Z d5 flag placement 1": {
+   "harper": 0.12993125000000005,
+   "device": 0.09776875000000003,
+   "model": 0.06632343750000001
+  },
+  "X d3 X weight 4 placement 2": {
+   "harper": 0.38867777777777784,
+   "device": 0.3039111111111111,
+   "model": 0.28625916666666673
+  },
+  "X d3 X weight 2 placement 2": {
+   "harper": 0.2528666666666667,
+   "device": 0.1403111111111111,
+   "model": 0.13726305555555554
+  },
+  "Z d3 Z placement 2": {
+   "harper": 0.43865,
+   "device": 0.37306666666666666,
+   "model": 0.2959344444444445
+  },
+  "Z d3 relay placement 2": {
+   "harper": 0.11786875000000001,
+   "device": 0.035350000000000006,
+   "model": 0.024308437499999995
+  },
+  "Z d3 flag placement 2": {
+   "harper": 0.130640625,
+   "device": 0.07502500000000004,
+   "model": 0.04899453125000001
+  },
+  "X d5 X weight 4 placement 2": {
+   "harper": 0.40377083333333336,
+   "device": 0.38550555555555555,
+   "model": 0.3316735416666667
+  },
+  "X d5 X weight 2 placement 2": {
+   "harper": 0.2770583333333334,
+   "device": 0.22403333333333342,
+   "model": 0.22660527777777772
+  },
+  "Z d5 Z placement 2": {
+   "harper": 0.47616666666666657,
+   "device": 0.48016666666666663,
+   "model": 0.4114098611111111
+  },
+  "Z d5 relay placement 2": {
+   "harper": 0.1210765625,
+   "device": 0.06016875000000001,
+   "model": 0.05325867187499999
+  },
+  "Z d5 flag placement 2": {
+   "harper": 0.13478046874999997,
+   "device": 0.11986562500000003,
+   "model": 0.08905398437500002
+  }
+ },
+ "time_like_edges_day1": {
+  "types": 101,
+  "median_model_p": 0.056108,
+  "median_device_p": 0.10373,
+  "median_harper_p": 0.191437178710859,
+  "median_device_over_harper": 0.5603251107044526,
+  "share_device_below_harper": 0.900990099009901
+ },
+ "seconds": 17.634443759918213
+}

@@ -1,25 +1,28 @@
 """Do flags and relays remember? The first sign of leakage, with no model of it.
 
-In 8-round Z memory every flag and relay should read 0 each round, and in the calibration
-model the rounds are independent. For each readout series, P(fires at r + L | fired at r)
-minus P(fires at r + L | quiet at r), averaged over series, on the chip and on the
-model's own shots; and how many shots hold a run of 5 or more firings in a row.
+In 8-round memory every flag and relay should read 0 each round, in either basis (they are
+uncomputed), and in the calibration model the rounds are independent. For each readout series,
+P(fires at r + L | fired at r) minus P(fires at r + L | quiet at r), averaged over series, on the
+chip and on the model's own shots; and how many shots hold a run of 5 or more firings in a row.
 The base odds behind the excess are written too: the fraction of rounds in which a flag
 or relay fires, and P(fires at r + L | quiet at r) and P(fires at r + L | fired at r)
 themselves, each averaged over series in the same way. Chip numbers repeat exactly; the
 model's come from stim-sampled shots (seed 6), which repeat only with the same stim build.
+Z memory is the paper's Fig. leak (a); X memory (common.readout_model) is its replication.
 A few minutes.
 
-    python docs/analysis/refiring.py      # writes results/refiring.json
+    python docs/analysis/refiring.py              # Z memory: results/refiring.json
+    python docs/analysis/refiring.py --basis X    # X memory: results/refiring_x.json
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 
 import numpy as np
 
-from common import RESULTS, ROUND_US, jobs, memory_index, readout_series
+from common import RESULTS, ROUND_US, Job, job_folders, memory_index, readout_model, readout_series
 
 LAGS = range(1, 7)
 
@@ -50,7 +53,10 @@ def longest(x: np.ndarray) -> np.ndarray:
 
 
 def main() -> None:
-    idx = memory_index("Z", 8)
+    ap = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
+    ap.add_argument("--basis", choices=("Z", "X"), default="Z", help="memory basis (default Z)")
+    basis = ap.parse_args().basis
+    idx = memory_index(basis, 8)
     rows = {src: {lag: [] for lag in LAGS} for src in ("chip", "model")}
     runs = {"chip": [], "model": []}
     positive = []
@@ -59,8 +65,8 @@ def main() -> None:
         src: {lag: {"after_quiet": [], "after_firing": []} for lag in LAGS}
         for src in ("chip", "model")
     }
-    for job in jobs():
-        model, records, labels = job.model(idx)
+    for job in map(Job, job_folders()):  # one job in memory at a time
+        model, records, labels = readout_model(job, idx)
         chip, _ = job.chip_detectors(idx, model, records)
         sim = np.asarray(model.compile_detector_sampler(seed=6).sample(20000))
         for cols in readout_series(labels).values():
@@ -77,6 +83,7 @@ def main() -> None:
             runs["chip"].append(float((longest(chip[:, cols]) >= 5).mean()))
             runs["model"].append(float((longest(sim[:, cols]) >= 5).mean()))
     out = {
+        "basis": basis,
         "lags": {lag: {src: float(np.mean(rows[src][lag])) for src in rows} for lag in LAGS},
         "series": len(positive),
         "chip_above_model_at_lag_1": float(np.mean(positive)),
@@ -119,7 +126,8 @@ def main() -> None:
             f"chip, lag {lag} ({lag * ROUND_US:.1f} us): {100 * c['after_quiet']:.1f}% after quiet, "
             f"{100 * c['after_firing']:.1f}% after firing, excess {100 * out['lags'][lag]['chip']:.1f} points"
         )
-    (RESULTS / "refiring.json").write_text(json.dumps(out, indent=1) + "\n")
+    name = "refiring.json" if basis == "Z" else "refiring_x.json"
+    (RESULTS / name).write_text(json.dumps(out, indent=1) + "\n")
 
 
 if __name__ == "__main__":

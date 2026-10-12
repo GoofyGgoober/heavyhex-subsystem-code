@@ -1,0 +1,260 @@
+{
+ "chip": {
+  "qubits": 156,
+  "couplers": 176
+ },
+ "d3": {
+  "searched_spots": 60,
+  "searched_sets": 30,
+  "embeddings": 148,
+  "all_sets": 74,
+  "searched_subset_of_all": true,
+  "pattern_qubits": 23,
+  "pattern_couplers": 24,
+  "per_day": {
+   "2026-10-04": {
+    "usable_all": 44,
+    "usable_searched": 18,
+    "rank_d3_rep2": {
+     "rank_among_all_usable": 1,
+     "of": 43,
+     "chosen_cost": 0.9613757145010339,
+     "best_cost": 0.9613757145010339,
+     "best_is_searched": true
+    }
+   },
+   "2026-10-05": {
+    "usable_all": 44,
+    "usable_searched": 18,
+    "rank_d3_rep2": {
+     "rank_among_all_usable": 2,
+     "of": 43,
+     "chosen_cost": 0.9279162539015192,
+     "best_cost": 0.8609837557730151,
+     "best_is_searched": false
+    }
+   },
+   "2026-10-06": {
+    "usable_all": 44,
+    "usable_searched": 18,
+    "rank_d3_rep2": {
+     "rank_among_all_usable": 2,
+     "of": 43,
+     "chosen_cost": 0.9450094988429862,
+     "best_cost": 0.9371601438936299,
+     "best_is_searched": false
+    }
+   },
+   "2026-10-07": {
+    "usable_all": 44,
+    "usable_searched": 18,
+    "rank_d3_rep2": {
+     "rank_among_all_usable": 2,
+     "of": 43,
+     "chosen_cost": 0.8927367151754556,
+     "best_cost": 0.8704862238669366,
+     "best_is_searched": false
+    }
+   },
+   "2026-10-08": {
+    "usable_all": 44,
+    "usable_searched": 18,
+    "rank_d3_rep2": {
+     "rank_among_all_usable": 3,
+     "of": 43,
+     "chosen_cost": 0.9753735957153123,
+     "best_cost": 0.9582804746801091,
+     "best_is_searched": false
+    }
+   }
+  }
+ },
+ "d5": {
+  "searched_spots": 24,
+  "searched_sets": 12,
+  "embeddings": 24,
+  "all_sets": 12,
+  "searched_subset_of_all": true,
+  "pattern_qubits": 65,
+  "pattern_couplers": 72,
+  "per_day": {
+   "2026-10-04": {
+    "usable_all": 2,
+    "usable_searched": 2,
+    "stricter (usable distance-5 placements passing)": {
+     "CZ error < 5%": 0,
+     "readout error < 10%": 0,
+     "T2 > 10 us": 1,
+     "all three": 0
+    }
+   },
+   "2026-10-05": {
+    "usable_all": 2,
+    "usable_searched": 2,
+    "stricter (usable distance-5 placements passing)": {
+     "CZ error < 5%": 0,
+     "readout error < 10%": 0,
+     "T2 > 10 us": 1,
+     "all three": 0
+    }
+   },
+   "2026-10-06": {
+    "usable_all": 2,
+    "usable_searched": 2,
+    "stricter (usable distance-5 placements passing)": {
+     "CZ error < 5%": 0,
+     "readout error < 10%": 0,
+     "T2 > 10 us": 1,
+     "all three": 0
+    }
+   },
+   "2026-10-07": {
+    "usable_all": 2,
+    "usable_searched": 2,
+    "stricter (usable distance-5 placements passing)": {
+     "CZ error < 5%": 0,
+     "readout error < 10%": 0,
+     "T2 > 10 us": 1,
+     "all three": 0
+    }
+   },
+   "2026-10-08": {
+    "usable_all": 2,
+    "usable_searched": 2,
+    "stricter (usable distance-5 placements passing)": {
+     "CZ error < 5%": 0,
+     "readout error < 10%": 0,
+     "T2 > 10 us": 1,
+     "all three": 0
+    }
+   }
+  }
+ },
+ "relay_q51": {
+  "2026-10-04": {
+   "reported_readout_error": 0.033935546875,
+   "gauge": "Z24Z25",
+   "read_1_fraction_by_round": [
+    0.0544,
+    0.0724,
+    0.0804,
+    0.0816,
+    0.0844,
+    0.0932,
+    0.0924,
+    0.1036
+   ],
+   "stabilizer_detection_fraction_by_round": [
+    0.4048,
+    0.4692,
+    0.4976,
+    0.4784,
+    0.4836,
+    0.488,
+    0.4812,
+    0.4888,
+    0.4704
+   ]
+  },
+  "2026-10-05": {
+   "reported_readout_error": 0.0479736328125,
+   "gauge": "Z24Z25",
+   "read_1_fraction_by_round": [
+    0.08,
+    0.0812,
+    0.0768,
+    0.09,
+    0.1004,
+    0.0888,
+    0.1,
+    0.0976
+   ],
+   "stabilizer_detection_fraction_by_round": [
+    0.428,
+    0.502,
+    0.4888,
+    0.4956,
+    0.4964,
+    0.4744,
+    0.5084,
+    0.4856,
+    0.4904
+   ]
+  },
+  "2026-10-06": {
+   "reported_readout_error": 0.1224365234375,
+   "gauge": "Z24Z25",
+   "read_1_fraction_by_round": [
+    0.0452,
+    0.0692,
+    0.072,
+    0.082,
+    0.0696,
+    0.0764,
+    0.082,
+    0.0924
+   ],
+   "stabilizer_detection_fraction_by_round": [
+    0.3812,
+    0.4704,
+    0.478,
+    0.4824,
+    0.4788,
+    0.4944,
+    0.4768,
+    0.4852,
+    0.474
+   ]
+  },
+  "2026-10-07": {
+   "reported_readout_error": 0.485595703125,
+   "gauge": "Z24Z25",
+   "read_1_fraction_by_round": [
+    0.4764,
+    0.4804,
+    0.466,
+    0.4656,
+    0.5024,
+    0.4688,
+    0.4792,
+    0.476
+   ],
+   "stabilizer_detection_fraction_by_round": [
+    0.4976,
+    0.4908,
+    0.504,
+    0.4944,
+    0.4996,
+    0.498,
+    0.4972,
+    0.5024,
+    0.4868
+   ]
+  },
+  "2026-10-08": {
+   "reported_readout_error": 0.0321044921875,
+   "gauge": "Z24Z25",
+   "read_1_fraction_by_round": [
+    0.0636,
+    0.0676,
+    0.0808,
+    0.0904,
+    0.09,
+    0.0988,
+    0.0992,
+    0.0988
+   ],
+   "stabilizer_detection_fraction_by_round": [
+    0.4228,
+    0.4772,
+    0.4836,
+    0.4904,
+    0.4776,
+    0.4968,
+    0.4828,
+    0.5028,
+    0.4752
+   ]
+  }
+ }
+}

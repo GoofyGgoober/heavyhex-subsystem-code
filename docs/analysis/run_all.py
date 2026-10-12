@@ -18,15 +18,22 @@ from common import HERE
 
 LIGHT = [
     ["hmm.py"],
+    ["hmm.py", "--basis", "X"],
     ["hmm_causes.py"],
     ["readout.py"],
     ["placements.py"],
     ["model_vs_device.py"],
+    ["effect_sizes.py"],
+    ["placement_counts.py"],
+    ["calibration_inputs.py"],
+    ["detection_events.py"],
     ["idle_f.py"],
+    ["idle_f_t2.py"],
     ["cz_scaled.py"],
     ["leakage_fit.py"],
     ["leakage_checks.py", "A", "E"],
     ["decoder.py"],
+    ["decoder_dominant.py"],
     ["ledger.py"],
 ]
 
