@@ -1,0 +1,289 @@
+{
+ "counterexample": {
+  "original leaky.py": 0.0,
+  "fixed leaky.py (dephase)": 0.50525,
+  "exact, CZ left out": 1.0,
+  "exact, CZ -> random phase": 0.4985
+ },
+ "no_leak_identical": true,
+ "random": [
+  {
+   "circuit": 0,
+   "kind": "bitflip",
+   "strength": 0.0,
+   "transfer": 0.0,
+   "TV fixed vs exact-dephase": 0.08783333333333333,
+   "TV fixed vs fixed (other seed)": 0.0865,
+   "TV original vs exact-dephase": 0.14233333333333334,
+   "TV original vs exact-identity": 0.272,
+   "TV exact-identity vs exact-dephase": 0.15066666666666667
+  },
+  {
+   "circuit": 1,
+   "kind": "depolarize",
+   "strength": 0.25,
+   "transfer": 0.1,
+   "TV fixed vs exact-dephase": 0.06666666666666667,
+   "TV fixed vs fixed (other seed)": 0.07133333333333333,
+   "TV original vs exact-dephase": 0.05800000000000001,
+   "TV original vs exact-identity": 0.0645,
+   "TV exact-identity vs exact-dephase": 0.06716666666666667
+  },
+  {
+   "circuit": 2,
+   "kind": "phase",
+   "strength": 0.5,
+   "transfer": 0.0,
+   "TV fixed vs exact-dephase": 0.07883333333333334,
+   "TV fixed vs fixed (other seed)": 0.07900000000000001,
+   "TV original vs exact-dephase": 0.08266666666666667,
+   "TV original vs exact-identity": 0.07666666666666666,
+   "TV exact-identity vs exact-dephase": 0.08116666666666666
+  },
+  {
+   "circuit": 3,
+   "kind": "bitflip",
+   "strength": 1.0,
+   "transfer": 0.1,
+   "TV fixed vs exact-dephase": 0.020666666666666673,
+   "TV fixed vs fixed (other seed)": 0.03233333333333334,
+   "TV original vs exact-dephase": 0.02399999999999999,
+   "TV original vs exact-identity": 0.023499999999999993,
+   "TV exact-identity vs exact-dephase": 0.028
+  },
+  {
+   "circuit": 4,
+   "kind": "depolarize",
+   "strength": 0.0,
+   "transfer": 0.0,
+   "TV fixed vs exact-dephase": 0.07083333333333333,
+   "TV fixed vs fixed (other seed)": 0.07299999999999998,
+   "TV original vs exact-dephase": 0.11283333333333334,
+   "TV original vs exact-identity": 0.17833333333333334,
+   "TV exact-identity vs exact-dephase": 0.10350000000000001
+  },
+  {
+   "circuit": 5,
+   "kind": "phase",
+   "strength": 0.25,
+   "transfer": 0.1,
+   "TV fixed vs exact-dephase": 0.06666666666666667,
+   "TV fixed vs fixed (other seed)": 0.07433333333333333,
+   "TV original vs exact-dephase": 0.07566666666666666,
+   "TV original vs exact-identity": 0.07683333333333332,
+   "TV exact-identity vs exact-dephase": 0.08099999999999999
+  },
+  {
+   "circuit": 6,
+   "kind": "bitflip",
+   "strength": 0.5,
+   "transfer": 0.0,
+   "TV fixed vs exact-dephase": 0.0555,
+   "TV fixed vs fixed (other seed)": 0.051,
+   "TV original vs exact-dephase": 0.0455,
+   "TV original vs exact-identity": 0.05733333333333334,
+   "TV exact-identity vs exact-dephase": 0.05616666666666667
+  },
+  {
+   "circuit": 7,
+   "kind": "depolarize",
+   "strength": 1.0,
+   "transfer": 0.1,
+   "TV fixed vs exact-dephase": 0.044499999999999984,
+   "TV fixed vs fixed (other seed)": 0.036,
+   "TV original vs exact-dephase": 0.04716666666666666,
+   "TV original vs exact-identity": 0.031000000000000003,
+   "TV exact-identity vs exact-dephase": 0.041833333333333333
+  },
+  {
+   "circuit": 8,
+   "kind": "phase",
+   "strength": 0.0,
+   "transfer": 0.0,
+   "TV fixed vs exact-dephase": 0.033000000000000015,
+   "TV fixed vs fixed (other seed)": 0.0435,
+   "TV original vs exact-dephase": 0.11450000000000002,
+   "TV original vs exact-identity": 0.025833333333333347,
+   "TV exact-identity vs exact-dephase": 0.1015
+  },
+  {
+   "circuit": 9,
+   "kind": "bitflip",
+   "strength": 0.25,
+   "transfer": 0.1,
+   "TV fixed vs exact-dephase": 0.03516666666666665,
+   "TV fixed vs fixed (other seed)": 0.05233333333333333,
+   "TV original vs exact-dephase": 0.036500000000000005,
+   "TV original vs exact-identity": 0.04816666666666666,
+   "TV exact-identity vs exact-dephase": 0.040999999999999995
+  },
+  {
+   "circuit": 10,
+   "kind": "depolarize",
+   "strength": 0.5,
+   "transfer": 0.0,
+   "TV fixed vs exact-dephase": 0.07933333333333334,
+   "TV fixed vs fixed (other seed)": 0.08216666666666667,
+   "TV original vs exact-dephase": 0.07333333333333333,
+   "TV original vs exact-identity": 0.08399999999999999,
+   "TV exact-identity vs exact-dephase": 0.081
+  },
+  {
+   "circuit": 11,
+   "kind": "phase",
+   "strength": 1.0,
+   "transfer": 0.1,
+   "TV fixed vs exact-dephase": 0.08483333333333334,
+   "TV fixed vs fixed (other seed)": 0.07766666666666668,
+   "TV original vs exact-dephase": 0.08566666666666667,
+   "TV original vs exact-identity": 0.08449999999999999,
+   "TV exact-identity vs exact-dephase": 0.076
+  },
+  {
+   "circuit": 12,
+   "kind": "bitflip",
+   "strength": 0.0,
+   "transfer": 0.0,
+   "TV fixed vs exact-dephase": 0.06183333333333334,
+   "TV fixed vs fixed (other seed)": 0.05416666666666667,
+   "TV original vs exact-dephase": 0.13333333333333333,
+   "TV original vs exact-identity": 0.051500000000000004,
+   "TV exact-identity vs exact-dephase": 0.12866666666666665
+  },
+  {
+   "circuit": 13,
+   "kind": "depolarize",
+   "strength": 0.25,
+   "transfer": 0.1,
+   "TV fixed vs exact-dephase": 0.07166666666666666,
+   "TV fixed vs fixed (other seed)": 0.07816666666666666,
+   "TV original vs exact-dephase": 0.1215,
+   "TV original vs exact-identity": 0.08066666666666666,
+   "TV exact-identity vs exact-dephase": 0.11299999999999999
+  },
+  {
+   "circuit": 14,
+   "kind": "phase",
+   "strength": 0.5,
+   "transfer": 0.0,
+   "TV fixed vs exact-dephase": 0.08683333333333333,
+   "TV fixed vs fixed (other seed)": 0.08049999999999999,
+   "TV original vs exact-dephase": 0.07516666666666666,
+   "TV original vs exact-identity": 0.07416666666666667,
+   "TV exact-identity vs exact-dephase": 0.07616666666666666
+  },
+  {
+   "circuit": 15,
+   "kind": "bitflip",
+   "strength": 1.0,
+   "transfer": 0.1,
+   "TV fixed vs exact-dephase": 0.040499999999999994,
+   "TV fixed vs fixed (other seed)": 0.03933333333333334,
+   "TV original vs exact-dephase": 0.048333333333333325,
+   "TV original vs exact-identity": 0.041166666666666664,
+   "TV exact-identity vs exact-dephase": 0.053
+  },
+  {
+   "circuit": 16,
+   "kind": "depolarize",
+   "strength": 0.0,
+   "transfer": 0.0,
+   "TV fixed vs exact-dephase": 0.061666666666666675,
+   "TV fixed vs fixed (other seed)": 0.07249999999999998,
+   "TV original vs exact-dephase": 0.06116666666666666,
+   "TV original vs exact-identity": 0.07616666666666666,
+   "TV exact-identity vs exact-dephase": 0.0675
+  },
+  {
+   "circuit": 17,
+   "kind": "phase",
+   "strength": 0.25,
+   "transfer": 0.1,
+   "TV fixed vs exact-dephase": 0.03583333333333334,
+   "TV fixed vs fixed (other seed)": 0.041999999999999996,
+   "TV original vs exact-dephase": 0.034166666666666665,
+   "TV original vs exact-identity": 0.03950000000000001,
+   "TV exact-identity vs exact-dephase": 0.038
+  },
+  {
+   "circuit": 18,
+   "kind": "bitflip",
+   "strength": 0.5,
+   "transfer": 0.0,
+   "TV fixed vs exact-dephase": 0.11466666666666667,
+   "TV fixed vs fixed (other seed)": 0.10983333333333332,
+   "TV original vs exact-dephase": 0.12016666666666666,
+   "TV original vs exact-identity": 0.11499999999999999,
+   "TV exact-identity vs exact-dephase": 0.12016666666666666
+  },
+  {
+   "circuit": 19,
+   "kind": "depolarize",
+   "strength": 1.0,
+   "transfer": 0.1,
+   "TV fixed vs exact-dephase": 0.08549999999999999,
+   "TV fixed vs fixed (other seed)": 0.07183333333333333,
+   "TV original vs exact-dephase": 0.08149999999999999,
+   "TV original vs exact-identity": 0.08233333333333333,
+   "TV exact-identity vs exact-dephase": 0.08283333333333334
+  },
+  {
+   "circuit": 20,
+   "kind": "phase",
+   "strength": 0.0,
+   "transfer": 0.0,
+   "TV fixed vs exact-dephase": 0.08349999999999999,
+   "TV fixed vs fixed (other seed)": 0.08466666666666667,
+   "TV original vs exact-dephase": 0.22933333333333333,
+   "TV original vs exact-identity": 0.086,
+   "TV exact-identity vs exact-dephase": 0.22383333333333333
+  },
+  {
+   "circuit": 21,
+   "kind": "bitflip",
+   "strength": 0.25,
+   "transfer": 0.1,
+   "TV fixed vs exact-dephase": 0.10449999999999998,
+   "TV fixed vs fixed (other seed)": 0.09833333333333333,
+   "TV original vs exact-dephase": 0.11049999999999999,
+   "TV original vs exact-identity": 0.10583333333333333,
+   "TV exact-identity vs exact-dephase": 0.11416666666666665
+  },
+  {
+   "circuit": 22,
+   "kind": "depolarize",
+   "strength": 0.5,
+   "transfer": 0.0,
+   "TV fixed vs exact-dephase": 0.08233333333333333,
+   "TV fixed vs fixed (other seed)": 0.08733333333333333,
+   "TV original vs exact-dephase": 0.08033333333333334,
+   "TV original vs exact-identity": 0.093,
+   "TV exact-identity vs exact-dephase": 0.073
+  },
+  {
+   "circuit": 23,
+   "kind": "phase",
+   "strength": 1.0,
+   "transfer": 0.1,
+   "TV fixed vs exact-dephase": 0.052000000000000005,
+   "TV fixed vs fixed (other seed)": 0.046833333333333345,
+   "TV original vs exact-dephase": 0.07116666666666666,
+   "TV original vs exact-identity": 0.04916666666666665,
+   "TV exact-identity vs exact-dephase": 0.06016666666666666
+  }
+ ],
+ "random_mean": {
+  "TV fixed vs exact-dephase": 0.06686111111111111,
+  "TV fixed vs fixed (other seed)": 0.06769444444444445,
+  "TV original vs exact-dephase": 0.08603472222222223,
+  "TV original vs exact-identity": 0.07988194444444445,
+  "TV exact-identity vs exact-dephase": 0.0858125
+ },
+ "random_max": {
+  "TV fixed vs exact-dephase": 0.11466666666666667,
+  "TV fixed vs fixed (other seed)": 0.10983333333333332,
+  "TV original vs exact-dephase": 0.22933333333333333,
+  "TV original vs exact-identity": 0.272,
+  "TV exact-identity vs exact-dephase": 0.22383333333333333
+ }
+}

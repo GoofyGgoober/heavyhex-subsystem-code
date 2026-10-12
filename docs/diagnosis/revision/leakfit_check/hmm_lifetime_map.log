@@ -1,0 +1,11 @@
+exact simulations: 36 runs on 4 workers
+  8/36 done (120s; last 41s 2026-10-06-r1_Z6_L0.002_S0.25_T0.05_life10.0000_read0.5079_n2500_s101.npz)
+  16/36 done (165s; last 19s 2026-10-06-r1_Z4_L0.002_S0.25_T0.05_life10.0000_read0.5079_n2500_s101.npz)
+  24/36 done (202s; last 21s 2026-10-06-r1_Z4_L0.002_S0.25_T0.05_life25.0000_read0.5079_n2500_s101.npz)
+  32/36 done (238s; last 8s 2026-10-08-r2-d3_Z4_L0.002_S0.25_T0.05_life17.7000_read0.5079_n2500_s101.npz)
+  36/36 done (257s; last 23s 2026-10-08-r2-d5_Z4_L0.002_S0.25_T0.05_life25.0000_read0.5079_n2500_s101.npz)
+simulator lifetime  10.0 us (b 0.546 per round): fitted median b 0.4533 (7.9 us / b = 17.4 us), e_P 0.476, a 0.0188; re-firing excess lag 1..6 5.41 2.85 1.59 0.88 0.38 0.23
+simulator lifetime  17.7 us (b 0.360 per round): fitted median b 0.2745 (7.9 us / b = 28.8 us), e_P 0.457, a 0.0267; re-firing excess lag 1..6 9.08 5.85 3.95 2.35 1.60 0.96
+simulator lifetime  25.0 us (b 0.271 per round): fitted median b 0.1797 (7.9 us / b = 44.0 us), e_P 0.435, a 0.0263; re-firing excess lag 1..6 10.80 7.86 5.62 4.27 2.89 2.23
+simulator lifetime  35.4 us (b 0.200 per round): fitted median b 0.1203 (7.9 us / b = 65.7 us), e_P 0.438, a 0.0292; re-firing excess lag 1..6 12.67 10.04 7.59 5.85 4.99 3.33
+device (fit jobs): median b 0.2245, e_P 0.512, a 0.0258; re-firing excess 14.87 10.74 7.72 5.75 4.09 3.03

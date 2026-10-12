@@ -14,8 +14,9 @@ import json
 
 import numpy as np
 
-from common import REPO, jobs
 from heavyhex.simulation.noisy import decay, typical
+
+from common import REPO, jobs
 
 SCALES = (0.2, 0.3, 0.4, 0.5, 0.7, 1.0)
 
@@ -26,15 +27,35 @@ def main() -> None:
     for basis in "XZ":
         lam = []
         for s in SCALES:
-            e = {d: decay(d, basis, cal, shots=20000, seed=5, scale=s, decoupling=True, decoupled_dephasing=1.0).per_round
-                 for d in (3, 5)}
+            e = {
+                d: decay(
+                    d,
+                    basis,
+                    cal,
+                    shots=20000,
+                    seed=5,
+                    scale=s,
+                    decoupling=True,
+                    decoupled_dephasing=1.0,
+                ).per_round
+                for d in (3, 5)
+            }
             lam.append(e[3] / e[5])
-            print(f"{basis} memory, scale {s:.2f}: eps3 {100*e[3]:.2f}%  eps5 {100*e[5]:.2f}%  Λ {e[3]/e[5]:.2f}", flush=True)
+            print(
+                f"{basis} memory, scale {s:.2f}: eps3 {100 * e[3]:.2f}%  eps5 {100 * e[5]:.2f}%  Λ {e[3] / e[5]:.2f}",
+                flush=True,
+            )
         lam = np.array(lam)
-        cross = float(np.interp(1.0, lam[::-1], np.array(SCALES)[::-1])) if lam.min() < 1 < lam.max() else None
+        cross = (
+            float(np.interp(1.0, lam[::-1], np.array(SCALES)[::-1]))
+            if lam.min() < 1 < lam.max()
+            else None
+        )
         out[basis] = {"lambda": lam.tolist(), "crosses_at": cross}
         print(f"{basis} memory: Λ = 1 at scale {cross}", flush=True)
-    (REPO / "docs/diagnosis/results/uniform_scale.json").write_text(json.dumps(out, indent=1) + "\n")
+    (REPO / "docs/diagnosis/results/uniform_scale.json").write_text(
+        json.dumps(out, indent=1) + "\n"
+    )
 
 
 if __name__ == "__main__":

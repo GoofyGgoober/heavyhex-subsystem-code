@@ -1,4 +1,4 @@
-"""Picking patch spots from the last Fez calibration, and pulling a fresh one when it's old."""
+"""Picking patch spots from a Fez calibration, and pulling a fresh one when it's old."""
 
 import json
 from dataclasses import replace
@@ -28,10 +28,13 @@ from heavyhex.patches.placement import (
 FIGURES = Path(__file__).resolve().parents[1] / "docs" / "figures"
 DEVICE = json.loads((FIGURES / "fez_map.json").read_text())
 COORDS, EDGES = DEVICE["coords"], DEVICE["edges"]
-SAVED = Calibration.load(FIGURES / "fez_calibration.json")
+DATA = Path(__file__).parent / "data"
+# IBM's calibration of 8 October 2026, kept fixed: `heavyhex calibrate` rewrites the
+# repository's own copy, docs/figures/fez_calibration.json.
+SAVED = Calibration.load(DATA / "fez_calibration_2026-10-08.json")
 # IBM's calibration of 3 October 2026, 17:05 UTC: two clean places for the d=5 patch, and
 # none for the d=3 patch beside the second. Kept fixed, unlike the day's calibration.
-OCTOBER_3 = Calibration.load(Path(__file__).parent / "data" / "fez_calibration_2026-10-03.json")
+OCTOBER_3 = Calibration.load(DATA / "fez_calibration_2026-10-03.json")
 # Every part working and alike, so every place is clean.
 ALL_GOOD = replace(
     SAVED,
@@ -76,6 +79,7 @@ def test_fetch_keeps_the_device_durations(tmp_path, monkeypatch):
     monkeypatch.setattr(runtime, "QiskitRuntimeService", Service)
     fetched = Calibration.fetch("ibm_kingston")
     assert fetched.durations_ns == {"x": 32, "cz": 68, "measure": 2280, "reset": 2312}
+    assert fetched.single_qubit is not None
     assert fetched.single_qubit[0] == FakeKingston().target["sx"][(0,)].error
     fetched.save(tmp_path / "calibration.json")
     assert Calibration.load(tmp_path / "calibration.json") == fetched
@@ -85,7 +89,7 @@ def test_fetch_keeps_the_device_durations(tmp_path, monkeypatch):
 @pytest.mark.parametrize("distance", [3, 5])
 def test_every_cx_lands_on_a_fez_bond(distance):
     pytest.importorskip("qiskit")
-    working = replace(SAVED, cz={pair: 0.003 for pair in SAVED.cz})
+    working = replace(SAVED, cz=dict.fromkeys(SAVED.cz, 0.003))
     qubits = fez_qubits(distance, working)
     circuit, _ = memory_circuit_flagged(build_operators(distance), rounds=2)
     assert len(set(qubits)) == len(qubits) == circuit.num_qubits

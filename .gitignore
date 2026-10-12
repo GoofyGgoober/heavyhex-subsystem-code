@@ -1,18 +1,33 @@
+# Python and tool caches
 __pycache__/
 *.py[cod]
+*.egg-info/
 .pytest_cache/
 .ruff_cache/
-.venv/
-*.egg-info/
-dist/
+.mypy_cache/
+.pyright/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
 build/
+dist/
+.venv/
+.cache/
 
 # Rehearsals are simulated; only the chip's shots belong to a run's record
 runs/*/rehearsal*
 runs/rehearsal_combined.json
 
-# Local tool and editor settings
+# Large intermediates that the scripts rebuild (docs/diagnosis/revision/README.md)
+docs/diagnosis/revision/**/cache/
+docs/diagnosis/revision/**/*per_shot.npz
+*.pkl
+
+# Local editor settings
 .vscode/
+.idea/
+.DS_Store
+Thumbs.db
 
 # Never commit credentials
 apikey*.json

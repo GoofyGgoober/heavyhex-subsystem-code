@@ -1,0 +1,12 @@
+dephase 0.0001,0.5,0.3;0.00025,0.5,0.15: 2 points, 128 tasks, sim frame
+leak 0.0001  strength 0.5   spread 0.3   loss 0.314 (slot 0.319)  X stab -9%  Z stab -21%  Z flag -27%  Z repeat -49%  Z co_data +37%  Z co_gauge -30%   [182s]
+leak 0.00025 strength 0.5   spread 0.15  loss 0.327 (slot 0.335)  X stab -7%  Z stab -19%  Z flag -24%  Z repeat -38%  Z co_data +54%  Z co_gauge -33%   [270s]
+best so far (seed 22): leak 0.0001 strength 0.5 spread 0.3 loss 0.314
+dephase 0.0001,0.5,0.3;0.00025,0.5,0.15: 2 points, 128 tasks, sim frame
+leak 0.0001  strength 0.5   spread 0.3   loss 0.306 (slot 0.309)  X stab -9%  Z stab -21%  Z flag -28%  Z repeat -49%  Z co_data +30%  Z co_gauge -33%   [143s]
+leak 0.00025 strength 0.5   spread 0.15  loss 0.329 (slot 0.336)  X stab -7%  Z stab -20%  Z flag -24%  Z repeat -37%  Z co_data +47%  Z co_gauge -44%   [205s]
+best so far (seed 23): leak 0.0001 strength 0.5 spread 0.3 loss 0.306
+dephase 0.0001,0.5,0.3;0.00025,0.5,0.15: 2 points, 128 tasks, sim frame
+leak 0.0001  strength 0.5   spread 0.3   loss 0.318 (slot 0.326)  X stab -9%  Z stab -21%  Z flag -27%  Z repeat -47%  Z co_data +45%  Z co_gauge -24%   [128s]
+leak 0.00025 strength 0.5   spread 0.15  loss 0.373 (slot 0.385)  X stab -7%  Z stab -20%  Z flag -24%  Z repeat -37%  Z co_data +66%  Z co_gauge -40%   [181s]
+best so far (seed 24): leak 0.0001 strength 0.5 spread 0.3 loss 0.318

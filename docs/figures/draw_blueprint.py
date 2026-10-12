@@ -44,8 +44,8 @@ TINT = {Z_BLUE: "#CDDFF5", X_RED: "#F7D4D1"}
 ROLE_COLOR = {"data": GOLD, "xanc": X_RED, "zanc": Z_BLUE, "relay": "white"}
 
 HALO = [pe.withStroke(linewidth=2.6, foreground="white")]
-WHITE_BOX = dict(facecolor="white", edgecolor="none", pad=0.12, alpha=0.85)
-TINT_BOX = dict(facecolor=TINT[Z_BLUE], edgecolor="none", pad=0.12)
+WHITE_BOX = {"facecolor": "white", "edgecolor": "none", "pad": 0.12, "alpha": 0.85}
+TINT_BOX = {"facecolor": TINT[Z_BLUE], "edgecolor": "none", "pad": 0.12}
 DASH = (5, 2.5)
 
 # Label anchor per d=3 X stabilizer; the iteration order also sets the dash phase.
@@ -59,7 +59,7 @@ D3_X_STAB_LABEL = {
 
 class DeviceMap(NamedTuple):
     coords: list[list[int]]
-    edges: list[list[int]]
+    edges: list  # [a, b] pairs, as fez_map.json stores them
     pos: dict[int, tuple[float, float]]
 
 
@@ -852,12 +852,12 @@ def build_figure(
     d5_grids = tuple(fig.add_subplot(gs[3, i : i + 3]) for i in range(0, 12, 3))
 
     grids = d3_grids + d5_grids
-    for ax in (ax_chip, ax_dev, ax_txt, ax_d5, ax_d5_txt) + grids:
+    for ax in (ax_chip, ax_dev, ax_txt, ax_d5, ax_d5_txt, *grids):
         ax.set_xticks([])
         ax.set_yticks([])
         for spine in ax.spines.values():
             spine.set_visible(False)
-    for ax in (ax_chip, ax_dev, ax_d5) + grids:
+    for ax in (ax_chip, ax_dev, ax_d5, *grids):
         ax.set_aspect("equal")
         ax.set_anchor("N")
 

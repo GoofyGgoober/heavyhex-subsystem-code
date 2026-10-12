@@ -1,0 +1,30 @@
+A. counterexample, observable flip rate (1 = the omitted-CZ answer; 0.5 = random phase; 0 = phase pi)
+   original leaky.py                0.000
+   corrected frame (random phase)   0.505
+   tableau_ref, CZ left out         1.000
+   tableau_ref, random phase        0.498
+   exact_sim, CZ left out           1.000
+   exact_sim, random phase          0.519
+   exact_sim, phase pi              0.000
+B. leakage off, 2026-10-08-r2-d3 Z8: 82 detectors, mean z^2 1.03, max |z| 2.95; observable z [0.7929822399241421]
+B. leakage off, 2026-10-08-r1 Z8: 310 detectors, mean z^2 1.07, max |z| 3.40; observable z [-0.5591434226190136, -0.432846886301638]
+C. random circuits (24):
+   TV corrected frame vs exact (dephase)          mean 0.066  max 0.124
+   TV exact_sim pi vs tableau_ref identity+Z      mean 0.064  max 0.085
+   TV exact_sim seed noise (dephase)              mean 0.068  max 0.121
+   TV exact_sim seed noise (identity)             mean 0.067  max 0.119
+   TV exact_sim vs tableau_ref (dephase)          mean 0.067  max 0.119
+   TV exact_sim vs tableau_ref (identity)         mean 0.066  max 0.118
+   TV original vs exact (identity)                mean 0.079  max 0.270
+C. det1 circuits (10):
+   TV exact_sim seed noise (identity)             mean 0.066  max 0.118
+   TV exact_sim vs tableau_ref (identity)         mean 0.065  max 0.124
+   TV original vs exact (identity)                mean 0.134  max 0.520
+D. 2026-10-08-r2-d3 Z8 identity: detectors mean z^2 1.04 (max |z| 2.8); logical 0.4350 vs 0.4343 (z +0.1); stab 0.3528/0.3495  flag 0.06616/0.06598  repeat 0.1421/0.1425  co_data 0.0007045/0.0006834  co_gauge 0.0007637/0.000866; ms/shot 6.1 vs 25.7
+D. 2026-10-08-r2-d3 Z8 dephase: detectors mean z^2 1.07 (max |z| 2.8); logical 0.4371 vs 0.4402 (z -0.4); stab 0.3511/0.3547  flag 0.07788/0.07932  repeat 0.1854/0.1782  co_data 0.002176/0.001857  co_gauge 0.0008299/0.0009725; ms/shot 4.2 vs 14.4
+D. 2026-10-08-r2-d3 X8 identity: detectors mean z^2 0.99 (max |z| 2.1); logical 0.4569 vs 0.4645 (z -0.9); stab 0.273/0.2711; ms/shot 6.0 vs 18.1
+D. 2026-10-08-r2-d3 X8 dephase: detectors mean z^2 1.20 (max |z| 2.2); logical 0.4583 vs 0.4590 (z -0.1); stab 0.2813/0.2797; ms/shot 8.2 vs 14.1
+D. 2026-10-08-r2-d5 Z8 identity: detectors mean z^2 1.05 (max |z| 3.0); logical 0.4956 vs 0.4890 (z +0.6); stab 0.4738/0.4752  flag 0.1092/0.1091  repeat 0.1159/0.1201  co_data 0.0009206/0.0009757  co_gauge 0.0008157/0.0007197; ms/shot 13.3 vs 70.6
+D. 2026-10-08-r2-d5 Z8 dephase: detectors mean z^2 0.87 (max |z| 2.9); logical 0.4970 vs 0.4805 (z +1.4); stab 0.4752/0.4752  flag 0.1248/0.1253  repeat 0.1542/0.1516  co_data 0.002472/0.002623  co_gauge 0.0008165/0.0009784; ms/shot 16.4 vs 69.3
+D. 2026-10-08-r1 Z8 identity: detectors mean z^2 0.98 (max |z| 3.3); logical 0.3849 vs 0.3633 (z +1.7), 0.4951 vs 0.4720 (z +1.7); stab 0.4357/0.4339  flag 0.1026/0.1022  repeat 0.1229/0.1205  co_data 0.0007221/0.0006898  co_gauge 0.0008548/0.0008734; ms/shot 17.5 vs 101.3
+D. 2026-10-08-r1 Z8 dephase: detectors mean z^2 1.06 (max |z| 3.3); logical 0.3947 vs 0.3920 (z +0.2), 0.4971 vs 0.4980 (z -0.1); stab 0.4384/0.4376  flag 0.1177/0.1167  repeat 0.1615/0.1615  co_data 0.002271/0.002137  co_gauge 0.0008198/0.0008662; ms/shot 14.2 vs 95.8

@@ -1,0 +1,4 @@
+dephase 0.0001,0.5,0.3;0.00025,0.5,0.15: 2 points, 128 tasks, sim exact
+leak 0.0001  strength 0.5   spread 0.3   loss 0.314 (slot 0.317)  X stab -9%  Z stab -21%  Z flag -28%  Z repeat -50%  Z co_data +28%  Z co_gauge -37%   [276s]
+leak 0.00025 strength 0.5   spread 0.15  loss 0.354 (slot 0.363)  X stab -7%  Z stab -20%  Z flag -24%  Z repeat -40%  Z co_data +56%  Z co_gauge -42%   [444s]
+best so far (seed 21): leak 0.0001 strength 0.5 spread 0.3 loss 0.314

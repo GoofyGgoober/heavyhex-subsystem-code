@@ -3,7 +3,7 @@
 Variants, each simulated with leaky.py and decoded exactly as the chip's shots were (the
 calibration model's own error model, at the job's measured f):
 
-  model     the calibration model as registered (the analysis' prediction, resampled)
+  model     the calibration model as prespecified (the analysis' prediction, resampled)
   leak      + leakage: each qubit's own leak per CZ where the flags and relays measured it,
             the median elsewhere; the fitted lifetime and the leaked readout
   leak+ro   + each reset's own error (IBM's init_error, where the model used the readout
@@ -15,7 +15,7 @@ calibration model's own error model, at the job's measured f):
   fit-bitflip  the same, with the partner's disturbance a bit flip (an exchange of
             excitation), the better fit to the detection statistics
 
-Λ and ε are fitted exactly as the registered analysis fits them. Exploratory.
+Λ and ε are fitted exactly as the prespecified analysis fits them. Exploratory.
 
     python docs/diagnosis/rerun.py [--shots 10000] [--cz-scale 1.5] [--jobs 2026-10-08-r1 ...]
 """
@@ -28,11 +28,12 @@ from collections import defaultdict
 
 import numpy as np
 
-from common import REPO, ROUND_US, jobs, memory_index
 from heavyhex.experiment import run as R
 from heavyhex.experiment.circuits import ROUNDS
 from heavyhex.simulation.noisy import fit_per_round
+
 import leaky
+from common import REPO, ROUND_US, jobs, memory_index
 
 
 def leakage_params(cz_scale: float = 1.0):
@@ -66,23 +67,42 @@ def variant(job, name: str, per, median_cz, life, read, cz_scale) -> leaky.Leaka
     if name in ("fit", "fit-bitflip"):
         q = PROPS[job.day]["qubits"]
         return leaky.Leakage(
-            leak=_AllQubits(defaultdict(lambda: FIT["leak"])), lifetime_us=life, half_round_us=ROUND_US / 2,
-            read_leaked=read, partner_phase=FIT["strength"],
-            partner_kind="bitflip" if name == "fit-bitflip" else "depolarize", transfer=FIT["spread"],
-            reset_error={int(k): v["init_error"] for k, v in q.items() if v.get("init_error") is not None},
-            readout={int(k): (v["prob_meas1_prep0"], v["prob_meas0_prep1"]) for k, v in q.items()
-                     if v.get("prob_meas1_prep0") is not None})
+            leak=_AllQubits(defaultdict(lambda: FIT["leak"])),
+            lifetime_us=life,
+            half_round_us=ROUND_US / 2,
+            read_leaked=read,
+            partner_phase=FIT["strength"],
+            partner_kind="bitflip" if name == "fit-bitflip" else "depolarize",
+            transfer=FIT["spread"],
+            reset_error={
+                int(k): v["init_error"] for k, v in q.items() if v.get("init_error") is not None
+            },
+            readout={
+                int(k): (v["prob_meas1_prep0"], v["prob_meas0_prep1"])
+                for k, v in q.items()
+                if v.get("prob_meas1_prep0") is not None
+            },
+        )
     own = per.get(job.name, {})
     leak = defaultdict(lambda: median_cz * KNOBS["data_scale"], own)
-    lk = leaky.Leakage(lifetime_us=life, half_round_us=ROUND_US / 2, read_leaked=read,
-                       partner_phase=KNOBS["partner_phase"],
-                       cz_scale=cz_scale if name.endswith("+cz") else 1.0)
+    lk = leaky.Leakage(
+        lifetime_us=life,
+        half_round_us=ROUND_US / 2,
+        read_leaked=read,
+        partner_phase=KNOBS["partner_phase"],
+        cz_scale=cz_scale if name.endswith("+cz") else 1.0,
+    )
     lk.leak = _AllQubits(leak)
     if "+ro" in name:
         q = PROPS[job.day]["qubits"]
-        lk.reset_error = {int(k): v["init_error"] for k, v in q.items() if v.get("init_error") is not None}
-        lk.readout = {int(k): (v["prob_meas1_prep0"], v["prob_meas0_prep1"]) for k, v in q.items()
-                      if v.get("prob_meas1_prep0") is not None}
+        lk.reset_error = {
+            int(k): v["init_error"] for k, v in q.items() if v.get("init_error") is not None
+        }
+        lk.readout = {
+            int(k): (v["prob_meas1_prep0"], v["prob_meas0_prep1"])
+            for k, v in q.items()
+            if v.get("prob_meas1_prep0") is not None
+        }
     return lk
 
 
@@ -100,15 +120,17 @@ class _AllQubits(dict):
         return True
 
 
-def run_job(job, variants, shots, params, cz_scale):
+def run_job(job, variants, shots, params: tuple[dict, float, float, float], cz_scale):
     out = {}
     for v in variants:
         errors = {b: defaultdict(list) for b in "XZ"}
         for basis in "XZ":
             for rounds in ROUNDS:
                 idx = memory_index(basis, rounds)
-                model, records, labels = job.model(idx)
-                det, obs = leaky.simulate(model, shots, variant(job, v, *params, cz_scale), seed=rounds)
+                model, _, labels = job.model(idx)
+                det, obs = leaky.simulate(
+                    model, shots, variant(job, v, *params, cz_scale), seed=rounds
+                )
                 failed = R._decode(model, det) != obs
                 patches = list(dict.fromkeys(str(p) for p, _, _ in labels))
                 for k, patch in enumerate(patches):
@@ -131,19 +153,44 @@ def main() -> None:
     args = ap.parse_args()
     KNOBS.update(data_scale=args.data_scale, partner_phase=args.partner_phase)
     params = leakage_params()
-    print(f"leak per CZ median {params[1]:.4f}, lifetime {params[2]:.0f} us, leaked reads 1 with {params[3]:.2f}", flush=True)
+    print(
+        f"leak per CZ median {params[1]:.4f}, lifetime {params[2]:.0f} us, leaked reads 1 with {params[3]:.2f}",
+        flush=True,
+    )
     results = {}
     for job in jobs():
         if args.jobs and job.name not in args.jobs:
             continue
         results[job.name] = run_job(job, args.variants, args.shots, params, args.cz_scale)
         r = results[job.name]
-        print(job.name, " | ".join(
-            f"{b} d{p}: chip {100*r['chip'][b][p][0]:.1f} " + " ".join(f"{v} {100*r[v][b][p][0]:.1f}" for v in args.variants)
-            for b in "XZ" for p in r["chip"][b]), flush=True)
-    tag = "-".join(args.variants).replace("+", "_") + f"_cz{args.cz_scale:g}_d{args.data_scale:g}_p{args.partner_phase:g}"
+        print(
+            job.name,
+            " | ".join(
+                f"{b} d{p}: chip {100 * r['chip'][b][p][0]:.1f} "
+                + " ".join(f"{v} {100 * r[v][b][p][0]:.1f}" for v in args.variants)
+                for b in "XZ"
+                for p in r["chip"][b]
+            ),
+            flush=True,
+        )
+    tag = (
+        "-".join(args.variants).replace("+", "_")
+        + f"_cz{args.cz_scale:g}_d{args.data_scale:g}_p{args.partner_phase:g}"
+    )
     path = REPO / f"docs/diagnosis/results/rerun_{tag}.json"
-    path.write_text(json.dumps({"cz_scale": args.cz_scale, "knobs": KNOBS, "shots": args.shots, "params": params[1:], "jobs": results}, indent=1) + "\n")
+    path.write_text(
+        json.dumps(
+            {
+                "cz_scale": args.cz_scale,
+                "knobs": KNOBS,
+                "shots": args.shots,
+                "params": params[1:],
+                "jobs": results,
+            },
+            indent=1,
+        )
+        + "\n"
+    )
     print("wrote", path)
 
 

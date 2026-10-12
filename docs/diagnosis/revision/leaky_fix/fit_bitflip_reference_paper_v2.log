@@ -1,0 +1,21 @@
+leak 0.001  strength 0.25 spread 0    loss 0.481  X stab -3%  Z co_data -56%  Z co_gauge -85%  Z flag -23%  Z repeat -51%  Z stab -16%
+leak 0.001  strength 0.25 spread 0.05 loss 0.319  X stab -2%  Z co_data -32%  Z co_gauge -56%  Z flag -17%  Z repeat -38%  Z stab -15%
+leak 0.001  strength 0.5  spread 0    loss 0.309  X stab -2%  Z co_data +29%  Z co_gauge -56%  Z flag -19%  Z repeat -33%  Z stab -15%
+leak 0.001  strength 0.5  spread 0.05 loss 0.276  X stab -1%  Z co_data +57%  Z co_gauge -19%  Z flag -13%  Z repeat -23%  Z stab -15%
+leak 0.001  strength 1    spread 0    loss 1.468  X stab -1%  Z co_data +345%  Z co_gauge -98%  Z flag -16%  Z repeat +12%  Z stab -16%
+leak 0.001  strength 1    spread 0.05 loss 1.536  X stab +2%  Z co_data +366%  Z co_gauge -84%  Z flag -9%  Z repeat +14%  Z stab -15%
+leak 0.002  strength 0.25 spread 0    loss 0.346  X stab +4%  Z co_data -23%  Z co_gauge -74%  Z flag -10%  Z repeat -30%  Z stab -11%
+leak 0.002  strength 0.25 spread 0.05 loss 0.142  X stab +6%  Z co_data +22%  Z co_gauge -18%  Z flag +1%  Z repeat -15%  Z stab -11%
+leak 0.002  strength 0.5  spread 0    loss 0.556  X stab +5%  Z co_data +133%  Z co_gauge -23%  Z flag -3%  Z repeat -8%  Z stab -11%
+leak 0.002  strength 0.5  spread 0.05 loss 0.751  X stab +8%  Z co_data +176%  Z co_gauge +51%  Z flag +9%  Z repeat +2%  Z stab -10%
+leak 0.002  strength 1    spread 0    loss 2.900  X stab +8%  Z co_data +703%  Z co_gauge -87%  Z flag +5%  Z repeat +48%  Z stab -12%
+leak 0.002  strength 1    spread 0.05 loss 2.847  X stab +12%  Z co_data +692%  Z co_gauge -68%  Z flag +16%  Z repeat +45%  Z stab -11%
+leak 0.003  strength 0.25 spread 0    loss 0.256  X stab +9%  Z co_data +10%  Z co_gauge -58%  Z flag +3%  Z repeat -18%  Z stab -8%
+leak 0.003  strength 0.25 spread 0.05 loss 0.321  X stab +12%  Z co_data +74%  Z co_gauge +11%  Z flag +18%  Z repeat -3%  Z stab -7%
+leak 0.003  strength 0.5  spread 0    loss 0.922  X stab +12%  Z co_data +224%  Z co_gauge +12%  Z flag +13%  Z repeat +6%  Z stab -7%
+leak 0.003  strength 0.5  spread 0.05 loss 1.210  X stab +15%  Z co_data +275%  Z co_gauge +105%  Z flag +29%  Z repeat +14%  Z stab -7%
+leak 0.003  strength 1    spread 0    loss 4.098  X stab +16%  Z co_data +998%  Z co_gauge -77%  Z flag +24%  Z repeat +67%  Z stab -8%
+leak 0.003  strength 1    spread 0.05 loss 3.922  X stab +19%  Z co_data +956%  Z co_gauge -62%  Z flag +39%  Z repeat +59%  Z stab -7%
+
+best (bitflip, reference, paper): leak 0.002 strength 0.25 spread 0.05 loss 0.142
+  X stab +6%  Z co_data +22%  Z co_gauge -18%  Z flag +1%  Z repeat -15%  Z stab -11%

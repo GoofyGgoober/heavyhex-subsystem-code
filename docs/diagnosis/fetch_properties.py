@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
+from typing import Any
 
 from qiskit_ibm_runtime import QiskitRuntimeService
 
@@ -20,7 +21,7 @@ from common import REPO, jobs
 
 
 def main() -> None:
-    backend = QiskitRuntimeService().backend("ibm_fez")
+    backend: Any = QiskitRuntimeService().backend("ibm_fez")  # an IBMBackend: has properties()
     out: dict = {}
     for job in jobs():
         stamp = json.loads((job.folder / "calibration.json").read_text())["calibrated"]
@@ -30,15 +31,29 @@ def main() -> None:
         qubits = {}
         for q in range(len(p.qubits)):
             props = p.qubit_property(q)
-            qubits[q] = {k: (props[k][0] if k in props else None) for k in
-                         ("prob_meas1_prep0", "prob_meas0_prep1", "readout_error", "init_error",
-                          "T1", "T2", "readout_length")}
+            qubits[q] = {
+                k: (props[k][0] if k in props else None)
+                for k in (
+                    "prob_meas1_prep0",
+                    "prob_meas0_prep1",
+                    "readout_error",
+                    "init_error",
+                    "T1",
+                    "T2",
+                    "readout_length",
+                )
+            }
         couplers = {}
         for gate in p.gates:
             if gate.gate == "cz":
                 err = next((par.value for par in gate.parameters if par.name == "gate_error"), None)
                 couplers["-".join(map(str, sorted(gate.qubits)))] = err
-        out[job.day] = {"calibrated": stamp, "served": str(p.last_update_date), "qubits": qubits, "cz": couplers}
+        out[job.day] = {
+            "calibrated": stamp,
+            "served": str(p.last_update_date),
+            "qubits": qubits,
+            "cz": couplers,
+        }
         print(job.day, "served", p.last_update_date, flush=True)
     path = REPO / "docs/diagnosis/results/properties.json"
     path.parent.mkdir(parents=True, exist_ok=True)

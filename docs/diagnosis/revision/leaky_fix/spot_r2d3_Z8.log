@@ -1,0 +1,5 @@
+frame original                 n= 20000 logical [0.4355]  det 0.1247  stab 0.3495  flag 0.06568  repeat 0.1391  co_data 0.0006915  co_gauge 0.0008151
+frame fixed (dephase)          n= 20000 logical [0.4381]  det 0.1365  stab 0.354  flag 0.07961  repeat 0.1872  co_data 0.002334  co_gauge 0.0007944
+exact dephase                  n=  1500 logical [0.452]  det 0.1368  stab 0.361  flag 0.07894  repeat 0.1843  co_data 0.002617  co_gauge 0.001338
+exact identity (CZ left out)   n=  1500 logical [0.43]  det 0.1267  stab 0.3505  flag 0.06724  repeat 0.128  co_data 0.0006521  co_gauge 0.0009841
+elapsed 43.49727201461792

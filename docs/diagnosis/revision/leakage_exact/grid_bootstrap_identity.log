@@ -1,0 +1,6 @@
+identity pooled: device relative SD X stab 0.2%  Z stab 0.2%  Z flag 0.4%  Z repeat 1.3%  Z co_data 7.0%  Z co_gauge 7.9%
+   noise floor of the loss: median 0.037, 90th pct 0.065
+   argmin frequency: (0.002, 0.175, 0.075): 66%, (0.0025, 0.175, 0.05): 32%, (0.0015, 0.25, 0.075): 0%, (0.0015, 0.175, 0.1): 0%, (0.0015, 0.175, 0.075): 0%
+identity per_slot: device relative SD X stab 0.2%  Z stab 0.2%  Z flag 0.4%  Z repeat 1.3%  Z co_data_slot 7.2%  Z co_gauge_slot 8.1%
+   noise floor of the loss: median 0.038, 90th pct 0.068
+   argmin frequency: (0.002, 0.175, 0.075): 72%, (0.0015, 0.25, 0.075): 18%, (0.0025, 0.175, 0.05): 5%, (0.0015, 0.175, 0.1): 4%, (0.002, 0.25, 0.075): 0%

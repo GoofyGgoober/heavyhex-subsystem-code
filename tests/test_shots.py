@@ -4,10 +4,10 @@ import pytest
 
 pytest.importorskip("qiskit_aer")
 
-from heavyhex.circuits.flagged import memory_circuit_flagged  # noqa: E402
-from heavyhex.circuits.shots import read_shot  # noqa: E402
-from heavyhex.patches.operators import D3, D5  # noqa: E402
-from heavyhex.simulation.aer import _sample_counts, _split_key, run_memory_flagged  # noqa: E402
+from heavyhex.circuits.flagged import memory_circuit_flagged
+from heavyhex.circuits.shots import read_shot
+from heavyhex.patches.operators import D3, D5
+from heavyhex.simulation.aer import _sample_counts, _split_key, run_memory_flagged
 
 
 @pytest.mark.parametrize("patch", [D3, D5], ids=["d3", "d5"])
@@ -42,4 +42,4 @@ def test_invalid_gauge_and_data_records_are_rejected():
     with pytest.raises(ValueError, match="data readout"):
         read_shot(schedule, gauge, (0,) * 24)
     with pytest.raises(ValueError, match="gauge outcomes"):
-        read_shot(schedule, (2,) + gauge[1:], (0,) * 25)
+        read_shot(schedule, (2, *gauge[1:]), (0,) * 25)

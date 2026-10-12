@@ -2,6 +2,7 @@
 
 from dataclasses import replace
 from math import exp, log
+from pathlib import Path
 
 import pytest
 
@@ -9,16 +10,25 @@ pytest.importorskip("stim")
 pytest.importorskip("pymatching")
 pytest.importorskip("qiskit")
 
-import heavyhex.simulation.noisy as noisy  # noqa: E402
-from heavyhex.circuits.flagged import memory_circuit_flagged  # noqa: E402
-from heavyhex.circuits.shots import Memory, read_shot  # noqa: E402
-from heavyhex.patches.operators import build_operators  # noqa: E402
-from heavyhex.patches.placement import LAST_CALIBRATION, Calibration  # noqa: E402
+import stim
 
-SAVED = Calibration.load(LAST_CALIBRATION)
+import heavyhex.simulation.noisy as noisy
+from heavyhex.circuits.flagged import memory_circuit_flagged
+from heavyhex.circuits.shots import Memory, read_shot
+from heavyhex.patches.operators import build_operators
+from heavyhex.patches.placement import Calibration
+
+# IBM's calibration of 8 October 2026, kept fixed: `heavyhex calibrate` rewrites the
+# repository's own copy, docs/figures/fez_calibration.json.
+SAVED = Calibration.load(Path(__file__).parent / "data" / "fez_calibration_2026-10-08.json")
 # FakeFez's gate times and the default √X error, whatever the saved calibration carries.
 TYPICAL = replace(noisy.typical(SAVED), durations_ns=None, single_qubit=None)
 CASES = [(d, basis) for d in (3, 5) for basis in ("Z", "X")]
+
+
+def flat(circuit: stim.Circuit) -> list[stim.CircuitInstruction]:
+    """The circuit's instructions, with its repeat blocks unrolled."""
+    return [i for i in circuit.flattened() if isinstance(i, stim.CircuitInstruction)]
 
 
 def measurement_order(circuit, schedule):
@@ -42,7 +52,7 @@ def test_gates_are_the_qiskit_circuit(distance, basis):
         if i.operation.name != "barrier"
     ]
     got = []
-    for i in noisy.noisy_circuit(distance, basis, 2, TYPICAL).flattened():
+    for i in flat(noisy.noisy_circuit(distance, basis, 2, TYPICAL)):
         if i.name in ("H", "CX", "R", "M"):
             targets = [t.value for t in i.targets_copy()]
             step = 2 if i.name == "CX" else 1
@@ -91,10 +101,10 @@ def test_detectors_and_logical_match_read_shot(distance, basis, rounds):
     kinds = ("z_flag", "relay") if basis == "Z" else ()
     flags_and_relays = [m.bit for m in schedule.measurements if m.kind in kinds]
     assert circuit.num_detectors == len(used) + len(flags_and_relays)
-    for shot, detector_row, logical_bit in zip(measurements, detectors, logical[:, 0]):
+    for shot, detector_row, logical_bit in zip(measurements, detectors, logical[:, 0], strict=True):
         gauge_bits = [0] * len(schedule.measurements)
         data_bits = [0] * patch.code.n
-        for (register, i), bit in zip(order, shot):
+        for (register, i), bit in zip(order, shot, strict=True):
             (gauge_bits if register == "m" else data_bits)[i] = int(bit)
         expected = read_shot(schedule, tuple(gauge_bits), tuple(data_bits))
         assert [int(b) for b in detector_row] == [
@@ -121,16 +131,17 @@ def test_no_errors_without_noise():
 def test_scale_multiplies_gate_errors():
     def cz_errors(scale):
         circuit = noisy.noisy_circuit(3, "Z", 1, TYPICAL, scale=scale)
-        return [i.gate_args_copy()[0] for i in circuit.flattened() if i.name == "DEPOLARIZE2"]
+        return [i.gate_args_copy()[0] for i in flat(circuit) if i.name == "DEPOLARIZE2"]
 
     assert cz_errors(2) == pytest.approx([2 * p for p in cz_errors(1)])
-    assert cz_errors(1)[0] == pytest.approx(1.25 * TYPICAL.cz[next(iter(TYPICAL.cz))])
+    cz = TYPICAL.cz[next(iter(TYPICAL.cz))]
+    assert cz is not None and cz_errors(1)[0] == pytest.approx(1.25 * cz)
 
 
 @pytest.mark.parametrize("scale", [1, 50])
 def test_idle_channels_are_valid(scale):
     circuit = noisy.noisy_circuit(3, "X", 2, TYPICAL, scale=scale)
-    idles = [i.gate_args_copy() for i in circuit.flattened() if i.name == "PAULI_CHANNEL_1"]
+    idles = [i.gate_args_copy() for i in flat(circuit) if i.name == "PAULI_CHANNEL_1"]
     assert idles and all(px == py and pz >= 0 and px + py + pz <= 1 for px, py, pz in idles)
 
 
@@ -139,7 +150,7 @@ def test_pulses_go_in_pairs_into_long_idles_only():
     decoupled = noisy.noisy_circuit(3, "X", 2, TYPICAL, decoupling=True)
     long_idles = sum(t >= noisy.DECOUPLE_NS for t, *_ in bare)
     assert long_idles
-    x_gates = sum(len(i.targets_copy()) for i in decoupled.flattened() if i.name == "X")
+    x_gates = sum(len(i.targets_copy()) for i in flat(decoupled) if i.name == "X")
     assert x_gates == 2 * long_idles
     assert sum(pulses for *_, pulses in idles_in(decoupled)) == 2 * long_idles
 
@@ -149,7 +160,7 @@ def test_pulses_take_time_and_add_gate_error():
     decoupled = idles_in(noisy.noisy_circuit(3, "Z", 2, TYPICAL, decoupling=True))
     shortened = sorted(t + noisy.FEZ_NS["x"] * pulses for t, _, _, pulses in decoupled)
     assert shortened == pytest.approx(bare)
-    instructions = list(noisy.noisy_circuit(3, "Z", 2, TYPICAL, decoupling=True).flattened())
+    instructions = flat(noisy.noisy_circuit(3, "Z", 2, TYPICAL, decoupling=True))
     for i, item in enumerate(instructions):
         if item.name == "X":
             error = instructions[i + 1]
@@ -190,7 +201,7 @@ def test_durations_come_from_the_calibration():
 
 def test_no_idle_noise_between_a_reset_and_the_first_cx():
     just_reset = set()
-    for i in noisy.noisy_circuit(3, "Z", 2, TYPICAL).flattened():
+    for i in flat(noisy.noisy_circuit(3, "Z", 2, TYPICAL)):
         qubits = [t.value for t in i.targets_copy() if t.is_qubit_target]
         if i.name == "R":
             just_reset.update(qubits)
@@ -204,7 +215,8 @@ def test_typical_puts_everything_at_the_median():
     assert len(set(TYPICAL.cz.values())) == len(set(TYPICAL.readout.values())) == 1
     assert len(set(TYPICAL.t1_us.values())) == len(set(TYPICAL.t2_us.values())) == 1
     assert TYPICAL.broken_qubits == ()
-    assert 0.001 < TYPICAL.cz[0, 1] < 0.01 and 0.005 < TYPICAL.readout[0] < 0.02
+    cz = TYPICAL.cz[0, 1]
+    assert cz is not None and 0.001 < cz < 0.01 and 0.005 < TYPICAL.readout[0] < 0.02
 
 
 def test_repaired_fixes_only_broken_parts():
@@ -242,7 +254,7 @@ def test_decay_gives_up_when_every_point_is_random(monkeypatch):
 
 @pytest.mark.parametrize("basis", ["X", "Z"])
 def test_d5_beats_d3_well_below_threshold(basis):
-    kwargs = dict(rounds=(2, 4, 6), shots=100_000, seed=1, scale=0.05, decoupling=True)
+    kwargs = {"rounds": (2, 4, 6), "shots": 100_000, "seed": 1, "scale": 0.05, "decoupling": True}
     d3 = noisy.decay(3, basis, TYPICAL, **kwargs).per_round
     d5 = noisy.decay(5, basis, TYPICAL, **kwargs).per_round
     assert d5 < d3 / 2

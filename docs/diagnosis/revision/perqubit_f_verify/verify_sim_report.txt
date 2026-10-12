@@ -1,0 +1,42 @@
+A. Redecode of chip shots
+  ibm_fez-2026-10-04-r1 X eps3: median-decode 0.132126 (prespecified 0.132126, diff 0.0e+00) | pq-decode 0.125157 (perqubit_f 0.125157) shift/sigma_O -0.98
+  ibm_fez-2026-10-04-r1 X eps5: median-decode 0.175832 (prespecified 0.175832, diff 0.0e+00) | pq-decode 0.192450 (perqubit_f 0.192450) shift/sigma_O +1.30
+  ibm_fez-2026-10-04-r1 Z eps3: median-decode 0.129019 (prespecified 0.129019, diff 0.0e+00) | pq-decode 0.129019 (perqubit_f 0.129019) shift/sigma_O +0.00
+  ibm_fez-2026-10-04-r1 Z eps5: median-decode 0.266302 (prespecified 0.266302, diff 0.0e+00) | pq-decode 0.266302 (perqubit_f 0.266302) shift/sigma_O +0.00
+  ibm_fez-2026-10-04-r1 Lambda_X pq-decode 0.6503 (prespecified 0.7514)
+  ibm_fez-2026-10-06-r2-d3 X eps3: median-decode 0.111321 (prespecified 0.111321, diff -5.6e-17) | pq-decode 0.132493 (perqubit_f 0.132493) shift/sigma_O +4.14
+  ibm_fez-2026-10-06-r2-d3 Z eps3: median-decode 0.149352 (prespecified 0.149352, diff 0.0e+00) | pq-decode 0.149352 (perqubit_f 0.149352) shift/sigma_O +0.00
+  ibm_fez-2026-10-07-r2-d5 X eps5: median-decode 0.211732 (prespecified 0.211732, diff -5.6e-17) | pq-decode 0.239620 (perqubit_f 0.239620) shift/sigma_O +2.03
+  ibm_fez-2026-10-07-r2-d5 Z eps5: median-decode 0.232263 (prespecified 0.232263, diff 0.0e+00) | pq-decode 0.232263 (perqubit_f 0.232263) shift/sigma_O +0.00
+  ibm_fez-2026-10-05-r1 X eps3: median-decode 0.118872 (prespecified 0.118872, diff 0.0e+00) | pq-decode 0.119378 (perqubit_f 0.119378) shift/sigma_O +0.09
+  ibm_fez-2026-10-05-r1 X eps5: median-decode 0.181801 (prespecified 0.181801, diff -5.6e-17) | pq-decode 0.162434 (perqubit_f 0.162434) shift/sigma_O -1.59
+  ibm_fez-2026-10-05-r1 Z eps3: median-decode 0.135494 (prespecified 0.135494, diff 0.0e+00) | pq-decode 0.135494 (perqubit_f 0.135494) shift/sigma_O +0.00
+  ibm_fez-2026-10-05-r1 Z eps5: median-decode 0.326283 (prespecified 0.326283, diff 0.0e+00) | pq-decode 0.326283 (perqubit_f 0.326283) shift/sigma_O +0.00
+  ibm_fez-2026-10-05-r1 Lambda_X pq-decode 0.7349 (prespecified 0.6539)
+B. Rerun of stored X-memory predictions
+  ibm_fez-2026-10-04-r2-d3 median eps3: rerun 0.081230 stored 0.080669 +- 0.000364 (diff +1.54 SE)
+     setting 0: rerun [0.114475] stored [0.11479] identical=False
+     setting 1: rerun [0.17711] stored [0.177515] identical=False
+     setting 2: rerun [0.23101] stored [0.229755] identical=False
+     setting 3: rerun [0.27329] stored [0.272025] identical=False
+     setting 4: rerun [0.340995] stored [0.34017] identical=False
+     setting 5: rerun [0.38811] stored [0.387885] identical=False
+  ibm_fez-2026-10-04-r2-d3 pq eps3: rerun 0.079115 stored 0.079317 +- 0.000713 (diff -0.28 SE)
+     setting 0: rerun [0.1166] stored [0.1126] identical=False
+     setting 1: rerun [0.17448] stored [0.17528] identical=False
+     setting 2: rerun [0.22748] stored [0.22664] identical=False
+     setting 3: rerun [0.27214] stored [0.2717] identical=False
+     setting 4: rerun [0.3394] stored [0.33496] identical=False
+     setting 5: rerun [0.38338] stored [0.3839] identical=False
+  ibm_fez-2026-10-08-r2-d5 pq eps5: rerun 0.176905 stored 0.171143 +- 0.002469 (diff +2.33 SE)
+     setting 0: rerun [0.18776] stored [0.18996] identical=False
+     setting 1: rerun [0.29698] stored [0.29326] identical=False
+     setting 2: rerun [0.368] stored [0.36224] identical=False
+     setting 3: rerun [0.41808] stored [0.41484] identical=False
+     setting 4: rerun [0.46342] stored [0.4652] identical=False
+     setting 5: rerun [0.49092] stored [0.4835] identical=False
+C. Mini Monte Carlo spread (these draws) vs perqubit_f's
+  ibm_fez-2026-10-05-r1 n=30: mine eps3 0.00272, eps5 0.00260, lambda 0.02875 (rel. SE ~13%) | theirs eps3 0.00281, eps5 0.00290, lambda 0.02872
+  ibm_fez-2026-10-04-r1 n=30: mine eps3 0.00323, eps5 0.00204, lambda 0.02385 (rel. SE ~13%) | theirs eps3 0.00297, eps5 0.00231, lambda 0.02599
+  ibm_fez-2026-10-04-r2-d5 n=20: mine eps5 0.00325 (rel. SE ~16%) | theirs eps5 0.00304
+  ibm_fez-2026-10-06-r2-d3 n=20: mine eps3 0.00250 (rel. SE ~16%) | theirs eps3 0.00225

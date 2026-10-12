@@ -17,9 +17,9 @@ import json
 
 import numpy as np
 
-from common import REPO, jobs, memory_index
 import leaky
 import rerun
+from common import REPO, jobs, memory_index
 
 FIT_JOBS = ("2026-10-08-r1", "2026-10-08-r2-d5", "2026-10-08-r2-d3", "2026-10-06-r1")
 SCALES = (0.0, 0.25, 0.5, 1.0)
@@ -29,7 +29,7 @@ SHOTS = 4000
 
 def groups(labels):
     g = {"stab": [], "flag": []}
-    for col, (patch, rnd, name) in enumerate(labels):
+    for col, (_, rnd, name) in enumerate(labels):
         if " " in name:
             g["flag"].append(col)
         elif 1 <= rnd <= 7:
@@ -40,7 +40,7 @@ def groups(labels):
 def main() -> None:
     params = rerun.leakage_params()
     js = [j for j in jobs() if j.name in FIT_JOBS]
-    targets, sims = [], {}
+    targets = []
     for j in js:
         for basis in "XZ":
             idx = memory_index(basis, 8)
@@ -57,20 +57,30 @@ def main() -> None:
         for j, basis, idx, g, cols, obs in targets:
             if (j.name, basis) not in cache:
                 model, _, _ = j.model(idx)
-                det, _ = leaky.simulate(model, SHOTS, rerun.variant(j, "leak+ro", *params, 1.0), seed=11)
+                det, _ = leaky.simulate(
+                    model, SHOTS, rerun.variant(j, "leak+ro", *params, 1.0), seed=11
+                )
                 cache[(j.name, basis)] = det
             sim = cache[(j.name, basis)][:, cols].mean()
-            sq.append((sim - obs) ** 2); rows.append((j.name, basis, g, obs, sim))
+            sq.append((sim - obs) ** 2)
+            rows.append((j.name, basis, g, obs, sim))
         rms = float(np.sqrt(np.mean(sq)))
         results.append({"data_scale": scale, "partner_phase": phase, "rms": rms, "rows": rows})
         by = {}
         for _, basis, g, obs, sim in rows:
             by.setdefault(f"{basis} {g}", []).append(sim - obs)
-        print(f"data_scale {scale:<4g} partner_phase {phase:<4g} rms {rms:.4f}  " +
-              "  ".join(f"{k}: {np.mean(v):+.3f}" for k, v in sorted(by.items())), flush=True)
+        print(
+            f"data_scale {scale:<4g} partner_phase {phase:<4g} rms {rms:.4f}  "
+            + "  ".join(f"{k}: {np.mean(v):+.3f}" for k, v in sorted(by.items())),
+            flush=True,
+        )
     best = min(results, key=lambda r: r["rms"])
-    print(f"\nbest: data_scale {best['data_scale']}, partner_phase {best['partner_phase']} (rms {best['rms']:.4f})")
-    (REPO / "docs/diagnosis/results/fit_leak.json").write_text(json.dumps(results, indent=1, default=str) + "\n")
+    print(
+        f"\nbest: data_scale {best['data_scale']}, partner_phase {best['partner_phase']} (rms {best['rms']:.4f})"
+    )
+    (REPO / "docs/diagnosis/results/fit_leak.json").write_text(
+        json.dumps(results, indent=1, default=str) + "\n"
+    )
 
 
 if __name__ == "__main__":

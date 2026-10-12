@@ -18,6 +18,15 @@ With no leakage and no overrides it reproduces the model exactly (checked agains
 own sampler in validate()). Optional overrides: cz_scale multiplies every CZ's
 depolarizing error; reset_error replaces the reset's X error (the model uses the readout
 error); readout gives per-qubit (P(1|0), P(0|1)) in place of the symmetric readout error.
+
+What a CZ with a leaked qubit does here: the shots' reference outcomes come from the
+circuit with every CZ in it, and the CZ only keeps the leaked qubit's frame from reaching
+its partner. The gate therefore acts with the leaked qubit's error-free Z value, rather
+than not at all; a Pauli frame cannot represent a left-out CZ in general.
+revision/leaky_fix/ keeps a copy of this simulator with a random phase on the partner as
+an alternative, and checks both against an exact per-shot stabilizer simulation
+(tableau_ref.py). revision/leakage_exact/ simulates the left-out CZ exactly and repeats
+the grid fit and the reruns with it (summarize_exact.py).
 """
 
 from __future__ import annotations
@@ -65,6 +74,7 @@ def simulate(model: stim.Circuit, shots: int, leakage: Leakage | None = None, se
         return rng.random(size) < p
 
     for ins in model.flattened():
+        assert isinstance(ins, stim.CircuitInstruction)  # flattened: no repeat blocks
         name = ins.name
         targets = [t.value for t in ins.targets_copy()]
         args = ins.gate_args_copy()
@@ -149,8 +159,10 @@ def simulate(model: stim.Circuit, shots: int, leakage: Leakage | None = None, se
                 kind = rng.integers(0, 15, shots)
                 pa = np.array([PAULI2[i][0] for i in range(15)])[kind]
                 pb = np.array([PAULI2[i][1] for i in range(15)])[kind]
-                x[a] ^= hit & XBIT[pa]; z[a] ^= hit & ZBIT[pa]
-                x[b] ^= hit & XBIT[pb]; z[b] ^= hit & ZBIT[pb]
+                x[a] ^= hit & XBIT[pa]
+                z[a] ^= hit & ZBIT[pa]
+                x[b] ^= hit & XBIT[pb]
+                z[b] ^= hit & ZBIT[pb]
         elif name == "PAULI_CHANNEL_1":
             px, py, pz = args
             for q in targets:
@@ -176,12 +188,16 @@ def simulate(model: stim.Circuit, shots: int, leakage: Leakage | None = None, se
         else:
             raise ValueError(f"unhandled instruction {name}")
     det = np.array(detectors).T if detectors else np.zeros((shots, 0), bool)
-    obs = np.array([observables[k] for k in sorted(observables)]).T if observables else np.zeros((shots, 0), bool)
+    obs = (
+        np.array([observables[k] for k in sorted(observables)]).T
+        if observables
+        else np.zeros((shots, 0), bool)
+    )
     return det, obs
 
 
 def validate(model: stim.Circuit, shots: int = 20000) -> float:
     """Largest gap between this simulator's detector rates (no leakage) and stim's sampler's."""
     mine, _ = simulate(model, shots, seed=1)
-    theirs = model.compile_detector_sampler(seed=1).sample(shots)
+    theirs = np.asarray(model.compile_detector_sampler(seed=1).sample(shots))
     return float(np.abs(mine.mean(0) - theirs.mean(0)).max())

@@ -1,0 +1,13 @@
+pi pi2: 11 points, 704 tasks, sim exact
+leak 0.0005  strength 0.1   spread 0.1   loss 0.438 (slot 0.436)  X stab -6%  Z stab -18%  Z flag -25%  Z repeat -53%  Z co_data -50%  Z co_gauge -72%   [180s]
+leak 0.0005  strength 0.1   spread 0.15  loss 0.273 (slot 0.274)  X stab -5%  Z stab -18%  Z flag -21%  Z repeat -39%  Z co_data -5%  Z co_gauge -46%   [248s]
+leak 0.0005  strength 0.1   spread 0.2   loss 0.260 (slot 0.257)  X stab -4%  Z stab -17%  Z flag -16%  Z repeat -24%  Z co_data +53%  Z co_gauge -6%   [311s]
+leak 0.0005  strength 0.25  spread 0.1   loss 0.344 (slot 0.340)  X stab -6%  Z stab -18%  Z flag -23%  Z repeat -48%  Z co_data -32%  Z co_gauge -54%   [373s]
+leak 0.0005  strength 0.25  spread 0.2   loss 0.369 (slot 0.362)  X stab -4%  Z stab -17%  Z flag -14%  Z repeat -20%  Z co_data +80%  Z co_gauge +30%   [432s]
+leak 0.00065 strength 0.1   spread 0.1   loss 0.376 (slot 0.376)  X stab -4%  Z stab -17%  Z flag -22%  Z repeat -44%  Z co_data -39%  Z co_gauge -66%   [488s]
+leak 0.00065 strength 0.1   spread 0.15  loss 0.212 (slot 0.214)  X stab -3%  Z stab -17%  Z flag -16%  Z repeat -29%  Z co_data +17%  Z co_gauge -32%   [556s]
+leak 0.00065 strength 0.1   spread 0.2   loss 0.479 (slot 0.464)  X stab -2%  Z stab -16%  Z flag -10%  Z repeat -14%  Z co_data +113%  Z co_gauge +19%   [626s]
+leak 0.00065 strength 0.25  spread 0.1   loss 0.256 (slot 0.254)  X stab -4%  Z stab -17%  Z flag -20%  Z repeat -38%  Z co_data -13%  Z co_gauge -40%   [696s]
+leak 0.00065 strength 0.25  spread 0.15  loss 0.225 (slot 0.222)  X stab -2%  Z stab -17%  Z flag -14%  Z repeat -24%  Z co_data +44%  Z co_gauge +7%   [768s]
+leak 0.00065 strength 0.25  spread 0.2   loss 0.635 (slot 0.613)  X stab -1%  Z stab -16%  Z flag -7%  Z repeat -10%  Z co_data +141%  Z co_gauge +63%   [841s]
+best so far (seed 21): leak 0.0005 strength 0.25 spread 0.15 loss 0.198
