@@ -6,15 +6,20 @@
   scatter      an exploratory second agreement test: the day-to-day scatter of placement 1's
                five predictions, s_Q, added to each prediction's variance,
                sigma_M'^2 = sigma_M^2 + (s_Q M)^2 (the prespecified test allows only shot
-               noise, f and the before/after calibration gap within a job)
-  detectors    detectors firing above prediction by more than sqrt(2 ln N) standard errors,
+               noise, f and the before/after calibration gap within a job); also the
+               prespecified z per repetition, the smallest added scatter that passes, the
+               chi2 with each placement's own scatter, and how the observed values follow
+               the predicted ones over the days
+  detectors   detectors firing above prediction by more than sqrt(2 ln N) standard errors,
                per job (analysis.json), and the largest observed/predicted ratio
   slope        the excess rise of the detection rate over the eight rounds (analysis.json
                "leakage"): cases above three standard errors, by basis and distance
   f            the idle test's f per job (the prespecified median beside the inverse-variance
                mean and the chi2/nu of the qubits about it), and f read off the memory runs
                (analysis.json "dephasing_from_memory"): jobs where the two agree
-  drift        the prespecified half-against-half drift check, over the 40 comparisons
+  selection    each patch's mean reported CZ and readout error on the day it was chosen,
+               against the same parts in the other four calibrations (winner's curse)
+  drift       the prespecified half-against-half drift check, over the 40 comparisons
   model_curves the model's own curves are not exactly exponential: the fit of the day-1
                repetition-1 predictions (fits.json)
 
@@ -66,27 +71,47 @@ def days() -> dict:
     return out
 
 
+def rel_sd(values: np.ndarray) -> float:
+    """Relative day-to-day spread of one placement's five predictions."""
+    return float(np.std(values, ddof=1) / np.mean(values))
+
+
+def chi2_with(o: np.ndarray, p: np.ndarray, half: np.ndarray, s) -> float:
+    """The agreement chi2 with the relative scatter s added to each prediction's variance."""
+    return float((((o - p) ** 2) / (half**2 + (s * p) ** 2)).sum())
+
+
 def scatter(combined: dict) -> dict:
     reps = combined["reps"]
     rep1 = [i for i, r in enumerate(reps) if r["rep"] == 1]  # one placement, five calibrations
+    rep2 = [i for i, r in enumerate(reps) if r["rep"] == 2]
     bar = float(chi2.ppf(0.95, len(reps)))
     out = {}
     for q in TESTS:
         o = np.array([r["tests"][q]["observed"] for r in reps])
         p = np.array([r["tests"][q]["predicted"] for r in reps])
         half = np.array([r["tests"][q]["bound"] / 2 for r in reps])
-        s = float(
-            np.std(p[rep1], ddof=1) / np.mean(p[rep1])
-        )  # relative day-to-day spread of one placement's prediction
+        s = rel_sd(p[rep1])
+        own = np.where([r["rep"] == 1 for r in reps], s, rel_sd(p[rep2]))
         before = float((((o - p) / half) ** 2).sum())
-        after = float((((o - p) ** 2) / (half**2 + (s * p) ** 2)).sum())
+        after = chi2_with(o, p, half, s)
+        grid = np.round(np.arange(0, 0.501, 0.01), 2)
+        passing = [float(g) for g in grid if chi2_with(o, p, half, g) < bar]
         out[q] = {
             "chi2": before,
             "chi2_with_scatter": after,
             "bar": bar,
             "relative_scatter": s,
+            "z_prespecified": [float(v) for v in (o - p) / half],
             "placement_1_predicted_range": [float(p[rep1].min()), float(p[rep1].max())],
             "placement_1_observed_range": [float(o[rep1].min()), float(o[rep1].max())],
+            "placement_2_relative_scatter": rel_sd(p[rep2]),
+            "chi2_with_each_placements_own_scatter": chi2_with(o, p, half, own),
+            "smallest_scatter_that_passes (grid 0.01)": passing[0] if passing else None,
+            "pearson_predicted_observed": {
+                "placement 1": float(np.corrcoef(p[rep1], o[rep1])[0, 1]),
+                "placement 2": float(np.corrcoef(p[rep2], o[rep2])[0, 1]),
+            },
         }
         print(
             f"  {q:9s} chi2 {before:7.1f} -> {after:6.1f}  (bar {bar:.1f}; prediction scatter {100 * s:.0f}%) "
@@ -174,6 +199,49 @@ def f() -> dict:
         "from_memory_higher_in": sum(
             v["from_memory"] > v["median"] and not v["from_memory_agrees"] for v in per_job.values()
         ),
+        "from_memory_above_idle_median_in": sum(
+            v["from_memory"] > v["median"] for v in per_job.values()
+        ),
+        "from_memory_median": float(np.median([v["from_memory"] for v in per_job.values()])),
+        "from_memory_at_search_edge_2.0": sum(v["from_memory"] >= 2.0 for v in per_job.values()),
+    }
+
+
+def selection() -> dict:
+    """Did choosing placements by their reported errors pick parts that were reported low by
+    chance? For each job's patch: its mean reported CZ error (couplers between its qubits) and
+    readout error on the day it was chosen, over the same parts' means in the other four days'
+    calibrations. A ratio below one would mean the chosen day's report flattered the patch."""
+    cals = {}
+    for job in jobs():
+        cals.setdefault(job.day, read(job.folder / "calibration.json"))
+
+    def means(cal: dict, qubits: set) -> tuple[float, float]:
+        cz = [e for k, e in cal["cz"].items() if set(map(int, k.split("-"))) <= qubits]
+        ro = [cal["readout"][str(q)] for q in qubits]
+        return float(np.mean(cz)), float(np.mean(ro))
+
+    rows: dict = defaultdict(lambda: {"cz": [], "readout": []})
+    for job in jobs():
+        for d, chip in job.info["chips"].items():
+            qubits = set(chip)
+            cz0, ro0 = means(cals[job.day], qubits)
+            others = [means(c, qubits) for day, c in cals.items() if day != job.day]
+            key = f"placement {job.rep} d{d}"
+            rows[key]["cz"].append(cz0 / np.mean([c for c, _ in others]))
+            rows[key]["readout"].append(ro0 / np.mean([r for _, r in others]))
+    return {
+        "what": "chosen day's mean reported error / mean over the other four days, per patch; "
+        "mean over the five days",
+        **{
+            k: {
+                "cz_ratio_mean": float(np.mean(v["cz"])),
+                "readout_ratio_mean": float(np.mean(v["readout"])),
+                "cz_ratio_per_day": v["cz"],
+                "readout_ratio_per_day": v["readout"],
+            }
+            for k, v in sorted(rows.items())
+        },
     }
 
 
@@ -224,6 +292,7 @@ def main() -> None:
         "detectors": detectors(),
         "slope": slope(),
         "f": f(),
+        "selection": selection(),
         "drift": drift(),
         "model_curves": model_curves(),
     }

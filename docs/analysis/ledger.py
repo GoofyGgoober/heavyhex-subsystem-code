@@ -37,6 +37,7 @@ def model_vs_device() -> dict:
         "detectors_beyond_chance": {k: v for k, v in d.items() if k != "per_job"},
         "excess_slope": m["slope"],
         "f": {k: v for k, v in f.items() if k != "per_job"},
+        "selection_check (reported errors on the chosen day / other days)": m["selection"],
         "prespecified_drift_check": m["drift"],
         "model_curves_day1_rep1": m["model_curves"],
     }
@@ -178,6 +179,8 @@ def leakage() -> dict:
     fit = take("leakage_fit.json")
     checks = take("leakage_checks.json")
     cz = take("cz_scaled.json")
+    life = take("leakage_lifetime.json")
+    recovery = take("leakage_recovery.json")
     exact = fit["reruns"]
     return {
         "refiring": {
@@ -194,7 +197,24 @@ def leakage() -> dict:
         "hmm": hmm,
         "hmm_bootstrap": {
             k: boot[k]
-            for k in ("published", "shot_bootstrap_ci95", "cluster", "lengths", "capped_at_300")
+            for k in (
+                "published",
+                "shot_bootstrap_ci95",
+                "cluster",
+                "lengths",
+                "capped_at_300",
+                "converged_paper_start",
+                "starts",
+                "best_of_starts",
+            )
+        },
+        "hmm_on_simulated_leakage (lifetime in us -> fitted tau_P, e_P, Delta(1))": {
+            k: {"tau_P_us": v["life_us_cont"], "e_P": v["e_P"], "refire_lag_1": v["refire"][0]}
+            for k, v in life.items()
+        },
+        "parameter_recovery_rank_of_truth": {
+            t: {"truth": v["truth"], "pooled": [r["pooled rank_of_truth"] for r in v["rows"]]}
+            for t, v in recovery["grid_fit"].items()
         },
         "causes": causes,
         "costreak": {
@@ -244,7 +264,13 @@ def leakage() -> dict:
         "frame_binomial_means": fit["frame_binomial"]["means_over_ten_reps"],
         "checks_three_qubit_example": checks["A"],
         "checks_cz_operands_with_definite_z": checks["E"]["total"],
-        "cz_scaled": {"follow_ratio_mean": cz["follow_ratio_mean"], "minus_fit": cz["minus_fit"]},
+        "cz_scaled": {
+            "follow_ratio_mean": cz["follow_ratio_mean"],
+            "twice_cz_minus_leakage_model_fit_jobs (the paper's CZ x 2 sentence)": exact[
+                "identity_ext_optimum"
+            ]["twice_cz_minus_leak_fit_jobs"],
+            "minus_fit_old_frame_model_at_0.2_25_5 (not quoted)": cz["minus_fit"],
+        },
     }
 
 
@@ -270,7 +296,8 @@ def digest(res: dict) -> str:
     L = []
     pp = res["per_placement"]
     L.append(
-        "1. Per placement (inverse-variance mean over 5 days; chi2/nu with nu = 4; ratio = observed / mean predicted)"
+        "1. Per placement over 5 days (eps: plain mean +- se over days, then the inverse-variance mean;"
+        " Lambda: inverse-variance mean; chi2/nu with nu = 4; ratio = plain observed / plain mean predicted)"
     )
     for b in BASES:
         for pl in PLACEMENTS:
@@ -280,8 +307,14 @@ def digest(res: dict) -> str:
                 for q in QUANTITIES:
                     o = blk[q]["observed"]
                     scale, d = (100, 1) if q != "lambda" else (1, 3)
+                    plain = ""
+                    if q != "lambda":
+                        op = blk[q]["observed_plain"]
+                        plain = (
+                            f"{fmt_pm(scale * op['value'], scale * op['se_over_days'], d)}; ivw "
+                        )
                     parts.append(
-                        f"{q} {fmt_pm(scale * o['value'], scale * o['se'], d)} (chi2/nu {o['chi2_per_dof']:.2f}; "
+                        f"{q} {plain}{fmt_pm(scale * o['value'], scale * o['se'], d)} (chi2/nu {o['chi2_per_dof']:.2f}; "
                         f"pred {scale * blk[q]['predicted_mean']:.{d}f}; ratio {blk[q]['observed_over_predicted']:.3f}; "
                         f"agrees {blk[q]['days_model_agrees']}/5)"
                     )

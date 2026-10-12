@@ -1,16 +1,16 @@
-1. Per placement (inverse-variance mean over 5 days; chi2/nu with nu = 4; ratio = observed / mean predicted)
-   X placement 1 wls     : eps3 12.5 +- 0.3 (chi2/nu 1.00; pred 10.2; ratio 1.225; agrees 2/5); eps5 18.4 +- 0.5 (chi2/nu 0.61; pred 16.1; ratio 1.142; agrees 4/5); lambda 0.682 +- 0.027 (chi2/nu 0.38; pred 0.642; ratio 1.062; agrees 3/5)
-   X placement 1 binomial: eps3 12.7 +- 0.4 (chi2/nu 1.31; pred 10.2; ratio 1.237; agrees 2/5); eps5 19.3 +- 0.6 (chi2/nu 0.73; pred 16.1; ratio 1.199; agrees 3/5); lambda 0.657 +- 0.026 (chi2/nu 0.66; pred 0.642; ratio 1.022; agrees 3/5)
-   X placement 2 wls     : eps3 11.0 +- 0.4 (chi2/nu 2.98; pred 8.6; ratio 1.278; agrees 3/5); eps5 21.9 +- 0.6 (chi2/nu 0.27; pred 19.2; ratio 1.141; agrees 5/5); lambda 0.501 +- 0.018 (chi2/nu 0.77; pred 0.448; ratio 1.118; agrees 5/5)
-   X placement 2 binomial: eps3 11.1 +- 0.4 (chi2/nu 2.91; pred 8.6; ratio 1.287; agrees 3/5); eps5 22.9 +- 0.6 (chi2/nu 0.16; pred 19.2; ratio 1.189; agrees 4/5); lambda 0.485 +- 0.017 (chi2/nu 0.90; pred 0.448; ratio 1.085; agrees 5/5)
-   Z placement 1 wls     : eps3 13.7 +- 0.3 (chi2/nu 1.92; pred 7.1; ratio 1.928; agrees 0/5); eps5 29.8 +- 1.7 (chi2/nu 2.70; pred 16.6; ratio 1.789; agrees 1/5); lambda 0.444 +- 0.026 (chi2/nu 1.90; pred 0.428; ratio 1.037; agrees 4/5)
-   Z placement 1 binomial: eps3 13.8 +- 0.3 (chi2/nu 1.75; pred 7.1; ratio 1.948; agrees 0/5); eps5 30.7 +- 1.2 (chi2/nu 1.61; pred 16.6; ratio 1.845; agrees 0/5); lambda 0.446 +- 0.021 (chi2/nu 1.68; pred 0.428; ratio 1.041; agrees 5/5)
-   Z placement 2 wls     : eps3 15.6 +- 1.3 (chi2/nu 13.90; pred 8.4; ratio 1.866; agrees 0/5); eps5 26.3 +- 1.0 (chi2/nu 0.43; pred 16.5; ratio 1.599; agrees 2/5); lambda 0.632 +- 0.055 (chi2/nu 2.65; pred 0.511; ratio 1.238; agrees 3/5)
-   Z placement 2 binomial: eps3 15.9 +- 1.4 (chi2/nu 16.25; pred 8.4; ratio 1.896; agrees 0/5); eps5 28.7 +- 1.0 (chi2/nu 1.37; pred 16.5; ratio 1.744; agrees 0/5); lambda 0.540 +- 0.055 (chi2/nu 5.99; pred 0.510; ratio 1.058; agrees 2/5)
-   observed/predicted eps3, eps5 range, X wls: 1.14-1.28
-   observed/predicted eps3, eps5 range, Z wls: 1.60-1.93
-   observed/predicted eps3, eps5 range, X binomial: 1.19-1.29
-   observed/predicted eps3, eps5 range, Z binomial: 1.74-1.95
+1. Per placement over 5 days (eps: plain mean +- se over days, then the inverse-variance mean; Lambda: inverse-variance mean; chi2/nu with nu = 4; ratio = plain observed / plain mean predicted)
+   X placement 1 wls     : eps3 12.7 +- 0.3; ivw 12.5 +- 0.3 (chi2/nu 1.00; pred 10.2; ratio 1.237; agrees 2/5); eps5 18.5 +- 0.4; ivw 18.4 +- 0.5 (chi2/nu 0.61; pred 16.1; ratio 1.148; agrees 4/5); lambda 0.682 +- 0.027 (chi2/nu 0.38; pred 0.642; ratio 1.068; agrees 3/5)
+   X placement 1 binomial: eps3 12.9 +- 0.4; ivw 12.7 +- 0.4 (chi2/nu 1.31; pred 10.2; ratio 1.257; agrees 2/5); eps5 19.3 +- 0.5; ivw 19.3 +- 0.6 (chi2/nu 0.73; pred 16.1; ratio 1.200; agrees 3/5); lambda 0.657 +- 0.026 (chi2/nu 0.66; pred 0.642; ratio 1.039; agrees 3/5)
+   X placement 2 wls     : eps3 11.1 +- 0.4; ivw 11.0 +- 0.4 (chi2/nu 2.98; pred 8.6; ratio 1.292; agrees 3/5); eps5 22.0 +- 0.3; ivw 21.9 +- 0.6 (chi2/nu 0.27; pred 19.2; ratio 1.142; agrees 5/5); lambda 0.501 +- 0.018 (chi2/nu 0.77; pred 0.448; ratio 1.130; agrees 5/5)
+   X placement 2 binomial: eps3 11.2 +- 0.4; ivw 11.1 +- 0.4 (chi2/nu 2.91; pred 8.6; ratio 1.300; agrees 3/5); eps5 22.8 +- 0.3; ivw 22.9 +- 0.6 (chi2/nu 0.16; pred 19.2; ratio 1.186; agrees 4/5); lambda 0.485 +- 0.017 (chi2/nu 0.90; pred 0.448; ratio 1.094; agrees 5/5)
+   Z placement 1 wls     : eps3 13.7 +- 0.3; ivw 13.7 +- 0.3 (chi2/nu 1.92; pred 7.1; ratio 1.937; agrees 0/5); eps5 29.0 +- 1.9; ivw 29.8 +- 1.7 (chi2/nu 2.70; pred 16.6; ratio 1.743; agrees 1/5); lambda 0.444 +- 0.026 (chi2/nu 1.90; pred 0.428; ratio 1.130; agrees 4/5)
+   Z placement 1 binomial: eps3 13.9 +- 0.3; ivw 13.8 +- 0.3 (chi2/nu 1.75; pred 7.1; ratio 1.956; agrees 0/5); eps5 31.1 +- 1.4; ivw 30.7 +- 1.2 (chi2/nu 1.61; pred 16.6; ratio 1.870; agrees 0/5); lambda 0.446 +- 0.021 (chi2/nu 1.68; pred 0.428; ratio 1.048; agrees 5/5)
+   Z placement 2 wls     : eps3 17.9 +- 1.8; ivw 15.6 +- 1.3 (chi2/nu 13.90; pred 8.4; ratio 2.136; agrees 0/5); eps5 25.6 +- 1.0; ivw 26.3 +- 1.0 (chi2/nu 0.43; pred 16.5; ratio 1.554; agrees 2/5); lambda 0.632 +- 0.055 (chi2/nu 2.65; pred 0.511; ratio 1.362; agrees 3/5)
+   Z placement 2 binomial: eps3 18.4 +- 2.1; ivw 15.9 +- 1.4 (chi2/nu 16.25; pred 8.4; ratio 2.205; agrees 0/5); eps5 29.9 +- 1.2; ivw 28.7 +- 1.0 (chi2/nu 1.37; pred 16.5; ratio 1.812; agrees 0/5); lambda 0.540 +- 0.055 (chi2/nu 5.99; pred 0.510; ratio 1.216; agrees 2/5)
+   observed/predicted eps3, eps5 range, X wls: 1.14-1.29
+   observed/predicted eps3, eps5 range, Z wls: 1.55-2.14
+   observed/predicted eps3, eps5 range, X binomial: 1.19-1.30
+   observed/predicted eps3, eps5 range, Z binomial: 1.81-2.20
 2. Placements compared
    Lambda_X wls: P1 - P2 = 0.182 +- 0.033
    Lambda_X binomial: P1 - P2 = 0.171 +- 0.031

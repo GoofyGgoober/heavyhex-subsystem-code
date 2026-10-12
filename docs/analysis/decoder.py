@@ -10,7 +10,8 @@ adds three light checks, and writes results/decoder.json:
   edge_p    the range of the matching graph's edge probabilities, p = 1 / (1 + e^w)
   dropped   hardware points with P(n) >= 1/2, which the prespecified fit leaves out
 
-Under a minute.
+and, in "paper", Lambda per placement under both weightings and the per-round probability
+mass of the single faults that calibrated matching miscorrects. Under a minute.
 
     python docs/analysis/decoder.py
 """
@@ -266,6 +267,42 @@ def dropped(shots: dict) -> dict:
     return dict(sorted(count.items()))
 
 
+def per_placement_lambda(shots: dict) -> dict:
+    """Lambda per placement under both weightings: inverse-variance mean over the five days,
+    its error widened by sqrt(chi2/nu) when chi2/nu > 1, as placements.py does it."""
+    out: dict = {}
+    for dec in ("calibrated", "uniform"):
+        for q in ("X lambda", "Z lambda"):
+            for placement in (1, 2):
+                rows = [r[dec][q] for r in shots["reps"] if r["rep"] == placement]
+                v = np.array([x[0] for x in rows])
+                w = 1 / np.array([x[1] for x in rows]) ** 2
+                m = float((w * v).sum() / w.sum())
+                red = float((w * (v - m) ** 2).sum() / (len(v) - 1))
+                out[f"{dec} {q} placement {placement}"] = {
+                    "value": m,
+                    "se": float(np.sqrt(max(red, 1.0) / w.sum())),
+                    "chi2_per_dof": red,
+                }
+    return out
+
+
+def miscorrected_per_round(mass: dict) -> dict:
+    """Probability mass of the single faults that calibrated matching miscorrects, per round:
+    (8-round mass - 1-round mass) / 7, per job, patch and basis. To first order this is what
+    those faults add to eps."""
+    out: dict = {}
+    for job, rows in mass.items():
+        for basis in "XZ":
+            for patch in ("3", "5"):
+                if patch not in rows.get(f"{basis}1", {}):
+                    continue
+                m1 = rows[f"{basis}1"][patch]["miscorrected_single_p_calibrated"]
+                m8 = rows[f"{basis}8"][patch]["miscorrected_single_p_calibrated"]
+                out[f"{job} {basis} d{patch}"] = (m8 - m1) / 7
+    return out
+
+
 def paper(s: dict, extra: dict) -> dict:
     """The numbers the paper quotes."""
     rd = result("decoder_shots.json")
@@ -362,7 +399,11 @@ def paper(s: dict, extra: dict) -> dict:
                 "se": worst[3],
             },
             "points_dropped_P_ge_half": extra["dropped"],
+            "per_placement_lambda": per_placement_lambda(rd),
         },
+        "miscorrected_single_mass_per_round_calibrated": miscorrected_per_round(
+            result("decoder_mass.json")
+        ),
         "model_simulation_20000_shots": {
             "pooled_lambda": {k: sim[k]["lambda"] for k in sim},
             "Lambda_X_drop_uniform": sim["calibrated X"]["lambda"] - sim["uniform X"]["lambda"],

@@ -49,8 +49,10 @@ from draw_blueprint import (
 
 WEAK_BAND = "#C8C8C8"
 OTHER_REP = "#1B7A3D"  # boxes of the reps after the first
+QUBIT_NUMBER = "#6B6B6B"  # the Fez qubit numbers, darker than the blueprint's grey for print
 GAP = 3  # points between a label and anything else
 LABEL = {"fontsize": 9.5, "fontweight": "bold", "color": INK, "zorder": 9, "path_effects": HALO}
+TITLE = 13.5
 
 
 def taken_boxes(ax: Axes) -> list[Bbox]:
@@ -149,13 +151,13 @@ def draw_key(fig: Figure, below: Axes) -> None:
                 [], [], color=WEAK_BAND, lw=10, label=f"coupler with CZ error above {WEAK_CZ:.0%}"
             ),
             Line2D(
-                [], [], color=OTHER_REP, lw=1.8, ls=":", label="a later repetition's patch, in (a)"
+                [], [], color=OTHER_REP, lw=1.8, ls=":", label="later placements' patches, in (a)"
             ),
         ],
         loc="upper center",
         ncol=4,
         frameon=False,
-        fontsize=11,
+        fontsize=11.5,
         handlelength=2.6,
         columnspacing=2.2,
         bbox_to_anchor=((box.x0 + box.x1) / 2, box.y0 - 0.01),
@@ -163,8 +165,9 @@ def draw_key(fig: Figure, below: Axes) -> None:
 
 
 def box_later_reps(ax: Axes, device: DeviceMap, plan: list) -> None:
-    """(a) Box each patch of the reps after the first, labelled with its rep."""
-    for r, jobs in enumerate(plan[1:], start=2):
+    """(a) Box each patch of the reps after the first. The boxes carry no labels, which would
+    sit on the drawing; the caption says which is which."""
+    for jobs in plan[1:]:
         for job in jobs:
             for d, spot in job.items():
                 layout = build_layout(
@@ -183,18 +186,6 @@ def box_later_reps(ax: Axes, device: DeviceMap, plan: list) -> None:
                         linestyle=":",
                         zorder=6,
                     )
-                )
-                alone = "" if len(jobs) == 1 else ", own job"
-                ax.text(
-                    x0 - pad,
-                    y1 + pad + 0.25,
-                    f"repetition {r}: d={d}{alone}",
-                    fontsize=8.5,
-                    color=OTHER_REP,
-                    fontweight="bold",
-                    va="top",
-                    path_effects=HALO,
-                    zorder=9,
                 )
 
 
@@ -239,15 +230,22 @@ def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
     for text in ax_d3.texts:
         if text.get_text().isdigit():
             text.set_text(f"q{text.get_text()}")
-    shown = "repetition 1 drawn, the rest boxed" if len(plan) > 1 else "one repetition"
-    ax_chip.set_title(f"(a) the day's repetitions on the chip: {shown}", fontsize=12)
+    for ax in (ax_d3, ax_d5):
+        for text in ax.texts:
+            if text.get_color() == GREY:
+                text.set_color(QUBIT_NUMBER)
+    # Repetition r's patches are the paper's placement r.
+    shown = {1: "one placement", 2: "placement 1 drawn, placement 2 boxed"}.get(
+        len(plan), "placement 1 drawn, the others boxed"
+    )
+    ax_chip.set_title(f"(a) the chip: {shown}", fontsize=TITLE)
     ax_d3.set_title(
-        f"(b) repetition 1, d = 3: {len(d3.data)} data qubits, {len(d3.physical_qubits)} in all",
-        fontsize=12,
+        f"(b) placement 1, d = 3: {len(d3.data)} data qubits, {len(d3.physical_qubits)} in all",
+        fontsize=TITLE,
     )
     ax_d5.set_title(
-        f"(c) repetition 1, d = 5: {len(d5.data)} data qubits, {len(d5.physical_qubits)} in all",
-        fontsize=12,
+        f"(c) placement 1, d = 5: {len(d5.data)} data qubits, {len(d5.physical_qubits)} in all",
+        fontsize=TITLE,
     )
 
     fig.draw_without_rendering()
