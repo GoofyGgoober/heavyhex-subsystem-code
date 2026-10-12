@@ -511,7 +511,9 @@
     ],
     "from_memory_eps": "3",
     "from_memory": 1.783,
-    "from_memory_agrees": false
+    "from_memory_agrees": false,
+    "from_detector_rates": 1.06,
+    "from_detector_rates_agree": true
    },
    "2026-10-04-r2-d3": {
     "median": 0.8833140337009852,
@@ -524,7 +526,9 @@
     ],
     "from_memory_eps": "3",
     "from_memory": 1.328,
-    "from_memory_agrees": true
+    "from_memory_agrees": true,
+    "from_detector_rates": 0.9139999999999999,
+    "from_detector_rates_agree": true
    },
    "2026-10-04-r2-d5": {
     "median": 0.9471254591763452,
@@ -537,7 +541,9 @@
     ],
     "from_memory_eps": "5",
     "from_memory": 1.1400000000000001,
-    "from_memory_agrees": true
+    "from_memory_agrees": true,
+    "from_detector_rates": 1.296,
+    "from_detector_rates_agree": true
    },
    "2026-10-05-r1": {
     "median": 0.7766487485966175,
@@ -550,7 +556,9 @@
     ],
     "from_memory_eps": "3",
     "from_memory": 0.7949999999999999,
-    "from_memory_agrees": true
+    "from_memory_agrees": true,
+    "from_detector_rates": 1.078,
+    "from_detector_rates_agree": true
    },
    "2026-10-05-r2-d3": {
     "median": 0.7209195209657838,
@@ -563,7 +571,9 @@
     ],
     "from_memory_eps": "3",
     "from_memory": 2.0,
-    "from_memory_agrees": false
+    "from_memory_agrees": false,
+    "from_detector_rates": 1.497,
+    "from_detector_rates_agree": false
    },
    "2026-10-05-r2-d5": {
     "median": 0.9444411324612529,
@@ -576,7 +586,9 @@
     ],
     "from_memory_eps": "5",
     "from_memory": 1.5390000000000001,
-    "from_memory_agrees": true
+    "from_memory_agrees": true,
+    "from_detector_rates": 1.344,
+    "from_detector_rates_agree": true
    },
    "2026-10-06-r1": {
     "median": 1.050757878545906,
@@ -589,7 +601,9 @@
     ],
     "from_memory_eps": "3",
     "from_memory": 1.698,
-    "from_memory_agrees": false
+    "from_memory_agrees": false,
+    "from_detector_rates": 1.097,
+    "from_detector_rates_agree": true
    },
    "2026-10-06-r2-d3": {
     "median": 1.5228084888934883,
@@ -602,7 +616,9 @@
     ],
     "from_memory_eps": "3",
     "from_memory": 1.641,
-    "from_memory_agrees": true
+    "from_memory_agrees": true,
+    "from_detector_rates": 1.364,
+    "from_detector_rates_agree": true
    },
    "2026-10-06-r2-d5": {
     "median": 1.1282786023847438,
@@ -615,7 +631,9 @@
     ],
     "from_memory_eps": "5",
     "from_memory": 1.352,
-    "from_memory_agrees": true
+    "from_memory_agrees": true,
+    "from_detector_rates": 1.218,
+    "from_detector_rates_agree": true
    },
    "2026-10-07-r1": {
     "median": 1.0109156834362347,
@@ -628,7 +646,9 @@
     ],
     "from_memory_eps": "3",
     "from_memory": 1.5310000000000001,
-    "from_memory_agrees": true
+    "from_memory_agrees": true,
+    "from_detector_rates": 1.1600000000000001,
+    "from_detector_rates_agree": true
    },
    "2026-10-07-r2-d3": {
     "median": 1.03343690279773,
@@ -641,7 +661,9 @@
     ],
     "from_memory_eps": "3",
     "from_memory": 1.448,
-    "from_memory_agrees": true
+    "from_memory_agrees": true,
+    "from_detector_rates": 1.094,
+    "from_detector_rates_agree": true
    },
    "2026-10-07-r2-d5": {
     "median": 1.095717140360736,
@@ -654,7 +676,9 @@
     ],
     "from_memory_eps": "5",
     "from_memory": 1.2630000000000001,
-    "from_memory_agrees": true
+    "from_memory_agrees": true,
+    "from_detector_rates": 1.298,
+    "from_detector_rates_agree": true
    },
    "2026-10-08-r1": {
     "median": 0.9907930952407054,
@@ -667,7 +691,9 @@
     ],
     "from_memory_eps": "3",
     "from_memory": 1.6520000000000001,
-    "from_memory_agrees": false
+    "from_memory_agrees": false,
+    "from_detector_rates": 1.274,
+    "from_detector_rates_agree": true
    },
    "2026-10-08-r2-d3": {
     "median": 0.791187681715852,
@@ -680,7 +706,9 @@
     ],
     "from_memory_eps": "3",
     "from_memory": 1.381,
-    "from_memory_agrees": false
+    "from_memory_agrees": false,
+    "from_detector_rates": 1.604,
+    "from_detector_rates_agree": false
    },
    "2026-10-08-r2-d5": {
     "median": 0.9805896625605671,
@@ -693,7 +721,9 @@
     ],
     "from_memory_eps": "5",
     "from_memory": 1.385,
-    "from_memory_agrees": true
+    "from_memory_agrees": true,
+    "from_detector_rates": 1.226,
+    "from_detector_rates_agree": true
    }
   },
   "median_range": [
@@ -713,7 +743,13 @@
   "from_memory_higher_in": 5,
   "from_memory_above_idle_median_in": 15,
   "from_memory_median": 1.448,
-  "from_memory_at_search_edge_2.0": 1
+  "from_memory_at_search_edge_2.0": 1,
+  "from_detector_rates_range": [
+   0.9139999999999999,
+   1.604
+  ],
+  "from_detector_rates_median": 1.226,
+  "from_detector_rates_agree_in": 13
  },
  "selection": {
   "what": "chosen day's mean reported error / mean over the other four days, per patch; mean over the five days",

@@ -56,6 +56,9 @@ GAP = 3  # points between a label and anything else
 WIDTH, HEIGHT, PRINT_WIDTH = 12.0, 7.05, 7.0
 MIN_PT = 7.0 * WIDTH / PRINT_WIDTH
 LABEL = {"fontsize": MIN_PT, "fontweight": "bold", "color": INK, "zorder": 9, "path_effects": HALO}
+LEADER = {"arrowstyle": "-", "lw": 0.8, "color": INK, "shrinkA": 0, "shrinkB": 3}
+# A white box under each Fez qubit number, so that no coupler line runs through it.
+UNDER = {"boxstyle": "square,pad=0.08", "facecolor": "white", "edgecolor": "none"}
 TITLE = 13.5
 
 
@@ -114,7 +117,7 @@ def mark_weak_couplers(
                 for dy in (0, -8, 8, -16, 16)
             ]
         text = "broken" if broken_coupler(error) else f"{error:.1%}"
-        place(ax, text, candidates, taken, **LABEL)
+        place(ax, text, candidates, taken, arrowprops=LEADER, **LABEL)
 
 
 def tidy_d3_labels(ax: Axes, device: DeviceMap, roles: dict) -> None:
@@ -176,7 +179,7 @@ def draw_key(fig: Figure, below: Axes) -> None:
             Line2D([], [], color=X_RED, lw=2.8, label="X-gauge CX"),
             Line2D([], [], color=Z_BLUE, lw=2.8, label="Z-gauge CX"),
             Line2D([], [], color=WEAK_BAND, lw=10, label=f"CZ error above {WEAK_CZ:.0%}"),
-            Line2D([], [], color=OTHER_REP, lw=1.8, ls=":", label="placement 2, in (a)"),
+            Line2D([], [], color=OTHER_REP, lw=1.8, ls=":", label="pair 2, in (a)"),
         ],
         loc="upper center",
         ncol=3,
@@ -259,20 +262,24 @@ def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
         for text in ax.texts:
             if text.get_color() == GREY:
                 text.set_color(QUBIT_NUMBER)
+            if text.get_text().startswith("q"):
+                text.set_bbox(UNDER)
+                text.set_zorder(max(text.get_zorder(), 7))
     for ax in (ax_chip, ax_d3, ax_d5):
         for text in ax.texts:
             text.set_fontsize(max(text.get_fontsize(), MIN_PT))
-    # Repetition r's patches are the paper's placement r.
-    shown = {1: "placement 1", 2: "placement 1, placement 2 boxed"}.get(
-        len(plan), "placement 1, the others boxed"
+    # Rep r's patches are the paper's pair r; pair r's distance-5 patch is placement r.
+    shown = {1: "pair 1", 2: "pair 1 drawn, pair 2 boxed"}.get(
+        len(plan), "pair 1 drawn, the others boxed"
     )
-    ax_chip.set_title(f"(a) Fez: {shown}", fontsize=TITLE)
+    ax_chip.set_title(rf"$\mathbf{{(a)}}$ Fez: {shown}", fontsize=TITLE)
     ax_d3.set_title(
-        f"(b) placement 1, d = 3: {len(d3.data)} data qubits, {len(d3.physical_qubits)} in all",
+        rf"$\mathbf{{(b)}}$ pair 1, $d = 3$: {len(d3.data)} data qubits, {len(d3.physical_qubits)} in all",
         fontsize=TITLE,
     )
     ax_d5.set_title(
-        f"(c) placement 1, d = 5: {len(d5.data)} data qubits, {len(d5.physical_qubits)} in all",
+        rf"$\mathbf{{(c)}}$ pair 1, $d = 5$ (placement 1): {len(d5.data)} data qubits, "
+        f"{len(d5.physical_qubits)} in all",
         fontsize=TITLE,
     )
 
@@ -285,7 +292,7 @@ def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
     for q, style in lifted:
         xy = device.pos[q]
         sides = [(xy, 9, 0, "left", "center"), (xy, -9, 0, "right", "center")]
-        place(ax_d5, f"q{q}", sides, taken, path_effects=HALO, zorder=7, **style)
+        place(ax_d5, f"q{q}", sides, taken, path_effects=HALO, zorder=7, bbox=UNDER, **style)
     mark_weak_couplers(ax_d5, device, d5, calibration, taken)
     return fig
 

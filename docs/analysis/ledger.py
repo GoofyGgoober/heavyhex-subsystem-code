@@ -307,6 +307,9 @@ def leakage() -> dict:
             label: {est: {c: r[est]["splits"][c] for c in ("Z d3", "Z d5")} for est in FITS}
             for label, r in exact.items()
         },
+        "closure_against_ibm_reset_and_readout (wls, all ten)": {
+            label: r["wls"]["closure_against_ibm_reset_and_readout"] for label, r in exact.items()
+        },
         "frame_binomial_means": fit["frame_binomial"]["means_over_ten_reps"],
         "checks_three_qubit_example": checks["A"],
         "checks_cz_operands_with_definite_z": checks["E"]["total"],
@@ -362,6 +365,7 @@ def placements_and_inputs() -> dict:
         },
         "single_qubit_error_median_by_day": cal["single_qubit"],
         "readout_gap_P01_minus_P10_flags_relays": cal["readout_gap"],
+        "t1_of_the_flag_and_relay_qubits": cal["t1_flags_relays"],
         "drift_rehearsal_largest_change_se (comment above DRIFT_BAR, src/heavyhex/experiment/run.py)": (
             float(rehearsal.group(1)) if rehearsal else None
         ),
@@ -465,6 +469,10 @@ def other() -> dict:
         "readout": take("readout.json"),
         "uniform_scale": take("uniform_scale.json"),
         "no_reset": take("no_reset.json"),
+        "day_swing (placement 1, reported values set to the other days' median)": take(
+            "day_swing.json"
+        ),
+        "repredict (a stored prediction derived again)": take("repredict.json"),
     }
     INPUTS.add("docs/figures/figure3.json")
     out["prerun_figure3_rows"] = read(REPO / "docs/figures/figure3.json")["rows"]

@@ -17,6 +17,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.legend_handler import HandlerTuple
 from matplotlib.lines import Line2D
 
 from make_figures import COLUMN, D3, D5, DIAG, INK, MUTED, OUT, label  # also sets the style
@@ -62,9 +63,15 @@ def delta_panel(ax, results_dir: Path = DIAG) -> None:
     handles = [
         Line2D([], [], marker="s", ms=3.2, color=D3, ls=(0, (1.5, 1.5)), lw=0.9, label="Z memory"),
         Line2D([], [], marker="o", ms=3.2, color=D5, ls=(0, (4, 2)), lw=0.9, label="X memory"),
-        Line2D([], [], marker="o", ms=3.0, mfc="white", mec=MUTED, ls="none", label="model"),
+        tuple(Line2D([], [], marker=m, ms=3.0, mfc="white", mec=MUTED, ls="none") for m in "so"),
     ]
-    ax.legend(handles=handles, loc="upper right", handlelength=2.4)
+    ax.legend(
+        handles,
+        ["Z memory", "X memory", "model"],
+        loc="upper right",
+        handlelength=2.4,
+        handler_map={tuple: HandlerTuple(ndivide=None)},
+    )
 
 
 def make_trace(results_dir: Path = DIAG, out_pdf: Path = OUT / "hmm_trace.pdf") -> None:
