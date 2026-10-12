@@ -17,8 +17,8 @@ Reports, for 5 and 10 reps:
 
 Folders of a split rep's two jobs go next to each other; a rep's patches are
 found from the folders' predictions. --out also writes the numbers, with the folders and
-seed they came from (docs/analysis/results/power.json by convention). The numbers in the
-paper were printed before the first job; the folders that run read were not recorded.
+seed they came from. The paper's numbers are from the fifteen jobs' frozen predictions,
+docs/analysis/results/power.json (docs/analysis/README.md gives the command).
 """
 
 from __future__ import annotations

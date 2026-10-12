@@ -21,6 +21,7 @@
    "docs/analysis/results/no_reset.json",
    "docs/analysis/results/perqubit_f.json",
    "docs/analysis/results/placements.json",
+   "docs/analysis/results/power.json",
    "docs/analysis/results/readout.json",
    "docs/analysis/results/refiring.json",
    "docs/analysis/results/uniform_scale.json",
@@ -7679,35 +7680,120 @@
      "ratio_of_medians": 0.2360651761975949
     }
    },
-   "rerun_leak_vs_leak_ro": {
-    "2026-10-08-r1": {
-     "X d3": {
-      "leak": 0.16814541067503946,
-      "leak+ro": 0.17550335041504134,
-      "change": 0.007357939740001873,
-      "shot_se": 0.0065799657328680684
-     },
-     "X d5": {
-      "leak": 0.26540547701158607,
-      "leak+ro": 0.2848338462532875,
-      "change": 0.019428369241701438,
-      "shot_se": 0.02405064411869875
-     },
-     "Z d3": {
-      "leak": 0.11429617954351468,
-      "leak+ro": 0.10950645850988566,
-      "change": -0.004789721033629013,
-      "shot_se": 0.004779685224529901
-     },
-     "Z d5": {
-      "leak": 0.2543668898181271,
-      "leak+ro": 0.2631249500538809,
-      "change": 0.008758060235753817,
-      "shot_se": 0.011679752040481486
-     }
+   "calibration_model_with_ibm_errors": {
+    "shots": 10000,
+    "X d3": {
+     "patches": 10,
+     "mean_change": -0.00040161059281873523,
+     "se_over_patches": 0.0010334276347832014,
+     "changes": [
+      0.0010448047342338507,
+      -0.0033478901155750695,
+      -0.0056666924400942675,
+      -0.0004923832593114463,
+      -0.0004795076599559689,
+      0.001000902418426708,
+      0.002437672700398019,
+      -0.0026655612515560367,
+      0.005960575716784655,
+      -0.0018080267715377962
+     ]
+    },
+    "X d5": {
+     "patches": 10,
+     "mean_change": -0.005171827669943729,
+     "se_over_patches": 0.002176266792942914,
+     "changes": [
+      0.002752299279873971,
+      0.0070643925008049835,
+      -0.010630308224621021,
+      -0.00424380316742784,
+      -0.003709596263177406,
+      -0.007948872225951586,
+      -0.010122963595083134,
+      -0.015270026922792168,
+      -0.009625082496519721,
+      1.5684415456629353e-05
+     ]
+    },
+    "X detectors, 8 rounds, jobs": {
+     "all": 15,
+     "model_mean_below_device": 15,
+     "ibm_mean_below_model": 15,
+     "ibm_farther_from_device": 14
+    },
+    "Z d3": {
+     "patches": 10,
+     "mean_change": -0.005800451119810296,
+     "se_over_patches": 0.0010069746639974,
+     "changes": [
+      -0.003273228101230541,
+      -0.009779701982831346,
+      -0.004565785085375307,
+      -0.008848041553673747,
+      -0.003972580262983971,
+      -0.00693247945153086,
+      -0.00124413521160871,
+      -0.007930294137607263,
+      -0.001967663724830704,
+      -0.009490601686430511
+     ]
+    },
+    "Z d5": {
+     "patches": 10,
+     "mean_change": -0.004755439959821755,
+     "se_over_patches": 0.0017400686794331163,
+     "changes": [
+      -0.008995999990635828,
+      -0.004583202765396477,
+      -0.008269072497312069,
+      -0.0023946971843905596,
+      -0.007473572957252317,
+      -0.01322211706232318,
+      0.003359502068578324,
+      0.004042995329435084,
+      -0.007665096897441215,
+      -0.0023531376414793193
+     ]
+    },
+    "Z detectors, 8 rounds, jobs": {
+     "all": 15,
+     "model_mean_below_device": 15,
+     "ibm_mean_below_model": 15,
+     "ibm_farther_from_device": 14
     }
    },
-   "note": "one job only (2026-10-08-r1); shot_se treats the two reruns as independent"
+   "leakage_model_with_ibm_errors_one_job": {
+    "rerun_leak_vs_leak_ro": {
+     "2026-10-08-r1": {
+      "X d3": {
+       "leak": 0.16814541067503946,
+       "leak+ro": 0.17550335041504134,
+       "change": 0.007357939740001873,
+       "shot_se": 0.0065799657328680684
+      },
+      "X d5": {
+       "leak": 0.26540547701158607,
+       "leak+ro": 0.2848338462532875,
+       "change": 0.019428369241701438,
+       "shot_se": 0.02405064411869875
+      },
+      "Z d3": {
+       "leak": 0.11429617954351468,
+       "leak+ro": 0.10950645850988566,
+       "change": -0.004789721033629013,
+       "shot_se": 0.004779685224529901
+      },
+      "Z d5": {
+       "leak": 0.2543668898181271,
+       "leak+ro": 0.2631249500538809,
+       "change": 0.008758060235753817,
+       "shot_se": 0.011679752040481486
+      }
+     }
+    },
+    "note": "one job only (2026-10-08-r1), in an earlier leakage model (leakage_frame_rerun.py); shot_se treats the two reruns as independent"
+   }
   }
  },
  "uniform_scale": {
@@ -8296,5 +8382,116 @@
    "lambda_x_f1": 0.9588341075182134,
    "lambda_z": 0.5667204263756602
   }
- ]
+ ],
+ "power": {
+  "folders": [
+   "runs/ibm_fez-2026-10-04-r1",
+   "runs/ibm_fez-2026-10-04-r2-d3",
+   "runs/ibm_fez-2026-10-04-r2-d5",
+   "runs/ibm_fez-2026-10-05-r1",
+   "runs/ibm_fez-2026-10-05-r2-d3",
+   "runs/ibm_fez-2026-10-05-r2-d5",
+   "runs/ibm_fez-2026-10-06-r1",
+   "runs/ibm_fez-2026-10-06-r2-d3",
+   "runs/ibm_fez-2026-10-06-r2-d5",
+   "runs/ibm_fez-2026-10-07-r1",
+   "runs/ibm_fez-2026-10-07-r2-d3",
+   "runs/ibm_fez-2026-10-07-r2-d5",
+   "runs/ibm_fez-2026-10-08-r1",
+   "runs/ibm_fez-2026-10-08-r2-d3",
+   "runs/ibm_fez-2026-10-08-r2-d5"
+  ],
+  "trials": 2000,
+  "seed": 1,
+  "f": {
+   "0.0": {
+    "predicted_lambda": [
+     0.5288794864046954,
+     0.5353128395400041,
+     0.7512343192838428,
+     0.5239380615448505,
+     0.5896731261459787,
+     0.4955664466675553,
+     0.6554832062264968,
+     0.4620271285354134,
+     0.6108717504484518,
+     0.425059929432447
+    ],
+    "5 reps": {
+     "sigma_one_rep": 0.03201706459152678,
+     "sigma_pooled": 0.03153660984462383,
+     "called_at_lambda_1": {
+      "scatter 1": 0.022,
+      "scatter 2": 0.0595,
+      "scatter 4": 0.103
+     },
+     "worse_at_predicted": 1.0,
+     "x_tests_fail_when_right": 0.0685,
+     "gap_caught_80pct": {
+      "gap": 0.06,
+      "caught": 0.834
+     }
+    },
+    "10 reps": {
+     "sigma_one_rep": 0.036458300079745445,
+     "sigma_pooled": 0.027838791729151217,
+     "called_at_lambda_1": {
+      "scatter 1": 0.046,
+      "scatter 2": 0.1135,
+      "scatter 4": 0.2315
+     },
+     "worse_at_predicted": 1.0,
+     "x_tests_fail_when_right": 0.058,
+     "gap_caught_80pct": {
+      "gap": 0.06,
+      "caught": 0.9815
+     }
+    }
+   },
+   "1.0": {
+    "predicted_lambda": [
+     0.5315108777462895,
+     0.41706312451665434,
+     0.8272340286904204,
+     0.44863632176053253,
+     0.6154720616605093,
+     0.46200340997457406,
+     0.5961911907248876,
+     0.4506123194735797,
+     0.5995862389871537,
+     0.4593749291364032
+    ],
+    "5 reps": {
+     "sigma_one_rep": 0.03221559616412138,
+     "sigma_pooled": 0.054205170739450075,
+     "called_at_lambda_1": {
+      "scatter 1": 0.0255,
+      "scatter 2": 0.103,
+      "scatter 4": 0.1905
+     },
+     "worse_at_predicted": 1.0,
+     "x_tests_fail_when_right": 0.0915,
+     "gap_caught_80pct": {
+      "gap": 0.06,
+      "caught": 0.821
+     }
+    },
+    "10 reps": {
+     "sigma_one_rep": 0.03252561051904149,
+     "sigma_pooled": 0.03367330518629909,
+     "called_at_lambda_1": {
+      "scatter 1": 0.06,
+      "scatter 2": 0.1945,
+      "scatter 4": 0.3835
+     },
+     "worse_at_predicted": 1.0,
+     "x_tests_fail_when_right": 0.118,
+     "gap_caught_80pct": {
+      "gap": 0.06,
+      "caught": 0.9755
+     }
+    }
+   }
+  }
+ }
 }

@@ -1,0 +1,111 @@
+{
+ "folders": [
+  "runs/ibm_fez-2026-10-04-r1",
+  "runs/ibm_fez-2026-10-04-r2-d3",
+  "runs/ibm_fez-2026-10-04-r2-d5",
+  "runs/ibm_fez-2026-10-05-r1",
+  "runs/ibm_fez-2026-10-05-r2-d3",
+  "runs/ibm_fez-2026-10-05-r2-d5",
+  "runs/ibm_fez-2026-10-06-r1",
+  "runs/ibm_fez-2026-10-06-r2-d3",
+  "runs/ibm_fez-2026-10-06-r2-d5",
+  "runs/ibm_fez-2026-10-07-r1",
+  "runs/ibm_fez-2026-10-07-r2-d3",
+  "runs/ibm_fez-2026-10-07-r2-d5",
+  "runs/ibm_fez-2026-10-08-r1",
+  "runs/ibm_fez-2026-10-08-r2-d3",
+  "runs/ibm_fez-2026-10-08-r2-d5"
+ ],
+ "trials": 2000,
+ "seed": 1,
+ "f": {
+  "0.0": {
+   "predicted_lambda": [
+    0.5288794864046954,
+    0.5353128395400041,
+    0.7512343192838428,
+    0.5239380615448505,
+    0.5896731261459787,
+    0.4955664466675553,
+    0.6554832062264968,
+    0.4620271285354134,
+    0.6108717504484518,
+    0.425059929432447
+   ],
+   "5 reps": {
+    "sigma_one_rep": 0.03201706459152678,
+    "sigma_pooled": 0.03153660984462383,
+    "called_at_lambda_1": {
+     "scatter 1": 0.022,
+     "scatter 2": 0.0595,
+     "scatter 4": 0.103
+    },
+    "worse_at_predicted": 1.0,
+    "x_tests_fail_when_right": 0.0685,
+    "gap_caught_80pct": {
+     "gap": 0.06,
+     "caught": 0.834
+    }
+   },
+   "10 reps": {
+    "sigma_one_rep": 0.036458300079745445,
+    "sigma_pooled": 0.027838791729151217,
+    "called_at_lambda_1": {
+     "scatter 1": 0.046,
+     "scatter 2": 0.1135,
+     "scatter 4": 0.2315
+    },
+    "worse_at_predicted": 1.0,
+    "x_tests_fail_when_right": 0.058,
+    "gap_caught_80pct": {
+     "gap": 0.06,
+     "caught": 0.9815
+    }
+   }
+  },
+  "1.0": {
+   "predicted_lambda": [
+    0.5315108777462895,
+    0.41706312451665434,
+    0.8272340286904204,
+    0.44863632176053253,
+    0.6154720616605093,
+    0.46200340997457406,
+    0.5961911907248876,
+    0.4506123194735797,
+    0.5995862389871537,
+    0.4593749291364032
+   ],
+   "5 reps": {
+    "sigma_one_rep": 0.03221559616412138,
+    "sigma_pooled": 0.054205170739450075,
+    "called_at_lambda_1": {
+     "scatter 1": 0.0255,
+     "scatter 2": 0.103,
+     "scatter 4": 0.1905
+    },
+    "worse_at_predicted": 1.0,
+    "x_tests_fail_when_right": 0.0915,
+    "gap_caught_80pct": {
+     "gap": 0.06,
+     "caught": 0.821
+    }
+   },
+   "10 reps": {
+    "sigma_one_rep": 0.03252561051904149,
+    "sigma_pooled": 0.03367330518629909,
+    "called_at_lambda_1": {
+     "scatter 1": 0.06,
+     "scatter 2": 0.1945,
+     "scatter 4": 0.3835
+    },
+    "worse_at_predicted": 1.0,
+    "x_tests_fail_when_right": 0.118,
+    "gap_caught_80pct": {
+     "gap": 0.06,
+     "caught": 0.9755
+    }
+   }
+  }
+ }
+}

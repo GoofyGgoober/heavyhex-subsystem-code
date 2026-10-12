@@ -19,8 +19,9 @@ circuit, seed = round count). Lambda and eps are fitted as the prespecified anal
     python docs/analysis/leakage_frame_rerun.py variants --variants model fit --out leakage_frame_rerun_depolarize.json
     python docs/analysis/leakage_frame_rerun.py variants --variants model leak leak+ro --jobs 2026-10-08-r1 --out leakage_frame_rerun_leak_ro.json
 
-The last, the only test of IBM's reset and readout errors, covers one job; it was written by
-an earlier version of this script that did not record the knobs.
+The last tests IBM's reset and readout errors inside the leakage model on one job; it was
+written by an earlier version of this script that did not record the knobs. readout_ibm.py
+tests them in the calibration model on all fifteen jobs.
 
 `point TAG` reruns the fitted model at one parameter point with the left-out CZ handled by
 --mode ("reference", "dephase", or exactly by tableau_ref.py: "exact-identity",

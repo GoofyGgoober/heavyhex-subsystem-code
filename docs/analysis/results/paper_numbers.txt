@@ -42,3 +42,10 @@
 12. Leakage
    fires in 9.1% of rounds (model 6.9%); HMM onset 2.5%, lifetime 31 us, e_L 0.51
    onset per round = 0.31% per CZ x CZs + 0.94% (two CZ counts only)
+13. IBM's reset and readout errors
+   init_error / the model's reset error, medians by day: 0.23, 0.22, 0.19, 0.23, 0.24
+   in the calibration model, change in Z eps (pp, mean over patches): d3 -0.58 +- 0.10; d5 -0.48 +- 0.17
+   X memory, jobs of 15: model's mean detector rate below the device's 15, lowered further 15, per-detector deviation larger 14
+   Z memory, jobs of 15: model's mean detector rate below the device's 15, lowered further 15, per-detector deviation larger 14
+14. Operating characteristics (power.py; 5 and 10 reps, f = 0 and 1)
+   Lambda = 1 called, scatter 1x/2x/4x: 2.2-6.0%, 5.9-19.4%, 10.3-38.4%; X tests fail when right 5.8-11.8%; gap 0.06 caught 82.1-98.2%
