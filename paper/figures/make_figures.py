@@ -1,7 +1,9 @@
 """Draw the paper's figures from the committed run folders and analysis results.
 
 Run from the repository root:  python paper/figures/make_figures.py
-Writes vector PDFs next to this file. Reads only runs/ and docs/analysis/results/.
+Writes every figure of the paper as a vector PDF next to this file, gadget.pdf aside (drawn by
+gadget.tex); the figures of the analyses after the run come from fig_*.py, which this calls.
+Reads only runs/ and docs/analysis/results/.
 The PDFs carry a fixed creation date (SOURCE_DATE_EPOCH), so a rerun writes the same bytes.
 Needs the paper's font, Latin Modern: from the TeX installation, or from the folder that
 LATIN_MODERN_DIR names (e.g. a MiKTeX fonts/opentype/public/lm).
@@ -129,6 +131,20 @@ def fig_lambda() -> None:
     obs = np.array([r["tests"]["X lambda"]["observed"] for r in reps])
     err = np.array([r["tests"]["X lambda"]["observed_uncertainty"] for r in reps])
     pred = np.array([r["tests"]["X lambda"]["predicted"] for r in reps])
+    # The predictions frozen before each job, at f = 0 and f = 1 (effect_sizes.py).
+    frozen = {
+        (p["placement"], p["day"]): p
+        for p in load(DIAG / "effect_sizes.json")["prejob"]["wls"]["per_repetition"]
+    }
+    bracket = np.array(
+        [
+            sorted(
+                frozen[(r["rep"], DAYS.index(r["day"]) + 1)][f"X lambda frozen_f{f}"]
+                for f in ("0.0", "1.0")
+            )
+            for r in reps
+        ]
+    )
 
     # Full column width with constrained layout, so LaTeX prints it at about 1:1 (fonts stay 7-8 pt)
     # and the figure is 2.0 in tall. The prespecified ten-repetition pool is not drawn: it treats
@@ -138,8 +154,10 @@ def fig_lambda() -> None:
     # Placement 1 on top, then placement 2, each under its own heading.
     y = np.concatenate([np.arange(half)[::-1] + half + 1, np.arange(half)[::-1]]).astype(float)
     for i in range(len(reps)):
+        low = y[i] - 0.3  # the predictions just under the observation
+        ax.plot(bracket[i], [low, low], color=MUTED, lw=2.4, alpha=0.4, solid_capstyle="butt")
         ax.errorbar(obs[i], y[i], xerr=err[i], fmt="o", ms=3.6, color=D5, elinewidth=1.0, capsize=0)
-        ax.plot(pred[i], y[i], marker="D", ms=3.4, mfc="white", mec=MUTED, mew=0.8, ls="none")
+        ax.plot(pred[i], low, marker="D", ms=3.4, mfc="white", mec=MUTED, mew=0.8, ls="none")
     for placement, top in ((1, y[0]), (2, y[half])):
         ax.text(
             0.31,
@@ -163,6 +181,7 @@ def fig_lambda() -> None:
     handles = [
         Line2D([], [], marker="o", ms=3.6, color=D5, ls="none", label=r"observed, $\pm1\sigma$"),
         Line2D([], [], marker="D", ms=3.4, mfc="white", mec=MUTED, ls="none", label="predicted"),
+        Line2D([], [], color=MUTED, lw=2.4, alpha=0.4, label=r"before the job, $0 \leq f \leq 1$"),
     ]
     # Beside placement 2's points and left of the Lambda = 1 line, which the legend used to cross.
     ax.legend(
@@ -185,7 +204,7 @@ def fig_pn() -> None:
             ax = axes[row, col]
             # d = 3 and d = 5 differ in marker and dash as well as colour, so they survive greyscale.
             for distance, colour, marker, dash in (
-                (3, D3, "s", (0, (1.5, 1.5))),
+                (3, D3, "s", (0, (5, 1.5, 1, 1.5))),
                 (5, D5, "o", (0, (4, 2))),
             ):
                 o = p_of_n(rep, distance, basis, "observed")
@@ -202,7 +221,7 @@ def fig_pn() -> None:
                     capsize=0,
                     label=f"$d={distance}$",
                 )
-            ax.axhline(0.5, color=MUTED, lw=0.6, ls=(0, (1, 2)))
+            ax.axhline(0.5, color=GRID, lw=1.4, zorder=0)
             ax.set_ylim(0, 0.55)
             ax.set_xticks(ROUNDS)
             ax.grid(axis="y", color=GRID, lw=0.4)
@@ -214,7 +233,7 @@ def fig_pn() -> None:
     handles = [
         Line2D([], [], marker="s", ms=3.2, color=D3, ls="none", label="$d=3$ observed"),
         Line2D([], [], marker="o", ms=3.2, color=D5, ls="none", label="$d=5$ observed"),
-        Line2D([], [], color=D3, lw=1.0, ls=(0, (1.5, 1.5)), label="$d=3$ predicted"),
+        Line2D([], [], color=D3, lw=1.0, ls=(0, (5, 1.5, 1, 1.5)), label="$d=3$ predicted"),
         Line2D([], [], color=D5, lw=1.0, ls=(0, (4, 2)), label="$d=5$ predicted"),
     ]
     axes[0, 0].legend(handles=handles, loc="lower right")
@@ -226,22 +245,13 @@ def fig_pn() -> None:
 
 
 def fig_leakage() -> None:
-    """(a) A flag that fired fires again: excess over the model by lag. (b) Onset rate by role."""
-    refiring = load(DIAG / "refiring.json")
+    """(a) The lag-l persistence of the flag and relay readouts in both bases. (b) Onset rate by
+    role."""
+    from fig_D_flag_records import delta_panel
+
     causes = load(DIAG / "hmm_causes.json")
     fig, (a, b) = plt.subplots(1, 2, figsize=(PAGE, 2.1))
-
-    lags = sorted(refiring["lags"], key=int)
-    t = np.array([int(k) for k in lags]) * ROUND_US
-    device = np.array([refiring["lags"][k]["chip"] for k in lags]) * 100
-    model = np.array([refiring["lags"][k]["model"] for k in lags]) * 100
-    a.plot(t, device, "o-", color=D5, ms=3.2, label="device")
-    a.plot(t, model, "o-", color=MUTED, ms=3.2, mfc="white", label="calibration model")
-    a.axhline(0, color=MUTED, lw=0.5)
-    a.set_xlabel("time after a firing (µs)")
-    a.set_ylabel("excess re-firing (percentage points)")
-    a.set_xlim(0, 52)
-    a.legend(loc="upper right")
+    delta_panel(a)
     label(a, "(a)")
 
     rng = np.random.default_rng(1)
@@ -270,9 +280,7 @@ def fig_leakage() -> None:
         )
     b.set_ylabel("onset rate (% per round)")
     b.set_xlim(1.5, 9.8)
-    b.set_xticks(
-        [3, 8.25], ["relays\n3 CZ, 1 readout, 1 reset", "flags\n8 CZ, 2 readouts, 2 resets"]
-    )
+    b.set_xticks([3, 8], ["relays\n3 CZ, 1 readout, 1 reset", "flags\n8 CZ, 2 readouts, 2 resets"])
     b.tick_params(axis="x", length=0, labelsize=6.5)
     b.set_ylim(0, None)
     b.legend(loc="upper left", handletextpad=0.2)
@@ -328,10 +336,25 @@ def fig_layout() -> None:
     )
 
 
+def fig_analyses() -> None:
+    """The figures of the analyses after the run, each drawn by its own script."""
+    import fig_A_effect_sizes
+    import fig_B_detector_diagnostics
+    import fig_C_idle_dephasing
+    import fig_D_flag_records
+
+    fig_A_effect_sizes.make(DIAG, OUT / "A_effect_sizes.pdf")
+    fig_B_detector_diagnostics.make(DIAG, OUT / "B_detector_diagnostics.pdf")
+    fig_B_detector_diagnostics.make_pij(DIAG, OUT / "B_detector_diagnostics_pij.pdf")
+    fig_C_idle_dephasing.make(DIAG, OUT / "C_idle_dephasing.pdf")
+    fig_D_flag_records.make_trace(DIAG, OUT / "hmm_trace.pdf")
+
+
 if __name__ == "__main__":
     fig_lambda()
     fig_pn()
     fig_leakage()
     fig_scale()
     fig_layout()
+    fig_analyses()
     print("wrote", ", ".join(sorted(p.name for p in OUT.glob("*.pdf"))))
