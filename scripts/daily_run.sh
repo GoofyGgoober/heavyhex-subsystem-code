@@ -4,7 +4,7 @@
 # (commit and push), send the day's jobs in order, then commit the shots, analyze,
 # combine, commit and push. Windows Task Scheduler starts it at 20:00 for days 2-5.
 #
-# It sends nothing without the author's approval file, stops after the registered
+# It sends nothing without the author's approval file, stops after the prespecified
 # five run days, never starts a second day on one date or too late to finish before
 # midnight, stops on any failure, and resumes where it stopped when run again.
 # The QPU caps (50 s a job, 300 s and 20 jobs in all) are enforced by heavyhex itself.
@@ -168,7 +168,7 @@ prepare_today() {
   if [ $rc -ne 0 ]; then
     if grep -q "no clean place for the d=5 patch" <<<"$out"; then
       commit "Skip $(day_name): no clean place for the d=5 patch" \
-        "IBM's calibration left no clean place for the d=5 patch on $backend, so by the registered rules the day is skipped."
+        "IBM's calibration left no clean place for the d=5 patch on $backend, so by the prespecified rules the day is skipped."
       exit 0
     fi
     say "prepare failed (exit $rc)"
