@@ -5,11 +5,14 @@
    and then the other days' (which the day's choice of qubits cannot have selected on); how
    steady the quotes are from day to day; which quote predicts the flags better.
 2. The model's resets take the calibration's readout error; IBM also reports a reset error
-   (init_error, properties.json), several times smaller. leakage_frame_rerun_leak_ro.json reruns one job
-   (2026-10-08-r1) with the leakage model, without and with each reset's own init_error and
-   each readout's own P(1|0), P(0|1): the change in eps.
+   (init_error, properties.json), several times smaller: the ratio of the two by day. Then
+   what IBM's reset error and separate P(1|0), P(0|1) do to the calibration model in all
+   fifteen jobs (readout_ibm.py): the change in eps, averaged over the patches of each
+   size, and whether the predicted detector rates move towards the device's or away. And
+   the same inputs inside the leakage model, one job only (2026-10-08-r1,
+   leakage_frame_rerun_leak_ro.json).
 
-Under a minute.
+Under a minute, after readout_ibm.py.
 
     python docs/analysis/readout.py      # writes results/readout.json
 """
@@ -153,7 +156,7 @@ def flags_against_quotes() -> dict:
 
 def reset_errors() -> dict:
     """IBM's init_error against the model's reset error (the calibration's readout error), per
-    day, over the qubits with an init_error; and the one-job rerun with IBM's errors."""
+    day, over the qubits with an init_error; and IBM's errors in the two models."""
     props = result("properties.json")
     calibrations = {}
     for folder in job_folders():
@@ -171,6 +174,56 @@ def reset_errors() -> dict:
             "model_reset_error_median": model,
             "ratio_of_medians": init / model,
         }
+    print(
+        "IBM's reset error / the model's, medians by day: "
+        + ", ".join(f"{d} {v['ratio_of_medians']:.2f}" for d, v in ratio.items())
+    )
+    return {
+        "init_error_against_model_reset_error": ratio,
+        "calibration_model_with_ibm_errors": in_calibration_model(),
+        "leakage_model_with_ibm_errors_one_job": in_leakage_model(),
+    }
+
+
+def in_calibration_model() -> dict:
+    """readout_ibm.json: IBM's reset and readout errors in the calibration model, all jobs."""
+    r = result("readout_ibm.json")
+    out: dict = {"shots": r["shots"]}
+    for basis in "XZ":
+        for d in ("3", "5"):
+            change = [
+                e["ibm"][0] - e["model"][0]
+                for job in r["jobs"].values()
+                for patch, e in job[basis]["eps"].items()
+                if patch == d
+            ]
+            out[f"{basis} d{d}"] = {
+                "patches": len(change),
+                "mean_change": float(np.mean(change)),
+                "se_over_patches": float(np.std(change, ddof=1) / np.sqrt(len(change))),
+                "changes": change,
+            }
+            print(
+                f"{basis} d{d}: eps with IBM's reset and readout errors minus the model's, mean over "
+                f"{len(change)} patches {100 * np.mean(change):+.2f} pp "
+                f"(se {100 * out[f'{basis} d{d}']['se_over_patches']:.2f})"
+            )
+        rates = [job[basis]["detectors_8_rounds"] for job in r["jobs"].values()]
+        jobs = out[f"{basis} detectors, 8 rounds, jobs"] = {
+            "all": len(rates),
+            "model_mean_below_device": sum(x["model"]["mean"] < x["device_mean"] for x in rates),
+            "ibm_mean_below_model": sum(x["ibm"]["mean"] < x["model"]["mean"] for x in rates),
+            "ibm_farther_from_device": sum(
+                x["ibm"]["rms_relative_to_device"] > x["model"]["rms_relative_to_device"]
+                for x in rates
+            ),
+        }
+        print(f"{basis} detector rates, 8 rounds, jobs:", jobs)
+    return out
+
+
+def in_leakage_model() -> dict:
+    """The one-job rerun of the leakage model with and without IBM's reset and readout errors."""
     rr = result("leakage_frame_rerun_leak_ro.json")
     jobs = {}
     for name, j in rr["jobs"].items():
@@ -192,14 +245,10 @@ def reset_errors() -> dict:
                 for k, v in cells.items()
             )
         )
-    print(
-        "IBM's reset error / the model's, medians by day: "
-        + ", ".join(f"{d} {v['ratio_of_medians']:.2f}" for d, v in ratio.items())
-    )
     return {
-        "init_error_against_model_reset_error": ratio,
         "rerun_leak_vs_leak_ro": jobs,
-        "note": "one job only (2026-10-08-r1); shot_se treats the two reruns as independent",
+        "note": "one job only (2026-10-08-r1), in an earlier leakage model "
+        "(leakage_frame_rerun.py); shot_se treats the two reruns as independent",
     }
 
 

@@ -1,7 +1,7 @@
-"""Draw the paper's figures from the committed run folders and diagnosis results.
+"""Draw the paper's figures from the committed run folders and analysis results.
 
 Run from the repository root:  python paper/figures/make_figures.py
-Writes vector PDFs next to this file. Reads only runs/ and docs/diagnosis/results/.
+Writes vector PDFs next to this file. Reads only runs/ and docs/analysis/results/.
 The PDFs carry a fixed creation date (SOURCE_DATE_EPOCH), so a rerun writes the same bytes.
 """
 
@@ -20,7 +20,7 @@ from matplotlib.lines import Line2D
 
 ROOT = Path(__file__).resolve().parents[2]
 RUNS = ROOT / "runs"
-DIAG = ROOT / "docs" / "diagnosis" / "results"
+DIAG = ROOT / "docs" / "analysis" / "results"
 OUT = Path(__file__).resolve().parent
 # matplotlib and fontTools date the PDFs and their embedded fonts by it: 4 October 2026.
 os.environ.setdefault("SOURCE_DATE_EPOCH", "1791072000")
@@ -210,16 +210,16 @@ def fig_pn() -> None:
 
 
 def fig_leakage() -> None:
-    """(a) A flag that fired fires again: excess over the model by lag. (b) Leak rate by role."""
-    repeats = load(DIAG / "repeats.json")
-    why = load(DIAG / "why.json")
+    """(a) A flag that fired fires again: excess over the model by lag. (b) Onset rate by role."""
+    refiring = load(DIAG / "refiring.json")
+    causes = load(DIAG / "hmm_causes.json")
     fig, (a, b) = plt.subplots(1, 2, figsize=(PAGE, 2.1))
 
-    lags = sorted(repeats["lags"], key=int)
+    lags = sorted(refiring["lags"], key=int)
     t = np.array([int(k) for k in lags]) * ROUND_US
-    chip = np.array([repeats["lags"][k]["chip"] for k in lags]) * 100
-    model = np.array([repeats["lags"][k]["model"] for k in lags]) * 100
-    a.plot(t, chip, "o-", color=D5, ms=3.2, label="chip")
+    device = np.array([refiring["lags"][k]["chip"] for k in lags]) * 100
+    model = np.array([refiring["lags"][k]["model"] for k in lags]) * 100
+    a.plot(t, device, "o-", color=D5, ms=3.2, label="device")
     a.plot(t, model, "o-", color=MUTED, ms=3.2, mfc="white", label="calibration model")
     a.axhline(0, color=MUTED, lw=0.5)
     a.set_xlabel(r"time after a firing ($\mu$s)")
@@ -230,7 +230,7 @@ def fig_leakage() -> None:
 
     rng = np.random.default_rng(1)
     for role, colour, marker, name in (("relay", D3, "s", "relay"), ("z_flag", D5, "o", "flag")):
-        rows = [r for r in why if r["role"] == role]
+        rows = [r for r in causes if r["role"] == role]
         x = np.array([r["cz_per_round"] for r in rows]) + rng.uniform(-0.35, 0.35, len(rows))
         y = np.array([r["leak_per_round"] for r in rows]) * 100
         b.plot(

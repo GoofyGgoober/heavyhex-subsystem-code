@@ -420,6 +420,45 @@ def digest(res: dict) -> str:
     L.append(
         f"   onset per round = {100 * on['per_cz']:.2f}% per CZ x CZs + {100 * on['per_round']:.2f}% (two CZ counts only)"
     )
+    rs = res["readout"]["resets"]
+    cm = rs["calibration_model_with_ibm_errors"]
+    L.append("13. IBM's reset and readout errors")
+    L.append(
+        "   init_error / the model's reset error, medians by day: "
+        + ", ".join(
+            f"{v['ratio_of_medians']:.2f}"
+            for v in rs["init_error_against_model_reset_error"].values()
+        )
+    )
+    L.append(
+        "   in the calibration model, change in Z eps (pp, mean over patches): "
+        + "; ".join(
+            f"d{d} {fmt_pm(100 * cm[f'Z d{d}']['mean_change'], 100 * cm[f'Z d{d}']['se_over_patches'], 2)}"
+            for d in "35"
+        )
+    )
+    for b in BASES:
+        j = cm[f"{b} detectors, 8 rounds, jobs"]
+        L.append(
+            f"   {b} memory, jobs of {j['all']}: model's mean detector rate below the device's "
+            f"{j['model_mean_below_device']}, lowered further {j['ibm_mean_below_model']}, "
+            f"per-detector deviation larger {j['ibm_farther_from_device']}"
+        )
+    if "power" in res:
+        rows = [r for f in res["power"]["f"].values() for k, r in f.items() if k.endswith("reps")]
+
+        def span(xs):
+            return f"{100 * min(xs):.1f}-{100 * max(xs):.1f}%"
+
+        L.append("14. Operating characteristics (power.py; 5 and 10 reps, f = 0 and 1)")
+        L.append(
+            "   Lambda = 1 called, scatter 1x/2x/4x: "
+            + ", ".join(
+                span([r["called_at_lambda_1"][f"scatter {s}"] for r in rows]) for s in (1, 2, 4)
+            )
+            + f"; X tests fail when right {span([r['x_tests_fail_when_right'] for r in rows])}; "
+            f"gap 0.06 caught {span([r['gap_caught_80pct']['caught'] for r in rows])}"
+        )
     return "\n".join(L) + "\n"
 
 
