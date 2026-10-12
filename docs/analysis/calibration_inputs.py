@@ -5,6 +5,9 @@
   readout_gap    Pr(0|1) - Pr(1|0) over the flag and relay qubits (the 38 of results/hmm.json),
                  one value per qubit and day, from results/properties.json; a reset that flips a
                  qubit only when it reads 1 fails more often after a 1 by about this much
+  t1_flags_relays  the reported T1 of the flag or relay qubit of each of the 320 Z-memory series
+                 of results/hmm.json, from its job's calibration (a transmon's |2> decays in
+                 about T1/2)
 
 Reads committed files only; a second.
 
@@ -33,7 +36,8 @@ def main() -> None:
             "median_cz": statistics.median(cz),
             "cz_over_single_qubit": statistics.median(cz) / statistics.median(sx),
         }
-    readout_qubits = sorted({row["qubit"] for row in result("hmm.json")})
+    series = result("hmm.json")
+    readout_qubits = sorted({row["qubit"] for row in series})
     props = result("properties.json")
     gaps = []
     for day in DAYS:
@@ -46,6 +50,15 @@ def main() -> None:
         "values": len(gaps),
         "median": statistics.median(gaps),
         "quartiles": statistics.quantiles(gaps, n=4)[::2],
+    }
+    t1 = {}
+    for job in {row["job"] for row in series}:
+        t1[job] = read(RUNS / f"ibm_fez-{job}" / "calibration.json")["t1_us"]
+    t1_series = [t1[row["job"]][str(row["qubit"])] for row in series]
+    out["t1_flags_relays"] = {
+        "series": len(t1_series),
+        "median_us": statistics.median(t1_series),
+        "quartiles_us": statistics.quantiles(t1_series, n=4)[::2],
     }
     write_json("calibration_inputs.json", out)
     print(out)

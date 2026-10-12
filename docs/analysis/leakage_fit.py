@@ -10,7 +10,9 @@ exact (the leakage model simulated exactly, exact_sim.py):
                repetitions, the three of the grid fit and the seven others, with the
                prespecified weighted-log fit of eps and with the binomial fit, and where the
                actual three/seven split falls among all 120; for the identity channel at
-               three points and for the other channels (random phase; phase pi)
+               three points and for the other channels (random phase; phase pi); and the
+               Z-memory closures against a baseline with IBM's reset and readout errors, as
+               the leakage simulation uses (readout_ibm.json)
   curve_checks curve-by-curve agreement of the reruns with the frame simulator's rerun
                (leakage_frame_rerun_bitflip.json) and with tableau_ref.py's rerun at the same
                point (leakage_frame_rerun_exactidentity_paperparams.json)
@@ -232,6 +234,30 @@ def table_and_closures(data: dict) -> dict:
     held = [r for r in reps if r not in fit]
     out = {g: group(data, rs) for g, rs in (("all", reps), ("fit", fit), ("heldout", held))}
     out["splits"] = splits(data, fit)
+    return out
+
+
+def against_ibm_readout(all_reps: dict) -> dict:
+    """Z-memory closures over the ten repetitions against the calibration model with IBM's
+    reset and readout errors, the ones the leakage simulation uses, instead of the model as run
+    (every reset and readout flips with the readout error). The baseline is the model's mean eps
+    shifted by the mean change that readout_ibm.json measured (10,000 shots per circuit)."""
+    jobs = result("readout_ibm.json")["jobs"].values()
+    out = {}
+    for p in ("3", "5"):
+        changes = [
+            j["Z"]["eps"][p]["ibm"][0] - j["Z"]["eps"][p]["model"][0]
+            for j in jobs
+            if p in j["Z"]["eps"]
+        ]
+        shift = float(np.mean(changes))
+        c = all_reps[f"Z d{p}"]
+        base = c["model"] + shift
+        out[f"Z d{p}"] = {
+            "baseline_shift": shift,
+            "baseline": base,
+            "closure": (c["leak"] - base) / (c["device"] - base),
+        }
     return out
 
 
@@ -515,6 +541,7 @@ def exact() -> dict:
             wls, binom = load_rerun(path)
             out["reruns"].setdefault(label, {})["params"] = json.loads(path.read_text())["params"]
         res = {"wls": table_and_closures(wls), "binomial": table_and_closures(binom)}
+        res["wls"]["closure_against_ibm_reset_and_readout"] = against_ibm_readout(res["wls"]["all"])
         out["reruns"].setdefault(label, {}).update(res)
         for est in ("wls", "binomial"):
             print_rerun(label, est, res[est])

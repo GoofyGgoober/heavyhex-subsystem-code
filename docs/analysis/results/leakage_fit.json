@@ -2477,6 +2477,18 @@
       ],
       "n_splits": 120
      }
+    },
+    "closure_against_ibm_reset_and_readout": {
+     "Z d3": {
+      "baseline_shift": -0.005800451119810296,
+      "baseline": 0.07052255022742344,
+      "closure": 0.3591874032533937
+     },
+     "Z d5": {
+      "baseline_shift": -0.004755439959821755,
+      "baseline": 0.1613611234268589,
+      "closure": 0.47760213483821545
+     }
     }
    },
    "binomial": {
@@ -3128,6 +3140,18 @@
        0.5480573978743575
       ],
       "n_splits": 120
+     }
+    },
+    "closure_against_ibm_reset_and_readout": {
+     "Z d3": {
+      "baseline_shift": -0.005800451119810296,
+      "baseline": 0.07052255022742344,
+      "closure": 0.36565228878734685
+     },
+     "Z d5": {
+      "baseline_shift": -0.004755439959821755,
+      "baseline": 0.1613611234268589,
+      "closure": 0.4489108386503873
      }
     }
    },
@@ -3799,6 +3823,18 @@
       ],
       "n_splits": 120
      }
+    },
+    "closure_against_ibm_reset_and_readout": {
+     "Z d3": {
+      "baseline_shift": -0.005800451119810296,
+      "baseline": 0.07052255022742344,
+      "closure": 0.3809311945951191
+     },
+     "Z d5": {
+      "baseline_shift": -0.004755439959821755,
+      "baseline": 0.1613611234268589,
+      "closure": 0.4555891099172316
+     }
     }
    },
    "binomial": {
@@ -4468,6 +4504,18 @@
        0.4343241321072533
       ],
       "n_splits": 120
+     }
+    },
+    "closure_against_ibm_reset_and_readout": {
+     "Z d3": {
+      "baseline_shift": -0.005800451119810296,
+      "baseline": 0.07052255022742344,
+      "closure": 0.29653045649006926
+     },
+     "Z d5": {
+      "baseline_shift": -0.004755439959821755,
+      "baseline": 0.1613611234268589,
+      "closure": 0.3485806739218084
      }
     }
    },
@@ -5139,6 +5187,18 @@
       ],
       "n_splits": 120
      }
+    },
+    "closure_against_ibm_reset_and_readout": {
+     "Z d3": {
+      "baseline_shift": -0.005800451119810296,
+      "baseline": 0.07052255022742344,
+      "closure": 0.03187387520251722
+     },
+     "Z d5": {
+      "baseline_shift": -0.004755439959821755,
+      "baseline": 0.1613611234268589,
+      "closure": 0.03418365588166498
+     }
     }
    },
    "binomial": {
@@ -5809,6 +5869,18 @@
       ],
       "n_splits": 120
      }
+    },
+    "closure_against_ibm_reset_and_readout": {
+     "Z d3": {
+      "baseline_shift": -0.005800451119810296,
+      "baseline": 0.07052255022742344,
+      "closure": 0.06986244774712214
+     },
+     "Z d5": {
+      "baseline_shift": -0.004755439959821755,
+      "baseline": 0.1613611234268589,
+      "closure": 0.06564104509900143
+     }
     }
    },
    "binomial": {
@@ -6478,6 +6550,18 @@
        0.1499811517259342
       ],
       "n_splits": 120
+     }
+    },
+    "closure_against_ibm_reset_and_readout": {
+     "Z d3": {
+      "baseline_shift": -0.005800451119810296,
+      "baseline": 0.07052255022742344,
+      "closure": 0.11442267228018844
+     },
+     "Z d5": {
+      "baseline_shift": -0.004755439959821755,
+      "baseline": 0.1613611234268589,
+      "closure": 0.12885489805367095
      }
     }
    },

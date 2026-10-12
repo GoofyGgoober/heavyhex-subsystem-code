@@ -167,10 +167,13 @@ def summarize(rows: list[dict]) -> dict:
     for src in ("chip", "model"):
         v = {k: np.array([r[src][k] for r in rows]) for k in ("a", "b", "e_N", "e_L", "pi", "llr")}
         life = -ROUND_US / np.log(1 - v["b"])
+        occupancy = v["a"] / (v["a"] + v["b"])  # stationary share of rounds in the state
         out[src] = {
             "a_median": float(np.median(v["a"])),
             "a_iqr": np.percentile(v["a"], [25, 75]).tolist(),
             "b_median": float(np.median(v["b"])),
+            "occupancy_median": float(np.median(occupancy)),
+            "occupancy_iqr": np.percentile(occupancy, [25, 75]).tolist(),
             "lifetime_us_median": float(np.median(life)),
             "lifetime_us_iqr": np.percentile(life, [25, 75]).tolist(),
             "round_us_times_median_1_over_b": float(np.median(1 / np.maximum(v["b"], 1e-6)))

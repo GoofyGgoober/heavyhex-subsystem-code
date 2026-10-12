@@ -1,0 +1,22 @@
+{
+ "job": "ibm_fez-2026-10-04-r1",
+ "shots_per_circuit": 200000,
+ "f": {
+  "0.0": {
+   "values": 6418,
+   "floats": 2132,
+   "unequal": 0,
+   "largest_abs_difference": 0.0,
+   "first_unequal": [],
+   "seconds": 91.7
+  },
+  "1.0": {
+   "values": 6418,
+   "floats": 2132,
+   "unequal": 0,
+   "largest_abs_difference": 0.0,
+   "first_unequal": [],
+   "seconds": 96.2
+  }
+ }
+}

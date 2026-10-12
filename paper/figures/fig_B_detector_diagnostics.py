@@ -179,8 +179,8 @@ def make_pij(
     b.set_yscale("log")
     b.set_xlim(*lim)
     b.set_ylim(*lim)
-    b.set_xlabel("model $p$")
-    b.set_ylabel("device $p$ (learned)")
+    b.set_xlabel("model $p_e$")
+    b.set_ylabel("device $p_e$ (learned)")
     b.legend(
         handles=[
             Line2D([], [], marker=mk, ms=3.2, color=col, ls="none", label=cls)
@@ -195,10 +195,8 @@ def make_pij(
     pairs = next(v for k, v in r.items() if k.startswith("unmodelled"))
     lags = np.array([0, 1, 2, 3])
     for basis, colour in (("X", D5), ("Z", D3)):
-        for same, marker, name in (
-            ("same", "o", "same detector"),
-            ("other", "s", "other detectors"),
-        ):
+        marker = "o" if basis == "X" else "D"
+        for same in ("same", "other"):
             rows = [pairs.get(f"both {basis} {same} {lag}") for lag in lags]
             keep = [k for k, row in enumerate(rows) if row]
             if not keep:
@@ -217,22 +215,22 @@ def make_pij(
                 mfc=colour if same == "same" else "white",
                 elinewidth=0.7,
                 capsize=0,
-                label=f"{basis}, {name}",
+                label=f"{basis}, {same}",
             )
             c.plot(lags[keep] + shift, ctl[:, 0], marker, ms=2.4, color=MUTED, mfc="none", mew=0.5)
     c.axhline(0, color=MUTED, lw=0.5)
     c.set_xticks(lags, ["0", "1", "2", "3+"])
     c.set_xlabel("rounds apart")
     c.set_ylabel("mean $p_{ij}$, pairs with no model edge")
-    c.set_ylim(-0.002, 0.06)  # room above the data for the legend
+    c.set_ylim(-0.002, 0.07)  # room above the data for the legend
     c.legend(
-        loc="upper center",
+        loc="upper right",
         ncol=2,
-        handlelength=1.8,
+        handlelength=1.4,
         handletextpad=0.3,
         labelspacing=0.25,
-        columnspacing=0.8,
-        fontsize=6,
+        columnspacing=0.6,
+        fontsize=7,
     )
     for ax, tag in zip((a, b, c), "abc"):
         label(ax, f"({tag})")

@@ -16,7 +16,8 @@
                "leakage"): cases above three standard errors, by basis and distance
   f            the idle test's f per job (the prespecified median beside the inverse-variance
                mean and the chi2/nu of the qubits about it), and f read off the memory runs
-               (analysis.json "dephasing_from_memory"): jobs where the two agree
+               from eps_3 and from the X-stabilizer detection rates (analysis.json
+               "dephasing_from_memory"): jobs where each agrees with the idle test
   selection    each patch's mean reported CZ and readout error on the day it was chosen,
                against the same parts in the other four calibrations (winner's curse)
   drift       the prespecified half-against-half drift check, over the 40 comparisons
@@ -181,8 +182,11 @@ def f() -> dict:
             "from_memory_eps": m["from_eps"],
             "from_memory": m["from_eps3"],  # named eps3 for either
             "from_memory_agrees": m["eps3_agrees"],
+            "from_detector_rates": m["from_detector_rates"],
+            "from_detector_rates_agree": m["detector_rates_agree"],
         }
     meds = [v["median"] for v in per_job.values()]
+    rates = [v["from_detector_rates"] for v in per_job.values()]
     return {
         "per_job": per_job,
         "median_range": [min(meds), max(meds)],
@@ -204,6 +208,11 @@ def f() -> dict:
         ),
         "from_memory_median": float(np.median([v["from_memory"] for v in per_job.values()])),
         "from_memory_at_search_edge_2.0": sum(v["from_memory"] >= 2.0 for v in per_job.values()),
+        "from_detector_rates_range": [min(rates), max(rates)],
+        "from_detector_rates_median": float(np.median(rates)),
+        "from_detector_rates_agree_in": sum(
+            bool(v["from_detector_rates_agree"]) for v in per_job.values()
+        ),
     }
 
 

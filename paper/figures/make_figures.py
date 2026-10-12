@@ -227,7 +227,7 @@ def fig_pn() -> None:
             ax.grid(axis="y", color=GRID, lw=0.4)
             ax.set_title(f"{basis} memory, placement {rep}", loc="left", fontsize=8, color=INK)
             if col == 0:
-                ax.set_ylabel(r"logical error $P(n)$")
+                ax.set_ylabel(r"logical error $P_\mathrm{L}(n)$")
             if row == 1:
                 ax.set_xlabel(r"rounds $n$")
     handles = [
@@ -322,14 +322,19 @@ def fig_layout() -> None:
     """The chip figure, drawn by the repository's own script from day 1's calibration."""
     calibration = RUNS / "ibm_fez-2026-10-04-r1" / "calibration.json"
     env_path = str(ROOT / "src")
-    # Embed TrueType fonts rather than Type 3, as arXiv and journals prefer.
+    # The paper's font, as in the other figures, embedded as TrueType rather than Type 3, as
+    # arXiv and journals prefer. Importing this module registers Latin Modern; the rest of its
+    # style is for plots, so it is reset before the chip figure is drawn.
     driver = (
-        "import matplotlib, runpy, sys; matplotlib.rcParams['pdf.fonttype'] = 42; "
+        "import matplotlib, runpy, sys; sys.path.insert(0, sys.argv[3]); import make_figures; "
+        "matplotlib.rcdefaults(); matplotlib.rcParams.update({'pdf.fonttype': 42, "
+        "'font.family': 'serif', 'font.serif': ['Latin Modern Roman', 'CMU Serif'], "
+        "'mathtext.fontset': 'cm'}); "
         "sys.argv = ['figure1.py', '--calibration', sys.argv[1], '--out', sys.argv[2]]; "
         "runpy.run_path('figure1.py', run_name='__main__')"
     )
     subprocess.run(
-        [sys.executable, "-c", driver, str(calibration), str(OUT / "layout.pdf")],
+        [sys.executable, "-c", driver, str(calibration), str(OUT / "layout.pdf"), str(OUT)],
         cwd=ROOT / "docs" / "figures",
         check=True,
         env={**os.environ, "PYTHONPATH": env_path},

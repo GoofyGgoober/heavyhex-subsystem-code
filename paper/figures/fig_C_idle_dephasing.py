@@ -42,7 +42,7 @@ def decay_panel(ax, q: dict, rounds: list[int], first: bool) -> None:
     ax.set_xticks(rounds)
     ax.set_xlabel(r"idle rounds $n$")
     ax.set_title(
-        f"qubit {q['physical_qubit']}, $T_2 = {q['t2_us']:.0f}$ µs",
+        f"q{q['physical_qubit']}, $T_2 = {q['t2_us']:.0f}$ µs",
         loc="left",
         fontsize=8,
         color=INK,
@@ -130,7 +130,7 @@ def make(results_dir: Path, out_pdf: Path) -> None:
     b.text(
         0.02,
         0.97,
-        f"Spearman $\\rho = {rho['rho']:.2f}$ [{ci[0]:.2f}, {ci[1]:.2f}] over {rho['points']} qubits",
+        f"Spearman $\\rho = {rho['rho']:.2f}$ ({ci[0]:.2f}\u2013{ci[1]:.2f}), {rho['points']} qubits",
         transform=b.transAxes,
         ha="left",
         va="top",
