@@ -3,6 +3,8 @@
 Run from the repository root:  python paper/figures/make_figures.py
 Writes vector PDFs next to this file. Reads only runs/ and docs/analysis/results/.
 The PDFs carry a fixed creation date (SOURCE_DATE_EPOCH), so a rerun writes the same bytes.
+Needs the paper's font, Latin Modern: from the TeX installation, or from the folder that
+LATIN_MODERN_DIR names (e.g. a MiKTeX fonts/opentype/public/lm).
 """
 
 from __future__ import annotations
@@ -36,20 +38,29 @@ COLUMN, PAGE = 3.375, 7.0  # revtex column and page widths, inches
 
 
 def register_latin_modern() -> None:
-    """Let matplotlib use the TeX installation's Latin Modern fonts when the OS has not installed them."""
+    """Use the paper's font, Latin Modern: installed, from the TeX installation (kpsewhich), or
+    from the folder LATIN_MODERN_DIR names. Stop rather than draw in another font."""
     from matplotlib import font_manager
 
     if any(f.name == "Latin Modern Roman" for f in font_manager.fontManager.ttflist):
         return
-    try:
-        found = subprocess.run(
-            ["kpsewhich", "lmroman10-regular.otf"], capture_output=True, text=True
-        ).stdout.strip()
-    except OSError:
-        return
-    if found:
-        for font in sorted(Path(found).parent.glob("lmroman*.otf")):
-            font_manager.fontManager.addfont(str(font))
+    folder = os.environ.get("LATIN_MODERN_DIR", "")
+    if not folder:
+        try:
+            found = subprocess.run(
+                ["kpsewhich", "lmroman10-regular.otf"], capture_output=True, text=True
+            ).stdout.strip()
+        except OSError:
+            found = ""
+        folder = str(Path(found).parent) if found else ""
+    fonts = sorted(Path(folder).glob("lmroman*.otf")) if folder else []
+    if not fonts:
+        sys.exit(
+            "Latin Modern not found: install TeX Live or the lmodern OTF fonts, "
+            "or set LATIN_MODERN_DIR to the folder holding lmroman10-regular.otf"
+        )
+    for font in fonts:
+        font_manager.fontManager.addfont(str(font))
 
 
 register_latin_modern()
@@ -172,15 +183,19 @@ def fig_pn() -> None:
     for col, rep in enumerate((1, 2)):
         for row, basis in enumerate(("X", "Z")):
             ax = axes[row, col]
-            for distance, colour in ((3, D3), (5, D5)):
+            # d = 3 and d = 5 differ in marker and dash as well as colour, so they survive greyscale.
+            for distance, colour, marker, dash in (
+                (3, D3, "s", (0, (1.5, 1.5))),
+                (5, D5, "o", (0, (4, 2))),
+            ):
                 o = p_of_n(rep, distance, basis, "observed")
                 p = p_of_n(rep, distance, basis, "predicted")
-                ax.plot(n, p.mean(0), color=colour, lw=1.0, ls=(0, (4, 2)), alpha=0.9)
+                ax.plot(n, p.mean(0), color=colour, lw=1.0, ls=dash, alpha=0.9)
                 ax.errorbar(
                     n,
                     o.mean(0),
                     yerr=o.std(0, ddof=1) / np.sqrt(len(DAYS)),
-                    fmt="o",
+                    fmt=marker,
                     ms=3.2,
                     color=colour,
                     elinewidth=0.9,
@@ -197,9 +212,10 @@ def fig_pn() -> None:
             if row == 1:
                 ax.set_xlabel(r"rounds $n$")
     handles = [
-        Line2D([], [], marker="o", ms=3.2, color=D3, ls="none", label="$d=3$ observed"),
+        Line2D([], [], marker="s", ms=3.2, color=D3, ls="none", label="$d=3$ observed"),
         Line2D([], [], marker="o", ms=3.2, color=D5, ls="none", label="$d=5$ observed"),
-        Line2D([], [], color=MUTED, ls=(0, (4, 2)), label="predicted"),
+        Line2D([], [], color=D3, lw=1.0, ls=(0, (1.5, 1.5)), label="$d=3$ predicted"),
+        Line2D([], [], color=D5, lw=1.0, ls=(0, (4, 2)), label="$d=5$ predicted"),
     ]
     axes[0, 0].legend(handles=handles, loc="lower right")
     for ax, tag in zip(axes.flat, "abcd"):
@@ -222,8 +238,8 @@ def fig_leakage() -> None:
     a.plot(t, device, "o-", color=D5, ms=3.2, label="device")
     a.plot(t, model, "o-", color=MUTED, ms=3.2, mfc="white", label="calibration model")
     a.axhline(0, color=MUTED, lw=0.5)
-    a.set_xlabel(r"time after a firing ($\mu$s)")
-    a.set_ylabel("excess re-firing (points)")
+    a.set_xlabel("time after a firing (µs)")
+    a.set_ylabel("excess re-firing (percentage points)")
     a.set_xlim(0, 52)
     a.legend(loc="upper right")
     label(a, "(a)")
@@ -286,7 +302,6 @@ def fig_scale() -> None:
             fontsize=7,
         )
     ax.axhline(1.0, color=MUTED, lw=0.6, ls=(0, (3, 2)))
-    ax.axvline(1.0, color=GRID, lw=0.6)
     ax.set_xlabel("error rates relative to Fez's day-5 medians")
     ax.set_ylabel(r"$\Lambda$")
     ax.set_xlim(0.15, 1.05)

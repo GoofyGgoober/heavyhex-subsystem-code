@@ -17,6 +17,8 @@
    "docs/analysis/results/idle_f.json",
    "docs/analysis/results/leakage_checks.json",
    "docs/analysis/results/leakage_fit.json",
+   "docs/analysis/results/leakage_lifetime.json",
+   "docs/analysis/results/leakage_recovery.json",
    "docs/analysis/results/model_vs_device.json",
    "docs/analysis/results/no_reset.json",
    "docs/analysis/results/perqubit_f.json",
@@ -30,7 +32,7 @@
  },
  "per_placement": {
   "source": "docs/analysis/results/fits.json",
-  "method": "observed: inverse-variance mean over the five days, se widened by sqrt(chi2/nu) when chi2/nu > 1 (nu = 4); binomial sigmas are half-widths of the quasi-likelihood 68% profile intervals. predicted: plain mean over the five days of the model's prediction (each job's measured f), fitted with the same estimator. ratio = observed / predicted_mean; its se carries the observed error only. Lambda is pooled from the daily ratios. The t test is within one placement (nu = 4); there is no test across placements.",
+  "method": "observed: inverse-variance mean over the five days, se widened by sqrt(chi2/nu) when chi2/nu > 1 (nu = 4); binomial sigmas are half-widths of the quasi-likelihood 68% profile intervals. observed_plain: plain mean over the five days, se = sd / sqrt(5). predicted: plain mean over the five days of the model's prediction (each job's measured f), fitted with the same estimator. ratio = observed_plain / predicted_mean, so both sides are averaged alike; its se carries the observed error only. Lambda is pooled from the daily ratios (inverse-variance). The t test is within one placement (nu = 4); there is no test across placements.",
   "X": {
    "placement 1": {
     "wls": {
@@ -44,13 +46,18 @@
        "chi2_per_dof": 0.9979548829403406,
        "widened": false
       },
+      "observed_plain": {
+       "value": 0.12675556212222414,
+       "se_over_days": 0.003375161507706501
+      },
       "predicted_mean": 0.10245296093357101,
       "predicted_range": [
        0.09570654872316176,
        0.11767979426872083
       ],
-      "observed_over_predicted": 1.2247483327939919,
-      "observed_over_predicted_se_observed_only": 0.03059031133401378,
+      "observed_over_predicted": 1.2372074068646057,
+      "observed_over_predicted_se_observed_only": 0.03294352331988634,
+      "inverse_variance_observed_over_predicted": 1.2247483327939919,
       "per_day_observed_over_predicted_range": [
        1.0101323388135788,
        1.3570294912176661
@@ -109,13 +116,18 @@
        "chi2_per_dof": 0.6074955044252269,
        "widened": false
       },
+      "observed_plain": {
+       "value": 0.1848785175362063,
+       "se_over_days": 0.004192691144702445
+      },
       "predicted_mean": 0.16103488546042719,
       "predicted_range": [
        0.1432070609963697,
        0.17919477045836096
       ],
-      "observed_over_predicted": 1.14178300676082,
-      "observed_over_predicted_se_observed_only": 0.033383386852965206,
+      "observed_over_predicted": 1.1480650109298116,
+      "observed_over_predicted_se_observed_only": 0.026035918445340585,
+      "inverse_variance_observed_over_predicted": 1.14178300676082,
       "per_day_observed_over_predicted_range": [
        0.9812348496075559,
        1.2694950542487664
@@ -174,13 +186,18 @@
        "chi2_per_dof": 0.3827307241246129,
        "widened": false
       },
+      "observed_plain": {
+       "value": 0.686256563946026,
+       "se_over_days": 0.017907190973008195
+      },
       "predicted_mean": 0.642302129063087,
       "predicted_range": [
        0.5433411391625861,
        0.8217457536657637
       ],
-      "observed_over_predicted": 1.0622165408762752,
-      "observed_over_predicted_se_observed_only": 0.042719811252717864,
+      "observed_over_predicted": 1.0684326470271153,
+      "observed_over_predicted_se_observed_only": 0.027879700475427423,
+      "inverse_variance_observed_over_predicted": 1.0622165408762752,
       "per_day_observed_over_predicted_range": [
        0.7956961592192516,
        1.382981344130214
@@ -245,13 +262,18 @@
        "chi2_per_dof": 1.3068793005922223,
        "widened": true
       },
+      "observed_plain": {
+       "value": 0.12881390078031066,
+       "se_over_days": 0.0037877474674510203
+      },
       "predicted_mean": 0.10246293780773108,
       "predicted_range": [
        0.0957088692584227,
        0.11768939666204412
       ],
-      "observed_over_predicted": 1.2367981062042461,
-      "observed_over_predicted_se_observed_only": 0.034354632431615885,
+      "observed_over_predicted": 1.2571755557314435,
+      "observed_over_predicted_se_observed_only": 0.03696700044418622,
+      "inverse_variance_observed_over_predicted": 1.2367981062042461,
       "per_day_observed_over_predicted_range": [
        1.0151318618676497,
        1.3675436684131739
@@ -310,13 +332,18 @@
        "chi2_per_dof": 0.7295647273366135,
        "widened": false
       },
+      "observed_plain": {
+       "value": 0.19328453550065267,
+       "se_over_days": 0.004673009432306487
+      },
       "predicted_mean": 0.1610989410165964,
       "predicted_range": [
        0.14323754356883595,
        0.179395107932165
       ],
-      "observed_over_predicted": 1.1989911577736094,
-      "observed_over_predicted_se_observed_only": 0.034384627752304164,
+      "observed_over_predicted": 1.1997877470885456,
+      "observed_over_predicted_se_observed_only": 0.029007077283177637,
+      "inverse_variance_observed_over_predicted": 1.1989911577736094,
       "per_day_observed_over_predicted_range": [
        1.034190786950781,
        1.3156009015675296
@@ -375,13 +402,18 @@
        "chi2_per_dof": 0.6578546315032575,
        "widened": false
       },
+      "observed_plain": {
+       "value": 0.667345723048857,
+       "se_over_days": 0.02036324677964865
+      },
       "predicted_mean": 0.6421403278530585,
       "predicted_range": [
        0.5427822116562888,
        0.8216379151007005
       ],
-      "observed_over_predicted": 1.0223894505936215,
-      "observed_over_predicted_se_observed_only": 0.039950862426808814,
+      "observed_over_predicted": 1.0392521604741296,
+      "observed_over_predicted_se_observed_only": 0.03171152144848374,
+      "inverse_variance_observed_over_predicted": 1.0223894505936215,
       "per_day_observed_over_predicted_range": [
        0.7716107982733418,
        1.3223320935252711
@@ -448,13 +480,18 @@
        "chi2_per_dof": 2.978021129790315,
        "widened": true
       },
+      "observed_plain": {
+       "value": 0.11113107054274114,
+       "se_over_days": 0.003827231183645767
+      },
       "predicted_mean": 0.08600049633022877,
       "predicted_range": [
        0.07699965885880455,
        0.10218901394103413
       ],
-      "observed_over_predicted": 1.2781882868909968,
-      "observed_over_predicted_se_observed_only": 0.04548838940605805,
+      "observed_over_predicted": 1.292214292764251,
+      "observed_over_predicted_se_observed_only": 0.04450243134585856,
+      "inverse_variance_observed_over_predicted": 1.2781882868909968,
       "per_day_observed_over_predicted_range": [
        1.0893665973176323,
        1.5568099721883217
@@ -513,13 +550,18 @@
        "chi2_per_dof": 0.272007567723494,
        "widened": false
       },
+      "observed_plain": {
+       "value": 0.21957935258694014,
+       "se_over_days": 0.0034693514586566563
+      },
       "predicted_mean": 0.1922228325359355,
       "predicted_range": [
        0.1834437802837574,
        0.20125815002550612
       ],
-      "observed_over_predicted": 1.1406870738981407,
-      "observed_over_predicted_se_observed_only": 0.032904055446178006,
+      "observed_over_predicted": 1.1423167044731297,
+      "observed_over_predicted_se_observed_only": 0.018048591901839085,
+      "inverse_variance_observed_over_predicted": 1.1406870738981407,
       "per_day_observed_over_predicted_range": [
        1.093332805552165,
        1.2008598619357553
@@ -578,13 +620,18 @@
        "chi2_per_dof": 0.7673353531260708,
        "widened": false
       },
+      "observed_plain": {
+       "value": 0.5060045210121371,
+       "se_over_days": 0.014563277259562085
+      },
       "predicted_mean": 0.44780179466187153,
       "predicted_range": [
        0.40082584468722393,
        0.5378096347705859
       ],
-      "observed_over_predicted": 1.118098325664315,
-      "observed_over_predicted_se_observed_only": 0.03974323424251052,
+      "observed_over_predicted": 1.1299743034621235,
+      "observed_over_predicted_se_observed_only": 0.03252170364917496,
+      "inverse_variance_observed_over_predicted": 1.118098325664315,
       "per_day_observed_over_predicted_range": [
        0.966819119847936,
        1.2965368806156623
@@ -649,13 +696,18 @@
        "chi2_per_dof": 2.9085928981823175,
        "widened": true
       },
+      "observed_plain": {
+       "value": 0.11178005785018046,
+       "se_over_days": 0.0037545689368953315
+      },
       "predicted_mean": 0.08600652946837069,
       "predicted_range": [
        0.0770036780271113,
        0.10219935797708435
       ],
-      "observed_over_predicted": 1.2868743574516317,
-      "observed_over_predicted_se_observed_only": 0.045606768618379104,
+      "observed_over_predicted": 1.2996694383684917,
+      "observed_over_predicted_se_observed_only": 0.043654463912255546,
+      "inverse_variance_observed_over_predicted": 1.2868743574516317,
       "per_day_observed_over_predicted_range": [
        1.0907365194213188,
        1.5615481850019455
@@ -714,13 +766,18 @@
        "chi2_per_dof": 0.16380832196913428,
        "widened": false
       },
+      "observed_plain": {
+       "value": 0.22819208913622235,
+       "se_over_days": 0.0027679537551476953
+      },
       "predicted_mean": 0.19233359370992995,
       "predicted_range": [
        0.18355424213983024,
        0.20142440792826954
       ],
-      "observed_over_predicted": 1.1886827889282645,
-      "observed_over_predicted_se_observed_only": 0.03320524352459021,
+      "observed_over_predicted": 1.1864390652439678,
+      "observed_over_predicted_se_observed_only": 0.01439142118522579,
+      "inverse_variance_observed_over_predicted": 1.1886827889282645,
       "per_day_observed_over_predicted_range": [
        1.129241082760094,
        1.2422381219017449
@@ -779,13 +836,18 @@
        "chi2_per_dof": 0.8997545397510178,
        "widened": false
       },
+      "observed_plain": {
+       "value": 0.489813774673023,
+       "se_over_days": 0.014907561185830262
+      },
       "predicted_mean": 0.44758609692083756,
       "predicted_range": [
        0.4005008757034621,
        0.5377314136382894
       ],
-      "observed_over_predicted": 1.084581019461392,
-      "observed_over_predicted_se_observed_only": 0.037912736264453115,
+      "observed_over_predicted": 1.0943453740915774,
+      "observed_over_predicted_se_observed_only": 0.03330657785929149,
+      "inverse_variance_observed_over_predicted": 1.084581019461392,
       "per_day_observed_over_predicted_range": [
        0.9074663604711817,
        1.2570441668714594
@@ -854,13 +916,18 @@
        "chi2_per_dof": 1.9233170328322715,
        "widened": true
       },
+      "observed_plain": {
+       "value": 0.1373724567966593,
+       "se_over_days": 0.0032395306747147485
+      },
       "predicted_mean": 0.0709155051544603,
       "predicted_range": [
        0.06167222573489589,
        0.08186538211244743
       ],
-      "observed_over_predicted": 1.9282200942649577,
-      "observed_over_predicted_se_observed_only": 0.04715752480917063,
+      "observed_over_predicted": 1.9371286504615575,
+      "observed_over_predicted_se_observed_only": 0.04568155677180557,
+      "inverse_variance_observed_over_predicted": 1.9282200942649577,
       "per_day_observed_over_predicted_range": [
        1.7899273134972875,
        2.2327116876195454
@@ -919,13 +986,18 @@
        "chi2_per_dof": 2.703867903450551,
        "widened": true
       },
+      "observed_plain": {
+       "value": 0.2897879229276282,
+       "se_over_days": 0.019315607429724543
+      },
       "predicted_mean": 0.16629578971452139,
       "predicted_range": [
        0.15340455406144188,
        0.17428499136555986
       ],
-      "observed_over_predicted": 1.7892602791205638,
-      "observed_over_predicted_se_observed_only": 0.1050261216980473,
+      "observed_over_predicted": 1.7426052903991422,
+      "observed_over_predicted_se_observed_only": 0.11615211342923046,
+      "inverse_variance_observed_over_predicted": 1.7892602791205638,
       "per_day_observed_over_predicted_range": [
        1.4213835704888715,
        1.9563300461236384
@@ -984,13 +1056,18 @@
        "chi2_per_dof": 1.9046980957683457,
        "widened": true
       },
+      "observed_plain": {
+       "value": 0.4839982497232251,
+       "se_over_days": 0.040258664273841845
+      },
       "predicted_mean": 0.4282946557635118,
       "predicted_range": [
        0.35385850067570895,
        0.4942609787390816
       ],
-      "observed_over_predicted": 1.0366649255713825,
-      "observed_over_predicted_se_observed_only": 0.05966708993039055,
+      "observed_over_predicted": 1.130059045122596,
+      "observed_over_predicted_se_observed_only": 0.09399758725000568,
+      "inverse_variance_observed_over_predicted": 1.0366649255713825,
       "per_day_observed_over_predicted_range": [
        0.9844663669499962,
        1.2799437524070802
@@ -1055,13 +1132,18 @@
        "chi2_per_dof": 1.7521834858844183,
        "widened": true
       },
+      "observed_plain": {
+       "value": 0.13868684040004622,
+       "se_over_days": 0.0030434513345383237
+      },
       "predicted_mean": 0.0709206097878501,
       "predicted_range": [
        0.061673956844500014,
        0.08187995418950117
       ],
-      "observed_over_predicted": 1.9479304735484546,
-      "observed_over_predicted_se_observed_only": 0.045122033316023276,
+      "observed_over_predicted": 1.955522390669089,
+      "observed_over_predicted_se_observed_only": 0.04291349642427522,
+      "inverse_variance_observed_over_predicted": 1.9479304735484546,
       "per_day_observed_over_predicted_range": [
        1.8104069825559328,
        2.2367823661329442
@@ -1120,13 +1202,18 @@
        "chi2_per_dof": 1.6148312496253463,
        "widened": true
       },
+      "observed_plain": {
+       "value": 0.3110265599700722,
+       "se_over_days": 0.013642012946157562
+      },
       "predicted_mean": 0.16634001510143573,
       "predicted_range": [
        0.15341993831235662,
        0.1743169623673438
       ],
-      "observed_over_predicted": 1.845218972452623,
-      "observed_over_predicted_se_observed_only": 0.07296746325733976,
+      "observed_over_predicted": 1.8698240455275015,
+      "observed_over_predicted_se_observed_only": 0.08201281536399123,
+      "inverse_variance_observed_over_predicted": 1.845218972452623,
       "per_day_observed_over_predicted_range": [
        1.695544090511879,
        2.043301316880112
@@ -1185,13 +1272,18 @@
        "chi2_per_dof": 1.681384341134725,
        "widened": true
       },
+      "observed_plain": {
+       "value": 0.44893907795426974,
+       "se_over_days": 0.019863845456558935
+      },
       "predicted_mean": 0.42820669337675704,
       "predicted_range": [
        0.35380353126239367,
        0.49421969828384615
       ],
-      "observed_over_predicted": 1.040731291627953,
-      "observed_over_predicted_se_observed_only": 0.04951699860361102,
+      "observed_over_predicted": 1.0484167690467914,
+      "observed_over_predicted_se_observed_only": 0.046388451567434416,
+      "inverse_variance_observed_over_predicted": 1.040731291627953,
       "per_day_observed_over_predicted_range": [
        0.9596107800942691,
        1.178432753592986
@@ -1258,13 +1350,18 @@
        "chi2_per_dof": 13.903151161342334,
        "widened": true
       },
+      "observed_plain": {
+       "value": 0.17860843586840408,
+       "se_over_days": 0.018038441901409276
+      },
       "predicted_mean": 0.08363765482042096,
       "predicted_range": [
        0.07667528152167408,
        0.08789648303121184
       ],
-      "observed_over_predicted": 1.8660792769190495,
-      "observed_over_predicted_se_observed_only": 0.15239814901949963,
+      "observed_over_predicted": 2.135502678212291,
+      "observed_over_predicted_se_observed_only": 0.21567369314861531,
+      "inverse_variance_observed_over_predicted": 1.8660792769190495,
       "per_day_observed_over_predicted_range": [
        1.5575677693191223,
        2.9112548905016493
@@ -1323,13 +1420,18 @@
        "chi2_per_dof": 0.42882715768155977,
        "widened": false
       },
+      "observed_plain": {
+       "value": 0.2559979692168122,
+       "se_over_days": 0.009879891495479905
+      },
       "predicted_mean": 0.1647454569173657,
       "predicted_range": [
        0.15420911184660457,
        0.18267788834550525
       ],
-      "observed_over_predicted": 1.5988394523905622,
-      "observed_over_predicted_se_observed_only": 0.05843404383552327,
+      "observed_over_predicted": 1.5539000225372992,
+      "observed_over_predicted_se_observed_only": 0.05997064611278196,
+      "inverse_variance_observed_over_predicted": 1.5988394523905622,
       "per_day_observed_over_predicted_range": [
        1.271434123823153,
        1.734148200172728
@@ -1388,13 +1490,18 @@
        "chi2_per_dof": 2.654313748863795,
        "widened": true
       },
+      "observed_plain": {
+       "value": 0.6951658646616836,
+       "se_over_days": 0.05682525001853613
+      },
       "predicted_mean": 0.5105150356236962,
       "predicted_range": [
        0.4197294057650555,
        0.569982421782213
       ],
-      "observed_over_predicted": 1.237732387097069,
-      "observed_over_predicted_se_observed_only": 0.10702183203288589,
+      "observed_over_predicted": 1.3616951826157275,
+      "observed_over_predicted_se_observed_only": 0.11130965016360925,
+      "inverse_variance_observed_over_predicted": 1.237732387097069,
       "per_day_observed_over_predicted_range": [
        1.0329754856522155,
        1.7588339646662199
@@ -1459,13 +1566,18 @@
        "chi2_per_dof": 16.254347026436424,
        "widened": true
       },
+      "observed_plain": {
+       "value": 0.18445073316469512,
+       "se_over_days": 0.020690029820507206
+      },
       "predicted_mean": 0.08365576910457671,
       "predicted_range": [
        0.07672472808540354,
        0.08791486541601995
       ],
-      "observed_over_predicted": 1.8962643359317666,
-      "observed_over_predicted_se_observed_only": 0.16138032217279238,
+      "observed_over_predicted": 2.2048776209817196,
+      "observed_over_predicted_se_observed_only": 0.24732340688474141,
+      "inverse_variance_observed_over_predicted": 1.8962643359317666,
       "per_day_observed_over_predicted_range": [
        1.5765026192559979,
        3.1361008838706796
@@ -1524,13 +1636,18 @@
        "chi2_per_dof": 1.374005895172371,
        "widened": true
       },
+      "observed_plain": {
+       "value": 0.2987419771326609,
+       "se_over_days": 0.011765127067923584
+      },
       "predicted_mean": 0.1648307217316675,
       "predicted_range": [
        0.15422534385641012,
        0.18299018199812933
       ],
-      "observed_over_predicted": 1.744187179570398,
-      "observed_over_predicted_se_observed_only": 0.0634301517797754,
+      "observed_over_predicted": 1.8124168479890008,
+      "observed_over_predicted_se_observed_only": 0.07137702816757886,
+      "inverse_variance_observed_over_predicted": 1.744187179570398,
       "per_day_observed_over_predicted_range": [
        1.5834116340344913,
        2.08311926441533
@@ -1589,13 +1706,18 @@
        "chi2_per_dof": 5.987903970175923,
        "widened": true
       },
+      "observed_plain": {
+       "value": 0.6208866807536089,
+       "se_over_days": 0.07415499692664354
+      },
       "predicted_mean": 0.5104031045162192,
       "predicted_range": [
        0.41928330387795276,
        0.5700416236249222
       ],
-      "observed_over_predicted": 1.058019776907113,
-      "observed_over_predicted_se_observed_only": 0.1072402101743126,
+      "observed_over_predicted": 1.2164633703435455,
+      "observed_over_predicted_se_observed_only": 0.1452871196716773,
+      "inverse_variance_observed_over_predicted": 1.058019776907113,
       "per_day_observed_over_predicted_range": [
        0.7739809575062399,
        1.789764193645424
@@ -1654,20 +1776,20 @@
   "replicates_fits_placement_pooled_to": 6.938893903907228e-18,
   "observed_over_predicted_range_eps3_eps5_both_placements": {
    "X wls": [
-    1.1406870738981407,
-    1.2781882868909968
+    1.1423167044731297,
+    1.292214292764251
    ],
    "Z wls": [
-    1.5988394523905622,
-    1.9282200942649577
+    1.5539000225372992,
+    2.135502678212291
    ],
    "X binomial": [
-    1.1886827889282645,
-    1.2868743574516317
+    1.1864390652439678,
+    1.2996694383684917
    ],
    "Z binomial": [
-    1.744187179570398,
-    1.9479304735484546
+    1.8124168479890008,
+    2.2048776209817196
    ]
   }
  },
@@ -2997,6 +3119,18 @@
     "chi2_with_scatter": 7.8167212931067755,
     "bar": 18.307038053275146,
     "relative_scatter": 0.16405221265307185,
+    "z_prespecified": [
+     3.0357762095290783,
+     0.6053090421287343,
+     -3.035942749409032,
+     1.4208696336261206,
+     1.0329712315431558,
+     -0.1944183695189619,
+     1.0377037539749914,
+     0.439218125824376,
+     0.7861526802501427,
+     1.0766125579157326
+    ],
     "placement_1_predicted_range": [
      0.5433411391625858,
      0.8217457536657641
@@ -3004,13 +3138,32 @@
     "placement_1_observed_range": [
      0.6533649509936019,
      0.751430658960315
-    ]
+    ],
+    "placement_2_relative_scatter": 0.1202867986456086,
+    "chi2_with_each_placements_own_scatter": 8.323326879391727,
+    "smallest_scatter_that_passes (grid 0.01)": 0.06,
+    "pearson_predicted_observed": {
+     "placement 1": -0.6491913338610518,
+     "placement 2": 0.31820972389307783
+    }
    },
    "X eps3": {
     "chi2": 52.07847784518833,
     "chi2_with_scatter": 35.28308840125322,
     "bar": 18.307038053275146,
     "relative_scatter": 0.08904195049784043,
+    "z_prespecified": [
+     3.2692116085883507,
+     1.2308378812621092,
+     0.10820048450154007,
+     3.152636573352546,
+     2.310881133420309,
+     0.686272565674746,
+     1.7594993144312254,
+     1.4256750168910821,
+     3.1490093583988727,
+     3.0115042798031193
+    ],
     "placement_1_predicted_range": [
      0.09570654872316164,
      0.11767979426872083
@@ -3018,13 +3171,32 @@
     "placement_1_observed_range": [
      0.11887216581576365,
      0.13689523784270996
-    ]
+    ],
+    "placement_2_relative_scatter": 0.11468255454520147,
+    "chi2_with_each_placements_own_scatter": 32.945942513295066,
+    "smallest_scatter_that_passes (grid 0.01)": 0.19,
+    "pearson_predicted_observed": {
+     "placement 1": -0.31474984892448904,
+     "placement 2": -0.18200719062313425
+    }
    },
    "X eps5": {
     "chi2": 19.799261018394674,
     "chi2_with_scatter": 13.414908794702294,
     "bar": 18.307038053275146,
     "relative_scatter": 0.08163259807833854,
+    "z_prespecified": [
+     -0.17264889580663603,
+     0.7988268549298656,
+     2.4645619546637683,
+     1.7593288885151417,
+     1.5366412027093943,
+     1.0582517107290759,
+     0.9705239500299373,
+     0.621442179342851,
+     1.6109574139226088,
+     1.5992409100034768
+    ],
     "placement_1_predicted_range": [
      0.14320706099636965,
      0.17919477045836096
@@ -3032,13 +3204,32 @@
     "placement_1_observed_range": [
      0.17583215364117016,
      0.19826851152177777
-    ]
+    ],
+    "placement_2_relative_scatter": 0.03347374759309064,
+    "chi2_with_each_placements_own_scatter": 15.310757199400248,
+    "smallest_scatter_that_passes (grid 0.01)": 0.04,
+    "pearson_predicted_observed": {
+     "placement 1": -0.06483542525095563,
+     "placement 2": 0.05193977733874636
+    }
    },
    "Z lambda": {
     "chi2": 35.155575225920536,
     "chi2_with_scatter": 21.39407323850279,
     "bar": 18.307038053275146,
     "relative_scatter": 0.14644663072635328,
+    "z_prespecified": [
+     2.0863327183307696,
+     0.17285159060293026,
+     0.0930820599468485,
+     1.8029213288073962,
+     1.3916942244867778,
+     0.5664640689043756,
+     -0.1801269749511044,
+     2.7825009120414226,
+     1.6013498470441492,
+     3.8622468866117656
+    ],
     "placement_1_predicted_range": [
      0.35385850067570906,
      0.49426097873908215
@@ -3046,13 +3237,32 @@
     "placement_1_observed_range": [
      0.4038500618991423,
      0.6298077791442842
-    ]
+    ],
+    "placement_2_relative_scatter": 0.11103053062245946,
+    "chi2_with_each_placements_own_scatter": 24.17251728044512,
+    "smallest_scatter_that_passes (grid 0.01)": 0.18,
+    "pearson_predicted_observed": {
+     "placement 1": 0.7326753558490933,
+     "placement 2": -0.504990186942235
+    }
    },
    "Z eps3": {
     "chi2": 1239.5780569023882,
     "chi2_with_scatter": 456.14891258486983,
     "bar": 18.307038053275146,
     "relative_scatter": 0.11446165676480592,
+    "z_prespecified": [
+     13.71862711021521,
+     9.656818520340789,
+     7.923472552720329,
+     11.742303985962616,
+     11.909764609492747,
+     6.8799360186011125,
+     11.59279704897977,
+     12.094171919368444,
+     15.16433389788965,
+     7.593753348092334
+    ],
     "placement_1_predicted_range": [
      0.06167222573489589,
      0.08186538211244743
@@ -3060,13 +3270,32 @@
     "placement_1_observed_range": [
      0.1290192880306153,
      0.14893695459328032
-    ]
+    ],
+    "placement_2_relative_scatter": 0.056222374791262214,
+    "chi2_with_each_placements_own_scatter": 597.1326672206613,
+    "smallest_scatter_that_passes (grid 0.01)": null,
+    "pearson_predicted_observed": {
+     "placement 1": 0.7031507942776817,
+     "placement 2": -0.43684279851300684
+    }
    },
    "Z eps5": {
     "chi2": 270.53090224731216,
     "chi2_with_scatter": 231.40208788012964,
     "bar": 18.307038053275146,
     "relative_scatter": 0.047161932233450325,
+    "z_prespecified": [
+     4.312612908186754,
+     1.866983583373169,
+     7.392329866518136,
+     3.051593862625066,
+     1.944561738119929,
+     7.9215262437719645,
+     5.725265971623425,
+     1.4642147455587031,
+     7.184627726723887,
+     5.604864786091
+    ],
     "placement_1_predicted_range": [
      0.15340455406144182,
      0.1742849913655598
@@ -3074,7 +3303,14 @@
     "placement_1_observed_range": [
      0.23648001743585956,
      0.34095896519684377
-    ]
+    ],
+    "placement_2_relative_scatter": 0.06457201172868446,
+    "chi2_with_each_placements_own_scatter": 219.42693465445598,
+    "smallest_scatter_that_passes (grid 0.01)": 0.48,
+    "pearson_predicted_observed": {
+     "placement 1": 0.49081602081128994,
+     "placement 2": -0.32753920813965715
+    }
    }
   },
   "detectors_beyond_chance": {
@@ -3152,7 +3388,85 @@
     0.5930004023779559
    ],
    "from_memory_agrees_in": 10,
-   "from_memory_higher_in": 5
+   "from_memory_higher_in": 5,
+   "from_memory_above_idle_median_in": 15,
+   "from_memory_median": 1.448,
+   "from_memory_at_search_edge_2.0": 1
+  },
+  "selection_check (reported errors on the chosen day / other days)": {
+   "what": "chosen day's mean reported error / mean over the other four days, per patch; mean over the five days",
+   "placement 1 d3": {
+    "cz_ratio_mean": 1.0012476426853902,
+    "readout_ratio_mean": 1.0035061287552132,
+    "cz_ratio_per_day": [
+     0.9566125810700584,
+     0.989138739238525,
+     0.9592286834002209,
+     1.158100752264344,
+     0.9431574574538031
+    ],
+    "readout_ratio_per_day": [
+     0.977534423061438,
+     1.2685587658740307,
+     0.9122695486331849,
+     0.9099285146942017,
+     0.9492393915132106
+    ]
+   },
+   "placement 1 d5": {
+    "cz_ratio_mean": 1.0021517237243924,
+    "readout_ratio_mean": 1.0018877133728268,
+    "cz_ratio_per_day": [
+     1.1995433606255235,
+     0.9631731842580379,
+     0.8904207483081232,
+     0.9570537814560233,
+     1.0005675439742532
+    ],
+    "readout_ratio_per_day": [
+     0.9574528301886793,
+     0.9353369335524769,
+     0.9344100662002911,
+     0.9872114266733102,
+     1.1950273102493758
+    ]
+   },
+   "placement 2 d3": {
+    "cz_ratio_mean": 0.9923011049153505,
+    "readout_ratio_mean": 0.9707330040963228,
+    "cz_ratio_per_day": [
+     1.111699570662459,
+     0.9711002842889327,
+     1.0117400695771366,
+     0.9510361975525333,
+     0.91592940249569
+    ],
+    "readout_ratio_per_day": [
+     0.9819617888782153,
+     0.8479434981304528,
+     0.8752793920429146,
+     0.9086128930486906,
+     1.2398674483813408
+    ]
+   },
+   "placement 2 d5": {
+    "cz_ratio_mean": 1.001121039523395,
+    "readout_ratio_mean": 1.0055408768076928,
+    "cz_ratio_per_day": [
+     1.0438091034723744,
+     1.005123133931403,
+     0.8631650408452218,
+     1.010793656869353,
+     1.0827142624986226
+    ],
+    "readout_ratio_per_day": [
+     0.8943099760709823,
+     0.855852259596193,
+     0.9326446986511866,
+     1.327770221986584,
+     1.0171272277335184
+    ]
+   }
   },
   "prespecified_drift_check": {
    "comparisons": 40,
@@ -4574,7 +4888,91 @@
     "Z d3 uniform": 1,
     "Z d5 calibrated": 9,
     "Z d5 uniform": 17
+   },
+   "per_placement_lambda": {
+    "calibrated X lambda placement 1": {
+     "value": 0.682263945730859,
+     "se": 0.027439025720793906,
+     "chi2_per_dof": 0.3827307241246133
+    },
+    "calibrated X lambda placement 2": {
+     "value": 0.5006864368409139,
+     "se": 0.017797091619463336,
+     "chi2_per_dof": 0.7673353531260789
+    },
+    "calibrated Z lambda placement 1": {
+     "value": 0.4439980474397013,
+     "se": 0.025555095742147295,
+     "chi2_per_dof": 1.9046980957683777
+    },
+    "calibrated Z lambda placement 2": {
+     "value": 0.6318809936914622,
+     "se": 0.05463625439278213,
+     "chi2_per_dof": 2.6543137488638093
+    },
+    "uniform X lambda placement 1": {
+     "value": 0.5983110278054592,
+     "se": 0.030132109389036526,
+     "chi2_per_dof": 0.1995710497551994
+    },
+    "uniform X lambda placement 2": {
+     "value": 0.4686414967654367,
+     "se": 0.04574059997012057,
+     "chi2_per_dof": 3.911628101159901
+    },
+    "uniform Z lambda placement 1": {
+     "value": 0.505568071202477,
+     "se": 0.0265234729769968,
+     "chi2_per_dof": 1.234945804551368
+    },
+    "uniform Z lambda placement 2": {
+     "value": 0.5420677519553735,
+     "se": 0.043718408191395206,
+     "chi2_per_dof": 2.003835769150974
+    }
    }
+  },
+  "miscorrected_single_mass_per_round_calibrated": {
+   "2026-10-04-r1 X d3": 0.04354096975290065,
+   "2026-10-04-r1 X d5": 0.0,
+   "2026-10-04-r1 Z d3": 0.0,
+   "2026-10-04-r1 Z d5": 0.0,
+   "2026-10-04-r2-d3 X d3": 0.008547030073896417,
+   "2026-10-04-r2-d3 Z d3": 0.013936784342386774,
+   "2026-10-04-r2-d5 X d5": 0.0,
+   "2026-10-04-r2-d5 Z d5": 0.0,
+   "2026-10-05-r1 X d3": 0.0054140787377859505,
+   "2026-10-05-r1 X d5": 0.0,
+   "2026-10-05-r1 Z d3": 0.0,
+   "2026-10-05-r1 Z d5": 0.0,
+   "2026-10-05-r2-d3 X d3": 0.009407715632962851,
+   "2026-10-05-r2-d3 Z d3": 0.013353288783874732,
+   "2026-10-05-r2-d5 X d5": 0.0,
+   "2026-10-05-r2-d5 Z d5": 0.0,
+   "2026-10-06-r1 X d3": 0.004917323739199031,
+   "2026-10-06-r1 X d5": 0.0015498058697846439,
+   "2026-10-06-r1 Z d3": 0.0014845852236959158,
+   "2026-10-06-r1 Z d5": 0.0,
+   "2026-10-06-r2-d3 X d3": 0.05752835723080437,
+   "2026-10-06-r2-d3 Z d3": 0.012579646387073939,
+   "2026-10-06-r2-d5 X d5": 0.0,
+   "2026-10-06-r2-d5 Z d5": 0.0,
+   "2026-10-07-r1 X d3": 0.04314762815369057,
+   "2026-10-07-r1 X d5": 0.0,
+   "2026-10-07-r1 Z d3": 0.0,
+   "2026-10-07-r1 Z d5": 0.0,
+   "2026-10-07-r2-d3 X d3": 0.010528705778710453,
+   "2026-10-07-r2-d3 Z d3": 0.012392407941304485,
+   "2026-10-07-r2-d5 X d5": 0.0,
+   "2026-10-07-r2-d5 Z d5": 0.0,
+   "2026-10-08-r1 X d3": 0.04025706602504876,
+   "2026-10-08-r1 X d5": 0.0,
+   "2026-10-08-r1 Z d3": 0.0,
+   "2026-10-08-r1 Z d5": 0.0,
+   "2026-10-08-r2-d3 X d3": 0.0062774287045148525,
+   "2026-10-08-r2-d3 Z d3": 0.007511909580345492,
+   "2026-10-08-r2-d5 X d5": 0.0,
+   "2026-10-08-r2-d5 Z d5": 0.0
   },
   "model_simulation_20000_shots": {
    "pooled_lambda": {
@@ -4953,7 +5351,91 @@
      "e_N": 0.041290151822615445
     }
    },
-   "capped_at_300": 132
+   "capped_at_300": 132,
+   "converged_paper_start": {
+    "b": 0.22355032432453636,
+    "life_rounds": 4.473265942487965,
+    "life_us": 35.338800945654924,
+    "life_us_cont": 31.22240464067663,
+    "e_P": 0.5070368192236567,
+    "a": 0.025195466698086828,
+    "pi": 0.030846544478564913,
+    "e_N": 0.04117968261156733
+   },
+   "starts": 6,
+   "best_of_starts": {
+    "b": 0.22355334527737947,
+    "life_rounds": 4.473205496184308,
+    "life_us": 35.33832341985603,
+    "life_us_cont": 31.221924561642027,
+    "e_P": 0.5070287703208791,
+    "a": 0.02519583399228396,
+    "pi": 0.03084721917569088,
+    "e_N": 0.04117909727681382
+   }
+  },
+  "hmm_on_simulated_leakage (lifetime in us -> fitted tau_P, e_P, Delta(1))": {
+   "10.00": {
+    "tau_P_us": 13.081099237475172,
+    "e_P": 0.47591418371544525,
+    "refire_lag_1": 0.054120609163291304
+   },
+   "17.70": {
+    "tau_P_us": 24.617742507442358,
+    "e_P": 0.45690965645820947,
+    "refire_lag_1": 0.09075107290920424
+   },
+   "25.00": {
+    "tau_P_us": 39.888334708233316,
+    "e_P": 0.43540516226888026,
+    "refire_lag_1": 0.10798077368215075
+   },
+   "35.36": {
+    "tau_P_us": 61.65866312180325,
+    "e_P": 0.43762396801376474,
+    "refire_lag_1": 0.1267214639203105
+   }
+  },
+  "parameter_recovery_rank_of_truth": {
+   "A": {
+    "truth": [
+     0.002,
+     0.25,
+     0.05
+    ],
+    "pooled": [
+     2,
+     4,
+     3,
+     1
+    ]
+   },
+   "B": {
+    "truth": [
+     0.003,
+     0.25,
+     0.0
+    ],
+    "pooled": [
+     2,
+     1,
+     1,
+     1
+    ]
+   },
+   "C": {
+    "truth": [
+     0.001,
+     0.25,
+     0.05
+    ],
+    "pooled": [
+     1,
+     2,
+     1,
+     1
+    ]
+   }
   },
   "causes": {
    "spearman": {
@@ -7462,7 +7944,25 @@
      "max_interpolated": 1.218458196035969
     }
    },
-   "minus_fit": {
+   "twice_cz_minus_leakage_model_fit_jobs (the paper's CZ x 2 sentence)": {
+    "X d3": {
+     "n_jobs": 3,
+     "mean_cz2_minus_leak": -0.02376515677708139
+    },
+    "X d5": {
+     "n_jobs": 3,
+     "mean_cz2_minus_leak": -0.00846680976506553
+    },
+    "Z d3": {
+     "n_jobs": 3,
+     "mean_cz2_minus_leak": -0.0026280993915129467
+    },
+    "Z d5": {
+     "n_jobs": 3,
+     "mean_cz2_minus_leak": 0.006919918693234976
+    }
+   },
+   "minus_fit_old_frame_model_at_0.2_25_5 (not quoted)": {
     "2026-10-08-r1": {
      "cz1.5": {
       "X d3": -0.03527224276379215,

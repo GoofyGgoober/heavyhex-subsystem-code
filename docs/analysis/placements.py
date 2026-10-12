@@ -8,8 +8,10 @@ reported per placement, over its five days, with no estimate or test across plac
   per_placement               eps3, eps5 and Lambda for X and Z memory on each placement under
                               the prespecified weighted-log fit ("wls") and the binomial refit
                               ("binomial"): inverse-variance mean over the five days, its error
-                              widened by sqrt(chi2/nu) when chi2/nu > 1 (nu = 4), the model's
-                              mean prediction under the same fit, and observed / predicted
+                              widened by sqrt(chi2/nu) when chi2/nu > 1 (nu = 4); plain mean
+                              over the days with its standard error over the days; the model's
+                              plain mean prediction under the same fit; and observed / predicted,
+                              both as plain means (the paper's eps columns and factors)
   placements_compared         placement 1 minus placement 2, and the qubits they share
   per_repetition              the ten repetitions under both fits, and their verdicts
   prespecified_pooled_record  the prespecified rule over all ten repetitions as if
@@ -107,11 +109,13 @@ def per_placement(D: Data) -> dict:
         "source": SOURCE,
         "method": "observed: inverse-variance mean over the five days, se widened by "
         "sqrt(chi2/nu) when chi2/nu > 1 (nu = 4); binomial sigmas are half-widths "
-        "of the quasi-likelihood 68% profile intervals. predicted: plain mean over the "
-        "five days of the model's prediction (each job's measured f), fitted with the "
-        "same estimator. ratio = observed / predicted_mean; its se carries the "
-        "observed error only. Lambda is pooled from the daily ratios. The t test is "
-        "within one placement (nu = 4); there is no test across placements.",
+        "of the quasi-likelihood 68% profile intervals. observed_plain: plain mean over "
+        "the five days, se = sd / sqrt(5). predicted: plain mean over the five days of "
+        "the model's prediction (each job's measured f), fitted with the same estimator. "
+        "ratio = observed_plain / predicted_mean, so both sides are averaged alike; its "
+        "se carries the observed error only. Lambda is pooled from the daily ratios "
+        "(inverse-variance). The t test is within one placement (nu = 4); there is no "
+        "test across placements.",
     }
     checks = []
     for b in BASES:
@@ -139,12 +143,17 @@ def per_placement(D: Data) -> dict:
                         bool(D.refits["agreement_tests"][fit][k][f"{b} {q}"]["agrees"])
                         for k in keys
                     ]
+                    plain = [v for v, _ in vals]
+                    om = float(np.mean(plain))
+                    ose = float(np.std(plain, ddof=1) / sqrt(len(plain)))
                     block[q] = {
                         "observed": p,
+                        "observed_plain": {"value": om, "se_over_days": ose},
                         "predicted_mean": pm,
                         "predicted_range": span(pred),
-                        "observed_over_predicted": p["value"] / pm,
-                        "observed_over_predicted_se_observed_only": p["se"] / pm,
+                        "observed_over_predicted": om / pm,
+                        "observed_over_predicted_se_observed_only": ose / pm,
+                        "inverse_variance_observed_over_predicted": p["value"] / pm,
                         "per_day_observed_over_predicted_range": span(ratios),
                         "days_model_agrees": int(sum(agree)),
                         "per_day": [
