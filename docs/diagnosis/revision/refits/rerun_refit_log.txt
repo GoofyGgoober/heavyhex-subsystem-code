@@ -1,8 +1,0 @@
-quantity              device wls         device binomial               model wls          model binomial         fit-bitflip wls    fit-bitflip binomial
-X eps3                    11.894                  12.030                   9.356                   9.376                  13.198                  13.237
-X eps5                    20.223                  21.074                  17.639                  17.730                  23.280                  23.805
-Z eps3                    15.799                  16.157                   7.632                   7.641                  10.194                  10.225
-Z eps5                    27.289                  30.488                  16.612                  16.667                  21.463                  21.594
-X lambda                   0.596                   0.579                   0.542                   0.540                   0.569                   0.559
-Z lambda                   0.590                   0.535                   0.462                   0.461                   0.476                   0.475
-regenerated P(n) reproduce the stored eps to 1.6653345369377348e-16

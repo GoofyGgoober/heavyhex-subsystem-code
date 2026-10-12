@@ -1,0 +1,181 @@
+{
+ "flags_against_quotes": {
+  "readouts": 320,
+  "flags": 200,
+  "relays": 120,
+  "days": [
+   "2026-10-04",
+   "2026-10-05",
+   "2026-10-06",
+   "2026-10-07",
+   "2026-10-08"
+  ],
+  "quote_day_to_day": {
+   "log_correlation_range": [
+    0.6826408798139537,
+    0.8909419053945604
+   ],
+   "median_relative_change": 0.2098809523809524
+  },
+  "binned_by_same_day_quote": [
+   {
+    "bin": [
+     0,
+     0.01
+    ],
+    "n": 92,
+    "observed": 0.05690054347826087,
+    "predicted": 0.029352753623188406,
+    "excess": 0.027547789855072464
+   },
+   {
+    "bin": [
+     0.01,
+     0.02
+    ],
+    "n": 113,
+    "observed": 0.08145029498525073,
+    "predicted": 0.04990386983775811,
+    "excess": 0.031546425147492625
+   },
+   {
+    "bin": [
+     0.02,
+     0.05
+    ],
+    "n": 68,
+    "observed": 0.08829901960784313,
+    "predicted": 0.08186944852941176,
+    "excess": 0.006429571078431371
+   },
+   {
+    "bin": [
+     0.05,
+     1
+    ],
+    "n": 47,
+    "observed": 0.13929255319148937,
+    "predicted": 0.17175248226950354,
+    "excess": -0.03245992907801418
+   }
+  ],
+  "binned_by_other_days_quote": [
+   {
+    "bin": [
+     0,
+     0.01
+    ],
+    "n": 61,
+    "observed": 0.05850163934426229,
+    "predicted": 0.03952040983606557,
+    "excess": 0.018981229508196723
+   },
+   {
+    "bin": [
+     0.01,
+     0.02
+    ],
+    "n": 144,
+    "observed": 0.07668449074074074,
+    "predicted": 0.04426301215277778,
+    "excess": 0.03242147858796296
+   },
+   {
+    "bin": [
+     0.02,
+     0.05
+    ],
+    "n": 71,
+    "observed": 0.08753286384976526,
+    "predicted": 0.08013948356807511,
+    "excess": 0.007393380281690141
+   },
+   {
+    "bin": [
+     0.05,
+     1
+    ],
+    "n": 44,
+    "observed": 0.14008674242424243,
+    "predicted": 0.1705581297348485,
+    "excess": -0.030471387310606057
+   }
+  ],
+  "quoted_below_1.5pct_every_day": {
+   "n": 84,
+   "excess": 0.02328656746031746
+  },
+  "correlation_with_observed": {
+   "same_day_log_quote": 0.5114499391356738,
+   "other_days_log_quote": 0.4336824852511286,
+   "model_prediction": 0.742273317459883
+  },
+  "quoted_below_2pct": {
+   "quoted_median": 0.01025390625,
+   "implied_effective_median": 0.02197013020833334
+  }
+ },
+ "resets": {
+  "init_error_against_model_reset_error": {
+   "2026-10-04": {
+    "qubits": 116,
+    "init_error_median": 0.0016598936268043493,
+    "model_reset_error_median": 0.0072021484375,
+    "ratio_of_medians": 0.23047201001324116
+   },
+   "2026-10-05": {
+    "qubits": 116,
+    "init_error_median": 0.0016132259826726844,
+    "model_reset_error_median": 0.0074462890625,
+    "ratio_of_medians": 0.21664831557466607
+   },
+   "2026-10-06": {
+    "qubits": 116,
+    "init_error_median": 0.0014133850146604895,
+    "model_reset_error_median": 0.00738525390625,
+    "ratio_of_medians": 0.19137933950576413
+   },
+   "2026-10-07": {
+    "qubits": 116,
+    "init_error_median": 0.0017899466864683964,
+    "model_reset_error_median": 0.00787353515625,
+    "ratio_of_medians": 0.2273371047371954
+   },
+   "2026-10-08": {
+    "qubits": 116,
+    "init_error_median": 0.002017158488016558,
+    "model_reset_error_median": 0.008544921875,
+    "ratio_of_medians": 0.2360651761975949
+   }
+  },
+  "rerun_leak_vs_leak_ro": {
+   "2026-10-08-r1": {
+    "X d3": {
+     "leak": 0.16814541067503946,
+     "leak+ro": 0.17550335041504134,
+     "change": 0.007357939740001873,
+     "shot_se": 0.0065799657328680684
+    },
+    "X d5": {
+     "leak": 0.26540547701158607,
+     "leak+ro": 0.2848338462532875,
+     "change": 0.019428369241701438,
+     "shot_se": 0.02405064411869875
+    },
+    "Z d3": {
+     "leak": 0.11429617954351468,
+     "leak+ro": 0.10950645850988566,
+     "change": -0.004789721033629013,
+     "shot_se": 0.004779685224529901
+    },
+    "Z d5": {
+     "leak": 0.2543668898181271,
+     "leak+ro": 0.2631249500538809,
+     "change": 0.008758060235753817,
+     "shot_se": 0.011679752040481486
+    }
+   }
+  },
+  "note": "one job only (2026-10-08-r1); shot_se treats the two reruns as independent"
+ }
+}

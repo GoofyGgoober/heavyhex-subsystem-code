@@ -201,7 +201,7 @@ def box_later_reps(ax: Axes, device: DeviceMap, plan: list) -> None:
 def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
     plan = day_plan(device.coords, device.edges, calibration)
     if not plan:
-        raise ValueError("no clean place for the d=5 patch: no rep to draw")
+        raise ValueError("no usable placement for the d=5 patch: no rep to draw")
     (first, *_) = plan[0]
     spots = first if len(plan[0]) == 1 else {**plan[0][1], **plan[0][0]}
     d3, d5 = (

@@ -1,0 +1,120 @@
+{
+ "lags": {
+  "1": {
+   "chip": 0.14789339187650855,
+   "model": -0.00025836522967400067
+  },
+  "2": {
+   "chip": 0.10495680940801447,
+   "model": 0.00014808856538424641
+  },
+  "3": {
+   "chip": 0.07575170592606496,
+   "model": -0.00026734526149260935
+  },
+  "4": {
+   "chip": 0.056673188969338664,
+   "model": -0.0002900883004408157
+  },
+  "5": {
+   "chip": 0.04099640720950582,
+   "model": -0.00011929213881588657
+  },
+  "6": {
+   "chip": 0.030035202198252155,
+   "model": 0.00034784088765062594
+  }
+ },
+ "series": 320,
+ "chip_above_model_at_lag_1": 0.996875,
+ "runs_of_5": {
+  "chip": 0.00330125,
+  "model": 0.00035484375
+ },
+ "base_odds": {
+  "chip": {
+   "fires_per_round": 0.0905634375,
+   "after_quiet": 0.08190754249976377,
+   "after_firing": 0.22980093437627228
+  },
+  "model": {
+   "fires_per_round": 0.06866560546875,
+   "after_quiet": 0.06868855558645448,
+   "after_firing": 0.06865465292058807
+  }
+ },
+ "conditional_by_lag": {
+  "1": {
+   "chip": {
+    "after_quiet": 0.08190754249976377,
+    "after_firing": 0.22980093437627228
+   },
+   "model": {
+    "after_quiet": 0.06868855558645448,
+    "after_firing": 0.06865465292058807
+   }
+  },
+  "2": {
+   "chip": {
+    "after_quiet": 0.08783507646249304,
+    "after_firing": 0.1927918858705075
+   },
+   "model": {
+    "after_quiet": 0.06865732361441464,
+    "after_firing": 0.0687683316472699
+   }
+  },
+  "3": {
+   "chip": {
+    "after_quiet": 0.09253759668462731,
+    "after_firing": 0.16828930261069228
+   },
+   "model": {
+    "after_quiet": 0.06871271713513154,
+    "after_firing": 0.0687101109668351
+   }
+  },
+  "4": {
+   "chip": {
+    "after_quiet": 0.09594198479269841,
+    "after_firing": 0.15261517376203707
+   },
+   "model": {
+    "after_quiet": 0.06867748012038602,
+    "after_firing": 0.0687945575049663
+   }
+  },
+  "5": {
+   "chip": {
+    "after_quiet": 0.09869531912418478,
+    "after_firing": 0.1396917263336906
+   },
+   "model": {
+    "after_quiet": 0.06863863148520262,
+    "after_firing": 0.06903069759368896
+   }
+  },
+  "6": {
+   "chip": {
+    "after_quiet": 0.10122491031267393,
+    "after_firing": 0.13126011251092612
+   },
+   "model": {
+    "after_quiet": 0.0686707386959274,
+    "after_firing": 0.06925369334674907
+   }
+  }
+ },
+ "model_rerun": {
+  "lags": {
+   "1": -3.3902665866411605e-05,
+   "2": 0.00011100803285527235,
+   "3": -2.60616829643903e-06,
+   "4": 0.00011707738458028433,
+   "5": 0.0003920661084863457,
+   "6": 0.0005829546508216727
+  },
+  "runs_of_5": 0.00036171874999999995
+ },
+ "note": "Chip values are deterministic and repeat exactly. Model values come from 20000 stim-sampled shots per job (seed 6), which repeat only with the same stim build. lags/*/model and runs_of_5/model are from the original run (2026-10-09). base_odds, conditional_by_lag and model_rerun were added on 2026-10-10 by rerunning refiring.py with stim 1.16.0; model_rerun lists what that rerun gives for the original model keys."
+}

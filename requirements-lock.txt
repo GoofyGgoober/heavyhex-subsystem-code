@@ -12,7 +12,7 @@
 #   python -m pip install -r requirements-lock.txt
 #   python -m pip install --no-deps -e .
 #
-# The post-run work (the tests, docs/diagnosis/revision/ and the paper's figures) ran on
+# The post-run work (the tests, most of docs/analysis/ and the paper's figures) ran on
 # Windows x86-64 with CPython 3.14.3 and these versions instead: charset-normalizer 3.5.2,
 # contourpy 1.4.0, cryptography 50.0.2, fonttools 4.66.1, ibm-cloud-sdk-core 3.28.0,
 # ibm-quantum-schemas 0.12.20260921, idna 3.20, matplotlib 3.11.2, networkx 3.7,

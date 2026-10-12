@@ -1,0 +1,2841 @@
+{
+ "per_placement": {
+  "source": "docs/analysis/results/fits.json",
+  "method": "observed: inverse-variance mean over the five days, se widened by sqrt(chi2/nu) when chi2/nu > 1 (nu = 4); binomial sigmas are half-widths of the quasi-likelihood 68% profile intervals. predicted: plain mean over the five days of the model's prediction (each job's measured f), fitted with the same estimator. ratio = observed / predicted_mean; its se carries the observed error only. Lambda is pooled from the daily ratios. The t test is within one placement (nu = 4); there is no test across placements.",
+  "X": {
+   "placement 1": {
+    "wls": {
+     "eps3": {
+      "observed": {
+       "value": 0.12547909309319907,
+       "se": 0.003134067972049488,
+       "se_unwidened": 0.003134067972049488,
+       "chi2": 3.9918195317613625,
+       "nu": 4,
+       "chi2_per_dof": 0.9979548829403406,
+       "widened": false
+      },
+      "predicted_mean": 0.10245296093357101,
+      "predicted_range": [
+       0.09570654872316176,
+       0.11767979426872083
+      ],
+      "observed_over_predicted": 1.2247483327939919,
+      "observed_over_predicted_se_observed_only": 0.03059031133401378,
+      "per_day_observed_over_predicted_range": [
+       1.0101323388135788,
+       1.3570294912176661
+      ],
+      "days_model_agrees": 2,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.13212567107699597,
+        "se": 0.007146099787959185,
+        "predicted": 0.09736389071282398,
+        "ratio": 1.3570294912176661,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.11887216581576376,
+        "se": 0.005846426920322467,
+        "predicted": 0.11767979426872083,
+        "ratio": 1.0101323388135788,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.13689523784270996,
+        "se": 0.008987268651563188,
+        "predicted": 0.10421187396907927,
+        "ratio": 1.3136241833951492,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.12136845989432898,
+        "se": 0.00897021569460341,
+        "predicted": 0.09730269699406918,
+        "ratio": 1.2473288371618996,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.12451627598132203,
+        "se": 0.005959000324729531,
+        "predicted": 0.09570654872316176,
+        "ratio": 1.3010214832998999,
+        "model_agrees": false
+       }
+      ]
+     },
+     "eps5": {
+      "observed": {
+       "value": 0.1838668957143908,
+       "se": 0.005375889878148383,
+       "se_unwidened": 0.005375889878148383,
+       "chi2": 2.4299820177009077,
+       "nu": 4,
+       "chi2_per_dof": 0.6074955044252269,
+       "widened": false
+      },
+      "predicted_mean": 0.16103488546042719,
+      "predicted_range": [
+       0.1432070609963697,
+       0.17919477045836096
+      ],
+      "observed_over_predicted": 1.14178300676082,
+      "observed_over_predicted_se_observed_only": 0.033383386852965206,
+      "per_day_observed_over_predicted_range": [
+       0.9812348496075559,
+       1.2694950542487664
+      ],
+      "days_model_agrees": 4,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.17583215364117033,
+        "se": 0.012829227101130452,
+        "predicted": 0.17919477045836096,
+        "ratio": 0.9812348496075559,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.18180065566839276,
+        "se": 0.012147472521827112,
+        "predicted": 0.1432070609963697,
+        "ratio": 1.2694950542487664,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.19826851152177755,
+        "se": 0.011970653515971536,
+        "predicted": 0.16630630357556264,
+        "ratio": 1.1921887941649345,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.1779143529947857,
+        "se": 0.009621142326527849,
+        "predicted": 0.15797121277864218,
+        "ratio": 1.12624540804209,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.19057691385490516,
+        "se": 0.015875694730467616,
+        "predicted": 0.15849507949320052,
+        "ratio": 1.2024153334241583,
+        "model_agrees": true
+       }
+      ]
+     },
+     "lambda": {
+      "observed": {
+       "value": 0.6822639457308591,
+       "se": 0.027439025720793906,
+       "se_unwidened": 0.027439025720793906,
+       "chi2": 1.5309228964984516,
+       "nu": 4,
+       "chi2_per_dof": 0.3827307241246129,
+       "widened": false
+      },
+      "predicted_mean": 0.642302129063087,
+      "predicted_range": [
+       0.5433411391625861,
+       0.8217457536657637
+      ],
+      "observed_over_predicted": 1.0622165408762752,
+      "observed_over_predicted_se_observed_only": 0.042719811252717864,
+      "per_day_observed_over_predicted_range": [
+       0.7956961592192516,
+       1.382981344130214
+      ],
+      "days_model_agrees": 3,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.7514306589603149,
+        "se": 0.06824729106793398,
+        "predicted": 0.5433411391625861,
+        "ratio": 1.382981344130214,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.6538599400465774,
+        "se": 0.05424870319978346,
+        "predicted": 0.8217457536657637,
+        "ratio": 0.7956961592192516,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.6904537528021618,
+        "se": 0.06158318191342642,
+        "predicted": 0.626626121370858,
+        "ratio": 1.1018591936315538,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.6821735169274737,
+        "se": 0.06247345063766216,
+        "predicted": 0.6159520793855966,
+        "ratio": 1.1075106972736126,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.653364950993602,
+        "se": 0.06276983948594984,
+        "predicted": 0.6038455517306301,
+        "ratio": 1.0820067302326706,
+        "model_agrees": true
+       }
+      ],
+      "within_placement_test": {
+       "nu": 4,
+       "one_sided_p_lambda_below_1": 0.0001588694998295617
+      }
+     }
+    },
+    "binomial": {
+     "eps3": {
+      "observed": {
+       "value": 0.12672596743672526,
+       "se": 0.0035200765662481196,
+       "se_unwidened": 0.0030791749883479803,
+       "chi2": 5.227517202368889,
+       "nu": 4,
+       "chi2_per_dof": 1.3068793005922223,
+       "widened": true
+      },
+      "predicted_mean": 0.10246293780773108,
+      "predicted_range": [
+       0.0957088692584227,
+       0.11768939666204412
+      ],
+      "observed_over_predicted": 1.2367981062042461,
+      "observed_over_predicted_se_observed_only": 0.034354632431615885,
+      "per_day_observed_over_predicted_range": [
+       1.0151318618676497,
+       1.3675436684131739
+      ],
+      "days_model_agrees": 2,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.13316110953571542,
+        "se": 0.006793371368353424,
+        "predicted": 0.09737247344373917,
+        "ratio": 1.3675436684131739,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.1194702563556212,
+        "se": 0.005473417113278922,
+        "predicted": 0.11768939666204412,
+        "ratio": 1.0151318618676497,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.14119595979902388,
+        "se": 0.009235225458454926,
+        "predicted": 0.1042170707276267,
+        "ratio": 1.3548256424136331,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.12539458569865009,
+        "se": 0.009724243044135009,
+        "predicted": 0.09732687894682263,
+        "ratio": 1.2883859736955408,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.12484759251254263,
+        "se": 0.005963132058408718,
+        "predicted": 0.0957088692584227,
+        "ratio": 1.3044516509273838,
+        "model_agrees": false
+       }
+      ]
+     },
+     "eps5": {
+      "observed": {
+       "value": 0.1931562058055913,
+       "se": 0.005539327118146072,
+       "se_unwidened": 0.005539327118146072,
+       "chi2": 2.918258909346454,
+       "nu": 4,
+       "chi2_per_dof": 0.7295647273366135,
+       "widened": false
+      },
+      "predicted_mean": 0.1610989410165964,
+      "predicted_range": [
+       0.14323754356883595,
+       0.179395107932165
+      ],
+      "observed_over_predicted": 1.1989911577736094,
+      "observed_over_predicted_se_observed_only": 0.034384627752304164,
+      "per_day_observed_over_predicted_range": [
+       1.034190786950781,
+       1.3156009015675296
+      ],
+      "days_model_agrees": 3,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.185528767847486,
+        "se": 0.014582577035107278,
+        "predicted": 0.179395107932165,
+        "ratio": 1.034190786950781,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.18844344145747888,
+        "se": 0.01280440176564708,
+        "predicted": 0.14323754356883595,
+        "ratio": 1.3156009015675296,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.2033607884110898,
+        "se": 0.011785054400212963,
+        "predicted": 0.16633491917717946,
+        "ratio": 1.2225982939545632,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.18339933378973294,
+        "se": 0.010783033342748341,
+        "predicted": 0.15798946414978443,
+        "ratio": 1.1608326844874812,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.20569034599747577,
+        "se": 0.012923076864835764,
+        "predicted": 0.15853767025501714,
+        "ratio": 1.2974225347616801,
+        "model_agrees": false
+       }
+      ]
+     },
+     "lambda": {
+      "observed": {
+       "value": 0.6565174969976965,
+       "se": 0.025654059896763448,
+       "se_unwidened": 0.025654059896763448,
+       "chi2": 2.63141852601303,
+       "nu": 4,
+       "chi2_per_dof": 0.6578546315032575,
+       "widened": false
+      },
+      "predicted_mean": 0.6421403278530585,
+      "predicted_range": [
+       0.5427822116562888,
+       0.8216379151007005
+      ],
+      "observed_over_predicted": 1.0223894505936215,
+      "observed_over_predicted_se_observed_only": 0.039950862426808814,
+      "per_day_observed_over_predicted_range": [
+       0.7716107982733418,
+       1.3223320935252711
+      ],
+      "days_model_agrees": 3,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.7177383382677373,
+        "se": 0.06744307249811426,
+        "predicted": 0.5427822116562888,
+        "ratio": 1.3223320935252711,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.6339846875624957,
+        "se": 0.05205738172917429,
+        "predicted": 0.8216379151007005,
+        "ratio": 0.7716107982733418,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.6943126101261914,
+        "se": 0.060746387867795515,
+        "predicted": 0.6265495618308203,
+        "ratio": 1.1081527343142064,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.6837243249880874,
+        "se": 0.06661697535374861,
+        "predicted": 0.6160339834721531,
+        "ratio": 1.109880856141103,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.6069686542997733,
+        "se": 0.0479867029507412,
+        "predicted": 0.6036979672053296,
+        "ratio": 1.0054177540295266,
+        "model_agrees": true
+       }
+      ],
+      "within_placement_test": {
+       "nu": 4,
+       "one_sided_p_lambda_below_1": 8.998011100141934e-05
+      }
+     }
+    }
+   },
+   "placement 2": {
+    "wls": {
+     "eps3": {
+      "observed": {
+       "value": 0.10992482707611058,
+       "se": 0.003912024066183713,
+       "se_unwidened": 0.002266927497397708,
+       "chi2": 11.91208451916126,
+       "nu": 4,
+       "chi2_per_dof": 2.978021129790315,
+       "widened": true
+      },
+      "predicted_mean": 0.08600049633022877,
+      "predicted_range": [
+       0.07699965885880455,
+       0.10218901394103413
+      ],
+      "observed_over_predicted": 1.2781882868909968,
+      "observed_over_predicted_se_observed_only": 0.04548838940605805,
+      "per_day_observed_over_predicted_range": [
+       1.0893665973176323,
+       1.5568099721883217
+      ],
+      "days_model_agrees": 3,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.10057854274032302,
+        "se": 0.004277628968398016,
+        "predicted": 0.08066946798416152,
+        "ratio": 1.2467981412753386,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.11987383676648578,
+        "se": 0.005548160624001011,
+        "predicted": 0.07699965885880455,
+        "ratio": 1.5568099721883217,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.11132129840018845,
+        "se": 0.005108073249377235,
+        "predicted": 0.10218901394103413,
+        "ratio": 1.0893665973176323,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.10473616756280252,
+        "se": 0.005350291905804298,
+        "predicted": 0.08788901735040122,
+        "ratio": 1.1916866375378172,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.11914550724390593,
+        "se": 0.005407700497325645,
+        "predicted": 0.08225532351674242,
+        "ratio": 1.448483844570313,
+        "model_agrees": false
+       }
+      ]
+     },
+     "eps5": {
+      "observed": {
+       "value": 0.2192661003818286,
+       "se": 0.006324910739783812,
+       "se_unwidened": 0.006324910739783812,
+       "chi2": 1.088030270893976,
+       "nu": 4,
+       "chi2_per_dof": 0.272007567723494,
+       "widened": false
+      },
+      "predicted_mean": 0.1922228325359355,
+      "predicted_range": [
+       0.1834437802837574,
+       0.20125815002550612
+      ],
+      "observed_over_predicted": 1.1406870738981407,
+      "observed_over_predicted_se_observed_only": 0.032904055446178006,
+      "per_day_observed_over_predicted_range": [
+       1.093332805552165,
+       1.2008598619357553
+      ],
+      "days_model_agrees": 5,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.2200421378076251,
+        "se": 0.013165567871839659,
+        "predicted": 0.20125815002550612,
+        "ratio": 1.093332805552165,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.22026917301886972,
+        "se": 0.013762017325330464,
+        "predicted": 0.1834437802837574,
+        "ratio": 1.2007448422516669,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.21409397932364954,
+        "se": 0.015009549897172918,
+        "predicted": 0.19000963786122022,
+        "ratio": 1.1267532622740963,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.21173169097937972,
+        "se": 0.013770455587491761,
+        "predicted": 0.19340773378365855,
+        "ratio": 1.0947426291454194,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.2317597818051766,
+        "se": 0.01536543624366256,
+        "predicted": 0.19299486072553523,
+        "ratio": 1.2008598619357553,
+        "model_agrees": true
+       }
+      ]
+     },
+     "lambda": {
+      "observed": {
+       "value": 0.500686436840914,
+       "se": 0.017797091619463357,
+       "se_unwidened": 0.017797091619463357,
+       "chi2": 3.0693414125042833,
+       "nu": 4,
+       "chi2_per_dof": 0.7673353531260708,
+       "widened": false
+      },
+      "predicted_mean": 0.44780179466187153,
+      "predicted_range": [
+       0.40082584468722393,
+       0.5378096347705859
+      ],
+      "observed_over_predicted": 1.118098325664315,
+      "observed_over_predicted_se_observed_only": 0.03974323424251052,
+      "per_day_observed_over_predicted_range": [
+       0.966819119847936,
+       1.2965368806156623
+      ],
+      "days_model_agrees": 5,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.4570876457683537,
+        "se": 0.03355375978431788,
+        "predicted": 0.40082584468722393,
+        "ratio": 1.1403647040899583,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.5442152214200967,
+        "se": 0.042314859486916864,
+        "predicted": 0.4197452687668054,
+        "ratio": 1.2965368806156623,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.5199646377346377,
+        "se": 0.04356715663759779,
+        "predicted": 0.5378096347705859,
+        "ratio": 0.966819119847936,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.49466457797761904,
+        "se": 0.04090901489514736,
+        "predicted": 0.4544234898523337,
+        "ratio": 1.0885541549323556,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.5140905221599785,
+        "se": 0.041305396465292965,
+        "predicted": 0.42620473523240915,
+        "ratio": 1.206205561934091,
+        "model_agrees": true
+       }
+      ],
+      "within_placement_test": {
+       "nu": 4,
+       "one_sided_p_lambda_below_1": 4.801253058421406e-06
+      }
+     }
+    },
+    "binomial": {
+     "eps3": {
+      "observed": {
+       "value": 0.11067959734625436,
+       "se": 0.003922479889133786,
+       "se_unwidened": 0.0022999545606719987,
+       "chi2": 11.63437159272927,
+       "nu": 4,
+       "chi2_per_dof": 2.9085928981823175,
+       "widened": true
+      },
+      "predicted_mean": 0.08600652946837069,
+      "predicted_range": [
+       0.0770036780271113,
+       0.10219935797708435
+      ],
+      "observed_over_predicted": 1.2868743574516317,
+      "observed_over_predicted_se_observed_only": 0.045606768618379104,
+      "per_day_observed_over_predicted_range": [
+       1.0907365194213188,
+       1.5615481850019455
+      ],
+      "days_model_agrees": 3,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.10096937010858734,
+        "se": 0.0043084840585063885,
+        "predicted": 0.08067065176332333,
+        "ratio": 1.251624573516744,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.12024495366170984,
+        "se": 0.005269388881515645,
+        "predicted": 0.0770036780271113,
+        "ratio": 1.5615481850019455,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.11147257200701838,
+        "se": 0.0053505195457560495,
+        "predicted": 0.10219935797708435,
+        "ratio": 1.0907365194213188,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.10640610577490736,
+        "se": 0.005548228725443964,
+        "predicted": 0.08789003352913016,
+        "ratio": 1.2106731730809985,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.11980728769867927,
+        "se": 0.005612858783772684,
+        "predicted": 0.0822689260452043,
+        "ratio": 1.4562884610022593,
+        "model_agrees": false
+       }
+      ]
+     },
+     "eps5": {
+      "observed": {
+       "value": 0.22862363257571525,
+       "se": 0.006386483817097816,
+       "se_unwidened": 0.006386483817097816,
+       "chi2": 0.6552332878765371,
+       "nu": 4,
+       "chi2_per_dof": 0.16380832196913428,
+       "widened": false
+      },
+      "predicted_mean": 0.19233359370992995,
+      "predicted_range": [
+       0.18355424213983024,
+       0.20142440792826954
+      ],
+      "observed_over_predicted": 1.1886827889282645,
+      "observed_over_predicted_se_observed_only": 0.03320524352459021,
+      "per_day_observed_over_predicted_range": [
+       1.129241082760094,
+       1.2422381219017449
+      ],
+      "days_model_agrees": 4,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.2304513263143117,
+        "se": 0.01396847493226304,
+        "predicted": 0.20142440792826954,
+        "ratio": 1.1441082472804345,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.22801807702288085,
+        "se": 0.013831962956203023,
+        "predicted": 0.18355424213983024,
+        "ratio": 1.2422381219017449,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.22843996171097652,
+        "se": 0.013695830576195417,
+        "predicted": 0.1900565140608092,
+        "ratio": 1.201958074627668,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.2185016382212091,
+        "se": 0.01602217933633797,
+        "predicted": 0.1934942339213756,
+        "ratio": 1.129241082760094,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.2355494424117337,
+        "se": 0.014229149617458164,
+        "predicted": 0.19313857049936523,
+        "ratio": 1.219587790272621,
+        "model_agrees": true
+       }
+      ]
+     },
+     "lambda": {
+      "observed": {
+       "value": 0.48544338529514747,
+       "se": 0.016969213648195664,
+       "se_unwidened": 0.016969213648195664,
+       "chi2": 3.5990181590040713,
+       "nu": 4,
+       "chi2_per_dof": 0.8997545397510178,
+       "widened": false
+      },
+      "predicted_mean": 0.44758609692083756,
+      "predicted_range": [
+       0.4005008757034621,
+       0.5377314136382894
+      ],
+      "observed_over_predicted": 1.084581019461392,
+      "observed_over_predicted_se_observed_only": 0.037912736264453115,
+      "per_day_observed_over_predicted_range": [
+       0.9074663604711817,
+       1.2570441668714594
+      ],
+      "days_model_agrees": 5,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.4381375092234253,
+        "se": 0.03253001163594724,
+        "predicted": 0.4005008757034621,
+        "ratio": 1.0939739106783628,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.5273483367270204,
+        "se": 0.039525540422340105,
+        "predicted": 0.41951456490147737,
+        "ratio": 1.2570441668714594,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.487973168845362,
+        "se": 0.037534626092133816,
+        "predicted": 0.5377314136382894,
+        "ratio": 0.9074663604711817,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.48698081461148024,
+        "se": 0.043916129198711656,
+        "predicted": 0.45422559498513726,
+        "ratio": 1.07211222790608,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.5086290439578267,
+        "se": 0.03894334512156525,
+        "predicted": 0.425958035375822,
+        "ratio": 1.1940825192065323,
+        "model_agrees": true
+       }
+      ],
+      "within_placement_test": {
+       "nu": 4,
+       "one_sided_p_lambda_below_1": 3.5228420494279057e-06
+      }
+     }
+    }
+   }
+  },
+  "Z": {
+   "placement 1": {
+    "wls": {
+     "eps3": {
+      "observed": {
+       "value": 0.13674070203378053,
+       "se": 0.003344199693676329,
+       "se_unwidened": 0.00241138615957826,
+       "chi2": 7.693268131329086,
+       "nu": 4,
+       "chi2_per_dof": 1.9233170328322715,
+       "widened": true
+      },
+      "predicted_mean": 0.0709155051544603,
+      "predicted_range": [
+       0.06167222573489589,
+       0.08186538211244743
+      ],
+      "observed_over_predicted": 1.9282200942649577,
+      "observed_over_predicted_se_observed_only": 0.04715752480917063,
+      "per_day_observed_over_predicted_range": [
+       1.7899273134972875,
+       2.2327116876195454
+      ],
+      "days_model_agrees": 0,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.1290192880306154,
+        "se": 0.004569666944569313,
+        "predicted": 0.06513178670115671,
+        "ratio": 1.9808958814932076,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.13549407917738138,
+        "se": 0.008232350835890724,
+        "predicted": 0.07008624619036086,
+        "ratio": 1.9332477703166848,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.14893695459328027,
+        "se": 0.005602336809871675,
+        "predicted": 0.08186538211244743,
+        "ratio": 1.8192910208213,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.13571566298220655,
+        "se": 0.005157654054491978,
+        "predicted": 0.07582188503344062,
+        "ratio": 1.7899273134972875,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.13769629919981297,
+        "se": 0.005007618744063347,
+        "predicted": 0.06167222573489589,
+        "ratio": 2.2327116876195454,
+        "model_agrees": false
+       }
+      ]
+     },
+     "eps5": {
+      "observed": {
+       "value": 0.2975464511211791,
+       "se": 0.017465401848430206,
+       "se_unwidened": 0.010621499847525239,
+       "chi2": 10.815471613802204,
+       "nu": 4,
+       "chi2_per_dof": 2.703867903450551,
+       "widened": true
+      },
+      "predicted_mean": 0.16629578971452139,
+      "predicted_range": [
+       0.15340455406144188,
+       0.17428499136555986
+      ],
+      "observed_over_predicted": 1.7892602791205638,
+      "observed_over_predicted_se_observed_only": 0.1050261216980473,
+      "per_day_observed_over_predicted_range": [
+       1.4213835704888715,
+       1.9563300461236384
+      ],
+      "days_model_agrees": 1,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.2663023836729258,
+        "se": 0.022937549344704027,
+        "predicted": 0.1672276340927632,
+        "ratio": 1.5924544117224348,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.3262826748323835,
+        "se": 0.021100153795034642,
+        "predicted": 0.17018865039175823,
+        "ratio": 1.9171823390179752,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.2364800174358599,
+        "se": 0.03601674157969639,
+        "predicted": 0.16637311866108373,
+        "ratio": 1.4213835704888715,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.2789155735001284,
+        "se": 0.021896457528925956,
+        "predicted": 0.15340455406144188,
+        "ratio": 1.8181701006634825,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.34095896519684366,
+        "se": 0.023183108226627374,
+        "predicted": 0.17428499136555986,
+        "ratio": 1.9563300461236384,
+        "model_agrees": false
+       }
+      ]
+     },
+     "lambda": {
+      "observed": {
+       "value": 0.44399804743970184,
+       "se": 0.02555509574214712,
+       "se_unwidened": 0.018516736164570727,
+       "chi2": 7.618792383073383,
+       "nu": 4,
+       "chi2_per_dof": 1.9046980957683457,
+       "widened": true
+      },
+      "predicted_mean": 0.4282946557635118,
+      "predicted_range": [
+       0.35385850067570895,
+       0.4942609787390816
+      ],
+      "observed_over_predicted": 1.0366649255713825,
+      "observed_over_predicted_se_observed_only": 0.05966708993039055,
+      "per_day_observed_over_predicted_range": [
+       0.9844663669499962,
+       1.2799437524070802
+      ],
+      "days_model_agrees": 4,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.48448416514768294,
+        "se": 0.045120652867036586,
+        "predicted": 0.38947980729684495,
+        "ratio": 1.2439262731236531,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.4152659323606036,
+        "se": 0.03684775182222932,
+        "predicted": 0.41181504189044876,
+        "ratio": 1.0083797096247709,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.6298077791442831,
+        "se": 0.0988041566225288,
+        "predicted": 0.49205895021547447,
+        "ratio": 1.2799437524070802,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.48658331006441297,
+        "se": 0.042439993782077225,
+        "predicted": 0.4942609787390816,
+        "ratio": 0.9844663669499962,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.40385006189914274,
+        "se": 0.03114029597108834,
+        "predicted": 0.35385850067570895,
+        "ratio": 1.1412755695510286,
+        "model_agrees": true
+       }
+      ],
+      "within_placement_test": {
+       "nu": 4,
+       "one_sided_p_lambda_below_1": 1.320183415581806e-05
+      }
+     }
+    },
+    "binomial": {
+     "eps3": {
+      "observed": {
+       "value": 0.138148417008392,
+       "se": 0.0032000821176400586,
+       "se_unwidened": 0.002417526990777523,
+       "chi2": 7.008733943537673,
+       "nu": 4,
+       "chi2_per_dof": 1.7521834858844183,
+       "widened": true
+      },
+      "predicted_mean": 0.0709206097878501,
+      "predicted_range": [
+       0.061673956844500014,
+       0.08187995418950117
+      ],
+      "observed_over_predicted": 1.9479304735484546,
+      "observed_over_predicted_se_observed_only": 0.045122033316023276,
+      "per_day_observed_over_predicted_range": [
+       1.8104069825559328,
+       2.2367823661329442
+      ],
+      "days_model_agrees": 0,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.130148045808116,
+        "se": 0.00479617943926669,
+        "predicted": 0.06513640105795887,
+        "ratio": 1.9980846914202288,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.13890123204495503,
+        "se": 0.008826043209781656,
+        "predicted": 0.07008958122383124,
+        "ratio": 1.9817671845031235,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.1491629346476025,
+        "se": 0.005382439172664663,
+        "predicted": 0.08187995418950117,
+        "ratio": 1.8217271385177265,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.13727077038013563,
+        "se": 0.005092548389661333,
+        "predicted": 0.07582315562345918,
+        "ratio": 1.8104069825559328,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.13795121911942182,
+        "se": 0.004896036885144936,
+        "predicted": 0.061673956844500014,
+        "ratio": 2.2367823661329442,
+        "model_agrees": false
+       }
+      ]
+     },
+     "eps5": {
+      "observed": {
+       "value": 0.306933751743225,
+       "se": 0.012137408940139352,
+       "se_unwidened": 0.009551298370927358,
+       "chi2": 6.459324998501385,
+       "nu": 4,
+       "chi2_per_dof": 1.6148312496253463,
+       "widened": true
+      },
+      "predicted_mean": 0.16634001510143573,
+      "predicted_range": [
+       0.15341993831235662,
+       0.1743169623673438
+      ],
+      "observed_over_predicted": 1.845218972452623,
+      "observed_over_predicted_se_observed_only": 0.07296746325733976,
+      "per_day_observed_over_predicted_range": [
+       1.695544090511879,
+       2.043301316880112
+      ],
+      "days_model_agrees": 0,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.28362150710381573,
+        "se": 0.022435091839573096,
+        "predicted": 0.1672746280624241,
+        "ratio": 1.695544090511879,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.328089633279757,
+        "se": 0.02150953112925158,
+        "predicted": 0.17019955529103203,
+        "ratio": 1.9276762076066618,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.29779668016282973,
+        "se": 0.018180794429071445,
+        "predicted": 0.16648899147402213,
+        "ratio": 1.7886869127277765,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.28944290054422417,
+        "se": 0.02053114920253893,
+        "predicted": 0.15341993831235662,
+        "ratio": 1.8866055072641892,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.35618207875973446,
+        "se": 0.02657658256833545,
+        "predicted": 0.1743169623673438,
+        "ratio": 2.043301316880112,
+        "model_agrees": false
+       }
+      ]
+     },
+     "lambda": {
+      "observed": {
+       "value": 0.44564810508172714,
+       "se": 0.021203510237993772,
+       "se_unwidened": 0.01635212751130726,
+       "chi2": 6.7255373645389,
+       "nu": 4,
+       "chi2_per_dof": 1.681384341134725,
+       "widened": true
+      },
+      "predicted_mean": 0.42820669337675704,
+      "predicted_range": [
+       0.35380353126239367,
+       0.49421969828384615
+      ],
+      "observed_over_predicted": 1.040731291627953,
+      "observed_over_predicted_se_observed_only": 0.04951699860361102,
+      "per_day_observed_over_predicted_range": [
+       0.9596107800942691,
+       1.178432753592986
+      ],
+      "days_model_agrees": 5,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.4588793252568012,
+        "se": 0.04017478178835859,
+        "predicted": 0.3893979727376889,
+        "ratio": 1.178432753592986,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.42336367247091916,
+        "se": 0.03870916809788158,
+        "predicted": 0.4118082512259321,
+        "ratio": 1.0280601984311561,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.5008885074408584,
+        "se": 0.03557686243936978,
+        "predicted": 0.49180401337392443,
+        "ratio": 1.0184717770085112,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.4742585502081159,
+        "se": 0.03805485155657004,
+        "predicted": 0.49421969828384615,
+        "ratio": 0.9596107800942691,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.38730533439465364,
+        "se": 0.03207039573261844,
+        "predicted": 0.35380353126239367,
+        "ratio": 1.0946904147980756,
+        "model_agrees": true
+       }
+      ],
+      "within_placement_test": {
+       "nu": 4,
+       "one_sided_p_lambda_below_1": 6.35896124870651e-06
+      }
+     }
+    }
+   },
+   "placement 2": {
+    "wls": {
+     "eps3": {
+      "observed": {
+       "value": 0.1560744944304962,
+       "se": 0.012746223782963985,
+       "se_unwidened": 0.0034184160328607966,
+       "chi2": 55.61260464536934,
+       "nu": 4,
+       "chi2_per_dof": 13.903151161342334,
+       "widened": true
+      },
+      "predicted_mean": 0.08363765482042096,
+      "predicted_range": [
+       0.07667528152167408,
+       0.08789648303121184
+      ],
+      "observed_over_predicted": 1.8660792769190495,
+      "observed_over_predicted_se_observed_only": 0.15239814901949963,
+      "per_day_observed_over_predicted_range": [
+       1.5575677693191223,
+       2.9112548905016493
+      ],
+      "days_model_agrees": 0,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.1369047290059207,
+        "se": 0.004851094649637961,
+        "predicted": 0.08789648303121184,
+        "ratio": 1.5575677693191223,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.20092900790469348,
+        "se": 0.009853436783046992,
+        "predicted": 0.08511052637879918,
+        "ratio": 2.3608009074039096,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.14935156972641367,
+        "se": 0.009008020437043128,
+        "predicted": 0.08732771898617647,
+        "ratio": 1.7102424231423616,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.1695262540961796,
+        "se": 0.007441113005834264,
+        "predicted": 0.07667528152167408,
+        "ratio": 2.2109635691165868,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.236330618608813,
+        "se": 0.02041808975142341,
+        "predicted": 0.08117826418424323,
+        "ratio": 2.9112548905016493,
+        "model_agrees": false
+       }
+      ]
+     },
+     "eps5": {
+      "observed": {
+       "value": 0.26340153612159395,
+       "se": 0.009626743251212657,
+       "se_unwidened": 0.009626743251212657,
+       "chi2": 1.715308630726239,
+       "nu": 4,
+       "chi2_per_dof": 0.42882715768155977,
+       "widened": false
+      },
+      "predicted_mean": 0.1647454569173657,
+      "predicted_range": [
+       0.15420911184660457,
+       0.18267788834550525
+      ],
+      "observed_over_predicted": 1.5988394523905622,
+      "observed_over_predicted_se_observed_only": 0.05843404383552327,
+      "per_day_observed_over_predicted_range": [
+       1.271434123823153,
+       1.734148200172728
+      ],
+      "days_model_agrees": 2,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.23252356487041265,
+        "se": 0.04192484950144667,
+        "predicted": 0.15420911184660457,
+        "ratio": 1.5078458210803347,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.2795280044822869,
+        "se": 0.038761726601141785,
+        "predicted": 0.16119037833931654,
+        "ratio": 1.734148200172728,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.2664550174439152,
+        "se": 0.013009812028599941,
+        "predicted": 0.16300048918778015,
+        "ratio": 1.6346884526030665,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.23226290091043122,
+        "se": 0.033756868185871314,
+        "predicted": 0.18267788834550525,
+        "ratio": 1.271434123823153,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.2692203583770151,
+        "se": 0.018999604784334146,
+        "predicted": 0.16264941686762202,
+        "ratio": 1.65521871250316,
+        "model_agrees": false
+       }
+      ]
+     },
+     "lambda": {
+      "observed": {
+       "value": 0.6318809936914626,
+       "se": 0.05463625439278196,
+       "se_unwidened": 0.033535500331745516,
+       "chi2": 10.61725499545518,
+       "nu": 4,
+       "chi2_per_dof": 2.654313748863795,
+       "widened": true
+      },
+      "predicted_mean": 0.5105150356236962,
+      "predicted_range": [
+       0.4197294057650555,
+       0.569982421782213
+      ],
+      "observed_over_predicted": 1.237732387097069,
+      "observed_over_predicted_se_observed_only": 0.10702183203288589,
+      "per_day_observed_over_predicted_range": [
+       1.0329754856522155,
+       1.7588339646662199
+      ],
+      "days_model_agrees": 3,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.5887778689537074,
+        "se": 0.10818941006662965,
+        "predicted": 0.569982421782213,
+        "ratio": 1.0329754856522155,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.718815305381776,
+        "se": 0.10572649801994864,
+        "predicted": 0.5280124487308778,
+        "ratio": 1.3613605268389197,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.5605132572061622,
+        "se": 0.04349574487103985,
+        "predicted": 0.5357512693447994,
+        "ratio": 1.0462191865483503,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.7298895063811974,
+        "se": 0.11081367894992586,
+        "predicted": 0.4197294057650555,
+        "ratio": 1.7389525164452135,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.8778333853855753,
+        "se": 0.09792790811001188,
+        "predicted": 0.4990996324955351,
+        "ratio": 1.7588339646662199,
+        "model_agrees": false
+       }
+      ],
+      "within_placement_test": {
+       "nu": 4,
+       "one_sided_p_lambda_below_1": 0.001264328655866579
+      }
+     }
+    },
+    "binomial": {
+     "eps3": {
+      "observed": {
+       "value": 0.15863345144795135,
+       "se": 0.013500394969709322,
+       "se_unwidened": 0.003348587954542451,
+       "chi2": 65.0173881057457,
+       "nu": 4,
+       "chi2_per_dof": 16.254347026436424,
+       "widened": true
+      },
+      "predicted_mean": 0.08365576910457671,
+      "predicted_range": [
+       0.07672472808540354,
+       0.08791486541601995
+      ],
+      "observed_over_predicted": 1.8962643359317666,
+      "observed_over_predicted_se_observed_only": 0.16138032217279238,
+      "per_day_observed_over_predicted_range": [
+       1.5765026192559979,
+       3.1361008838706796
+      ],
+      "days_model_agrees": 0,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.138598015599894,
+        "se": 0.004705461879398298,
+        "predicted": 0.08791486541601995,
+        "ratio": 1.5765026192559979,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.20458652307922198,
+        "se": 0.009697046862162176,
+        "predicted": 0.08512039547129405,
+        "ratio": 2.403495918298648,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.15374336877211242,
+        "se": 0.009706095032648812,
+        "predicted": 0.08733260530276002,
+        "ratio": 1.7604349285026264,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.17071748407711018,
+        "se": 0.006989774107000107,
+        "predicted": 0.07672472808540354,
+        "ratio": 2.2250646999632475,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.2546082742951371,
+        "se": 0.02085028384481341,
+        "predicted": 0.08118625124740603,
+        "ratio": 3.1361008838706796,
+        "model_agrees": false
+       }
+      ]
+     },
+     "eps5": {
+      "observed": {
+       "value": 0.2874956316437102,
+       "se": 0.010455237697409593,
+       "se_unwidened": 0.008919481577181828,
+       "chi2": 5.496023580689484,
+       "nu": 4,
+       "chi2_per_dof": 1.374005895172371,
+       "widened": true
+      },
+      "predicted_mean": 0.1648307217316675,
+      "predicted_range": [
+       0.15422534385641012,
+       0.18299018199812933
+      ],
+      "observed_over_predicted": 1.744187179570398,
+      "observed_over_predicted_se_observed_only": 0.0634301517797754,
+      "per_day_observed_over_predicted_range": [
+       1.5834116340344913,
+       2.08311926441533
+      ],
+      "days_model_agrees": 0,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.3141377784392419,
+        "se": 0.02179266178894043,
+        "predicted": 0.15422534385641012,
+        "ratio": 2.03687520211799,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.33582236695998346,
+        "se": 0.032990255775168786,
+        "predicted": 0.1612113010986142,
+        "ratio": 2.08311926441533,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.26893464838293,
+        "se": 0.01371271857265674,
+        "predicted": 0.1630402192565003,
+        "ratio": 1.649498814521545,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.2897487830899269,
+        "se": 0.023504359389880686,
+        "predicted": 0.18299018199812933,
+        "ratio": 1.5834116340344913,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.2850663087912219,
+        "se": 0.020340550077183106,
+        "predicted": 0.16268656244868346,
+        "ratio": 1.7522424993222223,
+        "model_agrees": false
+       }
+      ]
+     },
+     "lambda": {
+      "observed": {
+       "value": 0.5400165787729481,
+       "se": 0.054735736201940985,
+       "se_unwidened": 0.02236832943874299,
+       "chi2": 23.95161588070369,
+       "nu": 4,
+       "chi2_per_dof": 5.987903970175923,
+       "widened": true
+      },
+      "predicted_mean": 0.5104031045162192,
+      "predicted_range": [
+       0.41928330387795276,
+       0.5700416236249222
+      ],
+      "observed_over_predicted": 1.058019776907113,
+      "observed_over_predicted_se_observed_only": 0.1072402101743126,
+      "per_day_observed_over_predicted_range": [
+       0.7739809575062399,
+       1.789764193645424
+      ],
+      "days_model_agrees": 2,
+      "per_day": [
+       {
+        "day": "2026-10-04",
+        "value": 0.4412013616716289,
+        "se": 0.03415777746948473,
+        "predicted": 0.5700416236249222,
+        "ratio": 0.7739809575062399,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-05",
+        "value": 0.6092105327326232,
+        "se": 0.0666729875626928,
+        "predicted": 0.5280051391634464,
+        "ratio": 1.1537965969381205,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-06",
+        "value": 0.5716755713573979,
+        "se": 0.04642862376058532,
+        "predicted": 0.5356506860762096,
+        "ratio": 1.0672544369262003,
+        "model_agrees": true
+       },
+       {
+        "day": "2026-10-07",
+        "value": 0.5891913755652461,
+        "se": 0.053696194015824705,
+        "predicted": 0.41928330387795276,
+        "ratio": 1.4052345278617417,
+        "model_agrees": false
+       },
+       {
+        "day": "2026-10-08",
+        "value": 0.8931545624411484,
+        "se": 0.09719062419041352,
+        "predicted": 0.49903476983856465,
+        "ratio": 1.789764193645424,
+        "model_agrees": false
+       }
+      ],
+      "within_placement_test": {
+       "nu": 4,
+       "one_sided_p_lambda_below_1": 0.0005486717603228376
+      }
+     }
+    }
+   }
+  },
+  "replicates_fits_placement_pooled_to": 6.938893903907228e-18,
+  "observed_over_predicted_range_eps3_eps5_both_placements": {
+   "X wls": [
+    1.1406870738981407,
+    1.2781882868909968
+   ],
+   "Z wls": [
+    1.5988394523905622,
+    1.9282200942649577
+   ],
+   "X binomial": [
+    1.1886827889282645,
+    1.2868743574516317
+   ],
+   "Z binomial": [
+    1.744187179570398,
+    1.9479304735484546
+   ]
+  }
+ },
+ "placements_compared": {
+  "note": "No estimate, p-value or bound across placements is given: on every day these were the only usable distance-5 placements, and they overlap.",
+  "Lambda_X wls": {
+   "placement_1_minus_placement_2": 0.18157750888994517,
+   "se": 0.03270529930482157,
+   "chi2_between_placements_1dof": 30.823918753324502,
+   "plain_mean_of_the_two_descriptive_only": 0.5914751912858865
+  },
+  "Lambda_X binomial": {
+   "placement_1_minus_placement_2": 0.171074111702549,
+   "se": 0.030758494778269575,
+   "chi2_between_placements_1dof": 30.93416729269964,
+   "plain_mean_of_the_two_descriptive_only": 0.570980441146422
+  },
+  "Lambda_Z wls": {
+   "placement_1_minus_placement_2": -0.18788294625176072,
+   "se": 0.06031735415668605,
+   "chi2_between_placements_1dof": 9.702645367423235,
+   "plain_mean_of_the_two_descriptive_only": 0.5379395205655821
+  },
+  "Lambda_Z binomial": {
+   "placement_1_minus_placement_2": -0.09436847369122092,
+   "se": 0.05869914534285128,
+   "chi2_between_placements_1dof": 2.584581942505879,
+   "plain_mean_of_the_two_descriptive_only": 0.4928323419273376
+  },
+  "overlap": {
+   "source": "runs/combined.json spots + src/heavyhex/patches/placement.py (read only)",
+   "d5_qubits_each": 65,
+   "d5_shared": 51,
+   "placement_2_d3_spots": [
+    [
+     [
+      3,
+      11
+     ],
+     [
+      1,
+      1
+     ]
+    ],
+    [
+     [
+      5,
+      15
+     ],
+     [
+      1,
+      -1
+     ]
+    ],
+    [
+     [
+      7,
+      13
+     ],
+     [
+      1,
+      -1
+     ]
+    ]
+   ],
+   "placement_2_d3_inside_placement_1_d5": true,
+   "placement_1_d3_qubits_in_placement_2_d5": 5
+  }
+ },
+ "per_repetition": {
+  "source": "docs/analysis/results/fits.json (per_rep); prespecified verdicts from runs/combined.json",
+  "rows": [
+   {
+    "day": "2026-10-04",
+    "day_number": 1,
+    "rep": 1,
+    "placement": 1,
+    "pairing": "paired",
+    "X wls": {
+     "eps3": [
+      0.13212567107699597,
+      0.007146099787959185
+     ],
+     "eps5": [
+      0.17583215364117033,
+      0.012829227101130452
+     ],
+     "lambda": [
+      0.7514306589603149,
+      0.06824729106793398
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X binomial": {
+     "eps3": [
+      0.13316110953571542,
+      0.006793371368353424
+     ],
+     "eps5": [
+      0.185528767847486,
+      0.014582577035107278
+     ],
+     "lambda": [
+      0.7177383382677373,
+      0.06744307249811426
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X predicted wls": {
+     "eps3": 0.09736389071282398,
+     "eps5": 0.17919477045836096,
+     "lambda": 0.5433411391625861
+    },
+    "Z wls": {
+     "eps3": [
+      0.1290192880306154,
+      0.004569666944569313
+     ],
+     "eps5": [
+      0.2663023836729258,
+      0.022937549344704027
+     ],
+     "lambda": [
+      0.48448416514768294,
+      0.045120652867036586
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z binomial": {
+     "eps3": [
+      0.130148045808116,
+      0.00479617943926669
+     ],
+     "eps5": [
+      0.28362150710381573,
+      0.022435091839573096
+     ],
+     "lambda": [
+      0.4588793252568012,
+      0.04017478178835859
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z predicted wls": {
+     "eps3": 0.06513178670115671,
+     "eps5": 0.1672276340927632,
+     "lambda": 0.38947980729684495
+    }
+   },
+   {
+    "day": "2026-10-04",
+    "day_number": 1,
+    "rep": 2,
+    "placement": 2,
+    "pairing": "split",
+    "X wls": {
+     "eps3": [
+      0.10057854274032302,
+      0.004277628968398016
+     ],
+     "eps5": [
+      0.2200421378076251,
+      0.013165567871839659
+     ],
+     "lambda": [
+      0.4570876457683537,
+      0.03355375978431788
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X binomial": {
+     "eps3": [
+      0.10096937010858734,
+      0.0043084840585063885
+     ],
+     "eps5": [
+      0.2304513263143117,
+      0.01396847493226304
+     ],
+     "lambda": [
+      0.4381375092234253,
+      0.03253001163594724
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X predicted wls": {
+     "eps3": 0.08066946798416152,
+     "eps5": 0.20125815002550612,
+     "lambda": 0.40082584468722393
+    },
+    "Z wls": {
+     "eps3": [
+      0.1369047290059207,
+      0.004851094649637961
+     ],
+     "eps5": [
+      0.23252356487041265,
+      0.04192484950144667
+     ],
+     "lambda": [
+      0.5887778689537074,
+      0.10818941006662965
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z binomial": {
+     "eps3": [
+      0.138598015599894,
+      0.004705461879398298
+     ],
+     "eps5": [
+      0.3141377784392419,
+      0.02179266178894043
+     ],
+     "lambda": [
+      0.4412013616716289,
+      0.03415777746948473
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z predicted wls": {
+     "eps3": 0.08789648303121184,
+     "eps5": 0.15420911184660457,
+     "lambda": 0.569982421782213
+    }
+   },
+   {
+    "day": "2026-10-05",
+    "day_number": 2,
+    "rep": 1,
+    "placement": 1,
+    "pairing": "paired",
+    "X wls": {
+     "eps3": [
+      0.11887216581576376,
+      0.005846426920322467
+     ],
+     "eps5": [
+      0.18180065566839276,
+      0.012147472521827112
+     ],
+     "lambda": [
+      0.6538599400465774,
+      0.05424870319978346
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X binomial": {
+     "eps3": [
+      0.1194702563556212,
+      0.005473417113278922
+     ],
+     "eps5": [
+      0.18844344145747888,
+      0.01280440176564708
+     ],
+     "lambda": [
+      0.6339846875624957,
+      0.05205738172917429
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X predicted wls": {
+     "eps3": 0.11767979426872083,
+     "eps5": 0.1432070609963697,
+     "lambda": 0.8217457536657637
+    },
+    "Z wls": {
+     "eps3": [
+      0.13549407917738138,
+      0.008232350835890724
+     ],
+     "eps5": [
+      0.3262826748323835,
+      0.021100153795034642
+     ],
+     "lambda": [
+      0.4152659323606036,
+      0.03684775182222932
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z binomial": {
+     "eps3": [
+      0.13890123204495503,
+      0.008826043209781656
+     ],
+     "eps5": [
+      0.328089633279757,
+      0.02150953112925158
+     ],
+     "lambda": [
+      0.42336367247091916,
+      0.03870916809788158
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z predicted wls": {
+     "eps3": 0.07008624619036086,
+     "eps5": 0.17018865039175823,
+     "lambda": 0.41181504189044876
+    }
+   },
+   {
+    "day": "2026-10-05",
+    "day_number": 2,
+    "rep": 2,
+    "placement": 2,
+    "pairing": "split",
+    "X wls": {
+     "eps3": [
+      0.11987383676648578,
+      0.005548160624001011
+     ],
+     "eps5": [
+      0.22026917301886972,
+      0.013762017325330464
+     ],
+     "lambda": [
+      0.5442152214200967,
+      0.042314859486916864
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X binomial": {
+     "eps3": [
+      0.12024495366170984,
+      0.005269388881515645
+     ],
+     "eps5": [
+      0.22801807702288085,
+      0.013831962956203023
+     ],
+     "lambda": [
+      0.5273483367270204,
+      0.039525540422340105
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X predicted wls": {
+     "eps3": 0.07699965885880455,
+     "eps5": 0.1834437802837574,
+     "lambda": 0.4197452687668054
+    },
+    "Z wls": {
+     "eps3": [
+      0.20092900790469348,
+      0.009853436783046992
+     ],
+     "eps5": [
+      0.2795280044822869,
+      0.038761726601141785
+     ],
+     "lambda": [
+      0.718815305381776,
+      0.10572649801994864
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z binomial": {
+     "eps3": [
+      0.20458652307922198,
+      0.009697046862162176
+     ],
+     "eps5": [
+      0.33582236695998346,
+      0.032990255775168786
+     ],
+     "lambda": [
+      0.6092105327326232,
+      0.0666729875626928
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z predicted wls": {
+     "eps3": 0.08511052637879918,
+     "eps5": 0.16119037833931654,
+     "lambda": 0.5280124487308778
+    }
+   },
+   {
+    "day": "2026-10-06",
+    "day_number": 3,
+    "rep": 1,
+    "placement": 1,
+    "pairing": "paired",
+    "X wls": {
+     "eps3": [
+      0.13689523784270996,
+      0.008987268651563188
+     ],
+     "eps5": [
+      0.19826851152177755,
+      0.011970653515971536
+     ],
+     "lambda": [
+      0.6904537528021618,
+      0.06158318191342642
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X binomial": {
+     "eps3": [
+      0.14119595979902388,
+      0.009235225458454926
+     ],
+     "eps5": [
+      0.2033607884110898,
+      0.011785054400212963
+     ],
+     "lambda": [
+      0.6943126101261914,
+      0.060746387867795515
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X predicted wls": {
+     "eps3": 0.10421187396907927,
+     "eps5": 0.16630630357556264,
+     "lambda": 0.626626121370858
+    },
+    "Z wls": {
+     "eps3": [
+      0.14893695459328027,
+      0.005602336809871675
+     ],
+     "eps5": [
+      0.2364800174358599,
+      0.03601674157969639
+     ],
+     "lambda": [
+      0.6298077791442831,
+      0.0988041566225288
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z binomial": {
+     "eps3": [
+      0.1491629346476025,
+      0.005382439172664663
+     ],
+     "eps5": [
+      0.29779668016282973,
+      0.018180794429071445
+     ],
+     "lambda": [
+      0.5008885074408584,
+      0.03557686243936978
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z predicted wls": {
+     "eps3": 0.08186538211244743,
+     "eps5": 0.16637311866108373,
+     "lambda": 0.49205895021547447
+    }
+   },
+   {
+    "day": "2026-10-06",
+    "day_number": 3,
+    "rep": 2,
+    "placement": 2,
+    "pairing": "split",
+    "X wls": {
+     "eps3": [
+      0.11132129840018845,
+      0.005108073249377235
+     ],
+     "eps5": [
+      0.21409397932364954,
+      0.015009549897172918
+     ],
+     "lambda": [
+      0.5199646377346377,
+      0.04356715663759779
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X binomial": {
+     "eps3": [
+      0.11147257200701838,
+      0.0053505195457560495
+     ],
+     "eps5": [
+      0.22843996171097652,
+      0.013695830576195417
+     ],
+     "lambda": [
+      0.487973168845362,
+      0.037534626092133816
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X predicted wls": {
+     "eps3": 0.10218901394103413,
+     "eps5": 0.19000963786122022,
+     "lambda": 0.5378096347705859
+    },
+    "Z wls": {
+     "eps3": [
+      0.14935156972641367,
+      0.009008020437043128
+     ],
+     "eps5": [
+      0.2664550174439152,
+      0.013009812028599941
+     ],
+     "lambda": [
+      0.5605132572061622,
+      0.04349574487103985
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z binomial": {
+     "eps3": [
+      0.15374336877211242,
+      0.009706095032648812
+     ],
+     "eps5": [
+      0.26893464838293,
+      0.01371271857265674
+     ],
+     "lambda": [
+      0.5716755713573979,
+      0.04642862376058532
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z predicted wls": {
+     "eps3": 0.08732771898617647,
+     "eps5": 0.16300048918778015,
+     "lambda": 0.5357512693447994
+    }
+   },
+   {
+    "day": "2026-10-07",
+    "day_number": 4,
+    "rep": 1,
+    "placement": 1,
+    "pairing": "paired",
+    "X wls": {
+     "eps3": [
+      0.12136845989432898,
+      0.00897021569460341
+     ],
+     "eps5": [
+      0.1779143529947857,
+      0.009621142326527849
+     ],
+     "lambda": [
+      0.6821735169274737,
+      0.06247345063766216
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X binomial": {
+     "eps3": [
+      0.12539458569865009,
+      0.009724243044135009
+     ],
+     "eps5": [
+      0.18339933378973294,
+      0.010783033342748341
+     ],
+     "lambda": [
+      0.6837243249880874,
+      0.06661697535374861
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X predicted wls": {
+     "eps3": 0.09730269699406918,
+     "eps5": 0.15797121277864218,
+     "lambda": 0.6159520793855966
+    },
+    "Z wls": {
+     "eps3": [
+      0.13571566298220655,
+      0.005157654054491978
+     ],
+     "eps5": [
+      0.2789155735001284,
+      0.021896457528925956
+     ],
+     "lambda": [
+      0.48658331006441297,
+      0.042439993782077225
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z binomial": {
+     "eps3": [
+      0.13727077038013563,
+      0.005092548389661333
+     ],
+     "eps5": [
+      0.28944290054422417,
+      0.02053114920253893
+     ],
+     "lambda": [
+      0.4742585502081159,
+      0.03805485155657004
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z predicted wls": {
+     "eps3": 0.07582188503344062,
+     "eps5": 0.15340455406144188,
+     "lambda": 0.4942609787390816
+    }
+   },
+   {
+    "day": "2026-10-07",
+    "day_number": 4,
+    "rep": 2,
+    "placement": 2,
+    "pairing": "split",
+    "X wls": {
+     "eps3": [
+      0.10473616756280252,
+      0.005350291905804298
+     ],
+     "eps5": [
+      0.21173169097937972,
+      0.013770455587491761
+     ],
+     "lambda": [
+      0.49466457797761904,
+      0.04090901489514736
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X binomial": {
+     "eps3": [
+      0.10640610577490736,
+      0.005548228725443964
+     ],
+     "eps5": [
+      0.2185016382212091,
+      0.01602217933633797
+     ],
+     "lambda": [
+      0.48698081461148024,
+      0.043916129198711656
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X predicted wls": {
+     "eps3": 0.08788901735040122,
+     "eps5": 0.19340773378365855,
+     "lambda": 0.4544234898523337
+    },
+    "Z wls": {
+     "eps3": [
+      0.1695262540961796,
+      0.007441113005834264
+     ],
+     "eps5": [
+      0.23226290091043122,
+      0.033756868185871314
+     ],
+     "lambda": [
+      0.7298895063811974,
+      0.11081367894992586
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z binomial": {
+     "eps3": [
+      0.17071748407711018,
+      0.006989774107000107
+     ],
+     "eps5": [
+      0.2897487830899269,
+      0.023504359389880686
+     ],
+     "lambda": [
+      0.5891913755652461,
+      0.053696194015824705
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z predicted wls": {
+     "eps3": 0.07667528152167408,
+     "eps5": 0.18267788834550525,
+     "lambda": 0.4197294057650555
+    }
+   },
+   {
+    "day": "2026-10-08",
+    "day_number": 5,
+    "rep": 1,
+    "placement": 1,
+    "pairing": "paired",
+    "X wls": {
+     "eps3": [
+      0.12451627598132203,
+      0.005959000324729531
+     ],
+     "eps5": [
+      0.19057691385490516,
+      0.015875694730467616
+     ],
+     "lambda": [
+      0.653364950993602,
+      0.06276983948594984
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X binomial": {
+     "eps3": [
+      0.12484759251254263,
+      0.005963132058408718
+     ],
+     "eps5": [
+      0.20569034599747577,
+      0.012923076864835764
+     ],
+     "lambda": [
+      0.6069686542997733,
+      0.0479867029507412
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X predicted wls": {
+     "eps3": 0.09570654872316176,
+     "eps5": 0.15849507949320052,
+     "lambda": 0.6038455517306301
+    },
+    "Z wls": {
+     "eps3": [
+      0.13769629919981297,
+      0.005007618744063347
+     ],
+     "eps5": [
+      0.34095896519684366,
+      0.023183108226627374
+     ],
+     "lambda": [
+      0.40385006189914274,
+      0.03114029597108834
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z binomial": {
+     "eps3": [
+      0.13795121911942182,
+      0.004896036885144936
+     ],
+     "eps5": [
+      0.35618207875973446,
+      0.02657658256833545
+     ],
+     "lambda": [
+      0.38730533439465364,
+      0.03207039573261844
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "Z predicted wls": {
+     "eps3": 0.06167222573489589,
+     "eps5": 0.17428499136555986,
+     "lambda": 0.35385850067570895
+    }
+   },
+   {
+    "day": "2026-10-08",
+    "day_number": 5,
+    "rep": 2,
+    "placement": 2,
+    "pairing": "split",
+    "X wls": {
+     "eps3": [
+      0.11914550724390593,
+      0.005407700497325645
+     ],
+     "eps5": [
+      0.2317597818051766,
+      0.01536543624366256
+     ],
+     "lambda": [
+      0.5140905221599785,
+      0.041305396465292965
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X binomial": {
+     "eps3": [
+      0.11980728769867927,
+      0.005612858783772684
+     ],
+     "eps5": [
+      0.2355494424117337,
+      0.014229149617458164
+     ],
+     "lambda": [
+      0.5086290439578267,
+      0.03894334512156525
+     ],
+     "verdict": "d = 5 worse"
+    },
+    "X predicted wls": {
+     "eps3": 0.08225532351674242,
+     "eps5": 0.19299486072553523,
+     "lambda": 0.42620473523240915
+    },
+    "Z wls": {
+     "eps3": [
+      0.236330618608813,
+      0.02041808975142341
+     ],
+     "eps5": [
+      0.2692203583770151,
+      0.018999604784334146
+     ],
+     "lambda": [
+      0.8778333853855753,
+      0.09792790811001188
+     ],
+     "verdict": "undecided"
+    },
+    "Z binomial": {
+     "eps3": [
+      0.2546082742951371,
+      0.02085028384481341
+     ],
+     "eps5": [
+      0.2850663087912219,
+      0.020340550077183106
+     ],
+     "lambda": [
+      0.8931545624411484,
+      0.09719062419041352
+     ],
+     "verdict": "undecided"
+    },
+    "Z predicted wls": {
+     "eps3": 0.08117826418424323,
+     "eps5": 0.16264941686762202,
+     "lambda": 0.4990996324955351
+    }
+   }
+  ],
+  "Lambda_X_range": {
+   "wls": [
+    0.4570876457683537,
+    0.7514306589603149
+   ],
+   "binomial": [
+    0.4381375092234253,
+    0.7177383382677373
+   ]
+  },
+  "prespecified_verdicts": {
+   "d = 5 worse": 10
+  },
+  "verdicts": {
+   "X wls": {
+    "d = 5 worse": 10
+   },
+   "X binomial": {
+    "d = 5 worse": 10
+   },
+   "Z wls": {
+    "d = 5 worse": 9,
+    "undecided": 1
+   },
+   "Z binomial": {
+    "d = 5 worse": 9,
+    "undecided": 1
+   }
+  },
+  "binomial_lowers_Lambda_X_in": 8,
+  "binomial_raises_Lambda_X_max": 0.0038588573240295743,
+  "eps5_binomial_minus_wls_pp": {
+   "X": {
+    "mean": 0.850937725686431,
+    "max": 1.5113432142570604
+   },
+   "Z": {
+    "mean": 3.1991322479146302,
+    "max": 8.161421356882926
+   }
+  },
+  "per_rep_observed_over_predicted_range": {
+   "X eps3 wls": [
+    1.0101323388135788,
+    1.5568099721883217
+   ],
+   "X eps3 binomial": [
+    1.0151318618676497,
+    1.5615481850019455
+   ],
+   "X eps5 wls": [
+    0.9812348496075559,
+    1.2694950542487664
+   ],
+   "X eps5 binomial": [
+    1.034190786950781,
+    1.3156009015675296
+   ],
+   "X lambda wls": [
+    0.7956961592192516,
+    1.382981344130214
+   ],
+   "X lambda binomial": [
+    0.7716107982733418,
+    1.3223320935252711
+   ],
+   "Z eps3 wls": [
+    1.5575677693191223,
+    2.9112548905016493
+   ],
+   "Z eps3 binomial": [
+    1.5765026192559979,
+    3.1361008838706796
+   ],
+   "Z eps5 wls": [
+    1.271434123823153,
+    1.9563300461236384
+   ],
+   "Z eps5 binomial": [
+    1.5834116340344913,
+    2.08311926441533
+   ],
+   "Z lambda wls": [
+    0.9844663669499962,
+    1.7588339646662199
+   ],
+   "Z lambda binomial": [
+    0.7739809575062399,
+    1.789764193645424
+   ]
+  }
+ },
+ "prespecified_pooled_record": {
+  "prespecified": {
+   "source": "runs/combined.json (pooled_x), the prespecified code at v0.2.0",
+   "Lambda_X": 0.5544544353150603,
+   "se": 0.029622947034676324,
+   "chi2_per_dof": 3.9360203402585885,
+   "nu": 9,
+   "chi2": 35.424183062327295,
+   "birge_ratio": 1.9839406090552683,
+   "t9_critical": 1.833112932656237,
+   "verdict": "d = 5 worse",
+   "predicted_inverse_variance_weighted": 0.5054871811981743,
+   "note": "Record only (appendix): the rule treats the ten repetitions as independent."
+  },
+  "same_rule_other_fits_and_Z": {
+   "X wls": {
+    "Lambda": 0.5544544353150606,
+    "se": 0.029622947034676328,
+    "sqrt_chi2_per_dof": 1.9839406090552665,
+    "verdict": "d = 5 worse",
+    "predicted_inverse_variance_weighted": 0.5054871811981746,
+    "prespecified": true
+   },
+   "X binomial": {
+    "Lambda": 0.5375121856120855,
+    "se": 0.028760487505446127,
+    "sqrt_chi2_per_dof": 2.0320926263260057,
+    "verdict": "d = 5 worse",
+    "predicted_inverse_variance_weighted": 0.5084625616580999,
+    "prespecified": false
+   },
+   "Z wls": {
+    "Lambda": 0.48789540073104987,
+    "se": 0.0351383054833216,
+    "sqrt_chi2_per_dof": 2.1677067846653277,
+    "verdict": "d = 5 worse",
+    "predicted_inverse_variance_weighted": 0.4334718772370994,
+    "prespecified": false
+   },
+   "Z binomial": {
+    "Lambda": 0.4785154447550252,
+    "se": 0.028610925875409577,
+    "sqrt_chi2_per_dof": 2.1673524981091385,
+    "verdict": "d = 5 worse",
+    "predicted_inverse_variance_weighted": 0.46075228589958805,
+    "prespecified": false
+   }
+  },
+  "same_rule_other_fits_source": "docs/analysis/results/fits.json (summary.pooled_lambda)"
+ },
+ "agreement_tests": {
+  "source": "docs/analysis/results/fits.json (agreement, agreement_tests); wls replicates runs/combined.json model",
+  "wls": {
+   "X lambda": {
+    "chi2": 24.969855471470506,
+    "bar": 18.307038053275146,
+    "agrees": false,
+    "reps_agreeing": 8
+   },
+   "X eps3": {
+    "chi2": 52.07847784518813,
+    "bar": 18.307038053275146,
+    "agrees": false,
+    "reps_agreeing": 5
+   },
+   "X eps5": {
+    "chi2": 19.799261018394546,
+    "bar": 18.307038053275146,
+    "agrees": false,
+    "reps_agreeing": 9
+   },
+   "Z lambda": {
+    "chi2": 35.155575225920565,
+    "bar": 18.307038053275146,
+    "agrees": false,
+    "reps_agreeing": 7
+   },
+   "Z eps3": {
+    "chi2": 1239.5780569023889,
+    "bar": 18.307038053275146,
+    "agrees": false,
+    "reps_agreeing": 0
+   },
+   "Z eps5": {
+    "chi2": 270.5309022473109,
+    "bar": 18.307038053275146,
+    "agrees": false,
+    "reps_agreeing": 3
+   },
+   "reps_agreeing_on_all_three_X": 4
+  },
+  "binomial": {
+   "X lambda": {
+    "chi2": 24.592414387938675,
+    "bar": 18.307038053275146,
+    "agrees": false,
+    "reps_agreeing": 8
+   },
+   "X eps3": {
+    "chi2": 56.600852300062854,
+    "bar": 18.307038053275146,
+    "agrees": false,
+    "reps_agreeing": 5
+   },
+   "X eps5": {
+    "chi2": 32.60115221610294,
+    "bar": 18.307038053275146,
+    "agrees": false,
+    "reps_agreeing": 7
+   },
+   "Z lambda": {
+    "chi2": 45.43688039355625,
+    "bar": 18.307038053275146,
+    "agrees": false,
+    "reps_agreeing": 7
+   },
+   "Z eps3": {
+    "chi2": 1322.7356120471793,
+    "bar": 18.307038053275146,
+    "agrees": false,
+    "reps_agreeing": 0
+   },
+   "Z eps5": {
+    "chi2": 420.2926040854602,
+    "bar": 18.307038053275146,
+    "agrees": false,
+    "reps_agreeing": 0
+   },
+   "reps_agreeing_on_all_three_X": 4
+  }
+ },
+ "fit_bias": {
+  "source": "docs/analysis/results/fits.json (curves[*].bootstrap: parametric, 2000 replicates; per_rep)",
+  "X eps3": {
+   "wls_bias_pp_mean": -0.1456856646932425,
+   "wls_bias_pp_range": [
+    -0.23184153733347979,
+    -0.052702110403893276
+   ],
+   "binomial_bias_pp_mean": 0.0014889775837642616,
+   "observed_shift_binomial_minus_wls_pp_mean": 0.13536629827628988
+  },
+  "X eps5": {
+   "wls_bias_pp_mean": -0.8641326998504303,
+   "wls_bias_pp_range": [
+    -1.2200540475316908,
+    -0.46599252374140143
+   ],
+   "binomial_bias_pp_mean": 0.025955605239276758,
+   "observed_shift_binomial_minus_wls_pp_mean": 0.850937725686431
+  },
+  "Z eps3": {
+   "wls_bias_pp_mean": -0.4120847447230338,
+   "wls_bias_pp_range": [
+    -2.3974917191106253,
+    -0.09838174994213911
+   ],
+   "binomial_bias_pp_mean": 0.012396218107780244,
+   "observed_shift_binomial_minus_wls_pp_mean": 0.35783404498389626
+  },
+  "Z eps5": {
+   "wls_bias_pp_mean": -3.301012604021071,
+   "wls_bias_pp_range": [
+    -6.011158302279018,
+    -1.3201677544838752
+   ],
+   "binomial_bias_pp_mean": 0.05550375081304293,
+   "observed_shift_binomial_minus_wls_pp_mean": 3.1991322479146302
+  },
+  "binomial_goodness_of_fit": {
+   "deviance": 148.28295388234255,
+   "dof": 160,
+   "p": 0.7370249090261082,
+   "curves_with_A_above_1": 12,
+   "points_with_P_at_or_above_half": 13
+  }
+ },
+ "cross_pairing": {
+  "source": "docs/analysis/results/fits.json",
+  "wls": {
+   "per_day": [
+    {
+     "day": "2026-10-04",
+     "rep2_eps3_over_rep1_eps5": 0.572014507344196,
+     "rep2_own": 0.4570876457683537,
+     "rep1_own": 0.7514306589603149
+    },
+    {
+     "day": "2026-10-05",
+     "rep2_eps3_over_rep1_eps5": 0.659369661378656,
+     "rep2_own": 0.5442152214200967,
+     "rep1_own": 0.6538599400465774
+    },
+    {
+     "day": "2026-10-06",
+     "rep2_eps3_over_rep1_eps5": 0.5614673633536663,
+     "rep2_own": 0.5199646377346377,
+     "rep1_own": 0.6904537528021618
+    },
+    {
+     "day": "2026-10-07",
+     "rep2_eps3_over_rep1_eps5": 0.5886886909336209,
+     "rep2_own": 0.49466457797761904,
+     "rep1_own": 0.6821735169274737
+    },
+    {
+     "day": "2026-10-08",
+     "rep2_eps3_over_rep1_eps5": 0.6251833175062159,
+     "rep2_own": 0.5140905221599785,
+     "rep1_own": 0.653364950993602
+    }
+   ],
+   "mean_rep2_eps3_over_rep1_eps5": 0.601344708103271,
+   "mean_rep2_own": 0.5060045210121371,
+   "mean_rep1_own": 0.686256563946026
+  },
+  "binomial": {
+   "per_day": [
+    {
+     "day": "2026-10-04",
+     "rep2_eps3_over_rep1_eps5": 0.5442248729404016,
+     "rep2_own": 0.4381375092234253,
+     "rep1_own": 0.7177383382677373
+    },
+    {
+     "day": "2026-10-05",
+     "rep2_eps3_over_rep1_eps5": 0.6380957210911603,
+     "rep2_own": 0.5273483367270204,
+     "rep1_own": 0.6339846875624957
+    },
+    {
+     "day": "2026-10-06",
+     "rep2_eps3_over_rep1_eps5": 0.5481517497939612,
+     "rep2_own": 0.487973168845362,
+     "rep1_own": 0.6943126101261914
+    },
+    {
+     "day": "2026-10-07",
+     "rep2_eps3_over_rep1_eps5": 0.5801880714403347,
+     "rep2_own": 0.48698081461148024,
+     "rep1_own": 0.6837243249880874
+    },
+    {
+     "day": "2026-10-08",
+     "rep2_eps3_over_rep1_eps5": 0.5824643209076499,
+     "rep2_own": 0.5086290439578267,
+     "rep1_own": 0.6069686542997733
+    }
+   ],
+   "mean_rep2_eps3_over_rep1_eps5": 0.5786249472347015,
+   "mean_rep2_own": 0.489813774673023,
+   "mean_rep1_own": 0.667345723048857
+  }
+ },
+ "check": {
+  "X": {
+   "max_abs_dev_lambda": 0.0,
+   "max_abs_dev_se": 0.0
+  },
+  "Z": {
+   "max_abs_dev_lambda": 0.0,
+   "max_abs_dev_se": 0.0
+  }
+ }
+}

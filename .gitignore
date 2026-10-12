@@ -18,9 +18,8 @@ dist/
 runs/*/rehearsal*
 runs/rehearsal_combined.json
 
-# Large intermediates that the scripts rebuild (docs/diagnosis/revision/README.md)
-docs/diagnosis/revision/**/cache/
-docs/diagnosis/revision/**/*per_shot.npz
+# Large intermediates the analysis scripts rebuild (docs/analysis/README.md)
+docs/analysis/cache/
 *.pkl
 
 # Local editor settings

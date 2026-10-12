@@ -1,0 +1,44 @@
+1. Per placement (inverse-variance mean over 5 days; chi2/nu with nu = 4; ratio = observed / mean predicted)
+   X placement 1 wls     : eps3 12.5 +- 0.3 (chi2/nu 1.00; pred 10.2; ratio 1.225; agrees 2/5); eps5 18.4 +- 0.5 (chi2/nu 0.61; pred 16.1; ratio 1.142; agrees 4/5); lambda 0.682 +- 0.027 (chi2/nu 0.38; pred 0.642; ratio 1.062; agrees 3/5)
+   X placement 1 binomial: eps3 12.7 +- 0.4 (chi2/nu 1.31; pred 10.2; ratio 1.237; agrees 2/5); eps5 19.3 +- 0.6 (chi2/nu 0.73; pred 16.1; ratio 1.199; agrees 3/5); lambda 0.657 +- 0.026 (chi2/nu 0.66; pred 0.642; ratio 1.022; agrees 3/5)
+   X placement 2 wls     : eps3 11.0 +- 0.4 (chi2/nu 2.98; pred 8.6; ratio 1.278; agrees 3/5); eps5 21.9 +- 0.6 (chi2/nu 0.27; pred 19.2; ratio 1.141; agrees 5/5); lambda 0.501 +- 0.018 (chi2/nu 0.77; pred 0.448; ratio 1.118; agrees 5/5)
+   X placement 2 binomial: eps3 11.1 +- 0.4 (chi2/nu 2.91; pred 8.6; ratio 1.287; agrees 3/5); eps5 22.9 +- 0.6 (chi2/nu 0.16; pred 19.2; ratio 1.189; agrees 4/5); lambda 0.485 +- 0.017 (chi2/nu 0.90; pred 0.448; ratio 1.085; agrees 5/5)
+   Z placement 1 wls     : eps3 13.7 +- 0.3 (chi2/nu 1.92; pred 7.1; ratio 1.928; agrees 0/5); eps5 29.8 +- 1.7 (chi2/nu 2.70; pred 16.6; ratio 1.789; agrees 1/5); lambda 0.444 +- 0.026 (chi2/nu 1.90; pred 0.428; ratio 1.037; agrees 4/5)
+   Z placement 1 binomial: eps3 13.8 +- 0.3 (chi2/nu 1.75; pred 7.1; ratio 1.948; agrees 0/5); eps5 30.7 +- 1.2 (chi2/nu 1.61; pred 16.6; ratio 1.845; agrees 0/5); lambda 0.446 +- 0.021 (chi2/nu 1.68; pred 0.428; ratio 1.041; agrees 5/5)
+   Z placement 2 wls     : eps3 15.6 +- 1.3 (chi2/nu 13.90; pred 8.4; ratio 1.866; agrees 0/5); eps5 26.3 +- 1.0 (chi2/nu 0.43; pred 16.5; ratio 1.599; agrees 2/5); lambda 0.632 +- 0.055 (chi2/nu 2.65; pred 0.511; ratio 1.238; agrees 3/5)
+   Z placement 2 binomial: eps3 15.9 +- 1.4 (chi2/nu 16.25; pred 8.4; ratio 1.896; agrees 0/5); eps5 28.7 +- 1.0 (chi2/nu 1.37; pred 16.5; ratio 1.744; agrees 0/5); lambda 0.540 +- 0.055 (chi2/nu 5.99; pred 0.510; ratio 1.058; agrees 2/5)
+   observed/predicted eps3, eps5 range, X wls: 1.14-1.28
+   observed/predicted eps3, eps5 range, Z wls: 1.60-1.93
+   observed/predicted eps3, eps5 range, X binomial: 1.19-1.29
+   observed/predicted eps3, eps5 range, Z binomial: 1.74-1.95
+2. Placements compared
+   Lambda_X wls: P1 - P2 = 0.182 +- 0.033
+   Lambda_X binomial: P1 - P2 = 0.171 +- 0.031
+   Lambda_Z wls: P1 - P2 = -0.188 +- 0.060
+   Lambda_Z binomial: P1 - P2 = -0.094 +- 0.059
+   d5 patches share 51 of 65 qubits; placement-2 d3 inside placement-1 d5: True
+3. Per repetition
+   Lambda_X range wls 0.457-0.751, binomial 0.438-0.718; verdicts {'X wls': {'d = 5 worse': 10}, 'X binomial': {'d = 5 worse': 10}, 'Z wls': {'d = 5 worse': 9, 'undecided': 1}, 'Z binomial': {'d = 5 worse': 9, 'undecided': 1}}
+   binomial lowers Lambda_X in 8 of 10 (max rise 0.0039); eps5 shift (pp) {'X': {'mean': 0.850937725686431, 'max': 1.5113432142570604}, 'Z': {'mean': 3.1991322479146302, 'max': 8.161421356882926}}
+4. Prespecified 10-repetition rule (record only)
+   Lambda_X 0.554 +- 0.030, chi2/nu 3.94 (nu 9): d = 5 worse; predicted 0.505
+5. Agreement tests (chi2 vs 18.31; reps agreeing)
+   wls: X lambda 25.0 (8), X eps3 52.1 (5), X eps5 19.8 (9), Z lambda 35.2 (7), Z eps3 1239.6 (0), Z eps5 270.5 (3); all three X: 4
+   binomial: X lambda 24.6 (8), X eps3 56.6 (5), X eps5 32.6 (7), Z lambda 45.4 (7), Z eps3 1322.7 (0), Z eps5 420.3 (0); all three X: 4
+6. Weighted-log bias (bootstrap, pp): X eps3 -0.15 (shift +0.14), X eps5 -0.86 (shift +0.85), Z eps3 -0.41 (shift +0.36), Z eps5 -3.30 (shift +3.20)
+7. Cross pairing (mean): wls 0.601 vs own 0.506; binomial 0.579 vs own 0.490
+8. Prespecified drift check: 40 comparisons, max |change| 2.51 SE, second half worse 15/40
+   calibration-scatter check (exploratory): X lambda chi2 25.0->7.8 (scatter 16%), X eps3 chi2 52.1->35.3 (scatter 9%), X eps5 chi2 19.8->13.4 (scatter 8%)
+   detectors beyond chance (two-patch jobs) 757-834 of 1428; largest ratio 5.3; excess slope [25, 40]; f from memory agrees in 10/15
+9. XY-variance correction
+   excluded 11 -> 12 of 340; sigma_f new/old median 1.029; IQR 0.46-1.53
+   largest job change ibm_fez-2026-10-07-r1: median f 1.011 -> 1.143; verdict changes {'pooled_verdict_changed': False, 'any_per_rep_Lambda_verdict_changed': False, 'any_model_agreement_decision_changed': False, 'median_f_reps_agreeing_changed': False, 'per_qubit_f_reps_agreeing_changed': True}
+   per-qubit f (side prediction): chi2 X lambda 37.2, X eps3 39.6, X eps5 50.5; predicted Lambda_X placement 1 0.642->0.799, placement 2 0.448->0.477
+10. Heating (exploratory; fractional change start->end of a job)
+   detection events DL -0.21% [-0.57, +0.15]; rise excluded above (DL/HKSJ/t) 0.15%/0.21%/0.36%
+   step q51 at shot 371 in 68/68 pieces
+11. Decoder
+   Lambda_X calibrated 0.554 +- 0.030, uniform 0.517 +- 0.032; edge p 0.0014-0.50
+12. Leakage
+   fires in 9.1% of rounds (model 6.9%); HMM onset 2.5%, lifetime 31 us, e_L 0.51
+   onset per round = 0.31% per CZ x CZs + 0.94% (two CZ counts only)
