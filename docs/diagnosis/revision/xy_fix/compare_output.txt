@@ -1,0 +1,40 @@
+job                         f ctrl -> fix     sigma_f ctrl -> fix   memory-f agrees
+ibm_fez-2026-10-04-r1       1.0573 -> 1.0558   0.1613 -> 0.1622   False -> False
+ibm_fez-2026-10-04-r2-d3    0.8833 -> 0.8519   0.3833 -> 0.3835   True -> True
+ibm_fez-2026-10-04-r2-d5    0.9471 -> 0.9566   0.1943 -> 0.1959   True -> True
+ibm_fez-2026-10-05-r1       0.7766 -> 0.7727   0.1452 -> 0.1457   True -> True
+ibm_fez-2026-10-05-r2-d3    0.7209 -> 0.7187   0.3523 -> 0.3529   False -> False
+ibm_fez-2026-10-05-r2-d5    0.9444 -> 0.9470   0.2098 -> 0.2120   True -> True
+ibm_fez-2026-10-06-r1       1.0508 -> 1.0437   0.2179 -> 0.2182   False -> False
+ibm_fez-2026-10-06-r2-d3    1.5228 -> 1.5177   0.3150 -> 0.3151   True -> True
+ibm_fez-2026-10-06-r2-d5    1.1283 -> 1.1277   0.1907 -> 0.1906   True -> True
+ibm_fez-2026-10-07-r1       1.0109 -> 1.1428   0.2256 -> 0.2331   True -> True
+ibm_fez-2026-10-07-r2-d3    1.0334 -> 1.0299   0.2535 -> 0.2547   True -> True
+ibm_fez-2026-10-07-r2-d5    1.0957 -> 1.0988   0.2806 -> 0.2833   True -> True
+ibm_fez-2026-10-08-r1       0.9908 -> 0.9915   0.1544 -> 0.1543   False -> False
+ibm_fez-2026-10-08-r2-d3    0.7912 -> 0.7878   0.1948 -> 0.1951   False -> False
+ibm_fez-2026-10-08-r2-d5    0.9806 -> 0.9841   0.1988 -> 0.1997   True -> True
+memory-f agreements: 10 -> 10
+
+[median_f]
+  X lambda  chi2    25.24 ->    26.18   reps agreeing 8 -> 8
+  X eps3    chi2    52.16 ->    55.42   reps agreeing 5 -> 5
+  X eps5    chi2    21.99 ->    20.93   reps agreeing 8 -> 8
+  Z eps3    chi2  1244.85 ->  1255.81   reps agreeing 0 -> 0
+  Z eps5    chi2   271.16 ->   269.35   reps agreeing 3 -> 3
+  Z lambda  chi2    35.44 ->    36.07   reps agreeing 7 -> 7
+  reps agreeing on all three X: 4 -> 4
+  mean predicted Lambda_X placement 1: 0.6450 -> 0.6420; placement 2: 0.4468 -> 0.4465
+
+[per_qubit_f]
+  X lambda  chi2    35.02 ->    34.64   reps agreeing 9 -> 9
+  X eps3    chi2    39.85 ->    41.74   reps agreeing 5 -> 5
+  X eps5    chi2    55.11 ->    52.11   reps agreeing 4 -> 5
+  Z eps3    chi2  1240.63 ->  1236.70   reps agreeing 0 -> 0
+  Z eps5    chi2   269.01 ->   268.85   reps agreeing 3 -> 3
+  Z lambda  chi2    35.98 ->    35.62   reps agreeing 7 -> 7
+  reps agreeing on all three X: 3 -> 4
+  mean predicted Lambda_X placement 1: 0.7939 -> 0.7960; placement 2: 0.4748 -> 0.4779
+
+pooled X: {'lambda': 0.5544544353150603, 'lambda_uncertainty': 0.02962294703467632, 'predicted': 0.5058124965919755, 'verdict': 'd = 5 worse'} -> {'lambda': 0.5577424828814714, 'lambda_uncertainty': 0.029911271238429828, 'predicted': 0.507237392190026, 'verdict': 'd = 5 worse'}
+verdicts unchanged: True {'d = 5 worse'}

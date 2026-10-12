@@ -1,0 +1,15 @@
+{
+  // Type checks for everything but runs/. src/ is the code of tag v0.2.0, which every job
+  // in runs/ records and which stays byte-identical (tests/test_provenance.py): it is
+  // analysed for the code that imports it, but its own 26 reports (third-party stubs:
+  // stim's union return types, qiskit's options, GzipFile for BinaryIO) are not shown.
+  "include": ["src", "tests", "scripts", "docs", "paper/figures"],
+  "exclude": ["runs", "build", ".venv", "docs/diagnosis/revision", "**/__pycache__"],
+  "ignore": ["src"],
+  "extraPaths": ["src", "docs/diagnosis", "docs/figures"],
+  "pythonVersion": "3.10",
+  "typeCheckingMode": "basic",
+  "reportMissingTypeStubs": false,
+  "venvPath": ".",
+  "venv": ".venv"
+}

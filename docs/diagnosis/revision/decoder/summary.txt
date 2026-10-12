@@ -1,0 +1,848 @@
+{
+ "fault_scan": {
+  "X d3": {
+   "circuits": 60,
+   "mechanisms": 5940,
+   "hyperedge_mechanisms": 1560,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 60,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 689,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0
+  },
+  "X d3 rounds=1": {
+   "circuits": 10,
+   "mechanisms": 330,
+   "hyperedge_mechanisms": 80,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 10,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 27,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0
+  },
+  "X d3 rounds=2": {
+   "circuits": 10,
+   "mechanisms": 550,
+   "hyperedge_mechanisms": 140,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 10,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 57,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0
+  },
+  "X d3 rounds=3": {
+   "circuits": 10,
+   "mechanisms": 770,
+   "hyperedge_mechanisms": 200,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 10,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 86,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0
+  },
+  "X d3 rounds=4": {
+   "circuits": 10,
+   "mechanisms": 990,
+   "hyperedge_mechanisms": 260,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 10,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 115,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0
+  },
+  "X d3 rounds=6": {
+   "circuits": 10,
+   "mechanisms": 1430,
+   "hyperedge_mechanisms": 380,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 10,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 173,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0
+  },
+  "X d3 rounds=8": {
+   "circuits": 10,
+   "mechanisms": 1870,
+   "hyperedge_mechanisms": 500,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 10,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 231,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0
+  },
+  "X d5": {
+   "circuits": 60,
+   "mechanisms": 17820,
+   "hyperedge_mechanisms": 2640,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 4,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 13,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0,
+   "pairs": 3377880,
+   "undetectable_logical_pairs": 0,
+   "pair_miscorrections_calibrated": 76560,
+   "pair_miscorrections_calibrated_with_hyperedge": 8460,
+   "circuits_with_pair_miscorrection_calibrated": 60,
+   "pair_miscorrections_uniform": 0,
+   "pair_miscorrections_uniform_with_hyperedge": 0,
+   "circuits_with_pair_miscorrection_uniform": 0
+  },
+  "X d5 rounds=1": {
+   "circuits": 10,
+   "mechanisms": 990,
+   "hyperedge_mechanisms": 140,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 0,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 0,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0,
+   "pairs": 48510,
+   "undetectable_logical_pairs": 0,
+   "pair_miscorrections_calibrated": 2091,
+   "pair_miscorrections_calibrated_with_hyperedge": 238,
+   "circuits_with_pair_miscorrection_calibrated": 10,
+   "pair_miscorrections_uniform": 0,
+   "pair_miscorrections_uniform_with_hyperedge": 0,
+   "circuits_with_pair_miscorrection_uniform": 0
+  },
+  "X d5 rounds=2": {
+   "circuits": 10,
+   "mechanisms": 1650,
+   "hyperedge_mechanisms": 240,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 0,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 0,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0,
+   "pairs": 135300,
+   "undetectable_logical_pairs": 0,
+   "pair_miscorrections_calibrated": 5092,
+   "pair_miscorrections_calibrated_with_hyperedge": 570,
+   "circuits_with_pair_miscorrection_calibrated": 10,
+   "pair_miscorrections_uniform": 0,
+   "pair_miscorrections_uniform_with_hyperedge": 0,
+   "circuits_with_pair_miscorrection_uniform": 0
+  },
+  "X d5 rounds=3": {
+   "circuits": 10,
+   "mechanisms": 2310,
+   "hyperedge_mechanisms": 340,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 1,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 1,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0,
+   "pairs": 265650,
+   "undetectable_logical_pairs": 0,
+   "pair_miscorrections_calibrated": 8595,
+   "pair_miscorrections_calibrated_with_hyperedge": 951,
+   "circuits_with_pair_miscorrection_calibrated": 10,
+   "pair_miscorrections_uniform": 0,
+   "pair_miscorrections_uniform_with_hyperedge": 0,
+   "circuits_with_pair_miscorrection_uniform": 0
+  },
+  "X d5 rounds=4": {
+   "circuits": 10,
+   "mechanisms": 2970,
+   "hyperedge_mechanisms": 440,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 1,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 2,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0,
+   "pairs": 439560,
+   "undetectable_logical_pairs": 0,
+   "pair_miscorrections_calibrated": 12290,
+   "pair_miscorrections_calibrated_with_hyperedge": 1349,
+   "circuits_with_pair_miscorrection_calibrated": 10,
+   "pair_miscorrections_uniform": 0,
+   "pair_miscorrections_uniform_with_hyperedge": 0,
+   "circuits_with_pair_miscorrection_uniform": 0
+  },
+  "X d5 rounds=6": {
+   "circuits": 10,
+   "mechanisms": 4290,
+   "hyperedge_mechanisms": 640,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 1,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 4,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0,
+   "pairs": 918060,
+   "undetectable_logical_pairs": 0,
+   "pair_miscorrections_calibrated": 20088,
+   "pair_miscorrections_calibrated_with_hyperedge": 2207,
+   "circuits_with_pair_miscorrection_calibrated": 10,
+   "pair_miscorrections_uniform": 0,
+   "pair_miscorrections_uniform_with_hyperedge": 0,
+   "circuits_with_pair_miscorrection_uniform": 0
+  },
+  "X d5 rounds=8": {
+   "circuits": 10,
+   "mechanisms": 5610,
+   "hyperedge_mechanisms": 840,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 1,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 6,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0,
+   "pairs": 1570800,
+   "undetectable_logical_pairs": 0,
+   "pair_miscorrections_calibrated": 28404,
+   "pair_miscorrections_calibrated_with_hyperedge": 3145,
+   "circuits_with_pair_miscorrection_calibrated": 10,
+   "pair_miscorrections_uniform": 0,
+   "pair_miscorrections_uniform_with_hyperedge": 0,
+   "circuits_with_pair_miscorrection_uniform": 0
+  },
+  "Z d3": {
+   "circuits": 60,
+   "mechanisms": 11700,
+   "hyperedge_mechanisms": 6720,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 29,
+   "circuits_with_single_miscorrection_uniform": 60,
+   "single_miscorrections_calibrated": 328,
+   "single_miscorrections_calibrated_hyperedge": 252,
+   "single_miscorrections_uniform": 240,
+   "single_miscorrections_uniform_hyperedge": 240
+  },
+  "Z d3 rounds=1": {
+   "circuits": 10,
+   "mechanisms": 510,
+   "hyperedge_mechanisms": 280,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 2,
+   "circuits_with_single_miscorrection_uniform": 10,
+   "single_miscorrections_calibrated": 5,
+   "single_miscorrections_calibrated_hyperedge": 4,
+   "single_miscorrections_uniform": 10,
+   "single_miscorrections_uniform_hyperedge": 10
+  },
+  "Z d3 rounds=2": {
+   "circuits": 10,
+   "mechanisms": 990,
+   "hyperedge_mechanisms": 560,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 3,
+   "circuits_with_single_miscorrection_uniform": 10,
+   "single_miscorrections_calibrated": 10,
+   "single_miscorrections_calibrated_hyperedge": 8,
+   "single_miscorrections_uniform": 20,
+   "single_miscorrections_uniform_hyperedge": 20
+  },
+  "Z d3 rounds=3": {
+   "circuits": 10,
+   "mechanisms": 1470,
+   "hyperedge_mechanisms": 840,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 6,
+   "circuits_with_single_miscorrection_uniform": 10,
+   "single_miscorrections_calibrated": 31,
+   "single_miscorrections_calibrated_hyperedge": 24,
+   "single_miscorrections_uniform": 30,
+   "single_miscorrections_uniform_hyperedge": 30
+  },
+  "Z d3 rounds=4": {
+   "circuits": 10,
+   "mechanisms": 1950,
+   "hyperedge_mechanisms": 1120,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 6,
+   "circuits_with_single_miscorrection_uniform": 10,
+   "single_miscorrections_calibrated": 52,
+   "single_miscorrections_calibrated_hyperedge": 40,
+   "single_miscorrections_uniform": 40,
+   "single_miscorrections_uniform_hyperedge": 40
+  },
+  "Z d3 rounds=6": {
+   "circuits": 10,
+   "mechanisms": 2910,
+   "hyperedge_mechanisms": 1680,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 6,
+   "circuits_with_single_miscorrection_uniform": 10,
+   "single_miscorrections_calibrated": 94,
+   "single_miscorrections_calibrated_hyperedge": 72,
+   "single_miscorrections_uniform": 60,
+   "single_miscorrections_uniform_hyperedge": 60
+  },
+  "Z d3 rounds=8": {
+   "circuits": 10,
+   "mechanisms": 3870,
+   "hyperedge_mechanisms": 2240,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 6,
+   "circuits_with_single_miscorrection_uniform": 10,
+   "single_miscorrections_calibrated": 136,
+   "single_miscorrections_calibrated_hyperedge": 104,
+   "single_miscorrections_uniform": 80,
+   "single_miscorrections_uniform_hyperedge": 80
+  },
+  "Z d5": {
+   "circuits": 60,
+   "mechanisms": 31260,
+   "hyperedge_mechanisms": 19920,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 0,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 0,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0,
+   "pairs": 10956570,
+   "undetectable_logical_pairs": 0,
+   "pair_miscorrections_calibrated": 85705,
+   "pair_miscorrections_calibrated_with_hyperedge": 80406,
+   "circuits_with_pair_miscorrection_calibrated": 60,
+   "pair_miscorrections_uniform": 146840,
+   "pair_miscorrections_uniform_with_hyperedge": 143560,
+   "circuits_with_pair_miscorrection_uniform": 60
+  },
+  "Z d5 rounds=1": {
+   "circuits": 10,
+   "mechanisms": 1340,
+   "hyperedge_mechanisms": 830,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 0,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 0,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0,
+   "pairs": 89110,
+   "undetectable_logical_pairs": 0,
+   "pair_miscorrections_calibrated": 750,
+   "pair_miscorrections_calibrated_with_hyperedge": 685,
+   "circuits_with_pair_miscorrection_calibrated": 10,
+   "pair_miscorrections_uniform": 2140,
+   "pair_miscorrections_uniform_with_hyperedge": 2030,
+   "circuits_with_pair_miscorrection_uniform": 10
+  },
+  "Z d5 rounds=2": {
+   "circuits": 10,
+   "mechanisms": 2630,
+   "hyperedge_mechanisms": 1660,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 0,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 0,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0,
+   "pairs": 344530,
+   "undetectable_logical_pairs": 0,
+   "pair_miscorrections_calibrated": 4121,
+   "pair_miscorrections_calibrated_with_hyperedge": 3858,
+   "circuits_with_pair_miscorrection_calibrated": 10,
+   "pair_miscorrections_uniform": 9200,
+   "pair_miscorrections_uniform_with_hyperedge": 8930,
+   "circuits_with_pair_miscorrection_uniform": 10
+  },
+  "Z d5 rounds=3": {
+   "circuits": 10,
+   "mechanisms": 3920,
+   "hyperedge_mechanisms": 2490,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 0,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 0,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0,
+   "pairs": 766360,
+   "undetectable_logical_pairs": 0,
+   "pair_miscorrections_calibrated": 8551,
+   "pair_miscorrections_calibrated_with_hyperedge": 8033,
+   "circuits_with_pair_miscorrection_calibrated": 10,
+   "pair_miscorrections_uniform": 16640,
+   "pair_miscorrections_uniform_with_hyperedge": 16230,
+   "circuits_with_pair_miscorrection_uniform": 10
+  },
+  "Z d5 rounds=4": {
+   "circuits": 10,
+   "mechanisms": 5210,
+   "hyperedge_mechanisms": 3320,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 0,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 0,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0,
+   "pairs": 1354600,
+   "undetectable_logical_pairs": 0,
+   "pair_miscorrections_calibrated": 13431,
+   "pair_miscorrections_calibrated_with_hyperedge": 12620,
+   "circuits_with_pair_miscorrection_calibrated": 10,
+   "pair_miscorrections_uniform": 24300,
+   "pair_miscorrections_uniform_with_hyperedge": 23750,
+   "circuits_with_pair_miscorrection_uniform": 10
+  },
+  "Z d5 rounds=6": {
+   "circuits": 10,
+   "mechanisms": 7790,
+   "hyperedge_mechanisms": 4980,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 0,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 0,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0,
+   "pairs": 3030310,
+   "undetectable_logical_pairs": 0,
+   "pair_miscorrections_calibrated": 23766,
+   "pair_miscorrections_calibrated_with_hyperedge": 22315,
+   "circuits_with_pair_miscorrection_calibrated": 10,
+   "pair_miscorrections_uniform": 39620,
+   "pair_miscorrections_uniform_with_hyperedge": 38790,
+   "circuits_with_pair_miscorrection_uniform": 10
+  },
+  "Z d5 rounds=8": {
+   "circuits": 10,
+   "mechanisms": 10370,
+   "hyperedge_mechanisms": 6640,
+   "undetectable_single": 0,
+   "circuits_with_single_miscorrection_calibrated": 0,
+   "circuits_with_single_miscorrection_uniform": 0,
+   "single_miscorrections_calibrated": 0,
+   "single_miscorrections_calibrated_hyperedge": 0,
+   "single_miscorrections_uniform": 0,
+   "single_miscorrections_uniform_hyperedge": 0,
+   "pairs": 5371660,
+   "undetectable_logical_pairs": 0,
+   "pair_miscorrections_calibrated": 35086,
+   "pair_miscorrections_calibrated_with_hyperedge": 32895,
+   "circuits_with_pair_miscorrection_calibrated": 10,
+   "pair_miscorrections_uniform": 54940,
+   "pair_miscorrections_uniform_with_hyperedge": 53830,
+   "circuits_with_pair_miscorrection_uniform": 10
+  }
+ },
+ "distances_seen (exact<=4 [None = >4], stim graphlike, stim search)": {
+  "X d3": [
+   "(3, 3, 3)"
+  ],
+  "X d5": [
+   "(None, 5, 5)"
+  ],
+  "Z d3": [
+   "(3, 3, 3)"
+  ],
+  "Z d5": [
+   "(None, 5, 5)"
+  ]
+ },
+ "matching_graph": {
+  "X d3": {
+   "decoder_graph_hops_seen": [
+    3.0
+   ],
+   "weighted_distance_W_range": [
+    5.105489250649545,
+    6.964543152420124
+   ],
+   "max_edge_weight_range": [
+    6.093769900345355,
+    6.580335435821207
+   ],
+   "max_edge_p_range": [
+    0.11522489079687778,
+    0.3088047403894273
+   ],
+   "median_boundary_p_range": [
+    0.052884744525586794,
+    0.1452612477838967
+   ],
+   "fraction_edges_heavier_than_half_W": 0.523373691801307
+  },
+  "X d5": {
+   "decoder_graph_hops_seen": [
+    5.0
+   ],
+   "weighted_distance_W_range": [
+    8.287858350066292,
+    9.54272752482987
+   ],
+   "max_edge_weight_range": [
+    6.238424828867289,
+    6.426020699192515
+   ],
+   "max_edge_p_range": [
+    0.2603791868224281,
+    0.4099064444173226
+   ],
+   "median_boundary_p_range": [
+    0.1013968122565681,
+    0.17685839340153853
+   ],
+   "fraction_edges_heavier_than_half_W": 0.37413521719863313
+  },
+  "Z d3": {
+   "decoder_graph_hops_seen": [
+    3.0
+   ],
+   "weighted_distance_W_range": [
+    5.18614465151793,
+    7.283002259231992
+   ],
+   "max_edge_weight_range": [
+    5.947917479000239,
+    6.474055798803725
+   ],
+   "max_edge_p_range": [
+    0.11107969962400868,
+    0.21549990076356162
+   ],
+   "median_boundary_p_range": [
+    0.028969908844733022,
+    0.06347686203584807
+   ],
+   "fraction_edges_heavier_than_half_W": 0.5233328213241472
+  },
+  "Z d5": {
+   "decoder_graph_hops_seen": [
+    3.0
+   ],
+   "weighted_distance_W_range": [
+    6.037049278126113,
+    6.912512446888894
+   ],
+   "max_edge_weight_range": [
+    6.10376344506047,
+    6.296413716711389
+   ],
+   "max_edge_p_range": [
+    0.24294279470796476,
+    0.49959123449428144
+   ],
+   "median_boundary_p_range": [
+    0.042558259693074044,
+    0.07281141692947861
+   ],
+   "fraction_edges_heavier_than_half_W": 0.46662176547375644
+  }
+ },
+ "miscorrected_probability_mass (mean over jobs)": {
+  "X d3 rounds=1": {
+   "total_p": 1.3640991906005504,
+   "miscorrected_single_p_calibrated": 0.01626626700909712,
+   "miscorrected_single_p_uniform": 0.0
+  },
+  "X d3 rounds=2": {
+   "total_p": 2.238952249747609,
+   "miscorrected_single_p_calibrated": 0.03960115496324289,
+   "miscorrected_single_p_uniform": 0.0
+  },
+  "X d3 rounds=3": {
+   "total_p": 3.113805308894668,
+   "miscorrected_single_p_calibrated": 0.06249474241766188,
+   "miscorrected_single_p_uniform": 0.0
+  },
+  "X d3 rounds=4": {
+   "total_p": 3.988658368041726,
+   "miscorrected_single_p_calibrated": 0.08538832987208088,
+   "miscorrected_single_p_uniform": 0.0
+  },
+  "X d3 rounds=6": {
+   "total_p": 5.738364486335843,
+   "miscorrected_single_p_calibrated": 0.13117550478091886,
+   "miscorrected_single_p_uniform": 0.0
+  },
+  "X d3 rounds=8": {
+   "total_p": 7.488070604629959,
+   "miscorrected_single_p_calibrated": 0.17696267968975687,
+   "miscorrected_single_p_uniform": 0.0
+  },
+  "X d5 rounds=1": {
+   "total_p": 5.031301997720242,
+   "miscorrected_single_p_calibrated": 0.0,
+   "miscorrected_single_p_uniform": 0.0,
+   "total_pair_p": 12.322891584471382,
+   "miscorrected_pair_p_calibrated": 0.08664384788360514,
+   "miscorrected_pair_p_uniform": 0.0
+  },
+  "X d5 rounds=2": {
+   "total_p": 8.33345643026836,
+   "miscorrected_single_p_calibrated": 0.0,
+   "miscorrected_single_p_uniform": 0.0,
+   "total_pair_p": 34.17702078754193,
+   "miscorrected_pair_p_calibrated": 0.16930301901152703,
+   "miscorrected_pair_p_uniform": 0.0
+  },
+  "X d5 rounds=3": {
+   "total_p": 11.635610862816481,
+   "miscorrected_single_p_calibrated": 0.00018081068480820846,
+   "miscorrected_single_p_uniform": 0.0,
+   "total_pair_p": 66.95329679889889,
+   "miscorrected_pair_p_calibrated": 0.2565921229502526,
+   "miscorrected_pair_p_uniform": 0.0
+  },
+  "X d5 rounds=4": {
+   "total_p": 14.9377652953646,
+   "miscorrected_single_p_calibrated": 0.0003616213696164169,
+   "miscorrected_single_p_uniform": 0.0
+  },
+  "X d5 rounds=6": {
+   "total_p": 21.54207416046084,
+   "miscorrected_single_p_calibrated": 0.0007232427392328338,
+   "miscorrected_single_p_uniform": 0.0
+  },
+  "X d5 rounds=8": {
+   "total_p": 28.14638302555708,
+   "miscorrected_single_p_calibrated": 0.0010848641088492508,
+   "miscorrected_single_p_uniform": 0.0
+  },
+  "Z d3 rounds=1": {
+   "total_p": 1.0305086610811256,
+   "miscorrected_single_p_calibrated": 0.0010494557056356536,
+   "miscorrected_single_p_uniform": 0.0017186142391275691
+  },
+  "Z d3 rounds=2": {
+   "total_p": 1.8602014538080358,
+   "miscorrected_single_p_calibrated": 0.0025838534903889062,
+   "miscorrected_single_p_uniform": 0.0034372284782551383
+  },
+  "Z d3 rounds=3": {
+   "total_p": 2.689894246534947,
+   "miscorrected_single_p_calibrated": 0.009474959789776187,
+   "miscorrected_single_p_uniform": 0.005155842717382707
+  },
+  "Z d3 rounds=4": {
+   "total_p": 3.5195870392618565,
+   "miscorrected_single_p_calibrated": 0.01636606608916347,
+   "miscorrected_single_p_uniform": 0.0068744569565102765
+  },
+  "Z d3 rounds=6": {
+   "total_p": 5.178972624715678,
+   "miscorrected_single_p_calibrated": 0.03014827868793803,
+   "miscorrected_single_p_uniform": 0.010311685434765414
+  },
+  "Z d3 rounds=8": {
+   "total_p": 6.838358210169498,
+   "miscorrected_single_p_calibrated": 0.043930491286712586,
+   "miscorrected_single_p_uniform": 0.013748913913020553
+  },
+  "Z d5 rounds=1": {
+   "total_p": 3.887932456576358,
+   "miscorrected_single_p_calibrated": 0.0,
+   "miscorrected_single_p_uniform": 0.0,
+   "total_pair_p": 7.376908252364865,
+   "miscorrected_pair_p_calibrated": 0.0062217889583397416,
+   "miscorrected_pair_p_uniform": 0.24536652073039092
+  },
+  "Z d5 rounds=2": {
+   "total_p": 7.089257606282035,
+   "miscorrected_single_p_calibrated": 0.0,
+   "miscorrected_single_p_uniform": 0.0,
+   "total_pair_p": 24.966203980967883,
+   "miscorrected_pair_p_calibrated": 0.03675103418783519,
+   "miscorrected_pair_p_uniform": 0.5434230358572887
+  },
+  "Z d5 rounds=3": {
+   "total_p": 10.29058275598771,
+   "miscorrected_single_p_calibrated": 0.0,
+   "miscorrected_single_p_uniform": 0.0,
+   "total_pair_p": 52.94902535994752,
+   "miscorrected_pair_p_calibrated": 0.07258267673840553,
+   "miscorrected_pair_p_uniform": 0.8258700828512173
+  },
+  "Z d5 rounds=4": {
+   "total_p": 13.491907905693386,
+   "miscorrected_single_p_calibrated": 0.0,
+   "miscorrected_single_p_uniform": 0.0
+  },
+  "Z d5 rounds=6": {
+   "total_p": 19.894558205104744,
+   "miscorrected_single_p_calibrated": 0.0,
+   "miscorrected_single_p_uniform": 0.0
+  },
+  "Z d5 rounds=8": {
+   "total_p": 26.29720850451609,
+   "miscorrected_single_p_calibrated": 0.0,
+   "miscorrected_single_p_uniform": 0.0
+  }
+ },
+ "hardware": {
+  "pooled": {
+   "calibrated X": {
+    "lambda": 0.5544544353150603,
+    "lambda_uncertainty": 0.02962294703467632,
+    "spread": 3.9360203402585867,
+    "critical": 1.8331129326562368,
+    "verdict": "d = 5 worse",
+    "unweighted_mean": 0.5961305424790814,
+    "unweighted_se": 0.0319517219352111
+   },
+   "calibrated Z": {
+    "lambda": 0.48789540073104914,
+    "lambda_uncertainty": 0.03513830548332168,
+    "spread": 4.698952704284126,
+    "critical": 1.8331129326562368,
+    "verdict": "d = 5 worse",
+    "unweighted_mean": 0.5895820571924544,
+    "unweighted_se": 0.04812908404288693
+   },
+   "uniform X": {
+    "lambda": 0.516711540382325,
+    "lambda_uncertainty": 0.032416686575322935,
+    "spread": 3.122062531218747,
+    "critical": 1.8331129326562368,
+    "verdict": "d = 5 worse",
+    "unweighted_mean": 0.5657315560705846,
+    "unweighted_se": 0.028672528345615064
+   },
+   "uniform Z": {
+    "lambda": 0.5192159818445441,
+    "lambda_uncertainty": 0.023410206590600738,
+    "spread": 1.5366212379290465,
+    "critical": 1.8331129326562368,
+    "verdict": "d = 5 worse",
+    "unweighted_mean": 0.5921509947080552,
+    "unweighted_se": 0.04160796009115872
+   },
+   "difference X": {
+    "uniform_minus_calibrated": -0.037742894932735305,
+    "paired_bootstrap_sd_shot_noise": 0.03068418059892537,
+    "bootstrap_B": 400
+   },
+   "difference Z": {
+    "uniform_minus_calibrated": 0.03132058111349495,
+    "paired_bootstrap_sd_shot_noise": 0.047001975867007516,
+    "bootstrap_B": 400
+   }
+  },
+  "mcnemar": {
+   "X d3": {
+    "cal_only_fails": 18007,
+    "uni_only_fails": 20980,
+    "p_two_sided": 3.00910263761835e-51
+   },
+   "X d5": {
+    "cal_only_fails": 28455,
+    "uni_only_fails": 33586,
+    "p_two_sided": 2.350487853031956e-94
+   },
+   "Z d3": {
+    "cal_only_fails": 17011,
+    "uni_only_fails": 19718,
+    "p_two_sided": 2.6266483395990727e-45
+   },
+   "Z d5": {
+    "cal_only_fails": 25134,
+    "uni_only_fails": 27308,
+    "p_two_sided": 2.302909032105544e-21
+   }
+  },
+  "mean_eps_over_reps (mean, se over reps)": {
+   "calibrated X eps3": [
+    0.11894331633248263,
+    0.003545106357152092
+   ],
+   "calibrated X eps5": [
+    0.20222893506157327,
+    0.006326901167604014
+   ],
+   "calibrated Z eps3": [
+    0.1579904463325317,
+    0.01103963255702541
+   ],
+   "calibrated Z eps5": [
+    0.2728929460722203,
+    0.01167547351230184
+   ],
+   "uniform X eps3": [
+    0.13739240326987417,
+    0.0073313267071018085
+   ],
+   "uniform X eps5": [
+    0.24391653703325375,
+    0.0077189356691341
+   ],
+   "uniform Z eps3": [
+    0.16681193951663936,
+    0.007963904056741139
+   ],
+   "uniform Z eps5": [
+    0.2904678073162927,
+    0.017272612040776094
+   ]
+  }
+ },
+ "model_simulation redecode_sim20000": {
+  "pooled": {
+   "calibrated X": {
+    "lambda": 0.5082683104431818,
+    "lambda_uncertainty": 0.03600704453997364,
+    "spread": 87.27761339862325,
+    "critical": 1.8331129326562368,
+    "verdict": "d = 5 worse"
+   },
+   "calibrated Z": {
+    "lambda": 0.4430697709705515,
+    "lambda_uncertainty": 0.022600652812819002,
+    "spread": 57.26049201531474,
+    "critical": 1.8331129326562368,
+    "verdict": "d = 5 worse"
+   },
+   "uniform X": {
+    "lambda": 0.46506650258751675,
+    "lambda_uncertainty": 0.03730069843167312,
+    "spread": 85.58496747748313,
+    "critical": 1.8331129326562368,
+    "verdict": "d = 5 worse"
+   },
+   "uniform Z": {
+    "lambda": 0.47724410721694,
+    "lambda_uncertainty": 0.021812865264628948,
+    "spread": 45.78545958564483,
+    "critical": 1.8331129326562368,
+    "verdict": "d = 5 worse"
+   }
+  },
+  "mean_over_reps": {
+   "calibrated X eps3": 0.09444771254736609,
+   "calibrated X eps5": 0.17681888384431316,
+   "calibrated Z eps3": 0.07655175219433501,
+   "calibrated Z eps5": 0.16613400330084915,
+   "calibrated X lambda": 0.5448256635370274,
+   "calibrated Z lambda": 0.4631986123718531,
+   "uniform X eps3": 0.12647879779924226,
+   "uniform X eps5": 0.24783538090818363,
+   "uniform Z eps3": 0.09484815549090463,
+   "uniform Z eps5": 0.19557310922385276,
+   "uniform X lambda": 0.509647780646387,
+   "uniform Z lambda": 0.48828096874755345
+  }
+ }
+}

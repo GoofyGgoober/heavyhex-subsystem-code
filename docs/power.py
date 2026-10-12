@@ -32,7 +32,7 @@ from scipy.stats import t as student_t
 
 from heavyhex.experiment import run
 from heavyhex.experiment.circuits import ROUNDS, SETTINGS
-from heavyhex.simulation.noisy import fit_per_round
+from heavyhex.simulation.noisy import Decay, fit_per_round
 
 N = np.array(ROUNDS, dtype=float)
 
@@ -59,7 +59,7 @@ def logical_error(a: float, eps: float) -> np.ndarray:
     return (1 - a * (1 - 2 * eps) ** N) / 2
 
 
-def drawn(p: np.ndarray, shots: int, rng: np.random.Generator, scatter: float = 1.0) -> float:
+def drawn(p: np.ndarray, shots: int, rng: np.random.Generator, scatter: float = 1.0) -> Decay:
     """ε fitted to P(n) as `shots` shots return it."""
     seen = rng.binomial(shots, p) / shots
     seen = np.clip(p + scatter * (seen - p), 0.0, 0.5)
@@ -114,7 +114,7 @@ def at_one(truths: list) -> list:
 
 
 def main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     parser.add_argument("folders", nargs="+", type=Path)
     parser.add_argument("--trials", type=int, default=2000)
     parser.add_argument("--seed", type=int, default=1)
@@ -126,9 +126,10 @@ def main(argv: list[str] | None = None) -> None:
         print(f"f = {end}: predicted Λ per rep {', '.join(f'{v:.2f}' for v in lam)}")
         for reps in (5, 10):
 
-            def rate(truths, check, scatter=1.0):
+            def rate(truths, check, scatter=1.0):  # called within this iteration only
                 hits = sum(
-                    check(campaign(truths, models, reps, rng, scatter)) for _ in range(args.trials)
+                    check(campaign(truths, models, reps, rng, scatter))  # noqa: B023
+                    for _ in range(args.trials)
                 )
                 return hits / args.trials
 

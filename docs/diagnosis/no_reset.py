@@ -23,17 +23,19 @@ from dataclasses import replace
 from functools import cache
 from math import sqrt
 
-from common import REPO, jobs
 from heavyhex.experiment import run as R
 from heavyhex.experiment.circuits import ROUNDS, SETTINGS, for_fez, logical_circuit, with_durations
 from heavyhex.patches.placement import Calibration
 from heavyhex.simulation.noisy import decay, fit_per_round, typical
+
+from common import REPO, jobs
 
 FOLDER = REPO / "runs/ibm_fez-2026-10-04-r1"
 MEMORY = [k for k, s in enumerate(SETTINGS) if s.kind == "memory"]
 
 
 def without_reset_time(calibration: Calibration) -> Calibration:
+    assert calibration.durations_ns is not None, "the calibration has no gate times"
     return replace(calibration, durations_ns={**calibration.durations_ns, "reset": 0})
 
 
@@ -55,8 +57,11 @@ def translated(reset_time: bool) -> tuple[list, list]:
     cal = Calibration.load(FOLDER / "calibration.json")
     if not reset_time:
         cal = without_reset_time(cal)
+    assert cal.durations_ns is not None, "the calibration has no gate times"
     target = with_durations(FakeFez().target, cal.durations_ns)
-    circuits = [for_fez(logical_circuit(s, info["chips"], target.num_qubits)[0], target) for s in SETTINGS]
+    circuits = [
+        for_fez(logical_circuit(s, info["chips"], target.num_qubits)[0], target) for s in SETTINGS
+    ]
     return circuits, [c.estimate_duration(target, unit="s") for c in circuits]
 
 
@@ -66,14 +71,20 @@ def placement(task: tuple) -> tuple:
     f = json.loads((FOLDER / "analysis.json").read_text())["decoupled_dephasing"]
     cal = Calibration.load(FOLDER / "calibration.json")
     model, _, _ = R.simulated(SETTINGS[k], translated(reset_time)[0][k], cal, info["dt"], f)
-    detectors, flips = model.compile_detector_sampler(seed=SETTINGS[k].rounds).sample(shots, separate_observables=True)
+    detectors, flips = model.compile_detector_sampler(seed=SETTINGS[k].rounds).sample(
+        shots, separate_observables=True
+    )
     return task, (R._decode(model, detectors) != flips).mean(axis=0).tolist()
 
 
 def row(e3: tuple, e5: tuple) -> dict:
     lam = e3[0] / e5[0]
-    return {"eps3": e3[0], "eps5": e5[0], "lambda": lam,
-            "lambda_unc": lam * sqrt((e3[1] / e3[0]) ** 2 + (e5[1] / e5[0]) ** 2)}
+    return {
+        "eps3": e3[0],
+        "eps5": e5[0],
+        "lambda": lam,
+        "lambda_unc": lam * sqrt((e3[1] / e3[0]) ** 2 + (e5[1] / e5[0]) ** 2),
+    }
 
 
 def main() -> None:
@@ -85,7 +96,9 @@ def main() -> None:
         tasks = [(t, k, shots) for t in (True, False) for k in MEMORY]
         failed = dict(pool.map(placement, tasks))
     for t, name in ((True, "as_run"), (False, "no_reset_time")):
-        out["uniform"][name] = {b: row(fits[(t, b, 3, shots)], fits[(t, b, 5, shots)]) for b in "XZ"}
+        out["uniform"][name] = {
+            b: row(fits[(t, b, 3, shots)], fits[(t, b, 5, shots)]) for b in "XZ"
+        }
         seconds = translated(t)[1]
         x = [k for k in MEMORY if SETTINGS[k].basis == "X"]
         result = {"round_us": 1e6 * (seconds[x[1]] - seconds[x[0]])}
@@ -101,8 +114,10 @@ def main() -> None:
         for name in ("as_run", "no_reset_time"):
             for b in "XZ":
                 r = out[setting][name][b]
-                print(f"{setting:9s} {name:13s} {b}: eps3 {100*r['eps3']:.2f}%  eps5 {100*r['eps5']:.2f}%  "
-                      f"Λ {r['lambda']:.3f} ± {r['lambda_unc']:.3f}")
+                print(
+                    f"{setting:9s} {name:13s} {b}: eps3 {100 * r['eps3']:.2f}%  eps5 {100 * r['eps5']:.2f}%  "
+                    f"Λ {r['lambda']:.3f} ± {r['lambda_unc']:.3f}"
+                )
     (REPO / "docs/diagnosis/results/no_reset.json").write_text(json.dumps(out, indent=1) + "\n")
 
 

@@ -1,0 +1,180 @@
+2026-10-04-r1 X1 d3: W=6.96 hops=3 heavy(>W/2)=10/25 max w=6.47 median p=0.0374 max p=0.169 median bdy p=0.120 | d5: W=8.73 hops=5 heavy(>W/2)=30/85 max w=6.31 median p=0.0409 max p=0.356 median bdy p=0.157
+2026-10-04-r1 X2 d3: W=6.53 hops=3 heavy(>W/2)=19/41 max w=6.47 median p=0.0398 max p=0.204 median bdy p=0.125 | d5: W=8.73 hops=5 heavy(>W/2)=52/141 max w=6.31 median p=0.0391 max p=0.403 median bdy p=0.169
+2026-10-04-r1 X3 d3: W=6.53 hops=3 heavy(>W/2)=26/57 max w=6.47 median p=0.0406 max p=0.204 median bdy p=0.131 | d5: W=8.73 hops=5 heavy(>W/2)=74/197 max w=6.31 median p=0.0385 max p=0.403 median bdy p=0.169
+2026-10-04-r1 X4 d3: W=6.53 hops=3 heavy(>W/2)=33/73 max w=6.47 median p=0.0406 max p=0.204 median bdy p=0.134 | d5: W=8.73 hops=5 heavy(>W/2)=96/253 max w=6.31 median p=0.0348 max p=0.403 median bdy p=0.169
+2026-10-04-r1 X6 d3: W=6.53 hops=3 heavy(>W/2)=47/105 max w=6.47 median p=0.0406 max p=0.204 median bdy p=0.134 | d5: W=8.73 hops=5 heavy(>W/2)=140/365 max w=6.31 median p=0.0348 max p=0.403 median bdy p=0.169
+2026-10-04-r1 X8 d3: W=6.53 hops=3 heavy(>W/2)=61/137 max w=6.47 median p=0.0406 max p=0.204 median bdy p=0.134 | d5: W=8.73 hops=5 heavy(>W/2)=184/477 max w=6.31 median p=0.0348 max p=0.403 median bdy p=0.169
+2026-10-04-r1 Z1 d3: W=7.28 hops=3 heavy(>W/2)=6/23 max w=6.39 median p=0.0466 max p=0.155 median bdy p=0.053 | d5: W=6.58 hops=3 heavy(>W/2)=25/54 max w=6.15 median p=0.0414 max p=0.257 median bdy p=0.046
+2026-10-04-r1 Z2 d3: W=6.88 hops=3 heavy(>W/2)=12/43 max w=6.39 median p=0.0383 max p=0.155 median bdy p=0.054 | d5: W=6.58 hops=3 heavy(>W/2)=50/103 max w=6.15 median p=0.0376 max p=0.257 median bdy p=0.045
+2026-10-04-r1 Z3 d3: W=6.88 hops=3 heavy(>W/2)=18/63 max w=6.39 median p=0.0383 max p=0.155 median bdy p=0.054 | d5: W=6.58 hops=3 heavy(>W/2)=75/152 max w=6.15 median p=0.0376 max p=0.257 median bdy p=0.045
+2026-10-04-r1 Z4 d3: W=6.88 hops=3 heavy(>W/2)=24/83 max w=6.39 median p=0.0383 max p=0.155 median bdy p=0.054 | d5: W=6.58 hops=3 heavy(>W/2)=100/201 max w=6.15 median p=0.0376 max p=0.257 median bdy p=0.045
+2026-10-04-r1 Z6 d3: W=6.88 hops=3 heavy(>W/2)=36/123 max w=6.39 median p=0.0383 max p=0.155 median bdy p=0.054 | d5: W=6.58 hops=3 heavy(>W/2)=150/299 max w=6.15 median p=0.0318 max p=0.257 median bdy p=0.045
+2026-10-04-r1 Z8 d3: W=6.88 hops=3 heavy(>W/2)=48/163 max w=6.39 median p=0.0383 max p=0.155 median bdy p=0.054 | d5: W=6.58 hops=3 heavy(>W/2)=200/397 max w=6.15 median p=0.0318 max p=0.257 median bdy p=0.045
+2026-10-04-r2-d3 X1 d3: W=6.31 hops=3 heavy(>W/2)=13/25 max w=6.33 median p=0.0377 max p=0.150 median bdy p=0.053
+2026-10-04-r2-d3 X2 d3: W=6.31 hops=3 heavy(>W/2)=21/41 max w=6.33 median p=0.0383 max p=0.151 median bdy p=0.053
+2026-10-04-r2-d3 X3 d3: W=6.31 hops=3 heavy(>W/2)=29/57 max w=6.33 median p=0.0383 max p=0.151 median bdy p=0.053
+2026-10-04-r2-d3 X4 d3: W=6.31 hops=3 heavy(>W/2)=37/73 max w=6.33 median p=0.0383 max p=0.151 median bdy p=0.053
+2026-10-04-r2-d3 X6 d3: W=6.31 hops=3 heavy(>W/2)=53/105 max w=6.33 median p=0.0383 max p=0.151 median bdy p=0.053
+2026-10-04-r2-d3 X8 d3: W=6.31 hops=3 heavy(>W/2)=69/137 max w=6.33 median p=0.0383 max p=0.151 median bdy p=0.053
+2026-10-04-r2-d3 Z1 d3: W=5.61 hops=3 heavy(>W/2)=13/23 max w=6.15 median p=0.0283 max p=0.188 median bdy p=0.045
+2026-10-04-r2-d3 Z2 d3: W=5.61 hops=3 heavy(>W/2)=26/43 max w=6.15 median p=0.0255 max p=0.188 median bdy p=0.029
+2026-10-04-r2-d3 Z3 d3: W=5.61 hops=3 heavy(>W/2)=39/63 max w=6.15 median p=0.0255 max p=0.188 median bdy p=0.029
+2026-10-04-r2-d3 Z4 d3: W=5.61 hops=3 heavy(>W/2)=52/83 max w=6.15 median p=0.0255 max p=0.188 median bdy p=0.029
+2026-10-04-r2-d3 Z6 d3: W=5.61 hops=3 heavy(>W/2)=78/123 max w=6.15 median p=0.0255 max p=0.188 median bdy p=0.029
+2026-10-04-r2-d3 Z8 d3: W=5.61 hops=3 heavy(>W/2)=104/163 max w=6.15 median p=0.0255 max p=0.188 median bdy p=0.029
+2026-10-04-r2-d5 X1 d5: W=9.09 hops=5 heavy(>W/2)=30/85 max w=6.24 median p=0.0431 max p=0.302 median bdy p=0.127
+2026-10-04-r2-d5 X2 d5: W=8.29 hops=5 heavy(>W/2)=52/141 max w=6.24 median p=0.0431 max p=0.302 median bdy p=0.127
+2026-10-04-r2-d5 X3 d5: W=8.29 hops=5 heavy(>W/2)=74/197 max w=6.24 median p=0.0431 max p=0.302 median bdy p=0.127
+2026-10-04-r2-d5 X4 d5: W=8.29 hops=5 heavy(>W/2)=96/253 max w=6.24 median p=0.0431 max p=0.302 median bdy p=0.127
+2026-10-04-r2-d5 X6 d5: W=8.29 hops=5 heavy(>W/2)=140/365 max w=6.24 median p=0.0431 max p=0.302 median bdy p=0.127
+2026-10-04-r2-d5 X8 d5: W=8.29 hops=5 heavy(>W/2)=184/477 max w=6.24 median p=0.0431 max p=0.302 median bdy p=0.127
+2026-10-04-r2-d5 Z1 d5: W=6.74 hops=3 heavy(>W/2)=24/54 max w=6.30 median p=0.0467 max p=0.258 median bdy p=0.056
+2026-10-04-r2-d5 Z2 d5: W=6.74 hops=3 heavy(>W/2)=48/103 max w=6.30 median p=0.0417 max p=0.262 median bdy p=0.051
+2026-10-04-r2-d5 Z3 d5: W=6.74 hops=3 heavy(>W/2)=72/152 max w=6.30 median p=0.0417 max p=0.262 median bdy p=0.051
+2026-10-04-r2-d5 Z4 d5: W=6.74 hops=3 heavy(>W/2)=96/201 max w=6.30 median p=0.0417 max p=0.262 median bdy p=0.051
+2026-10-04-r2-d5 Z6 d5: W=6.74 hops=3 heavy(>W/2)=144/299 max w=6.30 median p=0.0341 max p=0.262 median bdy p=0.051
+2026-10-04-r2-d5 Z8 d5: W=6.74 hops=3 heavy(>W/2)=192/397 max w=6.30 median p=0.0341 max p=0.262 median bdy p=0.051
+2026-10-05-r1 X1 d3: W=6.82 hops=3 heavy(>W/2)=9/25 max w=6.38 median p=0.0536 max p=0.216 median bdy p=0.117 | d5: W=9.49 hops=5 heavy(>W/2)=30/85 max w=6.41 median p=0.0375 max p=0.312 median bdy p=0.159
+2026-10-05-r1 X2 d3: W=6.68 hops=3 heavy(>W/2)=15/41 max w=6.38 median p=0.0536 max p=0.216 median bdy p=0.121 | d5: W=9.49 hops=5 heavy(>W/2)=52/141 max w=6.41 median p=0.0375 max p=0.356 median bdy p=0.171
+2026-10-05-r1 X3 d3: W=6.68 hops=3 heavy(>W/2)=21/57 max w=6.38 median p=0.0536 max p=0.216 median bdy p=0.121 | d5: W=9.49 hops=5 heavy(>W/2)=74/197 max w=6.41 median p=0.0375 max p=0.356 median bdy p=0.177
+2026-10-05-r1 X4 d3: W=6.68 hops=3 heavy(>W/2)=27/73 max w=6.38 median p=0.0536 max p=0.216 median bdy p=0.121 | d5: W=9.49 hops=5 heavy(>W/2)=96/253 max w=6.41 median p=0.0375 max p=0.356 median bdy p=0.177
+2026-10-05-r1 X6 d3: W=6.68 hops=3 heavy(>W/2)=39/105 max w=6.38 median p=0.0536 max p=0.216 median bdy p=0.121 | d5: W=9.49 hops=5 heavy(>W/2)=140/365 max w=6.41 median p=0.0375 max p=0.356 median bdy p=0.177
+2026-10-05-r1 X8 d3: W=6.68 hops=3 heavy(>W/2)=51/137 max w=6.38 median p=0.0536 max p=0.216 median bdy p=0.121 | d5: W=9.49 hops=5 heavy(>W/2)=184/477 max w=6.41 median p=0.0375 max p=0.356 median bdy p=0.177
+2026-10-05-r1 Z1 d3: W=6.89 hops=3 heavy(>W/2)=7/23 max w=6.38 median p=0.0588 max p=0.129 median bdy p=0.062 | d5: W=6.55 hops=3 heavy(>W/2)=24/54 max w=6.13 median p=0.0466 max p=0.243 median bdy p=0.048
+2026-10-05-r1 Z2 d3: W=6.53 hops=3 heavy(>W/2)=16/43 max w=6.38 median p=0.0588 max p=0.129 median bdy p=0.063 | d5: W=6.55 hops=3 heavy(>W/2)=48/103 max w=6.13 median p=0.0435 max p=0.243 median bdy p=0.047
+2026-10-05-r1 Z3 d3: W=6.53 hops=3 heavy(>W/2)=24/63 max w=6.38 median p=0.0588 max p=0.129 median bdy p=0.063 | d5: W=6.55 hops=3 heavy(>W/2)=72/152 max w=6.13 median p=0.0435 max p=0.243 median bdy p=0.047
+2026-10-05-r1 Z4 d3: W=6.53 hops=3 heavy(>W/2)=32/83 max w=6.38 median p=0.0588 max p=0.129 median bdy p=0.063 | d5: W=6.55 hops=3 heavy(>W/2)=96/201 max w=6.13 median p=0.0435 max p=0.243 median bdy p=0.047
+2026-10-05-r1 Z6 d3: W=6.53 hops=3 heavy(>W/2)=48/123 max w=6.38 median p=0.0588 max p=0.129 median bdy p=0.063 | d5: W=6.55 hops=3 heavy(>W/2)=144/299 max w=6.13 median p=0.0376 max p=0.243 median bdy p=0.047
+2026-10-05-r1 Z8 d3: W=6.53 hops=3 heavy(>W/2)=64/163 max w=6.38 median p=0.0588 max p=0.129 median bdy p=0.063 | d5: W=6.55 hops=3 heavy(>W/2)=192/397 max w=6.13 median p=0.0376 max p=0.243 median bdy p=0.047
+2026-10-05-r2-d3 X1 d3: W=6.57 hops=3 heavy(>W/2)=11/25 max w=6.58 median p=0.0407 max p=0.115 median bdy p=0.059
+2026-10-05-r2-d3 X2 d3: W=6.57 hops=3 heavy(>W/2)=18/41 max w=6.58 median p=0.0407 max p=0.116 median bdy p=0.062
+2026-10-05-r2-d3 X3 d3: W=6.57 hops=3 heavy(>W/2)=25/57 max w=6.58 median p=0.0407 max p=0.116 median bdy p=0.062
+2026-10-05-r2-d3 X4 d3: W=6.57 hops=3 heavy(>W/2)=32/73 max w=6.58 median p=0.0407 max p=0.116 median bdy p=0.062
+2026-10-05-r2-d3 X6 d3: W=6.57 hops=3 heavy(>W/2)=46/105 max w=6.58 median p=0.0407 max p=0.116 median bdy p=0.062
+2026-10-05-r2-d3 X8 d3: W=6.57 hops=3 heavy(>W/2)=60/137 max w=6.58 median p=0.0407 max p=0.116 median bdy p=0.062
+2026-10-05-r2-d3 Z1 d3: W=5.89 hops=3 heavy(>W/2)=13/23 max w=6.17 median p=0.0319 max p=0.171 median bdy p=0.049
+2026-10-05-r2-d3 Z2 d3: W=5.86 hops=3 heavy(>W/2)=26/43 max w=6.17 median p=0.0264 max p=0.171 median bdy p=0.044
+2026-10-05-r2-d3 Z3 d3: W=5.86 hops=3 heavy(>W/2)=39/63 max w=6.17 median p=0.0264 max p=0.171 median bdy p=0.044
+2026-10-05-r2-d3 Z4 d3: W=5.86 hops=3 heavy(>W/2)=52/83 max w=6.17 median p=0.0264 max p=0.171 median bdy p=0.044
+2026-10-05-r2-d3 Z6 d3: W=5.86 hops=3 heavy(>W/2)=78/123 max w=6.17 median p=0.0264 max p=0.171 median bdy p=0.044
+2026-10-05-r2-d3 Z8 d3: W=5.86 hops=3 heavy(>W/2)=104/163 max w=6.17 median p=0.0264 max p=0.171 median bdy p=0.044
+2026-10-05-r2-d5 X1 d5: W=9.54 hops=5 heavy(>W/2)=26/85 max w=6.24 median p=0.0419 max p=0.262 median bdy p=0.137
+2026-10-05-r2-d5 X2 d5: W=8.97 hops=5 heavy(>W/2)=52/141 max w=6.24 median p=0.0416 max p=0.262 median bdy p=0.148
+2026-10-05-r2-d5 X3 d5: W=8.97 hops=5 heavy(>W/2)=74/197 max w=6.24 median p=0.0410 max p=0.262 median bdy p=0.148
+2026-10-05-r2-d5 X4 d5: W=8.97 hops=5 heavy(>W/2)=96/253 max w=6.24 median p=0.0410 max p=0.262 median bdy p=0.148
+2026-10-05-r2-d5 X6 d5: W=8.97 hops=5 heavy(>W/2)=140/365 max w=6.24 median p=0.0410 max p=0.262 median bdy p=0.148
+2026-10-05-r2-d5 X8 d5: W=8.97 hops=5 heavy(>W/2)=184/477 max w=6.24 median p=0.0410 max p=0.262 median bdy p=0.148
+2026-10-05-r2-d5 Z1 d5: W=6.54 hops=3 heavy(>W/2)=23/54 max w=6.17 median p=0.0463 max p=0.244 median bdy p=0.059
+2026-10-05-r2-d5 Z2 d5: W=6.54 hops=3 heavy(>W/2)=46/103 max w=6.17 median p=0.0430 max p=0.244 median bdy p=0.052
+2026-10-05-r2-d5 Z3 d5: W=6.54 hops=3 heavy(>W/2)=69/152 max w=6.17 median p=0.0430 max p=0.244 median bdy p=0.052
+2026-10-05-r2-d5 Z4 d5: W=6.54 hops=3 heavy(>W/2)=92/201 max w=6.17 median p=0.0430 max p=0.244 median bdy p=0.052
+2026-10-05-r2-d5 Z6 d5: W=6.54 hops=3 heavy(>W/2)=138/299 max w=6.17 median p=0.0425 max p=0.244 median bdy p=0.052
+2026-10-05-r2-d5 Z8 d5: W=6.54 hops=3 heavy(>W/2)=184/397 max w=6.17 median p=0.0425 max p=0.244 median bdy p=0.052
+2026-10-06-r1 X1 d3: W=6.69 hops=3 heavy(>W/2)=12/25 max w=6.47 median p=0.0416 max p=0.166 median bdy p=0.127 | d5: W=8.85 hops=5 heavy(>W/2)=33/85 max w=6.43 median p=0.0381 max p=0.368 median bdy p=0.135
+2026-10-06-r1 X2 d3: W=6.62 hops=3 heavy(>W/2)=18/41 max w=6.47 median p=0.0416 max p=0.201 median bdy p=0.134 | d5: W=8.85 hops=5 heavy(>W/2)=58/141 max w=6.43 median p=0.0382 max p=0.410 median bdy p=0.140
+2026-10-06-r1 X3 d3: W=6.62 hops=3 heavy(>W/2)=24/57 max w=6.47 median p=0.0416 max p=0.201 median bdy p=0.134 | d5: W=8.85 hops=5 heavy(>W/2)=83/197 max w=6.43 median p=0.0384 max p=0.410 median bdy p=0.140
+2026-10-06-r1 X4 d3: W=6.62 hops=3 heavy(>W/2)=30/73 max w=6.47 median p=0.0416 max p=0.201 median bdy p=0.134 | d5: W=8.85 hops=5 heavy(>W/2)=108/253 max w=6.43 median p=0.0384 max p=0.410 median bdy p=0.140
+2026-10-06-r1 X6 d3: W=6.62 hops=3 heavy(>W/2)=42/105 max w=6.47 median p=0.0416 max p=0.201 median bdy p=0.134 | d5: W=8.85 hops=5 heavy(>W/2)=158/365 max w=6.43 median p=0.0384 max p=0.410 median bdy p=0.140
+2026-10-06-r1 X8 d3: W=6.62 hops=3 heavy(>W/2)=54/137 max w=6.47 median p=0.0416 max p=0.201 median bdy p=0.134 | d5: W=8.85 hops=5 heavy(>W/2)=208/477 max w=6.43 median p=0.0384 max p=0.410 median bdy p=0.140
+2026-10-06-r1 Z1 d3: W=6.56 hops=3 heavy(>W/2)=10/23 max w=6.23 median p=0.0472 max p=0.124 median bdy p=0.053 | d5: W=6.82 hops=3 heavy(>W/2)=21/54 max w=6.26 median p=0.0418 max p=0.247 median bdy p=0.045
+2026-10-06-r1 Z2 d3: W=6.24 hops=3 heavy(>W/2)=22/43 max w=6.23 median p=0.0404 max p=0.130 median bdy p=0.051 | d5: W=6.80 hops=3 heavy(>W/2)=42/103 max w=6.26 median p=0.0406 max p=0.247 median bdy p=0.043
+2026-10-06-r1 Z3 d3: W=6.24 hops=3 heavy(>W/2)=33/63 max w=6.23 median p=0.0404 max p=0.130 median bdy p=0.051 | d5: W=6.80 hops=3 heavy(>W/2)=63/152 max w=6.26 median p=0.0406 max p=0.247 median bdy p=0.043
+2026-10-06-r1 Z4 d3: W=6.24 hops=3 heavy(>W/2)=44/83 max w=6.23 median p=0.0404 max p=0.130 median bdy p=0.051 | d5: W=6.80 hops=3 heavy(>W/2)=84/201 max w=6.26 median p=0.0406 max p=0.247 median bdy p=0.043
+2026-10-06-r1 Z6 d3: W=6.24 hops=3 heavy(>W/2)=66/123 max w=6.23 median p=0.0404 max p=0.130 median bdy p=0.051 | d5: W=6.80 hops=3 heavy(>W/2)=126/299 max w=6.26 median p=0.0386 max p=0.247 median bdy p=0.043
+2026-10-06-r1 Z8 d3: W=6.24 hops=3 heavy(>W/2)=88/163 max w=6.23 median p=0.0404 max p=0.130 median bdy p=0.051 | d5: W=6.80 hops=3 heavy(>W/2)=168/397 max w=6.26 median p=0.0386 max p=0.247 median bdy p=0.043
+2026-10-06-r2-d3 X1 d3: W=5.18 hops=3 heavy(>W/2)=21/25 max w=6.48 median p=0.0344 max p=0.291 median bdy p=0.097
+2026-10-06-r2-d3 X2 d3: W=5.11 hops=3 heavy(>W/2)=35/41 max w=6.48 median p=0.0344 max p=0.309 median bdy p=0.098
+2026-10-06-r2-d3 X3 d3: W=5.11 hops=3 heavy(>W/2)=49/57 max w=6.48 median p=0.0344 max p=0.309 median bdy p=0.098
+2026-10-06-r2-d3 X4 d3: W=5.11 hops=3 heavy(>W/2)=63/73 max w=6.48 median p=0.0344 max p=0.309 median bdy p=0.098
+2026-10-06-r2-d3 X6 d3: W=5.11 hops=3 heavy(>W/2)=91/105 max w=6.48 median p=0.0344 max p=0.309 median bdy p=0.098
+2026-10-06-r2-d3 X8 d3: W=5.11 hops=3 heavy(>W/2)=119/137 max w=6.48 median p=0.0344 max p=0.309 median bdy p=0.098
+2026-10-06-r2-d3 Z1 d3: W=5.53 hops=3 heavy(>W/2)=14/23 max w=6.28 median p=0.0359 max p=0.191 median bdy p=0.044
+2026-10-06-r2-d3 Z2 d3: W=5.53 hops=3 heavy(>W/2)=28/43 max w=6.28 median p=0.0311 max p=0.191 median bdy p=0.037
+2026-10-06-r2-d3 Z3 d3: W=5.53 hops=3 heavy(>W/2)=42/63 max w=6.28 median p=0.0311 max p=0.191 median bdy p=0.037
+2026-10-06-r2-d3 Z4 d3: W=5.53 hops=3 heavy(>W/2)=56/83 max w=6.28 median p=0.0311 max p=0.191 median bdy p=0.037
+2026-10-06-r2-d3 Z6 d3: W=5.53 hops=3 heavy(>W/2)=84/123 max w=6.28 median p=0.0311 max p=0.191 median bdy p=0.037
+2026-10-06-r2-d3 Z8 d3: W=5.53 hops=3 heavy(>W/2)=112/163 max w=6.28 median p=0.0311 max p=0.191 median bdy p=0.037
+2026-10-06-r2-d5 X1 d5: W=9.53 hops=5 heavy(>W/2)=30/85 max w=6.31 median p=0.0400 max p=0.260 median bdy p=0.101
+2026-10-06-r2-d5 X2 d5: W=8.82 hops=5 heavy(>W/2)=52/141 max w=6.31 median p=0.0403 max p=0.260 median bdy p=0.106
+2026-10-06-r2-d5 X3 d5: W=8.82 hops=5 heavy(>W/2)=74/197 max w=6.31 median p=0.0403 max p=0.260 median bdy p=0.113
+2026-10-06-r2-d5 X4 d5: W=8.82 hops=5 heavy(>W/2)=96/253 max w=6.31 median p=0.0403 max p=0.260 median bdy p=0.117
+2026-10-06-r2-d5 X6 d5: W=8.82 hops=5 heavy(>W/2)=140/365 max w=6.31 median p=0.0403 max p=0.260 median bdy p=0.117
+2026-10-06-r2-d5 X8 d5: W=8.82 hops=5 heavy(>W/2)=184/477 max w=6.31 median p=0.0403 max p=0.260 median bdy p=0.117
+2026-10-06-r2-d5 Z1 d5: W=6.72 hops=3 heavy(>W/2)=21/54 max w=6.10 median p=0.0459 max p=0.249 median bdy p=0.073
+2026-10-06-r2-d5 Z2 d5: W=6.58 hops=3 heavy(>W/2)=46/103 max w=6.10 median p=0.0433 max p=0.253 median bdy p=0.055
+2026-10-06-r2-d5 Z3 d5: W=6.58 hops=3 heavy(>W/2)=69/152 max w=6.10 median p=0.0433 max p=0.253 median bdy p=0.055
+2026-10-06-r2-d5 Z4 d5: W=6.58 hops=3 heavy(>W/2)=92/201 max w=6.10 median p=0.0433 max p=0.253 median bdy p=0.055
+2026-10-06-r2-d5 Z6 d5: W=6.58 hops=3 heavy(>W/2)=138/299 max w=6.10 median p=0.0419 max p=0.253 median bdy p=0.055
+2026-10-06-r2-d5 Z8 d5: W=6.58 hops=3 heavy(>W/2)=184/397 max w=6.10 median p=0.0419 max p=0.253 median bdy p=0.055
+2026-10-07-r1 X1 d3: W=6.63 hops=3 heavy(>W/2)=13/25 max w=6.37 median p=0.0323 max p=0.173 median bdy p=0.136 | d5: W=9.07 hops=5 heavy(>W/2)=30/85 max w=6.39 median p=0.0384 max p=0.354 median bdy p=0.159
+2026-10-07-r1 X2 d3: W=6.43 hops=3 heavy(>W/2)=23/41 max w=6.37 median p=0.0369 max p=0.209 median bdy p=0.145 | d5: W=9.07 hops=5 heavy(>W/2)=52/141 max w=6.39 median p=0.0384 max p=0.397 median bdy p=0.162
+2026-10-07-r1 X3 d3: W=6.43 hops=3 heavy(>W/2)=32/57 max w=6.37 median p=0.0369 max p=0.209 median bdy p=0.145 | d5: W=9.07 hops=5 heavy(>W/2)=74/197 max w=6.39 median p=0.0384 max p=0.397 median bdy p=0.162
+2026-10-07-r1 X4 d3: W=6.43 hops=3 heavy(>W/2)=41/73 max w=6.37 median p=0.0369 max p=0.209 median bdy p=0.145 | d5: W=9.07 hops=5 heavy(>W/2)=96/253 max w=6.39 median p=0.0384 max p=0.397 median bdy p=0.162
+2026-10-07-r1 X6 d3: W=6.43 hops=3 heavy(>W/2)=59/105 max w=6.37 median p=0.0369 max p=0.209 median bdy p=0.145 | d5: W=9.07 hops=5 heavy(>W/2)=140/365 max w=6.39 median p=0.0384 max p=0.397 median bdy p=0.162
+2026-10-07-r1 X8 d3: W=6.43 hops=3 heavy(>W/2)=77/137 max w=6.37 median p=0.0369 max p=0.209 median bdy p=0.145 | d5: W=9.07 hops=5 heavy(>W/2)=184/477 max w=6.39 median p=0.0384 max p=0.397 median bdy p=0.162
+2026-10-07-r1 Z1 d3: W=6.77 hops=3 heavy(>W/2)=7/23 max w=6.36 median p=0.0564 max p=0.135 median bdy p=0.062 | d5: W=6.91 hops=3 heavy(>W/2)=22/54 max w=6.28 median p=0.0444 max p=0.266 median bdy p=0.046
+2026-10-07-r1 Z2 d3: W=6.41 hops=3 heavy(>W/2)=22/43 max w=6.36 median p=0.0375 max p=0.135 median bdy p=0.062 | d5: W=6.91 hops=3 heavy(>W/2)=44/103 max w=6.28 median p=0.0383 max p=0.266 median bdy p=0.045
+2026-10-07-r1 Z3 d3: W=6.41 hops=3 heavy(>W/2)=33/63 max w=6.36 median p=0.0375 max p=0.135 median bdy p=0.062 | d5: W=6.91 hops=3 heavy(>W/2)=66/152 max w=6.28 median p=0.0383 max p=0.266 median bdy p=0.045
+2026-10-07-r1 Z4 d3: W=6.41 hops=3 heavy(>W/2)=44/83 max w=6.36 median p=0.0375 max p=0.135 median bdy p=0.062 | d5: W=6.91 hops=3 heavy(>W/2)=88/201 max w=6.28 median p=0.0383 max p=0.266 median bdy p=0.045
+2026-10-07-r1 Z6 d3: W=6.41 hops=3 heavy(>W/2)=66/123 max w=6.36 median p=0.0375 max p=0.135 median bdy p=0.062 | d5: W=6.91 hops=3 heavy(>W/2)=132/299 max w=6.28 median p=0.0381 max p=0.266 median bdy p=0.045
+2026-10-07-r1 Z8 d3: W=6.41 hops=3 heavy(>W/2)=88/163 max w=6.36 median p=0.0375 max p=0.135 median bdy p=0.062 | d5: W=6.91 hops=3 heavy(>W/2)=176/397 max w=6.28 median p=0.0381 max p=0.266 median bdy p=0.045
+2026-10-07-r2-d3 X1 d3: W=6.27 hops=3 heavy(>W/2)=13/25 max w=6.47 median p=0.0411 max p=0.172 median bdy p=0.087
+2026-10-07-r2-d3 X2 d3: W=6.27 hops=3 heavy(>W/2)=21/41 max w=6.47 median p=0.0411 max p=0.185 median bdy p=0.089
+2026-10-07-r2-d3 X3 d3: W=6.27 hops=3 heavy(>W/2)=29/57 max w=6.47 median p=0.0411 max p=0.185 median bdy p=0.089
+2026-10-07-r2-d3 X4 d3: W=6.27 hops=3 heavy(>W/2)=37/73 max w=6.47 median p=0.0411 max p=0.185 median bdy p=0.089
+2026-10-07-r2-d3 X6 d3: W=6.27 hops=3 heavy(>W/2)=53/105 max w=6.47 median p=0.0411 max p=0.185 median bdy p=0.089
+2026-10-07-r2-d3 X8 d3: W=6.27 hops=3 heavy(>W/2)=69/137 max w=6.47 median p=0.0411 max p=0.185 median bdy p=0.089
+2026-10-07-r2-d3 Z1 d3: W=6.05 hops=3 heavy(>W/2)=13/23 max w=6.25 median p=0.0320 max p=0.174 median bdy p=0.043
+2026-10-07-r2-d3 Z2 d3: W=6.05 hops=3 heavy(>W/2)=26/43 max w=6.25 median p=0.0287 max p=0.174 median bdy p=0.039
+2026-10-07-r2-d3 Z3 d3: W=6.05 hops=3 heavy(>W/2)=39/63 max w=6.25 median p=0.0287 max p=0.174 median bdy p=0.039
+2026-10-07-r2-d3 Z4 d3: W=6.05 hops=3 heavy(>W/2)=52/83 max w=6.25 median p=0.0287 max p=0.174 median bdy p=0.039
+2026-10-07-r2-d3 Z6 d3: W=6.05 hops=3 heavy(>W/2)=78/123 max w=6.25 median p=0.0287 max p=0.174 median bdy p=0.039
+2026-10-07-r2-d3 Z8 d3: W=6.05 hops=3 heavy(>W/2)=104/163 max w=6.25 median p=0.0287 max p=0.174 median bdy p=0.039
+2026-10-07-r2-d5 X1 d5: W=9.29 hops=5 heavy(>W/2)=28/85 max w=6.39 median p=0.0406 max p=0.280 median bdy p=0.121
+2026-10-07-r2-d5 X2 d5: W=8.56 hops=5 heavy(>W/2)=52/141 max w=6.39 median p=0.0397 max p=0.280 median bdy p=0.129
+2026-10-07-r2-d5 X3 d5: W=8.56 hops=5 heavy(>W/2)=74/197 max w=6.39 median p=0.0397 max p=0.280 median bdy p=0.129
+2026-10-07-r2-d5 X4 d5: W=8.56 hops=5 heavy(>W/2)=96/253 max w=6.39 median p=0.0397 max p=0.280 median bdy p=0.129
+2026-10-07-r2-d5 X6 d5: W=8.56 hops=5 heavy(>W/2)=140/365 max w=6.39 median p=0.0397 max p=0.280 median bdy p=0.129
+2026-10-07-r2-d5 X8 d5: W=8.56 hops=5 heavy(>W/2)=184/477 max w=6.39 median p=0.0397 max p=0.280 median bdy p=0.129
+2026-10-07-r2-d5 Z1 d5: W=6.47 hops=3 heavy(>W/2)=22/54 max w=6.19 median p=0.0501 max p=0.500 median bdy p=0.059
+2026-10-07-r2-d5 Z2 d5: W=6.41 hops=3 heavy(>W/2)=44/103 max w=6.19 median p=0.0442 max p=0.500 median bdy p=0.055
+2026-10-07-r2-d5 Z3 d5: W=6.41 hops=3 heavy(>W/2)=66/152 max w=6.19 median p=0.0442 max p=0.500 median bdy p=0.055
+2026-10-07-r2-d5 Z4 d5: W=6.41 hops=3 heavy(>W/2)=88/201 max w=6.19 median p=0.0442 max p=0.500 median bdy p=0.055
+2026-10-07-r2-d5 Z6 d5: W=6.41 hops=3 heavy(>W/2)=132/299 max w=6.19 median p=0.0427 max p=0.500 median bdy p=0.055
+2026-10-07-r2-d5 Z8 d5: W=6.41 hops=3 heavy(>W/2)=176/397 max w=6.19 median p=0.0427 max p=0.500 median bdy p=0.055
+2026-10-08-r1 X1 d3: W=6.90 hops=3 heavy(>W/2)=8/25 max w=6.21 median p=0.0340 max p=0.192 median bdy p=0.128 | d5: W=9.07 hops=5 heavy(>W/2)=29/85 max w=6.37 median p=0.0396 max p=0.335 median bdy p=0.168
+2026-10-08-r1 X2 d3: W=6.56 hops=3 heavy(>W/2)=20/41 max w=6.21 median p=0.0366 max p=0.199 median bdy p=0.132 | d5: W=9.07 hops=5 heavy(>W/2)=50/141 max w=6.37 median p=0.0398 max p=0.378 median bdy p=0.168
+2026-10-08-r1 X3 d3: W=6.56 hops=3 heavy(>W/2)=27/57 max w=6.21 median p=0.0372 max p=0.199 median bdy p=0.140 | d5: W=9.07 hops=5 heavy(>W/2)=71/197 max w=6.37 median p=0.0398 max p=0.378 median bdy p=0.168
+2026-10-08-r1 X4 d3: W=6.56 hops=3 heavy(>W/2)=34/73 max w=6.21 median p=0.0372 max p=0.199 median bdy p=0.144 | d5: W=9.07 hops=5 heavy(>W/2)=92/253 max w=6.37 median p=0.0398 max p=0.378 median bdy p=0.168
+2026-10-08-r1 X6 d3: W=6.56 hops=3 heavy(>W/2)=48/105 max w=6.21 median p=0.0372 max p=0.199 median bdy p=0.144 | d5: W=9.07 hops=5 heavy(>W/2)=134/365 max w=6.37 median p=0.0398 max p=0.378 median bdy p=0.168
+2026-10-08-r1 X8 d3: W=6.56 hops=3 heavy(>W/2)=62/137 max w=6.21 median p=0.0372 max p=0.199 median bdy p=0.144 | d5: W=9.07 hops=5 heavy(>W/2)=176/477 max w=6.37 median p=0.0398 max p=0.378 median bdy p=0.168
+2026-10-08-r1 Z1 d3: W=7.04 hops=3 heavy(>W/2)=6/23 max w=6.47 median p=0.0484 max p=0.111 median bdy p=0.059 | d5: W=6.07 hops=3 heavy(>W/2)=28/54 max w=6.16 median p=0.0442 max p=0.298 median bdy p=0.048
+2026-10-08-r1 Z2 d3: W=6.75 hops=3 heavy(>W/2)=14/43 max w=6.47 median p=0.0484 max p=0.126 median bdy p=0.060 | d5: W=6.07 hops=3 heavy(>W/2)=56/103 max w=6.16 median p=0.0398 max p=0.298 median bdy p=0.045
+2026-10-08-r1 Z3 d3: W=6.75 hops=3 heavy(>W/2)=21/63 max w=6.47 median p=0.0484 max p=0.126 median bdy p=0.060 | d5: W=6.07 hops=3 heavy(>W/2)=84/152 max w=6.16 median p=0.0398 max p=0.298 median bdy p=0.045
+2026-10-08-r1 Z4 d3: W=6.75 hops=3 heavy(>W/2)=28/83 max w=6.47 median p=0.0484 max p=0.126 median bdy p=0.060 | d5: W=6.07 hops=3 heavy(>W/2)=112/201 max w=6.16 median p=0.0398 max p=0.298 median bdy p=0.045
+2026-10-08-r1 Z6 d3: W=6.75 hops=3 heavy(>W/2)=42/123 max w=6.47 median p=0.0484 max p=0.126 median bdy p=0.060 | d5: W=6.07 hops=3 heavy(>W/2)=168/299 max w=6.16 median p=0.0391 max p=0.298 median bdy p=0.045
+2026-10-08-r1 Z8 d3: W=6.75 hops=3 heavy(>W/2)=56/163 max w=6.47 median p=0.0484 max p=0.126 median bdy p=0.060 | d5: W=6.07 hops=3 heavy(>W/2)=224/397 max w=6.16 median p=0.0391 max p=0.298 median bdy p=0.045
+2026-10-08-r2-d3 X1 d3: W=5.58 hops=3 heavy(>W/2)=17/25 max w=6.09 median p=0.0423 max p=0.203 median bdy p=0.066
+2026-10-08-r2-d3 X2 d3: W=5.58 hops=3 heavy(>W/2)=28/41 max w=6.09 median p=0.0423 max p=0.203 median bdy p=0.069
+2026-10-08-r2-d3 X3 d3: W=5.58 hops=3 heavy(>W/2)=39/57 max w=6.09 median p=0.0423 max p=0.203 median bdy p=0.069
+2026-10-08-r2-d3 X4 d3: W=5.58 hops=3 heavy(>W/2)=50/73 max w=6.09 median p=0.0423 max p=0.203 median bdy p=0.069
+2026-10-08-r2-d3 X6 d3: W=5.58 hops=3 heavy(>W/2)=72/105 max w=6.09 median p=0.0423 max p=0.203 median bdy p=0.069
+2026-10-08-r2-d3 X8 d3: W=5.58 hops=3 heavy(>W/2)=94/137 max w=6.09 median p=0.0423 max p=0.203 median bdy p=0.069
+2026-10-08-r2-d3 Z1 d3: W=5.19 hops=3 heavy(>W/2)=17/23 max w=5.95 median p=0.0377 max p=0.215 median bdy p=0.039
+2026-10-08-r2-d3 Z2 d3: W=5.19 hops=3 heavy(>W/2)=32/43 max w=5.95 median p=0.0346 max p=0.215 median bdy p=0.038
+2026-10-08-r2-d3 Z3 d3: W=5.19 hops=3 heavy(>W/2)=47/63 max w=5.95 median p=0.0346 max p=0.215 median bdy p=0.038
+2026-10-08-r2-d3 Z4 d3: W=5.19 hops=3 heavy(>W/2)=62/83 max w=5.95 median p=0.0346 max p=0.215 median bdy p=0.038
+2026-10-08-r2-d3 Z6 d3: W=5.19 hops=3 heavy(>W/2)=92/123 max w=5.95 median p=0.0346 max p=0.215 median bdy p=0.038
+2026-10-08-r2-d3 Z8 d3: W=5.19 hops=3 heavy(>W/2)=122/163 max w=5.95 median p=0.0346 max p=0.215 median bdy p=0.038
+2026-10-08-r2-d5 X1 d5: W=9.24 hops=5 heavy(>W/2)=28/85 max w=6.31 median p=0.0424 max p=0.318 median bdy p=0.121
+2026-10-08-r2-d5 X2 d5: W=8.61 hops=5 heavy(>W/2)=49/141 max w=6.31 median p=0.0423 max p=0.318 median bdy p=0.121
+2026-10-08-r2-d5 X3 d5: W=8.61 hops=5 heavy(>W/2)=70/197 max w=6.31 median p=0.0399 max p=0.318 median bdy p=0.121
+2026-10-08-r2-d5 X4 d5: W=8.61 hops=5 heavy(>W/2)=91/253 max w=6.31 median p=0.0399 max p=0.318 median bdy p=0.121
+2026-10-08-r2-d5 X6 d5: W=8.61 hops=5 heavy(>W/2)=133/365 max w=6.31 median p=0.0399 max p=0.318 median bdy p=0.121
+2026-10-08-r2-d5 X8 d5: W=8.61 hops=5 heavy(>W/2)=175/477 max w=6.31 median p=0.0399 max p=0.318 median bdy p=0.121
+2026-10-08-r2-d5 Z1 d5: W=6.04 hops=3 heavy(>W/2)=26/54 max w=6.15 median p=0.0494 max p=0.299 median bdy p=0.060
+2026-10-08-r2-d5 Z2 d5: W=6.04 hops=3 heavy(>W/2)=52/103 max w=6.15 median p=0.0433 max p=0.299 median bdy p=0.057
+2026-10-08-r2-d5 Z3 d5: W=6.04 hops=3 heavy(>W/2)=78/152 max w=6.15 median p=0.0433 max p=0.299 median bdy p=0.057
+2026-10-08-r2-d5 Z4 d5: W=6.04 hops=3 heavy(>W/2)=104/201 max w=6.15 median p=0.0433 max p=0.299 median bdy p=0.057
+2026-10-08-r2-d5 Z6 d5: W=6.04 hops=3 heavy(>W/2)=156/299 max w=6.15 median p=0.0418 max p=0.299 median bdy p=0.057
+2026-10-08-r2-d5 Z8 d5: W=6.04 hops=3 heavy(>W/2)=208/397 max w=6.15 median p=0.0418 max p=0.299 median bdy p=0.057

@@ -1,0 +1,12 @@
+exact mode: paper grid cut to [(0.001, 0.25, 0.0), (0.001, 0.25, 0.05), (0.002, 0.25, 0.0), (0.002, 0.25, 0.05), (0.003, 0.25, 0.0), (0.003, 0.25, 0.05), (0.002, 0.5, 0.0), (0.002, 0.5, 0.05)]
+leak 0.001  strength 0.25 spread 0    loss 0.483  X stab -3%  Z co_data -56%  Z co_gauge -86%  Z flag -23%  Z repeat -52%  Z stab -15%
+leak 0.001  strength 0.25 spread 0.05 loss 0.334  X stab -2%  Z co_data -36%  Z co_gauge -58%  Z flag -17%  Z repeat -38%  Z stab -15%
+leak 0.002  strength 0.25 spread 0    loss 0.338  X stab +4%  Z co_data -8%  Z co_gauge -75%  Z flag -10%  Z repeat -29%  Z stab -11%
+leak 0.002  strength 0.25 spread 0.05 loss 0.140  X stab +6%  Z co_data +23%  Z co_gauge -16%  Z flag +1%  Z repeat -15%  Z stab -11%
+leak 0.003  strength 0.25 spread 0    loss 0.251  X stab +10%  Z co_data +15%  Z co_gauge -56%  Z flag +4%  Z repeat -18%  Z stab -8%
+leak 0.003  strength 0.25 spread 0.05 loss 0.320  X stab +12%  Z co_data +73%  Z co_gauge +15%  Z flag +18%  Z repeat -3%  Z stab -7%
+leak 0.002  strength 0.5  spread 0    loss 0.653  X stab +6%  Z co_data +156%  Z co_gauge -30%  Z flag -3%  Z repeat -8%  Z stab -11%
+leak 0.002  strength 0.5  spread 0.05 loss 0.769  X stab +8%  Z co_data +180%  Z co_gauge +54%  Z flag +9%  Z repeat +3%  Z stab -10%
+
+best (bitflip, exact-identity, paper): leak 0.002 strength 0.25 spread 0.05 loss 0.140
+  X stab +6%  Z co_data +23%  Z co_gauge -16%  Z flag +1%  Z repeat -15%  Z stab -11%

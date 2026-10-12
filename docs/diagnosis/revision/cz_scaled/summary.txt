@@ -1,0 +1,88 @@
+Error per round in % (10,000 simulated shots per circuit; chip from analysis.json). Variants: chip, model, fit, cz1.5, cz2, cz2.5, cz3, cz4
+  2026-10-06-r1      X d3: chip 13.7+-0.9  model 10.3+-0.2  fit 14.1+-0.3  cz1.5 11.3+-0.4  cz2 12.4+-0.3  cz2.5 13.1+-0.5  cz3 14.5+-0.5  cz4 16.6+-0.6
+  2026-10-06-r1      X d5: chip 19.8+-1.2  model 16.0+-0.7  fit 23.4+-0.6  cz1.5 18.5+-0.8  cz2 21.5+-0.8  cz2.5 23.7+-0.9  cz3 25.3+-1.3  cz4 27.9+-1.2
+  2026-10-06-r1      Z d3: chip 14.9+-0.6  model 8.2+-0.2  fit 10.7+-0.3  cz1.5 9.5+-0.3  cz2 10.8+-0.3  cz2.5 11.7+-0.2  cz3 12.8+-0.2  cz4 14.8+-0.3
+  2026-10-06-r1      Z d5: chip 23.6+-3.6  model 16.7+-0.3  fit 22.7+-0.5  cz1.5 19.9+-0.4  cz2 22.5+-0.5  cz2.5 24.3+-0.7  cz3 25.5+-0.8  cz4 29.4+-1.1
+  2026-10-08-r1      X d3: chip 12.5+-0.6  model 9.4+-0.2  fit 14.2+-0.3  cz1.5 10.7+-0.2  cz2 11.8+-0.3  cz2.5 13.1+-0.3  cz3 14.4+-0.3  cz4 16.3+-0.4
+  2026-10-08-r1      X d5: chip 19.1+-1.6  model 15.8+-0.3  fit 22.1+-0.6  cz1.5 18.1+-0.4  cz2 21.2+-0.6  cz2.5 23.1+-0.7  cz3 24.9+-0.9  cz4 27.8+-1.1
+  2026-10-08-r1      Z d3: chip 13.8+-0.5  model 6.0+-0.1  fit 8.6+-0.3  cz1.5 7.2+-0.1  cz2 8.4+-0.1  cz2.5 9.4+-0.2  cz3 10.5+-0.2  cz4 12.7+-0.2
+  2026-10-08-r1      Z d5: chip 34.1+-2.3  model 17.3+-0.3  fit 21.7+-0.5  cz1.5 20.0+-0.5  cz2 22.3+-0.6  cz2.5 24.3+-0.9  cz3 24.4+-2.4  cz4 30.0+-1.1
+  2026-10-08-r2-d3   X d3: chip 11.9+-0.5  model 8.1+-0.2  fit 12.5+-0.3  cz1.5 9.1+-0.2  cz2 9.9+-0.3  cz2.5 11.1+-0.3  cz3 11.9+-0.3  cz4 14.4+-0.4
+  2026-10-08-r2-d3   Z d3: chip 23.6+-2.0  model 8.0+-0.2  fit 10.7+-0.2  cz1.5 9.2+-0.3  cz2 10.2+-0.3  cz2.5 11.1+-0.2  cz3 12.1+-0.3  cz4 14.4+-0.3
+  2026-10-08-r2-d5   X d5: chip 23.2+-1.5  model 19.0+-0.5  fit 25.2+-0.7  cz1.5 22.4+-0.6  cz2 25.5+-0.8  cz2.5 27.2+-1.7  cz3 28.7+-1.5  cz4 29.9+-1.8
+  2026-10-08-r2-d5   Z d5: chip 26.9+-1.9  model 16.6+-0.3  fit 20.6+-0.4  cz1.5 19.4+-0.4  cz2 21.2+-0.5  cz2.5 22.6+-0.7  cz3 24.9+-0.7  cz4 26.5+-0.8
+
+Arithmetic mean over the four jobs (each patch once):
+  X d3: chip 12.7  model 9.2  fit 13.6  cz1.5 10.4  cz2 11.4  cz2.5 12.4  cz3 13.6  cz4 15.8   | share of chip-model gap closed: fit 126%  cz1.5 33%  cz2 62%  cz2.5 93%  cz3 127%  cz4 189%
+  X d5: chip 20.7  model 16.9  fit 23.6  cz1.5 19.6  cz2 22.7  cz2.5 24.7  cz3 26.3  cz4 28.6   | share of chip-model gap closed: fit 177%  cz1.5 72%  cz2 155%  cz2.5 206%  cz3 250%  cz4 310%
+  Z d3: chip 17.4  model 7.4  fit 10.0  cz1.5 8.6  cz2 9.8  cz2.5 10.7  cz3 11.8  cz4 14.0   | share of chip-model gap closed: fit 26%  cz1.5 12%  cz2 24%  cz2.5 33%  cz3 44%  cz4 65%
+  Z d5: chip 28.2  model 16.8  fit 21.7  cz1.5 19.8  cz2 22.0  cz2.5 23.7  cz3 24.9  cz4 28.7   | share of chip-model gap closed: fit 43%  cz1.5 26%  cz2 46%  cz2.5 60%  cz3 71%  cz4 104%
+
+Lambda = eps3/eps5 per repetition:
+  2026-10-06-r1: LambdaX: chip 0.69 model 0.64 fit 0.60 cz1.5 0.61 cz2 0.58 cz2.5 0.55 cz3 0.58 cz4 0.59   LambdaZ: chip 0.63 model 0.49 fit 0.47 cz1.5 0.48 cz2 0.48 cz2.5 0.48 cz3 0.50 cz4 0.50
+  2026-10-08-r1: LambdaX: chip 0.65 model 0.59 fit 0.64 cz1.5 0.59 cz2 0.55 cz2.5 0.57 cz3 0.58 cz4 0.59   LambdaZ: chip 0.40 model 0.35 fit 0.40 cz1.5 0.36 cz2 0.38 cz2.5 0.39 cz3 0.43 cz4 0.42
+  2026-10-08-r2: LambdaX: chip 0.51 model 0.42 fit 0.49 cz1.5 0.41 cz2 0.39 cz2.5 0.41 cz3 0.41 cz4 0.48   LambdaZ: chip 0.88 model 0.48 fit 0.52 cz1.5 0.47 cz2 0.48 cz2.5 0.49 cz3 0.49 cz4 0.54
+
+Detection rate (bulk stabilizer detectors of the 8-round circuit, %) and eps (%):
+  family = calibration model with CZ x K, no leakage; 'family eps at rate' = eps the family gives at that detection rate
+  2026-10-06-r1      X d3: chip 29.60/13.7  model 27.96/10.3  fit 32.16/14.1  cz1.5 28.90/11.3  cz2 29.80/12.4  cz2.5 30.60/13.1  cz3 31.36/14.5  cz4 32.75/16.6
+      at fit's rate 32.16% (CZ x 3.6): family eps 15.7% vs fit eps 14.1%  (ratio 0.89)
+      at chip's rate 29.60% (CZ x 1.9): family eps 12.1% vs chip eps 13.7%  (ratio 1.13)
+  2026-10-06-r1      X d5: chip 32.73/19.8  model 31.28/16.0  fit 35.91/23.4  cz1.5 32.45/18.5  cz2 33.50/21.5  cz2.5 34.45/23.7  cz3 35.26/25.3  cz4 36.78/27.9
+      at fit's rate 35.91% (CZ x 3.4): family eps 26.4% vs fit eps 23.4%  (ratio 0.88)
+      at chip's rate 32.73% (CZ x 1.6): family eps 19.3% vs chip eps 19.8%  (ratio 1.03)
+  2026-10-06-r1      Z d3: chip 40.81/14.9  model 32.99/8.2  fit 37.96/10.7  cz1.5 35.22/9.5  cz2 37.27/10.8  cz2.5 38.96/11.7  cz3 40.43/12.8  cz4 42.79/14.8
+      flag/relay rate: chip 8.25  model 5.72  fit 8.08  cz1.5 6.39  cz2 7.03  cz2.5 7.64  cz3 8.25  cz4 9.44
+      at fit's rate 37.96% (CZ x 2.2): family eps 11.2% vs fit eps 10.7%  (ratio 0.96)
+      at chip's rate 40.81% (CZ x 3.2): family eps 13.1% vs chip eps 14.9%  (ratio 1.13)
+  2026-10-06-r1      Z d5: chip 47.87/23.6  model 42.18/16.7  fit 46.35/22.7  cz1.5 43.90/19.9  cz2 45.18/22.5  cz2.5 46.25/24.3  cz3 47.04/25.5  cz4 48.24/29.4
+      flag/relay rate: chip 8.65  model 6.72  fit 9.45  cz1.5 7.40  cz2 8.07  cz2.5 8.71  cz3 9.35  cz4 10.59
+      at fit's rate 46.35% (CZ x 2.6): family eps 24.5% vs fit eps 22.7%  (ratio 0.93)
+      at chip's rate 47.87% (CZ x 3.7): family eps 28.2% vs chip eps 23.6%  (ratio 0.84)
+  2026-10-08-r1      X d3: chip 27.16/12.5  model 26.70/9.4  fit 32.95/14.2  cz1.5 27.76/10.7  cz2 28.76/11.8  cz2.5 29.69/13.1  cz3 30.53/14.4  cz4 32.13/16.3
+      at fit's rate 32.95% (CZ x 4.5): family eps 17.3% (extrapolated) vs fit eps 14.2%  (ratio 0.82)
+      at chip's rate 27.16% (CZ x 1.2): family eps 9.9% vs chip eps 12.5%  (ratio 1.25)
+  2026-10-08-r1      X d5: chip 33.35/19.1  model 30.10/15.8  fit 34.58/22.1  cz1.5 31.40/18.1  cz2 32.57/21.2  cz2.5 33.66/23.1  cz3 34.57/24.9  cz4 36.26/27.8
+      at fit's rate 34.58% (CZ x 3.0): family eps 25.0% vs fit eps 22.1%  (ratio 0.88)
+      at chip's rate 33.35% (CZ x 2.4): family eps 22.6% vs chip eps 19.1%  (ratio 0.84)
+  2026-10-08-r1      Z d3: chip 40.41/13.8  model 32.01/6.0  fit 37.18/8.6  cz1.5 34.19/7.2  cz2 36.27/8.4  cz2.5 38.04/9.4  cz3 39.48/10.5  cz4 41.99/12.7
+      flag/relay rate: chip 8.04  model 6.52  fit 12.34  cz1.5 7.15  cz2 7.75  cz2.5 8.33  cz3 8.91  cz4 10.03
+      at fit's rate 37.18% (CZ x 2.3): family eps 8.9% vs fit eps 8.6%  (ratio 0.97)
+      at chip's rate 40.41% (CZ x 3.4): family eps 11.3% vs chip eps 13.8%  (ratio 1.22)
+  2026-10-08-r1      Z d5: chip 48.68/34.1  model 43.79/17.3  fit 46.97/21.7  cz1.5 45.26/20.0  cz2 46.33/22.3  cz2.5 47.26/24.3  cz3 47.89/24.4  cz4 48.71/30.0
+      flag/relay rate: chip 9.18  model 6.97  fit 10.31  cz1.5 7.70  cz2 8.41  cz2.5 9.12  cz3 9.81  cz4 11.14
+      at fit's rate 46.97% (CZ x 2.3): family eps 23.7% vs fit eps 21.7%  (ratio 0.92)
+      at chip's rate 48.68% (CZ x 4.0): family eps 29.8% vs chip eps 34.1%  (ratio 1.14)
+  2026-10-08-r2-d3   X d3: chip 26.11/11.9  model 21.60/8.1  fit 27.47/12.5  cz1.5 22.69/9.1  cz2 23.74/9.9  cz2.5 24.74/11.1  cz3 25.71/11.9  cz4 27.54/14.4
+      at fit's rate 27.47% (CZ x 4.0): family eps 14.3% vs fit eps 12.5%  (ratio 0.87)
+      at chip's rate 26.11% (CZ x 3.2): family eps 12.4% vs chip eps 11.9%  (ratio 0.96)
+  2026-10-08-r2-d3   Z d3: chip 48.39/23.6  model 30.54/8.0  fit 35.15/10.7  cz1.5 32.03/9.2  cz2 33.47/10.2  cz2.5 34.81/11.1  cz3 36.00/12.1  cz4 38.10/14.4
+      flag/relay rate: chip 6.82  model 3.97  fit 7.09  cz1.5 4.40  cz2 4.82  cz2.5 5.25  cz3 5.65  cz4 6.47
+      at fit's rate 35.15% (CZ x 2.6): family eps 11.4% vs fit eps 10.7%  (ratio 0.94)
+      at chip's rate 48.39% (CZ x 8.9): family eps 25.5% (extrapolated) vs chip eps 23.6%  (ratio 0.93)
+  2026-10-08-r2-d5   X d5: chip 34.50/23.2  model 31.05/19.0  fit 35.95/25.2  cz1.5 32.38/22.4  cz2 33.63/25.5  cz2.5 34.77/27.2  cz3 35.79/28.7  cz4 37.58/29.9
+      at fit's rate 35.95% (CZ x 3.1): family eps 28.8% vs fit eps 25.2%  (ratio 0.88)
+      at chip's rate 34.50% (CZ x 2.4): family eps 26.8% vs chip eps 23.2%  (ratio 0.87)
+  2026-10-08-r2-d5   Z d5: chip 49.63/26.9  model 44.34/16.6  fit 47.37/20.6  cz1.5 46.08/19.4  cz2 47.21/21.2  cz2.5 48.06/22.6  cz3 48.69/24.9  cz4 49.40/26.5
+      flag/relay rate: chip 11.71  model 8.02  fit 11.52  cz1.5 8.99  cz2 9.92  cz2.5 10.83  cz3 11.71  cz4 13.37
+      at fit's rate 47.37% (CZ x 2.1): family eps 21.5% vs fit eps 20.6%  (ratio 0.96)
+      at chip's rate 49.63% (CZ x 4.3): family eps 27.1% (extrapolated) vs chip eps 26.9%  (ratio 0.99)
+
+Ratio (actual eps / family eps at the same bulk stabilizer detection rate), per case; mean over all cases and over interpolated cases only:
+  fit X memory: 0.89 0.88 0.82* 0.88 0.87 0.88   mean 0.87; interpolated only: n=5, mean 0.88, range 0.87-0.89
+  fit Z memory: 0.96 0.93 0.97 0.92 0.94 0.96   mean 0.94; interpolated only: n=6, mean 0.94, range 0.92-0.97
+  chip X memory: 1.13 1.03 1.25 0.84 0.96 0.87   mean 1.01; interpolated only: n=6, mean 1.01, range 0.84-1.25
+  chip Z memory: 1.13 0.84 1.22 1.14 0.93* 0.99*   mean 1.04; interpolated only: n=4, mean 1.08, range 0.84-1.22
+  (* = detection rate outside the family's range, eps extrapolated)
+
+Scaled no-leakage model minus leakage model ('fit'), percentage points of eps per round:
+  2026-10-08-r1  cz1.5 : X d3 -3.5  X d5 -4.0  Z d3 -1.4  Z d5 -1.7   mean |diff| 2.7
+  2026-10-08-r1  cz2   : X d3 -2.4  X d5 -0.8  Z d3 -0.2  Z d5 +0.6   mean |diff| 1.0
+  2026-10-08-r1  cz2.5 : X d3 -1.1  X d5 +1.0  Z d3 +0.8  Z d5 +2.6   mean |diff| 1.4
+  2026-10-08-r1  cz3   : X d3 +0.2  X d5 +2.9  Z d3 +1.9  Z d5 +2.7   mean |diff| 1.9
+  2026-10-08-r1  cz4   : X d3 +2.1  X d5 +5.7  Z d3 +4.0  Z d5 +8.3   mean |diff| 5.0
+  mean           cz1.5 : X d3 -3.2  X d5 -3.9  Z d3 -1.4  Z d5 -1.9   mean |diff| 2.6
+  mean           cz2   : X d3 -2.2  X d5 -0.8  Z d3 -0.2  Z d5 +0.3   mean |diff| 0.9
+  mean           cz2.5 : X d3 -1.1  X d5 +1.1  Z d3 +0.7  Z d5 +2.0   mean |diff| 1.2
+  mean           cz3   : X d3 +0.0  X d5 +2.7  Z d3 +1.8  Z d5 +3.2   mean |diff| 2.0
+  mean           cz4   : X d3 +2.2  X d5 +5.0  Z d3 +3.9  Z d5 +7.0   mean |diff| 4.5

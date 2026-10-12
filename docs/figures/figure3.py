@@ -1,4 +1,6 @@
-"""Figure 3: simulated Λ on Fez as placed, and with parts of the chip made better.
+"""The pre-run planning figure: simulated Λ on Fez as placed, and with parts made better.
+
+Simulated for the write-up before the run (figure3.json); the paper does not use it.
 
 Every row runs what the run runs: the patches where fez_qubits puts them on the
 given calibration, both in one circuit, translated by for_fez with the
@@ -344,7 +346,7 @@ def report(figure: dict) -> str:
     for s in figure["inside_spots"]:
         low, high = s["X"]["0.0"], s["X"]["1.0"]
         lines.append(
-            f"  {str(tuple(s['origin'])):9s}{str(tuple(s['direction'])):9s}"
+            f"  {tuple(s['origin'])!s:9s}{tuple(s['direction'])!s:9s}"
             f"{low['eps3in'][0]:7.2%}{high['eps3in'][0]:7.2%}"
             f"{low['ratio'][0]:7.2f}{high['ratio'][0]:6.2f}"
         )
@@ -364,7 +366,7 @@ def report(figure: dict) -> str:
 
 
 def main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(description="Simulate the numbers of Figure 3.")
+    parser = argparse.ArgumentParser(description="Simulate the numbers of the planning figure.")
     parser.add_argument("--calibration", type=Path, required=True, metavar="PATH")
     parser.add_argument(
         "--out",

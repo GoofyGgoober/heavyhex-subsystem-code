@@ -16,19 +16,31 @@ qubit and of pairs on the same Z gauge. Logical errors and Λ are left out of th
 
 from __future__ import annotations
 
+import argparse
 import itertools
 import json
 import sys
 
 import numpy as np
 
-from common import REPO, ROUND_US, jobs, memory_index, readout_series
 import leaky
 import rerun
+from common import REPO, ROUND_US, jobs, memory_index, readout_series
 from where import data_read, z4_of
 
 FIT_JOBS = ("2026-10-08-r1", "2026-10-08-r2-d5", "2026-10-08-r2-d3", "2026-10-06-r1")
-KIND = sys.argv[1] if len(sys.argv) > 1 else "depolarize"
+KINDS = ("depolarize", "bitflip", "phase")  # what a leaked qubit's CZ does to its partner
+
+
+def _kind(argv: list[str]) -> str:
+    """The partner disturbance named on the command line."""
+    parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
+    parser.add_argument("kind", nargs="?", choices=KINDS, default=KINDS[0])
+    return parser.parse_args(argv).kind
+
+
+# Other scripts import FIT_JOBS and stats from here; only a run as a script reads argv.
+KIND = _kind(sys.argv[1:]) if __name__ == "__main__" else KINDS[0]
 LEAKS = (0.001, 0.002, 0.003, 0.0045) if KIND == "depolarize" else (0.001, 0.002, 0.003)
 STRENGTHS = (0.25, 0.5, 1.0)
 SPREADS = (0.0, 0.05, 0.15) if KIND == "depolarize" else (0.0, 0.05)
@@ -76,7 +88,15 @@ def main() -> None:
             idx = memory_index(basis, 8)
             model, records, labels = j.model(idx)
             chip, _ = j.chip_detectors(idx, model, records)
-            cases.append((j, basis, model, labels, {f"{basis} {k}": v for k, v in stats(chip, labels).items()}))
+            cases.append(
+                (
+                    j,
+                    basis,
+                    model,
+                    labels,
+                    {f"{basis} {k}": v for k, v in stats(chip, labels).items()},
+                )
+            )
     chip_tot = {}
     for *_, s in cases:
         for k, v in s.items():
@@ -88,23 +108,54 @@ def main() -> None:
         tot = {}
         for j, basis, model, labels, _ in cases:
             ro = rerun.variant(j, "leak+ro", *rerun.leakage_params(), 1.0)
-            lk = leaky.Leakage(leak=rerun._AllQubits(__import__("collections").defaultdict(lambda: leak)),
-                               lifetime_us=life, half_round_us=ROUND_US / 2, read_leaked=read,
-                               partner_phase=strength, partner_kind=KIND, transfer=spread,
-                               reset_error=ro.reset_error, readout=ro.readout)
+            assert ro is not None  # only "model" has no leakage
+            lk = leaky.Leakage(
+                # Used within this iteration, so the late-bound leak is this one.
+                leak=rerun._AllQubits(__import__("collections").defaultdict(lambda: leak)),  # noqa: B023
+                lifetime_us=life,
+                half_round_us=ROUND_US / 2,
+                read_leaked=read,
+                partner_phase=strength,
+                partner_kind=KIND,
+                transfer=spread,
+                reset_error=ro.reset_error,
+                readout=ro.readout,
+            )
             det, _ = leaky.simulate(model, SHOTS, lk, seed=21)
             for k, v in stats(det, labels).items():
                 tot.setdefault(f"{basis} {k}", []).append(v)
         sim = {k: float(np.nanmean(v)) for k, v in tot.items()}
-        rel = {k: (sim[k] - chip_mean[k]) / abs(chip_mean[k]) for k in chip_mean if np.isfinite(chip_mean[k])}
-        loss = float(np.sqrt(np.mean([v ** 2 for v in rel.values()])))
-        results.append({"leak": leak, "strength": strength, "spread": spread, "loss": loss, "sim": sim})
-        print(f"leak {leak:<6g} strength {strength:<4g} spread {spread:<4g} loss {loss:.3f}  " +
-              "  ".join(f"{k} {100*v:+.0f}%" for k, v in sorted(rel.items())), flush=True)
+        rel = {
+            k: (sim[k] - chip_mean[k]) / abs(chip_mean[k])
+            for k in chip_mean
+            if np.isfinite(chip_mean[k])
+        }
+        loss = float(np.sqrt(np.mean([v**2 for v in rel.values()])))
+        results.append(
+            {"leak": leak, "strength": strength, "spread": spread, "loss": loss, "sim": sim}
+        )
+        print(
+            f"leak {leak:<6g} strength {strength:<4g} spread {spread:<4g} loss {loss:.3f}  "
+            + "  ".join(f"{k} {100 * v:+.0f}%" for k, v in sorted(rel.items())),
+            flush=True,
+        )
     best = min(results, key=lambda r: r["loss"])
-    print(f"\nbest: leak {best['leak']} per CZ, strength {best['strength']}, spread {best['spread']} (loss {best['loss']:.3f})")
+    print(
+        f"\nbest: leak {best['leak']} per CZ, strength {best['strength']}, spread {best['spread']} (loss {best['loss']:.3f})"
+    )
     (REPO / f"docs/diagnosis/results/fit_leak2_{KIND}.json").write_text(
-        json.dumps({"chip": chip_mean, "lifetime_us": life, "read_leaked": read, "grid": results, "best": best}, indent=1) + "\n")
+        json.dumps(
+            {
+                "chip": chip_mean,
+                "lifetime_us": life,
+                "read_leaked": read,
+                "grid": results,
+                "best": best,
+            },
+            indent=1,
+        )
+        + "\n"
+    )
 
 
 if __name__ == "__main__":

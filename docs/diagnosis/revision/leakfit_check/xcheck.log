@@ -1,0 +1,4 @@
+2026-10-08-r1 X8: 144 detectors, chi2/detector 0.98 (1 expected), max |z| 2.4; mean rate 0.3052 vs 0.3061
+   stab 0.3151/0.3165 (z -1.8)
+2026-10-08-r1 Z8: 310 detectors, chi2/detector 0.97 (1 expected), max |z| 3.0; mean rate 0.1413 vs 0.1410
+   stab 0.4183/0.4176 (z +0.5)  flag 0.08603/0.08586 (z +0.5)  repeat 0.08937/0.08908 (z +0.1)  repeat_slot 0.08457/0.08368 (z +0.5)  co_data 0.000469/0.0003859 (z +2.0)  co_data_slot 0.0004539/0.0003704 (z +2.1)  co_gauge 0.0004393/0.0004103 (z +0.5)  co_gauge_slot 0.0004227/0.000391 (z +0.6)  co_unrel 1.005e-05/1.039e-05 (z -0.1)  co_unrel_slot 5.87e-08/-5.806e-07 (z +0.1)

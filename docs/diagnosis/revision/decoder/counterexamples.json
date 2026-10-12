@@ -1,0 +1,285 @@
+{
+ "job": "2026-10-08-r1",
+ "f": 0.9907930952407054,
+ "examples": [
+  {
+   "basis": "X",
+   "rounds": 2,
+   "target_patch_distance": 3,
+   "replaced": [
+    "#798 DEPOLARIZE1(0.000506441) 24 -> Z24"
+   ],
+   "fired_detectors": [
+    0,
+    5
+   ],
+   "detector_labels": {
+    "0": [
+     "3",
+     "0",
+     "X1X2X4X5"
+    ],
+    "5": [
+     "3",
+     "1",
+     "X5X6X8X9"
+    ]
+   },
+   "actual_observable_flips": [
+    0,
+    0
+   ],
+   "repo_decoder_prediction": [
+    1,
+    0
+   ],
+   "uniform_decoder_prediction": [
+    0,
+    0
+   ],
+   "actual_fault_symptoms": [
+    {
+     "fault": "Z24 at #798",
+     "detectors": [
+      0,
+      5
+     ],
+     "observables": []
+    }
+   ],
+   "actual_fault_dem_mechanisms": [
+    {
+     "fault": "Z24 at #798",
+     "dem_line": "error(0.00231965) D0 D5",
+     "p": 0.0023196521790500644
+    }
+   ],
+   "calibrated_matching_edges": [
+    {
+     "edge": [
+      0,
+      null
+     ],
+     "p": 0.11654223847851046,
+     "weight": 2.0255897131485057,
+     "observables": [
+      0
+     ]
+    },
+    {
+     "edge": [
+      5,
+      null
+     ],
+     "p": 0.1459939385147055,
+     "weight": 1.7663731876974214,
+     "observables": []
+    }
+   ],
+   "uniform_matching_edges": [
+    {
+     "edge": [
+      0,
+      5
+     ],
+     "p": 0.002319652179050064,
+     "weight": 6.064015680626781,
+     "observables": []
+    }
+   ],
+   "calibrated_correction_weight": 3.791962900845927,
+   "uniform_choice_calibrated_weight": 6.064015680626781
+  },
+  {
+   "basis": "Z",
+   "rounds": 2,
+   "target_patch_distance": 5,
+   "replaced": [
+    "#3907 PAULI_CHANNEL_1(5.24316e-05, 5.24316e-05, 0.000119349) 122 -> X122",
+    "#4127 PAULI_CHANNEL_1(6.13046e-05, 6.13046e-05, 0.000114828) 86 -> X86"
+   ],
+   "fired_detectors": [
+    22,
+    25,
+    27,
+    28,
+    39,
+    40
+   ],
+   "detector_labels": {
+    "22": [
+     "5",
+     "0",
+     "Z1Z2Z6Z7Z11Z12Z16Z17Z21Z22"
+    ],
+    "25": [
+     "5",
+     "0",
+     "Z4Z5Z9Z10Z14Z15Z19Z20Z24Z25"
+    ],
+    "27": [
+     "5",
+     "1",
+     "Z2Z3Z7Z8Z12Z13Z17Z18Z22Z23"
+    ],
+    "28": [
+     "5",
+     "1",
+     "Z3Z4Z8Z9Z13Z14Z18Z19Z23Z24"
+    ],
+    "39": [
+     "5",
+     "0",
+     "relay Z3Z4"
+    ],
+    "40": [
+     "5",
+     "0",
+     "z_flag X4X9"
+    ]
+   },
+   "actual_observable_flips": [
+    0,
+    0
+   ],
+   "repo_decoder_prediction": [
+    0,
+    1
+   ],
+   "uniform_decoder_prediction": [
+    0,
+    0
+   ],
+   "actual_fault_symptoms": [
+    {
+     "fault": "X122 at #3907",
+     "detectors": [
+      25,
+      28,
+      39,
+      40
+     ],
+     "observables": []
+    },
+    {
+     "fault": "X86 at #4127",
+     "detectors": [
+      22,
+      27
+     ],
+     "observables": []
+    }
+   ],
+   "actual_fault_dem_mechanisms": [
+    {
+     "fault": "X122 at #3907",
+     "dem_line": "error(0.00211761) D25 ^ D39 ^ D40 ^ D28",
+     "p": 0.0021176131419735214
+    },
+    {
+     "fault": "X86 at #4127",
+     "dem_line": "error(0.00653162) D22 D27",
+     "p": 0.00653162264102258
+    }
+   ],
+   "calibrated_matching_edges": [
+    {
+     "edge": [
+      22,
+      null
+     ],
+     "p": 0.15259573291544826,
+     "weight": 1.7143857177687798,
+     "observables": [
+      1
+     ]
+    },
+    {
+     "edge": [
+      25,
+      null
+     ],
+     "p": 0.12174788116218777,
+     "weight": 1.9759813450850423,
+     "observables": []
+    },
+    {
+     "edge": [
+      27,
+      28
+     ],
+     "p": 0.2637529145838616,
+     "weight": 1.0265530409860586,
+     "observables": []
+    },
+    {
+     "edge": [
+      39,
+      null
+     ],
+     "p": 0.028378380805821633,
+     "weight": 3.5333388319608083,
+     "observables": []
+    },
+    {
+     "edge": [
+      40,
+      null
+     ],
+     "p": 0.033815862468857844,
+     "weight": 3.3524244383966235,
+     "observables": []
+    }
+   ],
+   "uniform_matching_edges": [
+    {
+     "edge": [
+      22,
+      27
+     ],
+     "p": 0.012378605091182956,
+     "weight": 4.379329834244237,
+     "observables": []
+    },
+    {
+     "edge": [
+      25,
+      null
+     ],
+     "p": 0.12174788116218777,
+     "weight": 1.9759813450850423,
+     "observables": []
+    },
+    {
+     "edge": [
+      28,
+      null
+     ],
+     "p": 0.002117613141973521,
+     "weight": 6.155345842545741,
+     "observables": []
+    },
+    {
+     "edge": [
+      39,
+      null
+     ],
+     "p": 0.028378380805821633,
+     "weight": 3.5333388319608083,
+     "observables": []
+    },
+    {
+     "edge": [
+      40,
+      null
+     ],
+     "p": 0.033815862468857844,
+     "weight": 3.3524244383966235,
+     "observables": []
+    }
+   ],
+   "calibrated_correction_weight": 11.602683374197312,
+   "uniform_choice_calibrated_weight": 19.396420292232452
+  }
+ ]
+}

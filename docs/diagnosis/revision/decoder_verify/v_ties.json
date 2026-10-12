@@ -1,0 +1,38 @@
+{
+ "Z d3 singles rounds (1, 2, 3, 4, 6, 8)": {
+  "patterns": 11700,
+  "mis_uniform": 240,
+  "mis_any_jitter": 160,
+  "mis_all_jitter": 0,
+  "verdict_changes": 240,
+  "mis_jitter_seed": [
+   50,
+   80,
+   40
+  ]
+ },
+ "Z d5 pairs rounds (2,)": {
+  "patterns": 344530,
+  "mis_uniform": 9200,
+  "mis_any_jitter": 10965,
+  "mis_all_jitter": 615,
+  "verdict_changes": 15105,
+  "mis_jitter_seed": [
+   5280,
+   4675,
+   6130
+  ]
+ },
+ "X d5 pairs rounds (2,)": {
+  "patterns": 135300,
+  "mis_uniform": 0,
+  "mis_any_jitter": 0,
+  "mis_all_jitter": 0,
+  "verdict_changes": 0,
+  "mis_jitter_seed": [
+   0,
+   0,
+   0
+  ]
+ }
+}

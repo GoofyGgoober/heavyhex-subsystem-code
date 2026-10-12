@@ -11,7 +11,7 @@ from heavyhex.patches.operators import D5
 
 pytest.importorskip("qiskit_aer")
 
-from heavyhex.simulation.aer import run_flagged_circuit, run_memory_flagged  # noqa: E402
+from heavyhex.simulation.aer import run_flagged_circuit, run_memory_flagged
 
 
 def test_d5_gates_follow_every_blueprint_bond():

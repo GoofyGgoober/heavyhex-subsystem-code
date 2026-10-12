@@ -76,7 +76,9 @@ def test_d3_at_5_1_matches_the_falcon_mapping(device_map):
     }
     assert patch.x_ancillas == {
         name: mapping[q]
-        for name, q in zip(("X1X4", "X2X5", "X3X6", "X4X7", "X5X8", "X6X9"), (3, 12, 18, 8, 14, 23))
+        for name, q in zip(
+            ("X1X4", "X2X5", "X3X6", "X4X7", "X5X8", "X6X9"), (3, 12, 18, 8, 14, 23), strict=True
+        )
     }
     assert patch.z_ancillas == {
         name: mapping[q]

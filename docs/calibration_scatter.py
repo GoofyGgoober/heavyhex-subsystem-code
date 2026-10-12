@@ -10,7 +10,10 @@ predictions at f = 0, 0.5 and 1, as analyze does. Both directions are run.
 The preview used IBM's calibration of 3 October 2026 against the day before's:
 
     git show 9414ac1:runs/ibm_fez-2026-10-02-offline/calibration.json > before.json
-    python docs/calibration_scatter.py runs/ibm_fez-2026-10-03-offline/calibration.json before.json
+    git show d021f1e:runs/ibm_fez-2026-10-03-offline/calibration.json > after.json
+    python docs/calibration_scatter.py after.json before.json
+
+(The two offline preview folders are no longer in the tree; git keeps them.)
 
 Local simulation only; it uses no QPU time.
 """
@@ -89,7 +92,7 @@ def read_off(model_day: Path, chip_day: Path, shots: int, pool: ProcessPoolExecu
 
 
 def main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
     parser.add_argument("day", type=Path, help="one calibration file")
     parser.add_argument("other_day", type=Path, help="another day's calibration file")
     parser.add_argument("--shots", type=int, default=run.SIMULATED_SHOTS, metavar="N")

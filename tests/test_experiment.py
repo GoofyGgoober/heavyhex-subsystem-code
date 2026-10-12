@@ -6,6 +6,7 @@ from collections import Counter
 from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any
 
 import pytest
 
@@ -14,17 +15,21 @@ pytest.importorskip("pymatching")
 pytest.importorskip("qiskit_aer")
 pytest.importorskip("qiskit_ibm_runtime")
 
-import numpy as np  # noqa: E402
-from qiskit_ibm_runtime.fake_provider import FakeFez  # noqa: E402
+import numpy as np
+import stim
+from qiskit_ibm_runtime.fake_provider import FakeFez
 
-import heavyhex.simulation.noisy as noisy  # noqa: E402
-from heavyhex.cli import main  # noqa: E402
-from heavyhex.experiment import run  # noqa: E402
-from heavyhex.experiment.circuits import Setting, for_fez, logical_circuit  # noqa: E402
-from heavyhex.patches.placement import LAST_CALIBRATION, Calibration, fez_qubits  # noqa: E402
+import heavyhex.simulation.noisy as noisy
+from heavyhex.cli import main
+from heavyhex.experiment import run
+from heavyhex.experiment.circuits import Setting, for_fez, logical_circuit
+from heavyhex.patches.placement import Calibration, fez_qubits
 
 TARGET = FakeFez().target
-SAVED = Calibration.load(LAST_CALIBRATION)
+DATA = Path(__file__).parent / "data"
+# IBM's calibration of 8 October 2026, kept fixed: `heavyhex calibrate` rewrites the
+# repository's own copy, docs/figures/fez_calibration.json.
+SAVED = Calibration.load(DATA / "fez_calibration_2026-10-08.json")
 # Every CZ working, so both patches can be placed, and FakeFez's gate times, as TARGET has.
 WORKING = replace(SAVED, cz=dict.fromkeys(SAVED.cz, 0.003), durations_ns=None)
 pytestmark = pytest.mark.filterwarnings("ignore:.*weak parts")
@@ -66,7 +71,10 @@ def test_pulses_land_where_the_simulator_puts_them(basis):
     for d, chip in ((3, chips()["3"]), (5, chips()["5"])):
         model = noisy.noisy_circuit(d, basis, 2, WORKING, decoupling=True)
         simulated = Counter(
-            chip[t.value] for i in model.flattened() if i.name == "X" for t in i.targets_copy()
+            chip[t.value]
+            for i in model.flattened()
+            if isinstance(i, stim.CircuitInstruction) and i.name == "X"
+            for t in i.targets_copy()
         )
         assert {q: sent[q] for q in chip} == {q: simulated[q] for q in chip}
 
@@ -78,7 +86,7 @@ def test_a_noiseless_chip_never_fires_a_detector():
     settings = [Setting("memory", "X", 2), Setting("memory", "Z", 2), Setting("idle", "X", 2)]
     circuits = [native(s) for s in settings]
     result = SamplerV2(mode=AerSimulator(method="stabilizer")).run(circuits, shots=50).result()
-    for setting, circuit, pub in zip(settings, circuits, result):
+    for setting, circuit, pub in zip(settings, circuits, result, strict=True):
         bits = {name: b.to_bool_array(order="little") for name, b in pub.data.items()}
         model, records, _ = run.simulated(setting, circuit, WORKING, TARGET.dt, 0.0)
         measured = run.in_record_order(bits, records)
@@ -100,12 +108,11 @@ def test_shots_go_to_registers_and_back():
 
 def test_a_rehearsal_gives_back_its_dephasing(tmp_path, monkeypatch):
     settings = (
-        (Setting("memory", "X", 1), Setting("memory", "X", 2))
-        + (
-            Setting("memory", "Z", 1),
-            Setting("memory", "Z", 2),
-        )
-        + tuple(Setting("idle", "X", n, readout=r) for r in "XY" for n in (1, 4, 8))
+        Setting("memory", "X", 1),
+        Setting("memory", "X", 2),
+        Setting("memory", "Z", 1),
+        Setting("memory", "Z", 2),
+        *(Setting("idle", "X", n, readout=r) for r in "XY" for n in (1, 4, 8)),
     )
     monkeypatch.setattr(run, "SETTINGS", settings)
     monkeypatch.setattr(run, "ROUNDS", (1, 2))
@@ -131,7 +138,7 @@ def test_a_rehearsal_gives_back_its_dephasing(tmp_path, monkeypatch):
     assert 0 < analysis["observed"]["fits"]["X"]["lambda_uncertainty"] < 0.2
     seen = analysis["observed"]["settings"]
     expected = analysis["predicted_at_measured_dephasing"]["settings"]
-    for got, want in zip(seen[:4], expected[:4]):
+    for got, want in zip(seen[:4], expected[:4], strict=True):
         assert np.allclose(got["logical_error"], want["logical_error"], atol=0.015)
     # Six 2σ checks: by chance one misses about one rehearsal in four, so ask for 3σ here.
     rows = analysis["agreement"]["tests"].values()
@@ -192,14 +199,13 @@ def test_the_idle_test_reads_y_after_an_s_dagger():
 
 @pytest.mark.parametrize("basis", ["X", "Z"])
 def test_the_circuits_sent_to_the_chip_have_distance_3_and_5(basis):
-    import stim
-
     model, _, _ = run.simulated(
         Setting("memory", basis, 2), native(Setting("memory", basis, 2)), WORKING, TARGET.dt, 0.5
     )
     for k, d in enumerate((3, 5)):
         alone = stim.Circuit()
         for item in model.flattened():
+            assert isinstance(item, stim.CircuitInstruction)
             if item.name == "OBSERVABLE_INCLUDE" and item.gate_args_copy() != [k]:
                 continue
             alone.append(item)
@@ -329,7 +335,9 @@ def fake_ibm(monkeypatch, tmp_path, ibm_estimate=None, reply_lost=False):
     sent = SimpleNamespace(options=None, circuits=None, cancelled=False)
 
     class Job:  # as IBM leaves a job it stopped at the limit
-        usage_estimation = {"quantum_seconds": ibm_estimate}
+        @property
+        def usage_estimation(self):
+            return {"quantum_seconds": ibm_estimate}
 
         def job_id(self):
             return "fake"
@@ -397,14 +405,14 @@ def test_ibm_cancels_the_job_past_50_s_of_qpu_time_and_it_is_never_sent_again(
     assert record["usage"]["quantum_seconds"] == 50
     with pytest.raises(ValueError, match="already has a job"):
         run.submit(folder, QPU, 5000)
-    with pytest.raises(ValueError, match="ended ERROR without shots .Ran too long."):
+    with pytest.raises(ValueError, match=r"ended ERROR without shots .Ran too long."):
         run.fetch(folder)  # analyze says so, and sends nothing
 
 
 def test_a_job_estimated_past_the_limit_is_not_sent(tmp_path, monkeypatch):
     sent, folder = fake_ibm(monkeypatch, tmp_path)
     prepared_today(folder, seconds=1e-3)  # about 108 s
-    with pytest.raises(ValueError, match="over its 50 s limit .* not sent"):
+    with pytest.raises(ValueError, match=r"over its 50 s limit .* not sent"):
         run.submit(folder, QPU, 5000)
     assert sent.circuits is None and not (folder / "job.json").exists()
 
@@ -421,7 +429,7 @@ def test_a_job_ibm_estimates_past_the_limit_is_cancelled_before_it_runs(tmp_path
 def test_a_job_whose_reply_from_ibm_is_lost_is_never_sent_again(tmp_path, monkeypatch):
     from qiskit_ibm_runtime.exceptions import IBMRuntimeError
 
-    sent, folder = fake_ibm(monkeypatch, tmp_path, reply_lost=True)
+    _, folder = fake_ibm(monkeypatch, tmp_path, reply_lost=True)
     prepared_today(folder)
     with pytest.raises(IBMRuntimeError):
         run.submit(folder, QPU, 5000)
@@ -429,7 +437,7 @@ def test_a_job_whose_reply_from_ibm_is_lost_is_never_sent_again(tmp_path, monkey
     assert record["job"] is None and record["tag"] == "heavyhex:today"
     with pytest.raises(ValueError, match="already has a job"):
         run.submit(folder, QPU, 5000)
-    with pytest.raises(ValueError, match="reply never came.*job_tags"):
+    with pytest.raises(ValueError, match=r"reply never came.*job_tags"):
         run.fetch(folder)
 
 
@@ -472,7 +480,7 @@ def test_a_job_estimated_past_what_the_total_has_left_is_not_sent(tmp_path, monk
     sent, folder = fake_ibm(monkeypatch, tmp_path)
     prepared_today(folder)
     earlier_job("earlier", usage={"quantum_seconds": 290, "status": "complete"})
-    with pytest.raises(ValueError, match="over its 10 s limit .*290 s already counted"):
+    with pytest.raises(ValueError, match=r"over its 10 s limit .*290 s already counted"):
         run.submit(folder, QPU, 2500)
     assert sent.circuits is None and not (folder / "job.json").exists()
 
@@ -488,10 +496,9 @@ def test_no_job_goes_past_the_approved_count(tmp_path, monkeypatch):
 
 
 def test_drift_sets_the_first_half_of_every_pieces_shots_against_the_second(tmp_path):
-    import numpy as np
-
     ran = np.array([[0], [0], [1], [1]], dtype=bool)  # shots in the order they ran
-    np.savez(tmp_path / run.SHOTS, **{"0/0/0/m": ran, "1/0/1/m": ran})
+    pieces: dict[str, Any] = {"0/0/0/m": ran, "1/0/1/m": ran}
+    np.savez(tmp_path / run.SHOTS, **pieces)
     first, second = (run.load_shots(tmp_path, half=half)[0]["m"] for half in (0, 1))
     assert not first.any() and second.all() and len(first) == len(second) == 4
 
@@ -502,11 +509,13 @@ def test_day_folders_are_named_by_day_rep_and_lone_patch():
     assert run.day_folder("ibm_fez", "2026-10-04", 2, 3, offline=True).name.endswith("d3-offline")
 
 
-OCTOBER_3 = Calibration.load(Path(__file__).parent / "data" / "fez_calibration_2026-10-03.json")
+OCTOBER_3 = Calibration.load(DATA / "fez_calibration_2026-10-03.json")
 SMALL = (
-    (Setting("memory", "X", 1), Setting("memory", "X", 2))
-    + (Setting("memory", "Z", 1), Setting("memory", "Z", 2))
-    + tuple(Setting("idle", "X", n, readout=r) for r in "XY" for n in (1, 4, 8))
+    Setting("memory", "X", 1),
+    Setting("memory", "X", 2),
+    Setting("memory", "Z", 1),
+    Setting("memory", "Z", 2),
+    *(Setting("idle", "X", n, readout=r) for r in "XY" for n in (1, 4, 8)),
 )
 
 

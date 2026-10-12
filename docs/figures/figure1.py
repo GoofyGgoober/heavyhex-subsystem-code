@@ -1,8 +1,11 @@
-"""Draw the paper's Figure 1: the day's reps on ibm_fez.
+"""Draw the day's reps on ibm_fez: the paper's chip figure, paper/figures/layout.pdf.
 
-The patches go where heavyhex.patches.placement's day plan puts them for the
-given calibration, so redraw on run day after `heavyhex calibrate`. Rep 1 is
-drawn in full, the other reps are boxed on the chip. Runs offline.
+paper/figures/make_figures.py draws that from day 1's calibration. Run on its own,
+this draws figure1.png from the last `heavyhex calibrate`, as on the run days. The
+patches go where heavyhex.patches.placement's day plan puts them for the given
+calibration. Rep 1 is drawn in full, the other reps are boxed on the chip. Runs offline.
+
+    python docs/figures/figure1.py [--calibration PATH] [--out PATH]
 """
 
 from __future__ import annotations
@@ -12,6 +15,20 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
+from matplotlib.lines import Line2D
+from matplotlib.patches import Rectangle
+from matplotlib.transforms import Bbox
+
+from heavyhex.patches.layout import HeavyHexLayout, build_layout
+from heavyhex.patches.placement import (
+    WEAK_CZ,
+    Calibration,
+    broken_coupler,
+    day_plan,
+)
+
 from draw_blueprint import (
     CALIBRATION,
     FEZ_MAP,
@@ -29,24 +46,11 @@ from draw_blueprint import (
     load_device_map,
     patch_roles,
 )
-from matplotlib.axes import Axes
-from matplotlib.figure import Figure
-from matplotlib.lines import Line2D
-from matplotlib.patches import Rectangle
-from matplotlib.transforms import Bbox
-
-from heavyhex.patches.layout import HeavyHexLayout, build_layout
-from heavyhex.patches.placement import (
-    WEAK_CZ,
-    Calibration,
-    broken_coupler,
-    day_plan,
-)
 
 WEAK_BAND = "#C8C8C8"
 OTHER_REP = "#1B7A3D"  # boxes of the reps after the first
 GAP = 3  # points between a label and anything else
-LABEL = dict(fontsize=9.5, fontweight="bold", color=INK, zorder=9, path_effects=HALO)
+LABEL = {"fontsize": 9.5, "fontweight": "bold", "color": INK, "zorder": 9, "path_effects": HALO}
 
 
 def taken_boxes(ax: Axes) -> list[Bbox]:
@@ -55,7 +59,8 @@ def taken_boxes(ax: Axes) -> list[Bbox]:
     points = ax.figure.dpi / 72
     for markers in ax.collections:
         centers = ax.transData.transform(markers.get_offsets())
-        for (x, y), size in zip(centers, np.broadcast_to(markers.get_sizes(), len(centers))):
+        sizes = markers.get_sizes()  # pyright: ignore[reportAttributeAccessIssue]
+        for (x, y), size in zip(centers, np.broadcast_to(sizes, len(centers))):
             r = size**0.5 / 2 * points
             boxes.append(Bbox.from_extents(x - r, y - r, x + r, y + r))
     return boxes
@@ -111,7 +116,7 @@ def lift_z_labels(ax: Axes, layout: HeavyHexLayout) -> list[tuple[int, dict]]:
     names = {f"q{q}": q for q in layout.z_ancillas.values()}
     lifted = []
     for text in [t for t in ax.texts if t.get_text() in names]:
-        style = dict(fontsize=text.get_fontsize(), color=text.get_color())
+        style = {"fontsize": text.get_fontsize(), "color": text.get_color()}
         lifted.append((names[text.get_text()], style))
         text.remove()
     return lifted
@@ -143,7 +148,9 @@ def draw_key(fig: Figure, below: Axes) -> None:
             Line2D(
                 [], [], color=WEAK_BAND, lw=10, label=f"coupler with CZ error above {WEAK_CZ:.0%}"
             ),
-            Line2D([], [], color=OTHER_REP, lw=1.8, ls=":", label="a later rep's patch, in (a)"),
+            Line2D(
+                [], [], color=OTHER_REP, lw=1.8, ls=":", label="a later repetition's patch, in (a)"
+            ),
         ],
         loc="upper center",
         ncol=4,
@@ -181,7 +188,7 @@ def box_later_reps(ax: Axes, device: DeviceMap, plan: list) -> None:
                 ax.text(
                     x0 - pad,
                     y1 + pad + 0.25,
-                    f"rep {r}: d={d}{alone}",
+                    f"repetition {r}: d={d}{alone}",
                     fontsize=8.5,
                     color=OTHER_REP,
                     fontweight="bold",
@@ -232,14 +239,14 @@ def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
     for text in ax_d3.texts:
         if text.get_text().isdigit():
             text.set_text(f"q{text.get_text()}")
-    shown = "rep 1 drawn, the rest boxed" if len(plan) > 1 else "one rep"
-    ax_chip.set_title(f"(a) the day's reps on the chip: {shown}", fontsize=12)
+    shown = "repetition 1 drawn, the rest boxed" if len(plan) > 1 else "one repetition"
+    ax_chip.set_title(f"(a) the day's repetitions on the chip: {shown}", fontsize=12)
     ax_d3.set_title(
-        f"(b) rep 1, d = 3: {len(d3.data)} data qubits, {len(d3.physical_qubits)} in all",
+        f"(b) repetition 1, d = 3: {len(d3.data)} data qubits, {len(d3.physical_qubits)} in all",
         fontsize=12,
     )
     ax_d5.set_title(
-        f"(c) rep 1, d = 5: {len(d5.data)} data qubits, {len(d5.physical_qubits)} in all",
+        f"(c) repetition 1, d = 5: {len(d5.data)} data qubits, {len(d5.physical_qubits)} in all",
         fontsize=12,
     )
 
@@ -258,7 +265,7 @@ def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
 
 
 def main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(description="Draw the paper's Figure 1.")
+    parser = argparse.ArgumentParser(description="Draw the day's reps on ibm_fez.")
     parser.add_argument(
         "--calibration",
         type=Path,

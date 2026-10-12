@@ -1,0 +1,24 @@
+identity 0.002,0.175,0.075;0.0025,0.175,0.05;0.0015,0.25,0.075: 3 points, 192 tasks, sim exact
+leak 0.002   strength 0.175 spread 0.075 loss 0.138 (slot 0.132)  X stab +6%  Z stab -10%  Z flag +4%  Z repeat -11%  Z co_data +26%  Z co_gauge -15%   [271s]
+leak 0.0025  strength 0.175 spread 0.05  loss 0.196 (slot 0.217)  X stab +9%  Z stab -9%  Z flag +6%  Z repeat -12%  Z co_data +4%  Z co_gauge -44%   [384s]
+leak 0.0015  strength 0.25  spread 0.075 loss 0.139 (slot 0.131)  X stab +3%  Z stab -12%  Z flag -3%  Z repeat -17%  Z co_data +26%  Z co_gauge -3%   [464s]
+best so far (seed 22): leak 0.002 strength 0.175 spread 0.075 loss 0.138
+identity 0.002,0.175,0.075;0.0025,0.175,0.05;0.0015,0.25,0.075: 3 points, 192 tasks, sim exact
+leak 0.002   strength 0.175 spread 0.075 loss 0.155 (slot 0.142)  X stab +6%  Z stab -10%  Z flag +4%  Z repeat -10%  Z co_data +32%  Z co_gauge -12%   [244s]
+leak 0.0025  strength 0.175 spread 0.05  loss 0.175 (slot 0.194)  X stab +8%  Z stab -9%  Z flag +6%  Z repeat -13%  Z co_data +9%  Z co_gauge -38%   [339s]
+leak 0.0015  strength 0.25  spread 0.075 loss 0.174 (slot 0.168)  X stab +3%  Z stab -13%  Z flag -4%  Z repeat -17%  Z co_data +36%  Z co_gauge -9%   [423s]
+best so far (seed 23): leak 0.002 strength 0.175 spread 0.075 loss 0.155
+identity 0.002,0.175,0.075;0.0025,0.175,0.05;0.0015,0.25,0.075: 3 points, 192 tasks, sim exact
+leak 0.002   strength 0.175 spread 0.075 loss 0.155 (slot 0.146)  X stab +6%  Z stab -10%  Z flag +4%  Z repeat -11%  Z co_data +31%  Z co_gauge -14%   [227s]
+leak 0.0025  strength 0.175 spread 0.05  loss 0.180 (slot 0.199)  X stab +9%  Z stab -9%  Z flag +6%  Z repeat -13%  Z co_data +5%  Z co_gauge -40%   [330s]
+leak 0.0015  strength 0.25  spread 0.075 loss 0.131 (slot 0.128)  X stab +3%  Z stab -13%  Z flag -3%  Z repeat -16%  Z co_data +21%  Z co_gauge -13%   [420s]
+best so far (seed 24): leak 0.0015 strength 0.25 spread 0.075 loss 0.131
+identity 0.002,0.25,0.05: 1 points, 64 tasks, sim exact
+leak 0.002   strength 0.25  spread 0.05  loss 0.147 (slot 0.150)  X stab +6%  Z stab -11%  Z flag +1%  Z repeat -15%  Z co_data +19%  Z co_gauge -23%   [207s]
+best so far (seed 22): leak 0.002 strength 0.175 spread 0.075 loss 0.138
+identity 0.002,0.25,0.05: 1 points, 64 tasks, sim exact
+leak 0.002   strength 0.25  spread 0.05  loss 0.130 (slot 0.131)  X stab +6%  Z stab -11%  Z flag +1%  Z repeat -15%  Z co_data +17%  Z co_gauge -18%   [217s]
+best so far (seed 23): leak 0.002 strength 0.25 spread 0.05 loss 0.130
+identity 0.002,0.25,0.05: 1 points, 64 tasks, sim exact
+leak 0.002   strength 0.25  spread 0.05  loss 0.155 (slot 0.158)  X stab +6%  Z stab -11%  Z flag +1%  Z repeat -15%  Z co_data +21%  Z co_gauge -25%   [186s]
+best so far (seed 24): leak 0.0015 strength 0.25 spread 0.075 loss 0.131

@@ -1,0 +1,48 @@
+2026-10-04 1
+2026-10-04 2
+2026-10-05 1
+2026-10-05 2
+2026-10-06 1
+2026-10-06 2
+2026-10-07 1
+2026-10-07 2
+2026-10-08 1
+2026-10-08 2
+{
+ "wls X lambda": 24.96985547147045,
+ "wls X eps3": 52.078477845188154,
+ "wls X eps5": 19.799261018394617,
+ "wls Z lambda": 35.155575225920494,
+ "wls Z eps3": 1239.5780569023893,
+ "wls Z eps5": 270.5309022473109,
+ "wls X all-three agree reps": [
+  "2026-10-04 r2",
+  "2026-10-06 r2",
+  "2026-10-07 r1",
+  "2026-10-07 r2"
+ ],
+ "mle X lambda": 24.592403145498135,
+ "mle X eps3": 56.60084209131257,
+ "mle X eps5": 32.601164531538394,
+ "mle Z lambda": 45.4368805973201,
+ "mle Z eps3": 1322.7355991876968,
+ "mle Z eps5": 420.29260491866927,
+ "mle X all-three agree reps": [
+  "2026-10-04 r2",
+  "2026-10-06 r2",
+  "2026-10-07 r1",
+  "2026-10-07 r2"
+ ]
+}
+wls pooled predicted Lambda_X (obs weights): 0.5055  unweighted mean predicted Lambda_X: 0.5451  Lambda_Z: 0.4694
+mle pooled predicted Lambda_X (obs weights): 0.5085  unweighted mean predicted Lambda_X: 0.5449  Lambda_Z: 0.4693
+max |MLE - WLS| on predictions: eps 0.0312 pp, Lambda 0.0006
+window Lambda_X:
+  wls placement 1 [0.88, 0.67, 0.62, 0.64, 0.78]
+  wls placement 2 [0.51, 0.61, 0.55, 0.62, 0.46]
+  mle placement 1 [0.87, 0.62, 0.62, 0.61, 0.7]
+  mle placement 2 [0.45, 0.55, 0.46, 0.62, 0.45]
+  pred_wls placement 1 [0.53, 0.82, 0.62, 0.61, 0.6]
+  pred_wls placement 2 [0.39, 0.42, 0.54, 0.44, 0.42]
+  pred_mle placement 1 [0.53, 0.82, 0.62, 0.61, 0.6]
+  pred_mle placement 2 [0.39, 0.42, 0.54, 0.44, 0.42]

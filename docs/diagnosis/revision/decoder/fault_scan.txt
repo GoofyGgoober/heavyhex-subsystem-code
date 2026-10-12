@@ -1,0 +1,180 @@
+2026-10-04-r1 X1 (14s) | d3: 33 mech, single miscorr cal 3 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 99 mech, single miscorr cal 0 uni 0; pairs 4851: cal 233 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r1 X2 (5s) | d3: 55 mech, single miscorr cal 7 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 165 mech, single miscorr cal 0 uni 0; pairs 13530: cal 558 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r1 X3 (6s) | d3: 77 mech, single miscorr cal 11 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 231 mech, single miscorr cal 0 uni 0; pairs 26565: cal 931 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r1 X4 (11s) | d3: 99 mech, single miscorr cal 15 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 297 mech, single miscorr cal 0 uni 0; pairs 43956: cal 1310 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r1 X6 (13s) | d3: 143 mech, single miscorr cal 23 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 429 mech, single miscorr cal 0 uni 0; pairs 91806: cal 2066 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r1 X8 (19s) | d3: 187 mech, single miscorr cal 31 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 561 mech, single miscorr cal 0 uni 0; pairs 157080: cal 2822 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r1 Z1 (3s) | d3: 51 mech, single miscorr cal 0 uni 1; exact min logical 3, graphlike 3, search 3 | d5: 134 mech, single miscorr cal 0 uni 0; pairs 8911: cal 113 uni 214 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r1 Z2 (7s) | d3: 99 mech, single miscorr cal 0 uni 2; exact min logical 3, graphlike 3, search 3 | d5: 263 mech, single miscorr cal 0 uni 0; pairs 34453: cal 545 uni 920 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r1 Z3 (11s) | d3: 147 mech, single miscorr cal 0 uni 3; exact min logical 3, graphlike 3, search 3 | d5: 392 mech, single miscorr cal 0 uni 0; pairs 76636: cal 1148 uni 1664 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r1 Z4 (13s) | d3: 195 mech, single miscorr cal 0 uni 4; exact min logical 3, graphlike 3, search 3 | d5: 521 mech, single miscorr cal 0 uni 0; pairs 135460: cal 1821 uni 2430 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r1 Z6 (27s) | d3: 291 mech, single miscorr cal 0 uni 6; exact min logical 3, graphlike 3, search 3 | d5: 779 mech, single miscorr cal 0 uni 0; pairs 303031: cal 3135 uni 3962 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r1 Z8 (29s) | d3: 387 mech, single miscorr cal 0 uni 8; exact min logical 3, graphlike 3, search 3 | d5: 1037 mech, single miscorr cal 0 uni 0; pairs 537166: cal 4449 uni 5494 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r2-d3 X1 (2s) | d3: 33 mech, single miscorr cal 2 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-04-r2-d3 X2 (1s) | d3: 55 mech, single miscorr cal 4 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-04-r2-d3 X3 (1s) | d3: 77 mech, single miscorr cal 6 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-04-r2-d3 X4 (2s) | d3: 99 mech, single miscorr cal 8 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-04-r2-d3 X6 (3s) | d3: 143 mech, single miscorr cal 12 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-04-r2-d3 X8 (3s) | d3: 187 mech, single miscorr cal 16 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-04-r2-d3 Z1 (1s) | d3: 51 mech, single miscorr cal 0 uni 1; exact min logical 3, graphlike 3, search 3
+2026-10-04-r2-d3 Z2 (1s) | d3: 99 mech, single miscorr cal 0 uni 2; exact min logical 3, graphlike 3, search 3
+2026-10-04-r2-d3 Z3 (1s) | d3: 147 mech, single miscorr cal 4 uni 3; exact min logical 3, graphlike 3, search 3
+2026-10-04-r2-d3 Z4 (2s) | d3: 195 mech, single miscorr cal 8 uni 4; exact min logical 3, graphlike 3, search 3
+2026-10-04-r2-d3 Z6 (3s) | d3: 291 mech, single miscorr cal 16 uni 6; exact min logical 3, graphlike 3, search 3
+2026-10-04-r2-d3 Z8 (4s) | d3: 387 mech, single miscorr cal 24 uni 8; exact min logical 3, graphlike 3, search 3
+2026-10-04-r2-d5 X1 (4s) | d5: 99 mech, single miscorr cal 0 uni 0; pairs 4851: cal 156 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r2-d5 X2 (4s) | d5: 165 mech, single miscorr cal 0 uni 0; pairs 13530: cal 387 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r2-d5 X3 (5s) | d5: 231 mech, single miscorr cal 0 uni 0; pairs 26565: cal 646 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r2-d5 X4 (7s) | d5: 297 mech, single miscorr cal 0 uni 0; pairs 43956: cal 925 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r2-d5 X6 (9s) | d5: 429 mech, single miscorr cal 0 uni 0; pairs 91806: cal 1487 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r2-d5 X8 (13s) | d5: 561 mech, single miscorr cal 0 uni 0; pairs 157080: cal 2049 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r2-d5 Z1 (2s) | d5: 134 mech, single miscorr cal 0 uni 0; pairs 8911: cal 84 uni 214 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r2-d5 Z2 (5s) | d5: 263 mech, single miscorr cal 0 uni 0; pairs 34453: cal 475 uni 920 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r2-d5 Z3 (9s) | d5: 392 mech, single miscorr cal 0 uni 0; pairs 76636: cal 833 uni 1664 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r2-d5 Z4 (12s) | d5: 521 mech, single miscorr cal 0 uni 0; pairs 135460: cal 1223 uni 2430 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r2-d5 Z6 (14s) | d5: 779 mech, single miscorr cal 0 uni 0; pairs 303031: cal 2001 uni 3962 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-04-r2-d5 Z8 (29s) | d5: 1037 mech, single miscorr cal 0 uni 0; pairs 537166: cal 2779 uni 5494 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r1 X1 (6s) | d3: 33 mech, single miscorr cal 2 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 99 mech, single miscorr cal 0 uni 0; pairs 4851: cal 239 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r1 X2 (6s) | d3: 55 mech, single miscorr cal 4 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 165 mech, single miscorr cal 0 uni 0; pairs 13530: cal 542 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r1 X3 (8s) | d3: 77 mech, single miscorr cal 6 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 231 mech, single miscorr cal 0 uni 0; pairs 26565: cal 897 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r1 X4 (11s) | d3: 99 mech, single miscorr cal 8 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 297 mech, single miscorr cal 0 uni 0; pairs 43956: cal 1260 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r1 X6 (16s) | d3: 143 mech, single miscorr cal 12 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 429 mech, single miscorr cal 0 uni 0; pairs 91806: cal 1986 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r1 X8 (21s) | d3: 187 mech, single miscorr cal 16 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 561 mech, single miscorr cal 0 uni 0; pairs 157080: cal 2712 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r1 Z1 (3s) | d3: 51 mech, single miscorr cal 0 uni 1; exact min logical 3, graphlike 3, search 3 | d5: 134 mech, single miscorr cal 0 uni 0; pairs 8911: cal 49 uni 214 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r1 Z2 (7s) | d3: 99 mech, single miscorr cal 0 uni 2; exact min logical 3, graphlike 3, search 3 | d5: 263 mech, single miscorr cal 0 uni 0; pairs 34453: cal 332 uni 920 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r1 Z3 (11s) | d3: 147 mech, single miscorr cal 0 uni 3; exact min logical 3, graphlike 3, search 3 | d5: 392 mech, single miscorr cal 0 uni 0; pairs 76636: cal 801 uni 1664 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r1 Z4 (16s) | d3: 195 mech, single miscorr cal 0 uni 4; exact min logical 3, graphlike 3, search 3 | d5: 521 mech, single miscorr cal 0 uni 0; pairs 135460: cal 1268 uni 2430 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r1 Z6 (25s) | d3: 291 mech, single miscorr cal 0 uni 6; exact min logical 3, graphlike 3, search 3 | d5: 779 mech, single miscorr cal 0 uni 0; pairs 303031: cal 2202 uni 3962 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r1 Z8 (35s) | d3: 387 mech, single miscorr cal 0 uni 8; exact min logical 3, graphlike 3, search 3 | d5: 1037 mech, single miscorr cal 0 uni 0; pairs 537166: cal 3136 uni 5494 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r2-d3 X1 (1s) | d3: 33 mech, single miscorr cal 2 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-05-r2-d3 X2 (1s) | d3: 55 mech, single miscorr cal 4 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-05-r2-d3 X3 (1s) | d3: 77 mech, single miscorr cal 6 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-05-r2-d3 X4 (1s) | d3: 99 mech, single miscorr cal 8 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-05-r2-d3 X6 (2s) | d3: 143 mech, single miscorr cal 12 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-05-r2-d3 X8 (2s) | d3: 187 mech, single miscorr cal 16 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-05-r2-d3 Z1 (0s) | d3: 51 mech, single miscorr cal 0 uni 1; exact min logical 3, graphlike 3, search 3
+2026-10-05-r2-d3 Z2 (1s) | d3: 99 mech, single miscorr cal 3 uni 2; exact min logical 3, graphlike 3, search 3
+2026-10-05-r2-d3 Z3 (1s) | d3: 147 mech, single miscorr cal 7 uni 3; exact min logical 3, graphlike 3, search 3
+2026-10-05-r2-d3 Z4 (1s) | d3: 195 mech, single miscorr cal 11 uni 4; exact min logical 3, graphlike 3, search 3
+2026-10-05-r2-d3 Z6 (2s) | d3: 291 mech, single miscorr cal 19 uni 6; exact min logical 3, graphlike 3, search 3
+2026-10-05-r2-d3 Z8 (2s) | d3: 387 mech, single miscorr cal 27 uni 8; exact min logical 3, graphlike 3, search 3
+2026-10-05-r2-d5 X1 (4s) | d5: 99 mech, single miscorr cal 0 uni 0; pairs 4851: cal 186 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r2-d5 X2 (4s) | d5: 165 mech, single miscorr cal 0 uni 0; pairs 13530: cal 466 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r2-d5 X3 (5s) | d5: 231 mech, single miscorr cal 0 uni 0; pairs 26565: cal 777 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r2-d5 X4 (6s) | d5: 297 mech, single miscorr cal 0 uni 0; pairs 43956: cal 1097 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r2-d5 X6 (9s) | d5: 429 mech, single miscorr cal 0 uni 0; pairs 91806: cal 1739 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r2-d5 X8 (13s) | d5: 561 mech, single miscorr cal 0 uni 0; pairs 157080: cal 2381 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r2-d5 Z1 (2s) | d5: 134 mech, single miscorr cal 0 uni 0; pairs 8911: cal 66 uni 214 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r2-d5 Z2 (5s) | d5: 263 mech, single miscorr cal 0 uni 0; pairs 34453: cal 362 uni 920 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r2-d5 Z3 (9s) | d5: 392 mech, single miscorr cal 0 uni 0; pairs 76636: cal 849 uni 1664 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r2-d5 Z4 (13s) | d5: 521 mech, single miscorr cal 0 uni 0; pairs 135460: cal 1362 uni 2430 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r2-d5 Z6 (19s) | d5: 779 mech, single miscorr cal 0 uni 0; pairs 303031: cal 2428 uni 3962 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-05-r2-d5 Z8 (27s) | d5: 1037 mech, single miscorr cal 0 uni 0; pairs 537166: cal 3494 uni 5494 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r1 X1 (6s) | d3: 33 mech, single miscorr cal 2 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 99 mech, single miscorr cal 0 uni 0; pairs 4851: cal 236 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r1 X2 (6s) | d3: 55 mech, single miscorr cal 4 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 165 mech, single miscorr cal 0 uni 0; pairs 13530: cal 590 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r1 X3 (9s) | d3: 77 mech, single miscorr cal 6 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 231 mech, single miscorr cal 1 uni 0; pairs 26565: cal 1084 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r1 X4 (12s) | d3: 99 mech, single miscorr cal 8 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 297 mech, single miscorr cal 2 uni 0; pairs 43956: cal 1701 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r1 X6 (17s) | d3: 143 mech, single miscorr cal 12 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 429 mech, single miscorr cal 4 uni 0; pairs 91806: cal 3329 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r1 X8 (21s) | d3: 187 mech, single miscorr cal 16 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 561 mech, single miscorr cal 6 uni 0; pairs 157080: cal 5477 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r1 Z1 (3s) | d3: 51 mech, single miscorr cal 0 uni 1; exact min logical 3, graphlike 3, search 3 | d5: 134 mech, single miscorr cal 0 uni 0; pairs 8911: cal 47 uni 214 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r1 Z2 (7s) | d3: 99 mech, single miscorr cal 0 uni 2; exact min logical 3, graphlike 3, search 3 | d5: 263 mech, single miscorr cal 0 uni 0; pairs 34453: cal 331 uni 920 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r1 Z3 (12s) | d3: 147 mech, single miscorr cal 1 uni 3; exact min logical 3, graphlike 3, search 3 | d5: 392 mech, single miscorr cal 0 uni 0; pairs 76636: cal 743 uni 1664 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r1 Z4 (13s) | d3: 195 mech, single miscorr cal 2 uni 4; exact min logical 3, graphlike 3, search 3 | d5: 521 mech, single miscorr cal 0 uni 0; pairs 135460: cal 1193 uni 2430 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r1 Z6 (19s) | d3: 291 mech, single miscorr cal 4 uni 6; exact min logical 3, graphlike 3, search 3 | d5: 779 mech, single miscorr cal 0 uni 0; pairs 303031: cal 2063 uni 3962 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r1 Z8 (36s) | d3: 387 mech, single miscorr cal 6 uni 8; exact min logical 3, graphlike 3, search 3 | d5: 1037 mech, single miscorr cal 0 uni 0; pairs 537166: cal 2933 uni 5494 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r2-d3 X1 (1s) | d3: 33 mech, single miscorr cal 5 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-06-r2-d3 X2 (1s) | d3: 55 mech, single miscorr cal 9 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-06-r2-d3 X3 (1s) | d3: 77 mech, single miscorr cal 13 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-06-r2-d3 X4 (2s) | d3: 99 mech, single miscorr cal 17 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-06-r2-d3 X6 (3s) | d3: 143 mech, single miscorr cal 25 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-06-r2-d3 X8 (3s) | d3: 187 mech, single miscorr cal 33 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-06-r2-d3 Z1 (1s) | d3: 51 mech, single miscorr cal 1 uni 1; exact min logical 3, graphlike 3, search 3
+2026-10-06-r2-d3 Z2 (1s) | d3: 99 mech, single miscorr cal 2 uni 2; exact min logical 3, graphlike 3, search 3
+2026-10-06-r2-d3 Z3 (1s) | d3: 147 mech, single miscorr cal 6 uni 3; exact min logical 3, graphlike 3, search 3
+2026-10-06-r2-d3 Z4 (2s) | d3: 195 mech, single miscorr cal 10 uni 4; exact min logical 3, graphlike 3, search 3
+2026-10-06-r2-d3 Z6 (3s) | d3: 291 mech, single miscorr cal 18 uni 6; exact min logical 3, graphlike 3, search 3
+2026-10-06-r2-d3 Z8 (2s) | d3: 387 mech, single miscorr cal 26 uni 8; exact min logical 3, graphlike 3, search 3
+2026-10-06-r2-d5 X1 (4s) | d5: 99 mech, single miscorr cal 0 uni 0; pairs 4851: cal 178 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r2-d5 X2 (4s) | d5: 165 mech, single miscorr cal 0 uni 0; pairs 13530: cal 426 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r2-d5 X3 (5s) | d5: 231 mech, single miscorr cal 0 uni 0; pairs 26565: cal 720 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r2-d5 X4 (7s) | d5: 297 mech, single miscorr cal 0 uni 0; pairs 43956: cal 1032 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r2-d5 X6 (10s) | d5: 429 mech, single miscorr cal 0 uni 0; pairs 91806: cal 1657 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r2-d5 X8 (11s) | d5: 561 mech, single miscorr cal 0 uni 0; pairs 157080: cal 2283 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r2-d5 Z1 (2s) | d5: 134 mech, single miscorr cal 0 uni 0; pairs 8911: cal 102 uni 214 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r2-d5 Z2 (5s) | d5: 263 mech, single miscorr cal 0 uni 0; pairs 34453: cal 409 uni 920 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r2-d5 Z3 (8s) | d5: 392 mech, single miscorr cal 0 uni 0; pairs 76636: cal 784 uni 1664 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r2-d5 Z4 (12s) | d5: 521 mech, single miscorr cal 0 uni 0; pairs 135460: cal 1144 uni 2430 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r2-d5 Z6 (21s) | d5: 779 mech, single miscorr cal 0 uni 0; pairs 303031: cal 1904 uni 3962 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-06-r2-d5 Z8 (31s) | d5: 1037 mech, single miscorr cal 0 uni 0; pairs 537166: cal 2664 uni 5494 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r1 X1 (7s) | d3: 33 mech, single miscorr cal 3 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 99 mech, single miscorr cal 0 uni 0; pairs 4851: cal 242 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r1 X2 (7s) | d3: 55 mech, single miscorr cal 7 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 165 mech, single miscorr cal 0 uni 0; pairs 13530: cal 579 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r1 X3 (9s) | d3: 77 mech, single miscorr cal 11 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 231 mech, single miscorr cal 0 uni 0; pairs 26565: cal 970 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r1 X4 (13s) | d3: 99 mech, single miscorr cal 15 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 297 mech, single miscorr cal 0 uni 0; pairs 43956: cal 1369 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r1 X6 (18s) | d3: 143 mech, single miscorr cal 23 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 429 mech, single miscorr cal 0 uni 0; pairs 91806: cal 2170 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r1 X8 (25s) | d3: 187 mech, single miscorr cal 31 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 561 mech, single miscorr cal 0 uni 0; pairs 157080: cal 2970 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r1 Z1 (3s) | d3: 51 mech, single miscorr cal 0 uni 1; exact min logical 3, graphlike 3, search 3 | d5: 134 mech, single miscorr cal 0 uni 0; pairs 8911: cal 53 uni 214 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r1 Z2 (7s) | d3: 99 mech, single miscorr cal 0 uni 2; exact min logical 3, graphlike 3, search 3 | d5: 263 mech, single miscorr cal 0 uni 0; pairs 34453: cal 311 uni 920 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r1 Z3 (12s) | d3: 147 mech, single miscorr cal 0 uni 3; exact min logical 3, graphlike 3, search 3 | d5: 392 mech, single miscorr cal 0 uni 0; pairs 76636: cal 645 uni 1664 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r1 Z4 (16s) | d3: 195 mech, single miscorr cal 0 uni 4; exact min logical 3, graphlike 3, search 3 | d5: 521 mech, single miscorr cal 0 uni 0; pairs 135460: cal 996 uni 2430 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r1 Z6 (23s) | d3: 291 mech, single miscorr cal 0 uni 6; exact min logical 3, graphlike 3, search 3 | d5: 779 mech, single miscorr cal 0 uni 0; pairs 303031: cal 1668 uni 3962 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r1 Z8 (26s) | d3: 387 mech, single miscorr cal 0 uni 8; exact min logical 3, graphlike 3, search 3 | d5: 1037 mech, single miscorr cal 0 uni 0; pairs 537166: cal 2340 uni 5494 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r2-d3 X1 (1s) | d3: 33 mech, single miscorr cal 3 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-07-r2-d3 X2 (1s) | d3: 55 mech, single miscorr cal 6 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-07-r2-d3 X3 (1s) | d3: 77 mech, single miscorr cal 9 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-07-r2-d3 X4 (2s) | d3: 99 mech, single miscorr cal 12 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-07-r2-d3 X6 (3s) | d3: 143 mech, single miscorr cal 18 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-07-r2-d3 X8 (4s) | d3: 187 mech, single miscorr cal 24 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-07-r2-d3 Z1 (0s) | d3: 51 mech, single miscorr cal 0 uni 1; exact min logical 3, graphlike 3, search 3
+2026-10-07-r2-d3 Z2 (1s) | d3: 99 mech, single miscorr cal 0 uni 2; exact min logical 3, graphlike 3, search 3
+2026-10-07-r2-d3 Z3 (1s) | d3: 147 mech, single miscorr cal 4 uni 3; exact min logical 3, graphlike 3, search 3
+2026-10-07-r2-d3 Z4 (2s) | d3: 195 mech, single miscorr cal 8 uni 4; exact min logical 3, graphlike 3, search 3
+2026-10-07-r2-d3 Z6 (2s) | d3: 291 mech, single miscorr cal 16 uni 6; exact min logical 3, graphlike 3, search 3
+2026-10-07-r2-d3 Z8 (3s) | d3: 387 mech, single miscorr cal 24 uni 8; exact min logical 3, graphlike 3, search 3
+2026-10-07-r2-d5 X1 (4s) | d5: 99 mech, single miscorr cal 0 uni 0; pairs 4851: cal 193 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r2-d5 X2 (3s) | d5: 165 mech, single miscorr cal 0 uni 0; pairs 13530: cal 497 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r2-d5 X3 (5s) | d5: 231 mech, single miscorr cal 0 uni 0; pairs 26565: cal 839 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r2-d5 X4 (6s) | d5: 297 mech, single miscorr cal 0 uni 0; pairs 43956: cal 1191 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r2-d5 X6 (10s) | d5: 429 mech, single miscorr cal 0 uni 0; pairs 91806: cal 1897 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r2-d5 X8 (14s) | d5: 561 mech, single miscorr cal 0 uni 0; pairs 157080: cal 2603 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r2-d5 Z1 (2s) | d5: 134 mech, single miscorr cal 0 uni 0; pairs 8911: cal 104 uni 214 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r2-d5 Z2 (5s) | d5: 263 mech, single miscorr cal 0 uni 0; pairs 34453: cal 609 uni 920 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r2-d5 Z3 (8s) | d5: 392 mech, single miscorr cal 0 uni 0; pairs 76636: cal 1298 uni 1664 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r2-d5 Z4 (9s) | d5: 521 mech, single miscorr cal 0 uni 0; pairs 135460: cal 2250 uni 2430 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r2-d5 Z6 (11s) | d5: 779 mech, single miscorr cal 0 uni 0; pairs 303031: cal 4775 uni 3962 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-07-r2-d5 Z8 (13s) | d5: 1037 mech, single miscorr cal 0 uni 0; pairs 537166: cal 8285 uni 5494 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r1 X1 (4s) | d3: 33 mech, single miscorr cal 3 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 99 mech, single miscorr cal 0 uni 0; pairs 4851: cal 226 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r1 X2 (4s) | d3: 55 mech, single miscorr cal 7 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 165 mech, single miscorr cal 0 uni 0; pairs 13530: cal 551 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r1 X3 (5s) | d3: 77 mech, single miscorr cal 11 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 231 mech, single miscorr cal 0 uni 0; pairs 26565: cal 912 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r1 X4 (7s) | d3: 99 mech, single miscorr cal 15 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 297 mech, single miscorr cal 0 uni 0; pairs 43956: cal 1273 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r1 X6 (11s) | d3: 143 mech, single miscorr cal 23 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 429 mech, single miscorr cal 0 uni 0; pairs 91806: cal 1999 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r1 X8 (13s) | d3: 187 mech, single miscorr cal 31 uni 0; exact min logical 3, graphlike 3, search 3 | d5: 561 mech, single miscorr cal 0 uni 0; pairs 157080: cal 2725 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r1 Z1 (2s) | d3: 51 mech, single miscorr cal 0 uni 1; exact min logical 3, graphlike 3, search 3 | d5: 134 mech, single miscorr cal 0 uni 0; pairs 8911: cal 58 uni 214 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r1 Z2 (4s) | d3: 99 mech, single miscorr cal 0 uni 2; exact min logical 3, graphlike 3, search 3 | d5: 263 mech, single miscorr cal 0 uni 0; pairs 34453: cal 379 uni 920 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r1 Z3 (7s) | d3: 147 mech, single miscorr cal 0 uni 3; exact min logical 3, graphlike 3, search 3 | d5: 392 mech, single miscorr cal 0 uni 0; pairs 76636: cal 705 uni 1664 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r1 Z4 (11s) | d3: 195 mech, single miscorr cal 0 uni 4; exact min logical 3, graphlike 3, search 3 | d5: 521 mech, single miscorr cal 0 uni 0; pairs 135460: cal 1032 uni 2430 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r1 Z6 (16s) | d3: 291 mech, single miscorr cal 0 uni 6; exact min logical 3, graphlike 3, search 3 | d5: 779 mech, single miscorr cal 0 uni 0; pairs 303031: cal 1652 uni 3962 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r1 Z8 (18s) | d3: 387 mech, single miscorr cal 0 uni 8; exact min logical 3, graphlike 3, search 3 | d5: 1037 mech, single miscorr cal 0 uni 0; pairs 537166: cal 2272 uni 5494 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r2-d3 X1 (1s) | d3: 33 mech, single miscorr cal 2 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-08-r2-d3 X2 (0s) | d3: 55 mech, single miscorr cal 5 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-08-r2-d3 X3 (1s) | d3: 77 mech, single miscorr cal 7 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-08-r2-d3 X4 (1s) | d3: 99 mech, single miscorr cal 9 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-08-r2-d3 X6 (1s) | d3: 143 mech, single miscorr cal 13 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-08-r2-d3 X8 (1s) | d3: 187 mech, single miscorr cal 17 uni 0; exact min logical 3, graphlike 3, search 3
+2026-10-08-r2-d3 Z1 (0s) | d3: 51 mech, single miscorr cal 4 uni 1; exact min logical 3, graphlike 3, search 3
+2026-10-08-r2-d3 Z2 (0s) | d3: 99 mech, single miscorr cal 5 uni 2; exact min logical 3, graphlike 3, search 3
+2026-10-08-r2-d3 Z3 (1s) | d3: 147 mech, single miscorr cal 9 uni 3; exact min logical 3, graphlike 3, search 3
+2026-10-08-r2-d3 Z4 (1s) | d3: 195 mech, single miscorr cal 13 uni 4; exact min logical 3, graphlike 3, search 3
+2026-10-08-r2-d3 Z6 (1s) | d3: 291 mech, single miscorr cal 21 uni 6; exact min logical 3, graphlike 3, search 3
+2026-10-08-r2-d3 Z8 (2s) | d3: 387 mech, single miscorr cal 29 uni 8; exact min logical 3, graphlike 3, search 3
+2026-10-08-r2-d5 X1 (2s) | d5: 99 mech, single miscorr cal 0 uni 0; pairs 4851: cal 202 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r2-d5 X2 (1s) | d5: 165 mech, single miscorr cal 0 uni 0; pairs 13530: cal 496 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r2-d5 X3 (2s) | d5: 231 mech, single miscorr cal 0 uni 0; pairs 26565: cal 819 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r2-d5 X4 (3s) | d5: 297 mech, single miscorr cal 0 uni 0; pairs 43956: cal 1132 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r2-d5 X6 (4s) | d5: 429 mech, single miscorr cal 0 uni 0; pairs 91806: cal 1758 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r2-d5 X8 (5s) | d5: 561 mech, single miscorr cal 0 uni 0; pairs 157080: cal 2382 uni 0 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r2-d5 Z1 (1s) | d5: 134 mech, single miscorr cal 0 uni 0; pairs 8911: cal 74 uni 214 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r2-d5 Z2 (2s) | d5: 263 mech, single miscorr cal 0 uni 0; pairs 34453: cal 368 uni 920 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r2-d5 Z3 (3s) | d5: 392 mech, single miscorr cal 0 uni 0; pairs 76636: cal 745 uni 1664 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r2-d5 Z4 (4s) | d5: 521 mech, single miscorr cal 0 uni 0; pairs 135460: cal 1142 uni 2430 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r2-d5 Z6 (6s) | d5: 779 mech, single miscorr cal 0 uni 0; pairs 303031: cal 1938 uni 3962 undetectable 0; exact min logical None, graphlike 5, search 5
+2026-10-08-r2-d5 Z8 (9s) | d5: 1037 mech, single miscorr cal 0 uni 0; pairs 537166: cal 2734 uni 5494 undetectable 0; exact min logical None, graphlike 5, search 5

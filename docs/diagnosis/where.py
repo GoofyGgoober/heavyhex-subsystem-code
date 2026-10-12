@@ -23,9 +23,10 @@ from collections import defaultdict
 
 import numpy as np
 
-from common import REPO, jobs, memory_index, readout_series
 from heavyhex.circuits.flagged import qubit_roles
 from heavyhex.patches.operators import build_operators
+
+from common import REPO, jobs, memory_index, readout_series
 
 
 def data_read(patch: str, name: str, k: int) -> set[int]:
@@ -55,10 +56,13 @@ def main() -> None:
     for job in jobs():
         model, records, labels = job.model(idx)
         chip, _ = job.chip_detectors(idx, model, records)
-        sim = model.compile_detector_sampler(seed=4).sample(20000)
+        sim = np.asarray(model.compile_detector_sampler(seed=4).sample(20000))
         series = readout_series(labels)
         keys = list(series)
-        st = {src: {k: streaks(x[:, series[k]]) for k in keys} for src, x in (("chip", chip), ("model", sim))}
+        st = {
+            src: {k: streaks(x[:, series[k]]) for k in keys}
+            for src, x in (("chip", chip), ("model", sim))
+        }
         for a, b in itertools.combinations(keys, 2):
             if a[0] != b[0]:
                 kind = "different patches"
@@ -76,9 +80,15 @@ def main() -> None:
     print("\nco-streak excess, P(both) - P(A)P(B), mean over pairs:")
     for kind, d in acc.items():
         c, m = np.array(d["chip"]), np.array(d["model"])
-        out[kind] = {"pairs": len(c), "chip": float(c.mean()), "model": float(m.mean()),
-                     "chip_se": float(c.std(ddof=1) / np.sqrt(len(c)))}
-        print(f"  {kind:30s} pairs {len(c):5d}  chip {1e4*c.mean():+7.2f}e-4 (±{1e4*c.std(ddof=1)/np.sqrt(len(c)):.2f})  model {1e4*m.mean():+7.2f}e-4")
+        out[kind] = {
+            "pairs": len(c),
+            "chip": float(c.mean()),
+            "model": float(m.mean()),
+            "chip_se": float(c.std(ddof=1) / np.sqrt(len(c))),
+        }
+        print(
+            f"  {kind:30s} pairs {len(c):5d}  chip {1e4 * c.mean():+7.2f}e-4 (±{1e4 * c.std(ddof=1) / np.sqrt(len(c)):.2f})  model {1e4 * m.mean():+7.2f}e-4"
+        )
     (REPO / "docs/diagnosis/results/where.json").write_text(json.dumps(out, indent=1) + "\n")
 
 

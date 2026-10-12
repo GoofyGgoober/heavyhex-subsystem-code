@@ -1,0 +1,778 @@
+{
+ "A": {
+  "original leaky.py": 0.0,
+  "corrected frame (random phase)": 0.50525,
+  "tableau_ref, CZ left out": 1.0,
+  "tableau_ref, random phase": 0.4985,
+  "exact_sim, CZ left out": 1.0,
+  "exact_sim, random phase": 0.51875,
+  "exact_sim, phase pi": 0.0
+ },
+ "B": {
+  "2026-10-08-r2-d3 Z8": {
+   "n_detectors": 82,
+   "mean_z2": 1.0285670588403237,
+   "max_abs_z": 2.9498397974638624,
+   "observable_z": [
+    0.7929822399241421
+   ]
+  },
+  "2026-10-08-r1 Z8": {
+   "n_detectors": 310,
+   "mean_z2": 1.0720041188069738,
+   "max_abs_z": 3.3950452132299813,
+   "observable_z": [
+    -0.5591434226190136,
+    -0.432846886301638
+   ]
+  }
+ },
+ "C": {
+  "rows": [
+   {
+    "set": "random",
+    "circuit": 0,
+    "kind": "bitflip",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.08266666666666667,
+    "TV exact_sim seed noise (identity)": 0.08066666666666666,
+    "TV original vs exact (identity)": 0.27049999999999996,
+    "TV exact_sim vs tableau_ref (dephase)": 0.07600000000000001,
+    "TV exact_sim seed noise (dephase)": 0.07883333333333334,
+    "TV corrected frame vs exact (dephase)": 0.07833333333333334,
+    "TV exact_sim pi vs tableau_ref identity+Z": 0.08483333333333332
+   },
+   {
+    "set": "random",
+    "circuit": 1,
+    "kind": "depolarize",
+    "strength": 0.25,
+    "transfer": 0.1,
+    "TV exact_sim vs tableau_ref (identity)": 0.053,
+    "TV exact_sim seed noise (identity)": 0.05966666666666667,
+    "TV original vs exact (identity)": 0.067,
+    "TV exact_sim vs tableau_ref (dephase)": 0.05650000000000001,
+    "TV exact_sim seed noise (dephase)": 0.06316666666666668,
+    "TV corrected frame vs exact (dephase)": 0.05399999999999999
+   },
+   {
+    "set": "random",
+    "circuit": 2,
+    "kind": "phase",
+    "strength": 0.5,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.07766666666666666,
+    "TV exact_sim seed noise (identity)": 0.08783333333333333,
+    "TV original vs exact (identity)": 0.08416666666666667,
+    "TV exact_sim vs tableau_ref (dephase)": 0.08533333333333333,
+    "TV exact_sim seed noise (dephase)": 0.08000000000000002,
+    "TV corrected frame vs exact (dephase)": 0.0815
+   },
+   {
+    "set": "random",
+    "circuit": 3,
+    "kind": "bitflip",
+    "strength": 1.0,
+    "transfer": 0.1,
+    "TV exact_sim vs tableau_ref (identity)": 0.033333333333333354,
+    "TV exact_sim seed noise (identity)": 0.033666666666666664,
+    "TV original vs exact (identity)": 0.021333333333333343,
+    "TV exact_sim vs tableau_ref (dephase)": 0.030499999999999992,
+    "TV exact_sim seed noise (dephase)": 0.029666666666666668,
+    "TV corrected frame vs exact (dephase)": 0.01700000000000001
+   },
+   {
+    "set": "random",
+    "circuit": 4,
+    "kind": "depolarize",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.06583333333333334,
+    "TV exact_sim seed noise (identity)": 0.07300000000000001,
+    "TV original vs exact (identity)": 0.18300000000000002,
+    "TV exact_sim vs tableau_ref (dephase)": 0.07516666666666667,
+    "TV exact_sim seed noise (dephase)": 0.0905,
+    "TV corrected frame vs exact (dephase)": 0.07450000000000001,
+    "TV exact_sim pi vs tableau_ref identity+Z": 0.06633333333333334
+   },
+   {
+    "set": "random",
+    "circuit": 5,
+    "kind": "phase",
+    "strength": 0.25,
+    "transfer": 0.1,
+    "TV exact_sim vs tableau_ref (identity)": 0.07300000000000001,
+    "TV exact_sim seed noise (identity)": 0.06566666666666665,
+    "TV original vs exact (identity)": 0.07216666666666666,
+    "TV exact_sim vs tableau_ref (dephase)": 0.07466666666666667,
+    "TV exact_sim seed noise (dephase)": 0.065,
+    "TV corrected frame vs exact (dephase)": 0.07283333333333333
+   },
+   {
+    "set": "random",
+    "circuit": 6,
+    "kind": "bitflip",
+    "strength": 0.5,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.04783333333333333,
+    "TV exact_sim seed noise (identity)": 0.05266666666666667,
+    "TV original vs exact (identity)": 0.05283333333333333,
+    "TV exact_sim vs tableau_ref (dephase)": 0.06383333333333333,
+    "TV exact_sim seed noise (dephase)": 0.057666666666666665,
+    "TV corrected frame vs exact (dephase)": 0.05299999999999999
+   },
+   {
+    "set": "random",
+    "circuit": 7,
+    "kind": "depolarize",
+    "strength": 1.0,
+    "transfer": 0.1,
+    "TV exact_sim vs tableau_ref (identity)": 0.048333333333333325,
+    "TV exact_sim seed noise (identity)": 0.03949999999999999,
+    "TV original vs exact (identity)": 0.0425,
+    "TV exact_sim vs tableau_ref (dephase)": 0.037333333333333336,
+    "TV exact_sim seed noise (dephase)": 0.04016666666666667,
+    "TV corrected frame vs exact (dephase)": 0.041833333333333333
+   },
+   {
+    "set": "random",
+    "circuit": 8,
+    "kind": "phase",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.036000000000000025,
+    "TV exact_sim seed noise (identity)": 0.024,
+    "TV original vs exact (identity)": 0.03816666666666668,
+    "TV exact_sim vs tableau_ref (dephase)": 0.038666666666666655,
+    "TV exact_sim seed noise (dephase)": 0.04266666666666667,
+    "TV corrected frame vs exact (dephase)": 0.045166666666666674,
+    "TV exact_sim pi vs tableau_ref identity+Z": 0.02999999999999999
+   },
+   {
+    "set": "random",
+    "circuit": 9,
+    "kind": "bitflip",
+    "strength": 0.25,
+    "transfer": 0.1,
+    "TV exact_sim vs tableau_ref (identity)": 0.0425,
+    "TV exact_sim seed noise (identity)": 0.044500000000000005,
+    "TV original vs exact (identity)": 0.03416666666666667,
+    "TV exact_sim vs tableau_ref (dephase)": 0.040999999999999995,
+    "TV exact_sim seed noise (dephase)": 0.04883333333333332,
+    "TV corrected frame vs exact (dephase)": 0.0355
+   },
+   {
+    "set": "random",
+    "circuit": 10,
+    "kind": "depolarize",
+    "strength": 0.5,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.09216666666666667,
+    "TV exact_sim seed noise (identity)": 0.08266666666666667,
+    "TV original vs exact (identity)": 0.08199999999999999,
+    "TV exact_sim vs tableau_ref (dephase)": 0.08633333333333335,
+    "TV exact_sim seed noise (dephase)": 0.0915,
+    "TV corrected frame vs exact (dephase)": 0.08966666666666667
+   },
+   {
+    "set": "random",
+    "circuit": 11,
+    "kind": "phase",
+    "strength": 1.0,
+    "transfer": 0.1,
+    "TV exact_sim vs tableau_ref (identity)": 0.07566666666666667,
+    "TV exact_sim seed noise (identity)": 0.08616666666666667,
+    "TV original vs exact (identity)": 0.075,
+    "TV exact_sim vs tableau_ref (dephase)": 0.07766666666666668,
+    "TV exact_sim seed noise (dephase)": 0.07733333333333334,
+    "TV corrected frame vs exact (dephase)": 0.077
+   },
+   {
+    "set": "random",
+    "circuit": 12,
+    "kind": "bitflip",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.054666666666666655,
+    "TV exact_sim seed noise (identity)": 0.0495,
+    "TV original vs exact (identity)": 0.05966666666666666,
+    "TV exact_sim vs tableau_ref (dephase)": 0.058499999999999996,
+    "TV exact_sim seed noise (dephase)": 0.05433333333333334,
+    "TV corrected frame vs exact (dephase)": 0.0635,
+    "TV exact_sim pi vs tableau_ref identity+Z": 0.057833333333333334
+   },
+   {
+    "set": "random",
+    "circuit": 13,
+    "kind": "depolarize",
+    "strength": 0.25,
+    "transfer": 0.1,
+    "TV exact_sim vs tableau_ref (identity)": 0.07166666666666666,
+    "TV exact_sim seed noise (identity)": 0.07583333333333334,
+    "TV original vs exact (identity)": 0.07783333333333334,
+    "TV exact_sim vs tableau_ref (dephase)": 0.083,
+    "TV exact_sim seed noise (dephase)": 0.08583333333333334,
+    "TV corrected frame vs exact (dephase)": 0.07266666666666668
+   },
+   {
+    "set": "random",
+    "circuit": 14,
+    "kind": "phase",
+    "strength": 0.5,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.08116666666666666,
+    "TV exact_sim seed noise (identity)": 0.07866666666666666,
+    "TV original vs exact (identity)": 0.06466666666666666,
+    "TV exact_sim vs tableau_ref (dephase)": 0.06783333333333334,
+    "TV exact_sim seed noise (dephase)": 0.07350000000000001,
+    "TV corrected frame vs exact (dephase)": 0.08133333333333333
+   },
+   {
+    "set": "random",
+    "circuit": 15,
+    "kind": "bitflip",
+    "strength": 1.0,
+    "transfer": 0.1,
+    "TV exact_sim vs tableau_ref (identity)": 0.046666666666666655,
+    "TV exact_sim seed noise (identity)": 0.03616666666666665,
+    "TV original vs exact (identity)": 0.03716666666666665,
+    "TV exact_sim vs tableau_ref (dephase)": 0.03466666666666666,
+    "TV exact_sim seed noise (dephase)": 0.042,
+    "TV corrected frame vs exact (dephase)": 0.03883333333333333
+   },
+   {
+    "set": "random",
+    "circuit": 16,
+    "kind": "depolarize",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.06883333333333333,
+    "TV exact_sim seed noise (identity)": 0.06933333333333333,
+    "TV original vs exact (identity)": 0.07050000000000001,
+    "TV exact_sim vs tableau_ref (dephase)": 0.07949999999999999,
+    "TV exact_sim seed noise (dephase)": 0.0665,
+    "TV corrected frame vs exact (dephase)": 0.071,
+    "TV exact_sim pi vs tableau_ref identity+Z": 0.07133333333333333
+   },
+   {
+    "set": "random",
+    "circuit": 17,
+    "kind": "phase",
+    "strength": 0.25,
+    "transfer": 0.1,
+    "TV exact_sim vs tableau_ref (identity)": 0.03983333333333333,
+    "TV exact_sim seed noise (identity)": 0.04683333333333334,
+    "TV original vs exact (identity)": 0.04416666666666668,
+    "TV exact_sim vs tableau_ref (dephase)": 0.035666666666666666,
+    "TV exact_sim seed noise (dephase)": 0.03433333333333333,
+    "TV corrected frame vs exact (dephase)": 0.03799999999999999
+   },
+   {
+    "set": "random",
+    "circuit": 18,
+    "kind": "bitflip",
+    "strength": 0.5,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.11783333333333333,
+    "TV exact_sim seed noise (identity)": 0.119,
+    "TV original vs exact (identity)": 0.11399999999999999,
+    "TV exact_sim vs tableau_ref (dephase)": 0.1195,
+    "TV exact_sim seed noise (dephase)": 0.12083333333333333,
+    "TV corrected frame vs exact (dephase)": 0.12383333333333334
+   },
+   {
+    "set": "random",
+    "circuit": 19,
+    "kind": "depolarize",
+    "strength": 1.0,
+    "transfer": 0.1,
+    "TV exact_sim vs tableau_ref (identity)": 0.068,
+    "TV exact_sim seed noise (identity)": 0.0855,
+    "TV original vs exact (identity)": 0.07066666666666666,
+    "TV exact_sim vs tableau_ref (dephase)": 0.06966666666666665,
+    "TV exact_sim seed noise (dephase)": 0.06883333333333334,
+    "TV corrected frame vs exact (dephase)": 0.06366666666666668
+   },
+   {
+    "set": "random",
+    "circuit": 20,
+    "kind": "phase",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.08199999999999999,
+    "TV exact_sim seed noise (identity)": 0.08866666666666667,
+    "TV original vs exact (identity)": 0.08283333333333334,
+    "TV exact_sim vs tableau_ref (dephase)": 0.08049999999999999,
+    "TV exact_sim seed noise (dephase)": 0.08383333333333333,
+    "TV corrected frame vs exact (dephase)": 0.0885,
+    "TV exact_sim pi vs tableau_ref identity+Z": 0.07266666666666667
+   },
+   {
+    "set": "random",
+    "circuit": 21,
+    "kind": "bitflip",
+    "strength": 0.25,
+    "transfer": 0.1,
+    "TV exact_sim vs tableau_ref (identity)": 0.10216666666666667,
+    "TV exact_sim seed noise (identity)": 0.10383333333333333,
+    "TV original vs exact (identity)": 0.10683333333333334,
+    "TV exact_sim vs tableau_ref (dephase)": 0.10666666666666665,
+    "TV exact_sim seed noise (dephase)": 0.0955,
+    "TV corrected frame vs exact (dephase)": 0.10233333333333333
+   },
+   {
+    "set": "random",
+    "circuit": 22,
+    "kind": "depolarize",
+    "strength": 0.5,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.08549999999999999,
+    "TV exact_sim seed noise (identity)": 0.0745,
+    "TV original vs exact (identity)": 0.08683333333333333,
+    "TV exact_sim vs tableau_ref (dephase)": 0.08316666666666667,
+    "TV exact_sim seed noise (dephase)": 0.09166666666666665,
+    "TV corrected frame vs exact (dephase)": 0.08266666666666667
+   },
+   {
+    "set": "random",
+    "circuit": 23,
+    "kind": "phase",
+    "strength": 1.0,
+    "transfer": 0.1,
+    "TV exact_sim vs tableau_ref (identity)": 0.04583333333333334,
+    "TV exact_sim seed noise (identity)": 0.04483333333333334,
+    "TV original vs exact (identity)": 0.05049999999999999,
+    "TV exact_sim vs tableau_ref (dephase)": 0.04749999999999999,
+    "TV exact_sim seed noise (dephase)": 0.042499999999999996,
+    "TV corrected frame vs exact (dephase)": 0.038833333333333345
+   },
+   {
+    "set": "det1",
+    "circuit": 100,
+    "kind": "phase",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.0595,
+    "TV exact_sim seed noise (identity)": 0.06866666666666667,
+    "TV original vs exact (identity)": 0.06283333333333334
+   },
+   {
+    "set": "det1",
+    "circuit": 101,
+    "kind": "phase",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.12366666666666667,
+    "TV exact_sim seed noise (identity)": 0.118,
+    "TV original vs exact (identity)": 0.114
+   },
+   {
+    "set": "det1",
+    "circuit": 102,
+    "kind": "phase",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.03716666666666667,
+    "TV exact_sim seed noise (identity)": 0.030166666666666665,
+    "TV original vs exact (identity)": 0.03233333333333333
+   },
+   {
+    "set": "det1",
+    "circuit": 103,
+    "kind": "phase",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.0715,
+    "TV exact_sim seed noise (identity)": 0.07466666666666667,
+    "TV original vs exact (identity)": 0.2723333333333333
+   },
+   {
+    "set": "det1",
+    "circuit": 104,
+    "kind": "phase",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.093,
+    "TV exact_sim seed noise (identity)": 0.07533333333333332,
+    "TV original vs exact (identity)": 0.07866666666666666
+   },
+   {
+    "set": "det1",
+    "circuit": 105,
+    "kind": "phase",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.04533333333333334,
+    "TV exact_sim seed noise (identity)": 0.044,
+    "TV original vs exact (identity)": 0.05083333333333333
+   },
+   {
+    "set": "det1",
+    "circuit": 106,
+    "kind": "phase",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.050666666666666665,
+    "TV exact_sim seed noise (identity)": 0.05583333333333333,
+    "TV original vs exact (identity)": 0.5195000000000001
+   },
+   {
+    "set": "det1",
+    "circuit": 107,
+    "kind": "phase",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.056999999999999995,
+    "TV exact_sim seed noise (identity)": 0.06633333333333333,
+    "TV original vs exact (identity)": 0.07650000000000001
+   },
+   {
+    "set": "det1",
+    "circuit": 108,
+    "kind": "phase",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.07666666666666666,
+    "TV exact_sim seed noise (identity)": 0.08349999999999999,
+    "TV original vs exact (identity)": 0.08966666666666666
+   },
+   {
+    "set": "det1",
+    "circuit": 109,
+    "kind": "phase",
+    "strength": 0.0,
+    "transfer": 0.0,
+    "TV exact_sim vs tableau_ref (identity)": 0.03716666666666667,
+    "TV exact_sim seed noise (identity)": 0.04283333333333334,
+    "TV original vs exact (identity)": 0.04083333333333333
+   }
+  ],
+  "summary": {
+   "random": {
+    "TV corrected frame vs exact (dephase)": {
+     "mean": 0.06606250000000001,
+     "max": 0.12383333333333334
+    },
+    "TV exact_sim pi vs tableau_ref identity+Z": {
+     "mean": 0.06383333333333334,
+     "max": 0.08483333333333332
+    },
+    "TV exact_sim seed noise (dephase)": {
+     "mean": 0.06770833333333333,
+     "max": 0.12083333333333333
+    },
+    "TV exact_sim seed noise (identity)": {
+     "mean": 0.06677777777777778,
+     "max": 0.119
+    },
+    "TV exact_sim vs tableau_ref (dephase)": {
+     "mean": 0.06704861111111111,
+     "max": 0.1195
+    },
+    "TV exact_sim vs tableau_ref (identity)": {
+     "mean": 0.06634027777777778,
+     "max": 0.11783333333333333
+    },
+    "TV original vs exact (identity)": {
+     "mean": 0.07868750000000001,
+     "max": 0.27049999999999996
+    }
+   },
+   "det1": {
+    "TV exact_sim seed noise (identity)": {
+     "mean": 0.06593333333333333,
+     "max": 0.118
+    },
+    "TV exact_sim vs tableau_ref (identity)": {
+     "mean": 0.06516666666666668,
+     "max": 0.12366666666666667
+    },
+    "TV original vs exact (identity)": {
+     "mean": 0.13374999999999998,
+     "max": 0.5195000000000001
+    }
+   }
+  }
+ },
+ "D": {
+  "2026-10-08-r2-d3 Z8 identity": {
+   "detector_mean_z2": 1.0351815269546103,
+   "detector_max_abs_z": 2.8292556317123205,
+   "n_detectors": 82,
+   "logical_exact_sim": [
+    0.435
+   ],
+   "logical_tableau_ref": [
+    0.43425
+   ],
+   "logical_z": [
+    0.08734663028201434
+   ],
+   "stats_exact_sim": {
+    "stab": 0.352825,
+    "flag": 0.06616484375,
+    "repeat": 0.14209797080262887,
+    "co_data": 0.0007045448469387756,
+    "co_gauge": 0.0007636770663265306
+   },
+   "stats_tableau_ref": {
+    "stab": 0.34948214285714285,
+    "flag": 0.065984375,
+    "repeat": 0.14247592814334464,
+    "co_data": 0.0006833545918367347,
+    "co_gauge": 0.0008660357142857142
+   },
+   "shots": [
+    20000,
+    4000
+   ],
+   "ms_per_shot": [
+    6.141369295120239,
+    25.685091257095337
+   ]
+  },
+  "2026-10-08-r2-d3 Z8 dephase": {
+   "detector_mean_z2": 1.073733744373679,
+   "detector_max_abs_z": 2.770881562307595,
+   "n_detectors": 82,
+   "logical_exact_sim": [
+    0.4371
+   ],
+   "logical_tableau_ref": [
+    0.44025
+   ],
+   "logical_z": [
+    -0.3665944295003409
+   ],
+   "stats_exact_sim": {
+    "stab": 0.3510607142857143,
+    "flag": 0.07788359375,
+    "repeat": 0.18544162619259885,
+    "co_data": 0.0021762142857142857,
+    "co_gauge": 0.0008298881377551021
+   },
+   "stats_tableau_ref": {
+    "stab": 0.3546964285714286,
+    "flag": 0.07931640625,
+    "repeat": 0.17816666799444314,
+    "co_data": 0.0018571602891156462,
+    "co_gauge": 0.0009725312500000001
+   },
+   "shots": [
+    20000,
+    4000
+   ],
+   "ms_per_shot": [
+    4.180156767368317,
+    14.43267834186554
+   ]
+  },
+  "2026-10-08-r2-d3 X8 identity": {
+   "detector_mean_z2": 0.9866697670570308,
+   "detector_max_abs_z": 2.1125025447006407,
+   "n_detectors": 36,
+   "logical_exact_sim": [
+    0.4569
+   ],
+   "logical_tableau_ref": [
+    0.4645
+   ],
+   "logical_z": [
+    -0.880660181908397
+   ],
+   "stats_exact_sim": {
+    "stab": 0.2729964285714286
+   },
+   "stats_tableau_ref": {
+    "stab": 0.27108035714285716
+   },
+   "shots": [
+    20000,
+    4000
+   ],
+   "ms_per_shot": [
+    6.039273571968079,
+    18.119218587875366
+   ]
+  },
+  "2026-10-08-r2-d3 X8 dephase": {
+   "detector_mean_z2": 1.1964003101233762,
+   "detector_max_abs_z": 2.1929742569534185,
+   "n_detectors": 36,
+   "logical_exact_sim": [
+    0.4583
+   ],
+   "logical_tableau_ref": [
+    0.459
+   ],
+   "logical_z": [
+    -0.08111003106662294
+   ],
+   "stats_exact_sim": {
+    "stab": 0.2813375
+   },
+   "stats_tableau_ref": {
+    "stab": 0.27969642857142857
+   },
+   "shots": [
+    20000,
+    4000
+   ],
+   "ms_per_shot": [
+    8.166472125053406,
+    14.112629652023315
+   ]
+  },
+  "2026-10-08-r2-d5 Z8 identity": {
+   "detector_mean_z2": 1.0457380746412435,
+   "detector_max_abs_z": 3.00439673930441,
+   "n_detectors": 228,
+   "logical_exact_sim": [
+    0.49565
+   ],
+   "logical_tableau_ref": [
+    0.489
+   ],
+   "logical_z": [
+    0.5671417500371075
+   ],
+   "stats_exact_sim": {
+    "stab": 0.47375357142857144,
+    "flag": 0.109221875,
+    "repeat": 0.11592672224970997,
+    "co_data": 0.0009205769183673469,
+    "co_gauge": 0.0008157363010204081
+   },
+   "stats_tableau_ref": {
+    "stab": 0.4752142857142857,
+    "flag": 0.10913802083333334,
+    "repeat": 0.12005518740057745,
+    "co_data": 0.0009756721088435373,
+    "co_gauge": 0.00071965625
+   },
+   "shots": [
+    20000,
+    2000
+   ],
+   "ms_per_shot": [
+    13.309130573272705,
+    70.59364557266235
+   ]
+  },
+  "2026-10-08-r2-d5 Z8 dephase": {
+   "detector_mean_z2": 0.8652128381731803,
+   "detector_max_abs_z": 2.8876012571541,
+   "n_detectors": 228,
+   "logical_exact_sim": [
+    0.497
+   ],
+   "logical_tableau_ref": [
+    0.4805
+   ],
+   "logical_z": [
+    1.4071817199608
+   ],
+   "stats_exact_sim": {
+    "stab": 0.4751642857142857,
+    "flag": 0.1248328125,
+    "repeat": 0.15423163920838026,
+    "co_data": 0.0024717218129251704,
+    "co_gauge": 0.000816478093112245
+   },
+   "stats_tableau_ref": {
+    "stab": 0.47517857142857145,
+    "flag": 0.12532291666666667,
+    "repeat": 0.15163190160414883,
+    "co_data": 0.0026226302721088436,
+    "co_gauge": 0.000978389668367347
+   },
+   "shots": [
+    20000,
+    2000
+   ],
+   "ms_per_shot": [
+    16.392684090137482,
+    69.30495917797089
+   ]
+  },
+  "2026-10-08-r1 Z8 identity": {
+   "detector_mean_z2": 0.9825686313205974,
+   "detector_max_abs_z": 3.305169544517286,
+   "n_detectors": 310,
+   "logical_exact_sim": [
+    0.3849,
+    0.49515
+   ],
+   "logical_tableau_ref": [
+    0.36333333333333334,
+    0.472
+   ],
+   "logical_z": [
+    1.6569049874066513,
+    1.7296518531623146
+   ],
+   "stats_exact_sim": {
+    "stab": 0.43570476190476193,
+    "flag": 0.102580859375,
+    "repeat": 0.12287656488751846,
+    "co_data": 0.0007221416524943312,
+    "co_gauge": 0.0008548369795918366
+   },
+   "stats_tableau_ref": {
+    "stab": 0.43393650793650795,
+    "flag": 0.10221354166666667,
+    "repeat": 0.12047826712820317,
+    "co_data": 0.0006898175862937767,
+    "co_gauge": 0.0008734303854875282
+   },
+   "shots": [
+    20000,
+    1500
+   ],
+   "ms_per_shot": [
+    17.50371563434601,
+    101.31836573282878
+   ]
+  },
+  "2026-10-08-r1 Z8 dephase": {
+   "detector_mean_z2": 1.061730522967108,
+   "detector_max_abs_z": 3.304628110412977,
+   "n_detectors": 310,
+   "logical_exact_sim": [
+    0.39475,
+    0.49715
+   ],
+   "logical_tableau_ref": [
+    0.392,
+    0.498
+   ],
+   "logical_z": [
+    0.21017563355060526,
+    -0.06350341538527693
+   ],
+   "stats_exact_sim": {
+    "stab": 0.43844642857142857,
+    "flag": 0.11765859375,
+    "repeat": 0.1615473826275689,
+    "co_data": 0.002271429560657596,
+    "co_gauge": 0.0008197726224489796
+   },
+   "stats_tableau_ref": {
+    "stab": 0.43761904761904763,
+    "flag": 0.116703125,
+    "repeat": 0.16148336886718678,
+    "co_data": 0.0021367518266565883,
+    "co_gauge": 0.0008662448979591837
+   },
+   "shots": [
+    20000,
+    1500
+   ],
+   "ms_per_shot": [
+    14.222882652282715,
+    95.78851826985677
+   ]
+  }
+ }
+}

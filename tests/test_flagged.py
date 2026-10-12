@@ -13,7 +13,7 @@ from heavyhex.patches.operators import D3, D5, build_operators
 
 pytest.importorskip("qiskit_aer")
 
-from heavyhex.simulation.aer import run_memory_flagged  # noqa: E402
+from heavyhex.simulation.aer import run_memory_flagged
 
 CODE = D3.code
 ROLES = qubit_roles(D3)

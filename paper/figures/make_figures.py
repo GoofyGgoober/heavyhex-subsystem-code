@@ -2,11 +2,13 @@
 
 Run from the repository root:  python paper/figures/make_figures.py
 Writes vector PDFs next to this file. Reads only runs/ and docs/diagnosis/results/.
+The PDFs carry a fixed creation date (SOURCE_DATE_EPOCH), so a rerun writes the same bytes.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -14,11 +16,14 @@ from pathlib import Path
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.lines import Line2D
 
 ROOT = Path(__file__).resolve().parents[2]
 RUNS = ROOT / "runs"
 DIAG = ROOT / "docs" / "diagnosis" / "results"
 OUT = Path(__file__).resolve().parent
+# matplotlib and fontTools date the PDFs and their embedded fonts by it: 4 October 2026.
+os.environ.setdefault("SOURCE_DATE_EPOCH", "1791072000")
 
 DAYS = ["2026-10-04", "2026-10-05", "2026-10-06", "2026-10-07", "2026-10-08"]
 ROUNDS = [1, 2, 3, 4, 6, 8]
@@ -29,6 +34,25 @@ D3, D5 = "#eb6834", "#2a78d6"
 INK, MUTED, GRID = "#0b0b0b", "#52514e", "#d9d8d4"
 COLUMN, PAGE = 3.375, 7.0  # revtex column and page widths, inches
 
+
+def register_latin_modern() -> None:
+    """Let matplotlib use the TeX installation's Latin Modern fonts when the OS has not installed them."""
+    from matplotlib import font_manager
+
+    if any(f.name == "Latin Modern Roman" for f in font_manager.fontManager.ttflist):
+        return
+    try:
+        found = subprocess.run(
+            ["kpsewhich", "lmroman10-regular.otf"], capture_output=True, text=True
+        ).stdout.strip()
+    except OSError:
+        return
+    if found:
+        for font in sorted(Path(found).parent.glob("lmroman*.otf")):
+            font_manager.fontManager.addfont(str(font))
+
+
+register_latin_modern()
 mpl.rcParams.update(
     {
         "font.family": "serif",
@@ -94,36 +118,49 @@ def fig_lambda() -> None:
     obs = np.array([r["tests"]["X lambda"]["observed"] for r in reps])
     err = np.array([r["tests"]["X lambda"]["observed_uncertainty"] for r in reps])
     pred = np.array([r["tests"]["X lambda"]["predicted"] for r in reps])
-    pooled = combined["pooled_x"]
 
-    fig, ax = plt.subplots(figsize=(COLUMN, 3.0))
+    # Full column width with constrained layout, so LaTeX prints it at about 1:1 (fonts stay 7-8 pt)
+    # and the figure is 2.0 in tall. The prespecified ten-repetition pool is not drawn: it treats
+    # the repetitions as independent, and the paper quotes it once in the text.
+    fig, ax = plt.subplots(figsize=(COLUMN, 2.0), layout="constrained")
     half = len(reps) // 2
-    # Placement 1 on top, then placement 2, each under its own heading; pooled at the bottom.
-    y = np.concatenate([np.arange(half)[::-1] + half + 3, np.arange(half)[::-1] + 2]).astype(float)
+    # Placement 1 on top, then placement 2, each under its own heading.
+    y = np.concatenate([np.arange(half)[::-1] + half + 1, np.arange(half)[::-1]]).astype(float)
     for i in range(len(reps)):
         ax.errorbar(obs[i], y[i], xerr=err[i], fmt="o", ms=3.6, color=D5, elinewidth=1.0, capsize=0)
         ax.plot(pred[i], y[i], marker="D", ms=3.4, mfc="white", mec=MUTED, mew=0.8, ls="none")
     for placement, top in ((1, y[0]), (2, y[half])):
-        ax.text(0.31, top + 0.85, f"placement {placement}", ha="left", va="center", color=INK, fontsize=7, style="italic")
+        ax.text(
+            0.31,
+            top + 0.85,
+            f"placement {placement}",
+            ha="left",
+            va="center",
+            color=INK,
+            fontsize=7,
+            style="italic",
+        )
     ax.axvline(1.0, color=MUTED, lw=0.7, ls=(0, (3, 2)))
     ax.text(0.985, y.max() + 0.85, r"$\Lambda=1$", ha="right", va="center", color=MUTED, fontsize=7)
 
-    py = 0.0
-    ax.errorbar(pooled["lambda"], py, xerr=pooled["lambda_uncertainty"], fmt="s", ms=4, color=INK, elinewidth=1.2)
-    ax.plot(pooled["predicted"], py, marker="D", ms=3.4, mfc="white", mec=MUTED, mew=0.8, ls="none")
-    ax.axhline(1.0, color=GRID, lw=0.6)
-
-    labels = [f"day {DAYS.index(r['day']) + 1}" for r in reps] + ["all 10"]
-    ax.set_yticks(list(y) + [py], labels)
+    labels = [f"day {DAYS.index(r['day']) + 1}" for r in reps]
+    ax.set_yticks(list(y), labels)
     ax.tick_params(axis="y", length=0)
     ax.set_ylim(-0.8, y.max() + 1.5)
     ax.set_xlim(0.3, 1.05)
     ax.set_xlabel(r"$\Lambda = \varepsilon_3/\varepsilon_5$, X memory")
     handles = [
-        mpl.lines.Line2D([], [], marker="o", ms=3.6, color=D5, ls="none", label=r"observed, $\pm1\sigma$"),
-        mpl.lines.Line2D([], [], marker="D", ms=3.4, mfc="white", mec=MUTED, ls="none", label="predicted"),
+        Line2D([], [], marker="o", ms=3.6, color=D5, ls="none", label=r"observed, $\pm1\sigma$"),
+        Line2D([], [], marker="D", ms=3.4, mfc="white", mec=MUTED, ls="none", label="predicted"),
     ]
-    ax.legend(handles=handles, loc="lower right", bbox_to_anchor=(1.0, 0.1), handletextpad=0.3)
+    # Beside placement 2's points and left of the Lambda = 1 line, which the legend used to cross.
+    ax.legend(
+        handles=handles,
+        loc="lower right",
+        bbox_to_anchor=(0.92, 0.15),
+        handletextpad=0.3,
+        borderaxespad=0.0,
+    )
     fig.savefig(OUT / "lambda.pdf")
     plt.close(fig)
 
@@ -140,8 +177,15 @@ def fig_pn() -> None:
                 p = p_of_n(rep, distance, basis, "predicted")
                 ax.plot(n, p.mean(0), color=colour, lw=1.0, ls=(0, (4, 2)), alpha=0.9)
                 ax.errorbar(
-                    n, o.mean(0), yerr=o.std(0, ddof=1) / np.sqrt(len(DAYS)), fmt="o", ms=3.2,
-                    color=colour, elinewidth=0.9, capsize=0, label=f"$d={distance}$",
+                    n,
+                    o.mean(0),
+                    yerr=o.std(0, ddof=1) / np.sqrt(len(DAYS)),
+                    fmt="o",
+                    ms=3.2,
+                    color=colour,
+                    elinewidth=0.9,
+                    capsize=0,
+                    label=f"$d={distance}$",
                 )
             ax.axhline(0.5, color=MUTED, lw=0.6, ls=(0, (1, 2)))
             ax.set_ylim(0, 0.55)
@@ -153,9 +197,9 @@ def fig_pn() -> None:
             if row == 1:
                 ax.set_xlabel(r"rounds $n$")
     handles = [
-        mpl.lines.Line2D([], [], marker="o", ms=3.2, color=D3, ls="none", label="$d=3$ observed"),
-        mpl.lines.Line2D([], [], marker="o", ms=3.2, color=D5, ls="none", label="$d=5$ observed"),
-        mpl.lines.Line2D([], [], color=MUTED, ls=(0, (4, 2)), label="predicted"),
+        Line2D([], [], marker="o", ms=3.2, color=D3, ls="none", label="$d=3$ observed"),
+        Line2D([], [], marker="o", ms=3.2, color=D5, ls="none", label="$d=5$ observed"),
+        Line2D([], [], color=MUTED, ls=(0, (4, 2)), label="predicted"),
     ]
     axes[0, 0].legend(handles=handles, loc="lower right")
     for ax, tag in zip(axes.flat, "abcd"):
@@ -189,11 +233,30 @@ def fig_leakage() -> None:
         rows = [r for r in why if r["role"] == role]
         x = np.array([r["cz_per_round"] for r in rows]) + rng.uniform(-0.35, 0.35, len(rows))
         y = np.array([r["leak_per_round"] for r in rows]) * 100
-        b.plot(x, y, marker, ms=2.2, color=colour, alpha=0.45, mew=0, label=f"{name} ({len(rows)} series)")
-        b.plot(np.mean([r["cz_per_round"] for r in rows]), np.median(y), marker, ms=5, color=colour, mec=INK, mew=0.6)
+        b.plot(
+            x,
+            y,
+            marker,
+            ms=2.2,
+            color=colour,
+            alpha=0.45,
+            mew=0,
+            label=f"{name} ({len(rows)} series)",
+        )
+        b.plot(
+            np.mean([r["cz_per_round"] for r in rows]),
+            np.median(y),
+            marker,
+            ms=5,
+            color=colour,
+            mec=INK,
+            mew=0.6,
+        )
     b.set_ylabel("onset rate (% per round)")
     b.set_xlim(1.5, 9.8)
-    b.set_xticks([3, 8.25], ["relays\n3 CZ, 1 readout, 1 reset", "flags\n8 CZ, 2 readouts, 2 resets"])
+    b.set_xticks(
+        [3, 8.25], ["relays\n3 CZ, 1 readout, 1 reset", "flags\n8 CZ, 2 readouts, 2 resets"]
+    )
     b.tick_params(axis="x", length=0, labelsize=6.5)
     b.set_ylim(0, None)
     b.legend(loc="upper left", handletextpad=0.2)
@@ -213,7 +276,15 @@ def fig_scale() -> None:
         ax.plot(s, lam, marker + "-", color=colour, ms=3.2, label=f"{basis} memory")
         cross = data[basis]["crosses_at"]
         ax.plot([cross], [1.0], marker="|", ms=7, color=colour, mew=1.2)
-        ax.annotate(f"{cross:.2f}", (cross, 1.0), xytext=(3, 5), textcoords="offset points", ha="left", color=colour, fontsize=7)
+        ax.annotate(
+            f"{cross:.2f}",
+            (cross, 1.0),
+            xytext=(3, 5),
+            textcoords="offset points",
+            ha="left",
+            color=colour,
+            fontsize=7,
+        )
     ax.axhline(1.0, color=MUTED, lw=0.6, ls=(0, (3, 2)))
     ax.axvline(1.0, color=GRID, lw=0.6)
     ax.set_xlabel("error rates relative to Fez's day-5 medians")
@@ -238,7 +309,7 @@ def fig_layout() -> None:
         [sys.executable, "-c", driver, str(calibration), str(OUT / "layout.pdf")],
         cwd=ROOT / "docs" / "figures",
         check=True,
-        env={"PYTHONPATH": env_path, "PATH": "/usr/bin:/bin"},
+        env={**os.environ, "PYTHONPATH": env_path},
     )
 
 

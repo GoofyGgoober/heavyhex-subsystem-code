@@ -1,6 +1,6 @@
 """Shared loading for the post-run diagnosis of why the calibration model misses the chip.
 
-Exploratory: nothing here was pre-registered, and none of it changes the registered
+Exploratory: nothing here was prespecified, and none of it changes the prespecified
 analysis in src/. Every script reads the committed run folders and uses no QPU time.
 """
 
@@ -26,7 +26,9 @@ ROUND_US = 7.9  # one round at both distances (paper, The setup)
 
 def memory_index(basis: str, rounds: int) -> int:
     return next(
-        i for i, s in enumerate(SETTINGS) if s.kind == "memory" and s.basis == basis and s.rounds == rounds
+        i
+        for i, s in enumerate(SETTINGS)
+        if s.kind == "memory" and s.basis == basis and s.rounds == rounds
     )
 
 
@@ -71,7 +73,10 @@ class Job:
     def model(self, idx: int, calibration: Calibration | None = None, f: float | None = None):
         """(stim model, records, labels) for setting idx, as the analysis built it."""
         return R.simulated(
-            SETTINGS[idx], self.circuits[idx], calibration or self.calibration, self.info["dt"],
+            SETTINGS[idx],
+            self.circuits[idx],
+            calibration or self.calibration,
+            self.info["dt"],
             self.f if f is None else f,
         )
 
@@ -79,8 +84,11 @@ class Job:
         """The chip's detector bits and observable flips for setting idx."""
         if model is None:
             model, records, _ = self.model(idx)
+        assert records is not None, "pass the records with the model"
         measured = R.in_record_order(self.shots[idx], records)
-        return model.compile_m2d_converter().convert(measurements=measured, separate_observables=True)
+        return model.compile_m2d_converter().convert(
+            measurements=measured, separate_observables=True
+        )
 
     def readout_qubit(self, patch: str, name: str, k: int) -> int:
         """Chip qubit of a flag ("z_flag Xa..") or the k-th relay ("relay Z..") readout."""

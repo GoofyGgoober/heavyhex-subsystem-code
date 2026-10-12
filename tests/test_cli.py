@@ -82,7 +82,7 @@ def test_calibrate_offline_reports_the_days_plan(capsys):
     figures = Path(__file__).resolve().parents[1] / "docs" / "figures"
     saved = Path(__file__).parent / "data" / "fez_calibration_2026-10-03.json"
     argv = ["--json", "calibrate", "--offline", "--file", str(saved)]
-    assert main(argv + ["--map", str(figures / "fez_map.json")]) == 0
+    assert main([*argv, "--map", str(figures / "fez_map.json")]) == 0
     plan = json.loads(capsys.readouterr().out)["plan"]
     assert [[set(job) for job in jobs] for jobs in plan] == [[{"3", "5"}], [{"5"}, {"3"}]]
     assert all(found["broken"] == [] for jobs in plan for job in jobs for found in job.values())
@@ -92,3 +92,23 @@ def test_missing_hardware_extra_is_reported(monkeypatch, capsys):
     monkeypatch.setitem(sys.modules, "qiskit_ibm_runtime", None)
     assert main(["calibrate", "--file", "/nonexistent/calibration.json"]) == 1
     assert "[hardware]" in capsys.readouterr().err
+
+
+def test_a_job_step_without_its_folder_exits_2(capsys):
+    pytest.importorskip("stim")
+    pytest.importorskip("pymatching")
+    assert main(["experiment", "analyze"]) == 2
+    assert "name the job's folder" in capsys.readouterr().err
+
+
+def test_combining_no_rehearsals_gives_no_reps(tmp_path, monkeypatch, capsys):
+    pytest.importorskip("stim")
+    pytest.importorskip("pymatching")
+    pytest.importorskip("scipy")
+    from heavyhex.experiment import run
+
+    monkeypatch.setattr(run, "RUNS", tmp_path)
+    assert main(["--json", "experiment", "combine", "--rehearsal"]) == 0
+    combined = json.loads(capsys.readouterr().out)
+    assert combined["reps"] == [] and combined["pooled_x"] == {}
+    assert (tmp_path / "rehearsal_combined.json").exists()

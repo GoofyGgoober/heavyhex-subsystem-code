@@ -1,0 +1,180 @@
+2026-10-04-r1 X1 d3: sum p 1.409, miscorr single p cal 8.07e-03 uni 0.00e+00 | d5: sum p 5.169, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 1.15e-01 uni 0.00e+00 of 1.30e+01
+2026-10-04-r1 X2 d3: sum p 2.362, miscorr single p cal 5.16e-02 uni 0.00e+00 | d5: sum p 8.547, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 2.14e-01 uni 0.00e+00 of 3.59e+01
+2026-10-04-r1 X3 d3: sum p 3.314, miscorr single p cal 9.52e-02 uni 0.00e+00 | d5: sum p 11.926, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 3.15e-01 uni 0.00e+00 of 7.02e+01
+2026-10-04-r1 X4 d3: sum p 4.266, miscorr single p cal 1.39e-01 uni 0.00e+00 | d5: sum p 15.305, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-04-r1 X6 d3: sum p 6.170, miscorr single p cal 2.26e-01 uni 0.00e+00 | d5: sum p 22.062, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-04-r1 X8 d3: sum p 8.074, miscorr single p cal 3.13e-01 uni 0.00e+00 | d5: sum p 28.820, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-04-r1 Z1 d3: sum p 1.033, miscorr single p cal 0.00e+00 uni 1.92e-03 | d5: sum p 3.600, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 9.75e-03 uni 2.31e-01 of 6.26e+00
+2026-10-04-r1 Z2 d3: sum p 1.939, miscorr single p cal 0.00e+00 uni 3.85e-03 | d5: sum p 6.505, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 5.08e-02 uni 5.27e-01 of 2.08e+01
+2026-10-04-r1 Z3 d3: sum p 2.846, miscorr single p cal 0.00e+00 uni 5.77e-03 | d5: sum p 9.409, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 1.10e-01 uni 8.03e-01 of 4.37e+01
+2026-10-04-r1 Z4 d3: sum p 3.753, miscorr single p cal 0.00e+00 uni 7.70e-03 | d5: sum p 12.313, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-04-r1 Z6 d3: sum p 5.566, miscorr single p cal 0.00e+00 uni 1.15e-02 | d5: sum p 18.122, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-04-r1 Z8 d3: sum p 7.379, miscorr single p cal 0.00e+00 uni 1.54e-02 | d5: sum p 23.931, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-04-r2-d3 X1 d3: sum p 1.181, miscorr single p cal 8.55e-03 uni 0.00e+00
+2026-10-04-r2-d3 X2 d3: sum p 1.893, miscorr single p cal 1.71e-02 uni 0.00e+00
+2026-10-04-r2-d3 X3 d3: sum p 2.606, miscorr single p cal 2.56e-02 uni 0.00e+00
+2026-10-04-r2-d3 X4 d3: sum p 3.318, miscorr single p cal 3.42e-02 uni 0.00e+00
+2026-10-04-r2-d3 X6 d3: sum p 4.743, miscorr single p cal 5.13e-02 uni 0.00e+00
+2026-10-04-r2-d3 X8 d3: sum p 6.168, miscorr single p cal 6.84e-02 uni 0.00e+00
+2026-10-04-r2-d3 Z1 d3: sum p 0.980, miscorr single p cal 0.00e+00 uni 1.50e-03
+2026-10-04-r2-d3 Z2 d3: sum p 1.719, miscorr single p cal 0.00e+00 uni 3.01e-03
+2026-10-04-r2-d3 Z3 d3: sum p 2.457, miscorr single p cal 1.63e-02 uni 4.51e-03
+2026-10-04-r2-d3 Z4 d3: sum p 3.195, miscorr single p cal 3.25e-02 uni 6.02e-03
+2026-10-04-r2-d3 Z6 d3: sum p 4.672, miscorr single p cal 6.50e-02 uni 9.02e-03
+2026-10-04-r2-d3 Z8 d3: sum p 6.148, miscorr single p cal 9.76e-02 uni 1.20e-02
+2026-10-04-r2-d5 X1 d5: sum p 4.998, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 4.56e-02 uni 0.00e+00 of 1.22e+01
+2026-10-04-r2-d5 X2 d5: sum p 8.323, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 1.02e-01 uni 0.00e+00 of 3.41e+01
+2026-10-04-r2-d5 X3 d5: sum p 11.647, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 1.62e-01 uni 0.00e+00 of 6.71e+01
+2026-10-04-r2-d5 X4 d5: sum p 14.972, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-04-r2-d5 X6 d5: sum p 21.621, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-04-r2-d5 X8 d5: sum p 28.270, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-04-r2-d5 Z1 d5: sum p 3.840, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 8.49e-03 uni 2.10e-01 of 7.14e+00
+2026-10-04-r2-d5 Z2 d5: sum p 7.020, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 3.89e-02 uni 4.64e-01 of 2.42e+01
+2026-10-04-r2-d5 Z3 d5: sum p 10.199, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 6.57e-02 uni 7.02e-01 of 5.14e+01
+2026-10-04-r2-d5 Z4 d5: sum p 13.379, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-04-r2-d5 Z6 d5: sum p 19.739, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-04-r2-d5 Z8 d5: sum p 26.098, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-05-r1 X1 d3: sum p 1.608, miscorr single p cal 5.41e-03 uni 0.00e+00 | d5: sum p 4.593, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 9.76e-02 uni 0.00e+00 of 1.02e+01
+2026-10-05-r1 X2 d3: sum p 2.730, miscorr single p cal 1.08e-02 uni 0.00e+00 | d5: sum p 7.563, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 1.85e-01 uni 0.00e+00 of 2.81e+01
+2026-10-05-r1 X3 d3: sum p 3.853, miscorr single p cal 1.62e-02 uni 0.00e+00 | d5: sum p 10.533, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 2.76e-01 uni 0.00e+00 of 5.47e+01
+2026-10-05-r1 X4 d3: sum p 4.975, miscorr single p cal 2.17e-02 uni 0.00e+00 | d5: sum p 13.503, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-05-r1 X6 d3: sum p 7.220, miscorr single p cal 3.25e-02 uni 0.00e+00 | d5: sum p 19.442, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-05-r1 X8 d3: sum p 9.464, miscorr single p cal 4.33e-02 uni 0.00e+00 | d5: sum p 25.382, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-05-r1 Z1 d3: sum p 1.148, miscorr single p cal 0.00e+00 uni 1.60e-03 | d5: sum p 3.555, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 3.72e-03 uni 2.46e-01 of 6.11e+00
+2026-10-05-r1 Z2 d3: sum p 2.153, miscorr single p cal 0.00e+00 uni 3.21e-03 | d5: sum p 6.424, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 3.24e-02 uni 5.45e-01 of 2.03e+01
+2026-10-05-r1 Z3 d3: sum p 3.158, miscorr single p cal 0.00e+00 uni 4.81e-03 | d5: sum p 9.292, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 7.03e-02 uni 8.27e-01 of 4.27e+01
+2026-10-05-r1 Z4 d3: sum p 4.162, miscorr single p cal 0.00e+00 uni 6.42e-03 | d5: sum p 12.161, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-05-r1 Z6 d3: sum p 6.172, miscorr single p cal 0.00e+00 uni 9.63e-03 | d5: sum p 17.899, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-05-r1 Z8 d3: sum p 8.181, miscorr single p cal 0.00e+00 uni 1.28e-02 | d5: sum p 23.636, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-05-r2-d3 X1 d3: sum p 1.059, miscorr single p cal 9.41e-03 uni 0.00e+00
+2026-10-05-r2-d3 X2 d3: sum p 1.713, miscorr single p cal 1.88e-02 uni 0.00e+00
+2026-10-05-r2-d3 X3 d3: sum p 2.366, miscorr single p cal 2.82e-02 uni 0.00e+00
+2026-10-05-r2-d3 X4 d3: sum p 3.020, miscorr single p cal 3.76e-02 uni 0.00e+00
+2026-10-05-r2-d3 X6 d3: sum p 4.328, miscorr single p cal 5.64e-02 uni 0.00e+00
+2026-10-05-r2-d3 X8 d3: sum p 5.635, miscorr single p cal 7.53e-02 uni 0.00e+00
+2026-10-05-r2-d3 Z1 d3: sum p 0.934, miscorr single p cal 0.00e+00 uni 1.75e-03
+2026-10-05-r2-d3 Z2 d3: sum p 1.652, miscorr single p cal 1.19e-02 uni 3.51e-03
+2026-10-05-r2-d3 Z3 d3: sum p 2.369, miscorr single p cal 2.55e-02 uni 5.26e-03
+2026-10-05-r2-d3 Z4 d3: sum p 3.087, miscorr single p cal 3.91e-02 uni 7.01e-03
+2026-10-05-r2-d3 Z6 d3: sum p 4.522, miscorr single p cal 6.63e-02 uni 1.05e-02
+2026-10-05-r2-d3 Z8 d3: sum p 5.958, miscorr single p cal 9.35e-02 uni 1.40e-02
+2026-10-05-r2-d5 X1 d5: sum p 4.880, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 7.33e-02 uni 0.00e+00 of 1.16e+01
+2026-10-05-r2-d5 X2 d5: sum p 8.072, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 1.49e-01 uni 0.00e+00 of 3.21e+01
+2026-10-05-r2-d5 X3 d5: sum p 11.263, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 2.27e-01 uni 0.00e+00 of 6.27e+01
+2026-10-05-r2-d5 X4 d5: sum p 14.454, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-05-r2-d5 X6 d5: sum p 20.837, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-05-r2-d5 X8 d5: sum p 27.220, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-05-r2-d5 Z1 d5: sum p 3.800, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 4.88e-03 uni 2.30e-01 of 7.00e+00
+2026-10-05-r2-d5 Z2 d5: sum p 6.921, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 3.44e-02 uni 4.99e-01 of 2.36e+01
+2026-10-05-r2-d5 Z3 d5: sum p 10.043, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 7.27e-02 uni 7.52e-01 of 4.99e+01
+2026-10-05-r2-d5 Z4 d5: sum p 13.164, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-05-r2-d5 Z6 d5: sum p 19.408, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-05-r2-d5 Z8 d5: sum p 25.651, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-06-r1 X1 d3: sum p 1.513, miscorr single p cal 4.92e-03 uni 0.00e+00 | d5: sum p 5.200, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 8.60e-02 uni 0.00e+00 of 1.31e+01
+2026-10-06-r1 X2 d3: sum p 2.513, miscorr single p cal 9.83e-03 uni 0.00e+00 | d5: sum p 8.624, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 1.72e-01 uni 0.00e+00 of 3.65e+01
+2026-10-06-r1 X3 d3: sum p 3.514, miscorr single p cal 1.48e-02 uni 0.00e+00 | d5: sum p 12.048, miscorr single p cal 1.81e-03 uni 0.00e+00; pair p cal 2.77e-01 uni 0.00e+00 of 7.16e+01
+2026-10-06-r1 X4 d3: sum p 4.514, miscorr single p cal 1.97e-02 uni 0.00e+00 | d5: sum p 15.472, miscorr single p cal 3.62e-03 uni 0.00e+00
+2026-10-06-r1 X6 d3: sum p 6.515, miscorr single p cal 2.95e-02 uni 0.00e+00 | d5: sum p 22.321, miscorr single p cal 7.23e-03 uni 0.00e+00
+2026-10-06-r1 X8 d3: sum p 8.516, miscorr single p cal 3.93e-02 uni 0.00e+00 | d5: sum p 29.169, miscorr single p cal 1.08e-02 uni 0.00e+00
+2026-10-06-r1 Z1 d3: sum p 1.046, miscorr single p cal 0.00e+00 uni 1.73e-03 | d5: sum p 3.585, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 2.74e-03 uni 2.36e-01 of 6.21e+00
+2026-10-06-r1 Z2 d3: sum p 1.933, miscorr single p cal 0.00e+00 uni 3.46e-03 | d5: sum p 6.524, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 2.82e-02 uni 5.43e-01 of 2.09e+01
+2026-10-06-r1 Z3 d3: sum p 2.820, miscorr single p cal 1.73e-03 uni 5.20e-03 | d5: sum p 9.463, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 6.04e-02 uni 8.34e-01 of 4.42e+01
+2026-10-06-r1 Z4 d3: sum p 3.707, miscorr single p cal 3.46e-03 uni 6.93e-03 | d5: sum p 12.402, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-06-r1 Z6 d3: sum p 5.480, miscorr single p cal 6.93e-03 uni 1.04e-02 | d5: sum p 18.279, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-06-r1 Z8 d3: sum p 7.254, miscorr single p cal 1.04e-02 uni 1.39e-02 | d5: sum p 24.157, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-06-r2-d3 X1 d3: sum p 1.473, miscorr single p cal 9.43e-02 uni 0.00e+00
+2026-10-06-r2-d3 X2 d3: sum p 2.359, miscorr single p cal 1.52e-01 uni 0.00e+00
+2026-10-06-r2-d3 X3 d3: sum p 3.245, miscorr single p cal 2.09e-01 uni 0.00e+00
+2026-10-06-r2-d3 X4 d3: sum p 4.131, miscorr single p cal 2.67e-01 uni 0.00e+00
+2026-10-06-r2-d3 X6 d3: sum p 5.902, miscorr single p cal 3.82e-01 uni 0.00e+00
+2026-10-06-r2-d3 X8 d3: sum p 7.674, miscorr single p cal 4.97e-01 uni 0.00e+00
+2026-10-06-r2-d3 Z1 d3: sum p 1.043, miscorr single p cal 1.98e-03 uni 1.98e-03
+2026-10-06-r2-d3 Z2 d3: sum p 1.801, miscorr single p cal 3.96e-03 uni 3.96e-03
+2026-10-06-r2-d3 Z3 d3: sum p 2.559, miscorr single p cal 1.83e-02 uni 5.95e-03
+2026-10-06-r2-d3 Z4 d3: sum p 3.316, miscorr single p cal 3.27e-02 uni 7.93e-03
+2026-10-06-r2-d3 Z6 d3: sum p 4.832, miscorr single p cal 6.13e-02 uni 1.19e-02
+2026-10-06-r2-d3 Z8 d3: sum p 6.347, miscorr single p cal 9.00e-02 uni 1.59e-02
+2026-10-06-r2-d5 X1 d5: sum p 5.143, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 6.98e-02 uni 0.00e+00 of 1.29e+01
+2026-10-06-r2-d5 X2 d5: sum p 8.586, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 1.40e-01 uni 0.00e+00 of 3.63e+01
+2026-10-06-r2-d5 X3 d5: sum p 12.030, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 2.17e-01 uni 0.00e+00 of 7.16e+01
+2026-10-06-r2-d5 X4 d5: sum p 15.473, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-06-r2-d5 X6 d5: sum p 22.360, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-06-r2-d5 X8 d5: sum p 29.246, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-06-r2-d5 Z1 d5: sum p 4.047, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 8.63e-03 uni 2.23e-01 of 7.95e+00
+2026-10-06-r2-d5 Z2 d5: sum p 7.456, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 3.23e-02 uni 5.13e-01 of 2.74e+01
+2026-10-06-r2-d5 Z3 d5: sum p 10.864, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 5.81e-02 uni 7.92e-01 of 5.84e+01
+2026-10-06-r2-d5 Z4 d5: sum p 14.273, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-06-r2-d5 Z6 d5: sum p 21.089, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-06-r2-d5 Z8 d5: sum p 27.906, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-07-r1 X1 d3: sum p 1.457, miscorr single p cal 8.25e-03 uni 0.00e+00 | d5: sum p 4.998, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 1.01e-01 uni 0.00e+00 of 1.21e+01
+2026-10-07-r1 X2 d3: sum p 2.433, miscorr single p cal 5.14e-02 uni 0.00e+00 | d5: sum p 8.286, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 1.83e-01 uni 0.00e+00 of 3.37e+01
+2026-10-07-r1 X3 d3: sum p 3.408, miscorr single p cal 9.45e-02 uni 0.00e+00 | d5: sum p 11.574, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 2.71e-01 uni 0.00e+00 of 6.61e+01
+2026-10-07-r1 X4 d3: sum p 4.384, miscorr single p cal 1.38e-01 uni 0.00e+00 | d5: sum p 14.863, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-07-r1 X6 d3: sum p 6.335, miscorr single p cal 2.24e-01 uni 0.00e+00 | d5: sum p 21.439, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-07-r1 X8 d3: sum p 8.286, miscorr single p cal 3.10e-01 uni 0.00e+00 | d5: sum p 28.015, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-07-r1 Z1 d3: sum p 1.069, miscorr single p cal 0.00e+00 uni 1.53e-03 | d5: sum p 3.550, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 3.07e-03 uni 2.51e-01 of 6.09e+00
+2026-10-07-r1 Z2 d3: sum p 1.985, miscorr single p cal 0.00e+00 uni 3.06e-03 | d5: sum p 6.443, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 2.68e-02 uni 5.64e-01 of 2.04e+01
+2026-10-07-r1 Z3 d3: sum p 2.900, miscorr single p cal 0.00e+00 uni 4.59e-03 | d5: sum p 9.335, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 5.36e-02 uni 8.66e-01 of 4.30e+01
+2026-10-07-r1 Z4 d3: sum p 3.815, miscorr single p cal 0.00e+00 uni 6.12e-03 | d5: sum p 12.227, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-07-r1 Z6 d3: sum p 5.646, miscorr single p cal 0.00e+00 uni 9.18e-03 | d5: sum p 18.012, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-07-r1 Z8 d3: sum p 7.477, miscorr single p cal 0.00e+00 uni 1.22e-02 | d5: sum p 23.797, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-07-r2-d3 X1 d3: sum p 1.275, miscorr single p cal 1.05e-02 uni 0.00e+00
+2026-10-07-r2-d3 X2 d3: sum p 2.058, miscorr single p cal 2.11e-02 uni 0.00e+00
+2026-10-07-r2-d3 X3 d3: sum p 2.840, miscorr single p cal 3.16e-02 uni 0.00e+00
+2026-10-07-r2-d3 X4 d3: sum p 3.623, miscorr single p cal 4.21e-02 uni 0.00e+00
+2026-10-07-r2-d3 X6 d3: sum p 5.188, miscorr single p cal 6.32e-02 uni 0.00e+00
+2026-10-07-r2-d3 X8 d3: sum p 6.753, miscorr single p cal 8.42e-02 uni 0.00e+00
+2026-10-07-r2-d3 Z1 d3: sum p 0.914, miscorr single p cal 0.00e+00 uni 1.67e-03
+2026-10-07-r2-d3 Z2 d3: sum p 1.614, miscorr single p cal 0.00e+00 uni 3.33e-03
+2026-10-07-r2-d3 Z3 d3: sum p 2.313, miscorr single p cal 1.45e-02 uni 5.00e-03
+2026-10-07-r2-d3 Z4 d3: sum p 3.013, miscorr single p cal 2.89e-02 uni 6.66e-03
+2026-10-07-r2-d3 Z6 d3: sum p 4.412, miscorr single p cal 5.78e-02 uni 1.00e-02
+2026-10-07-r2-d3 Z8 d3: sum p 5.811, miscorr single p cal 8.67e-02 uni 1.33e-02
+2026-10-07-r2-d5 X1 d5: sum p 5.150, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 9.92e-02 uni 0.00e+00 of 1.29e+01
+2026-10-07-r2-d5 X2 d5: sum p 8.565, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 2.03e-01 uni 0.00e+00 of 3.61e+01
+2026-10-07-r2-d5 X3 d5: sum p 11.981, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 3.08e-01 uni 0.00e+00 of 7.10e+01
+2026-10-07-r2-d5 X4 d5: sum p 15.397, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-07-r2-d5 X6 d5: sum p 22.228, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-07-r2-d5 X8 d5: sum p 29.060, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-07-r2-d5 Z1 d5: sum p 4.877, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 7.62e-03 uni 2.16e-01 of 1.14e+01
+2026-10-07-r2-d5 Z2 d5: sum p 9.077, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 5.20e-02 uni 4.94e-01 of 4.03e+01
+2026-10-07-r2-d5 Z3 d5: sum p 13.276, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 1.12e-01 uni 7.54e-01 of 8.68e+01
+2026-10-07-r2-d5 Z4 d5: sum p 17.475, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-07-r2-d5 Z6 d5: sum p 25.874, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-07-r2-d5 Z8 d5: sum p 34.272, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-08-r1 X1 d3: sum p 1.449, miscorr single p cal 7.54e-03 uni 0.00e+00 | d5: sum p 5.024, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 1.06e-01 uni 0.00e+00 of 1.22e+01
+2026-10-08-r1 X2 d3: sum p 2.431, miscorr single p cal 4.78e-02 uni 0.00e+00 | d5: sum p 8.284, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 2.01e-01 uni 0.00e+00 of 3.37e+01
+2026-10-08-r1 X3 d3: sum p 3.413, miscorr single p cal 8.81e-02 uni 0.00e+00 | d5: sum p 11.544, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 2.97e-01 uni 0.00e+00 of 6.57e+01
+2026-10-08-r1 X4 d3: sum p 4.395, miscorr single p cal 1.28e-01 uni 0.00e+00 | d5: sum p 14.804, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-08-r1 X6 d3: sum p 6.360, miscorr single p cal 2.09e-01 uni 0.00e+00 | d5: sum p 21.325, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-08-r1 X8 d3: sum p 8.324, miscorr single p cal 2.89e-01 uni 0.00e+00 | d5: sum p 27.845, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-08-r1 Z1 d3: sum p 1.044, miscorr single p cal 0.00e+00 uni 1.98e-03 | d5: sum p 3.881, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 4.19e-03 uni 3.21e-01 of 7.28e+00
+2026-10-08-r1 Z2 d3: sum p 1.947, miscorr single p cal 0.00e+00 uni 3.96e-03 | d5: sum p 6.995, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 3.49e-02 uni 7.00e-01 of 2.40e+01
+2026-10-08-r1 Z3 d3: sum p 2.850, miscorr single p cal 0.00e+00 uni 5.94e-03 | d5: sum p 10.109, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 5.34e-02 uni 1.07e+00 of 5.05e+01
+2026-10-08-r1 Z4 d3: sum p 3.753, miscorr single p cal 0.00e+00 uni 7.92e-03 | d5: sum p 13.223, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-08-r1 Z6 d3: sum p 5.559, miscorr single p cal 0.00e+00 uni 1.19e-02 | d5: sum p 19.451, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-08-r1 Z8 d3: sum p 7.365, miscorr single p cal 0.00e+00 uni 1.58e-02 | d5: sum p 25.678, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-08-r2-d3 X1 d3: sum p 1.216, miscorr single p cal 5.65e-03 uni 0.00e+00
+2026-10-08-r2-d3 X2 d3: sum p 1.898, miscorr single p cal 1.57e-02 uni 0.00e+00
+2026-10-08-r2-d3 X3 d3: sum p 2.579, miscorr single p cal 2.14e-02 uni 0.00e+00
+2026-10-08-r2-d3 X4 d3: sum p 3.261, miscorr single p cal 2.70e-02 uni 0.00e+00
+2026-10-08-r2-d3 X6 d3: sum p 4.623, miscorr single p cal 3.83e-02 uni 0.00e+00
+2026-10-08-r2-d3 X8 d3: sum p 5.986, miscorr single p cal 4.96e-02 uni 0.00e+00
+2026-10-08-r2-d3 Z1 d3: sum p 1.092, miscorr single p cal 8.51e-03 uni 1.51e-03
+2026-10-08-r2-d3 Z2 d3: sum p 1.860, miscorr single p cal 1.00e-02 uni 3.02e-03
+2026-10-08-r2-d3 Z3 d3: sum p 2.627, miscorr single p cal 1.85e-02 uni 4.53e-03
+2026-10-08-r2-d3 Z4 d3: sum p 3.394, miscorr single p cal 2.70e-02 uni 6.04e-03
+2026-10-08-r2-d3 Z6 d3: sum p 4.929, miscorr single p cal 4.41e-02 uni 9.07e-03
+2026-10-08-r2-d3 Z8 d3: sum p 6.464, miscorr single p cal 6.11e-02 uni 1.21e-02
+2026-10-08-r2-d5 X1 d5: sum p 5.159, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 7.33e-02 uni 0.00e+00 of 1.30e+01
+2026-10-08-r2-d5 X2 d5: sum p 8.484, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 1.44e-01 uni 0.00e+00 of 3.54e+01
+2026-10-08-r2-d5 X3 d5: sum p 11.810, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 2.15e-01 uni 0.00e+00 of 6.89e+01
+2026-10-08-r2-d5 X4 d5: sum p 15.135, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-08-r2-d5 X6 d5: sum p 21.787, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-08-r2-d5 X8 d5: sum p 28.438, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-08-r2-d5 Z1 d5: sum p 4.143, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 9.12e-03 uni 2.89e-01 of 8.31e+00
+2026-10-08-r2-d5 Z2 d5: sum p 7.529, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 3.68e-02 uni 5.85e-01 of 2.79e+01
+2026-10-08-r2-d5 Z3 d5: sum p 10.915, miscorr single p cal 0.00e+00 uni 0.00e+00; pair p cal 6.89e-02 uni 8.62e-01 of 5.89e+01
+2026-10-08-r2-d5 Z4 d5: sum p 14.301, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-08-r2-d5 Z6 d5: sum p 21.073, miscorr single p cal 0.00e+00 uni 0.00e+00
+2026-10-08-r2-d5 Z8 d5: sum p 27.845, miscorr single p cal 0.00e+00 uni 0.00e+00

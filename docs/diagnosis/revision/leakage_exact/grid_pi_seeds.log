@@ -1,0 +1,6 @@
+pi 0.0005,0.25,0.15: 1 points, 64 tasks, sim exact
+leak 0.0005  strength 0.25  spread 0.15  loss 0.190 (slot 0.190)  X stab -4%  Z stab -17%  Z flag -19%  Z repeat -34%  Z co_data +12%  Z co_gauge -13%   [238s]
+best so far (seed 22): leak 0.0005 strength 0.25 spread 0.15 loss 0.190
+pi 0.0005,0.25,0.15: 1 points, 64 tasks, sim exact
+leak 0.0005  strength 0.25  spread 0.15  loss 0.192 (slot 0.193)  X stab -5%  Z stab -18%  Z flag -19%  Z repeat -34%  Z co_data +15%  Z co_gauge -11%   [249s]
+best so far (seed 23): leak 0.0005 strength 0.25 spread 0.15 loss 0.192

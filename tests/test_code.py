@@ -99,7 +99,7 @@ def test_gauge_group_rejects_non_central_stabilizers():
             data_qubits=code.data_qubits,
             gauge_x=code.gauge_x,
             gauge_z=code.gauge_z,
-            stabilizers=(bad,) + code.stabilizers[1:],
+            stabilizers=(bad, *code.stabilizers[1:]),
             logical_x=code.logical_x,
             logical_z=code.logical_z,
         )

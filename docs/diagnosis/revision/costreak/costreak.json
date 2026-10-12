@@ -1,0 +1,238 @@
+{
+ "script": "docs/diagnosis/revision/costreak/costreak.py",
+ "reproduces": "docs/diagnosis/where.py -> docs/diagnosis/results/where.json",
+ "circuit": "8-round Z memory, all 15 jobs, 2500 shots each; model: stim, 20000 shots per job, seed 4",
+ "definition": "co-streak excess = P(both in a streak) - P(A in a streak) P(B in a streak); in a streak at round r = fires at r-1 and r (r = 2..8, 7 slots); P pooled over shots and slots of one job; class value = mean over (job, pair) rows",
+ "where_json_check": {
+  "share a data qubit": {
+   "rows_match": true,
+   "chip_abs_diff": 0.0,
+   "chip_se_abs_diff": 0.0,
+   "model_where_json": 5.6374406179138324e-05,
+   "model_here": 5.529336479591837e-05,
+   "model_exact": 5.5730588030972687e-05,
+   "model_where_json_minus_exact_over_se": 0.3780327307121032,
+   "chip_match": true
+  },
+  "same Z gauge, no shared data": {
+   "rows_match": true,
+   "chip_abs_diff": 0.0,
+   "chip_se_abs_diff": 0.0,
+   "model_where_json": -4.484041326530611e-06,
+   "model_here": 1.810031122448976e-06,
+   "model_exact": 4.580860057869663e-21,
+   "model_where_json_minus_exact_over_se": -1.5079759551777454,
+   "chip_match": true
+  },
+  "same patch, unrelated": {
+   "rows_match": true,
+   "chip_abs_diff": 0.0,
+   "chip_se_abs_diff": 0.0,
+   "model_where_json": 6.051261461106205e-07,
+   "model_here": 4.503011498077495e-07,
+   "model_exact": 3.2914979124712962e-21,
+   "model_where_json_minus_exact_over_se": 1.8354408847845676,
+   "chip_match": true
+  },
+  "different patches": {
+   "rows_match": true,
+   "chip_abs_diff": 0.0,
+   "chip_se_abs_diff": 0.0,
+   "model_where_json": 2.0834130527210946e-07,
+   "model_here": -6.817676445578166e-08,
+   "model_exact": -6.885451418891402e-22,
+   "model_where_json_minus_exact_over_se": 0.46462340410450426,
+   "chip_match": true
+  }
+ },
+ "where_json_chip_reproduced_exactly": true,
+ "note_model_sampling": "stim's seeded sampling is not reproducible across machines and builds, so the sampled model values differ from where.json by sampling noise; model_exact removes that noise",
+ "streak_probability_by_slot": {
+  "chip": [
+   0.013447500000000005,
+   0.01703125,
+   0.019728750000000003,
+   0.02220875,
+   0.024036250000000002,
+   0.025816250000000002,
+   0.0273575
+  ],
+  "model": [
+   0.007877812500000006,
+   0.007883750000000005,
+   0.007879218750000003,
+   0.007865,
+   0.007869687499999996,
+   0.007891718749999997,
+   0.007846249999999997
+  ],
+  "model_exact": [
+   0.007863913261617329,
+   0.007863913261617329,
+   0.007863913261617329,
+   0.007863913261617329,
+   0.007863913261617329,
+   0.007863913261617329,
+   0.007863913261617329
+  ],
+  "series": 320
+ },
+ "classes": {
+  "share a data qubit": {
+   "rows": 180,
+   "physical_pairs": 23,
+   "physical_qubits": 28,
+   "jobs": 15,
+   "rows_per_physical_pair": {
+    "min": 5,
+    "median": 9.0,
+    "max": 11
+   },
+   "chip": 0.0006777675283446712,
+   "chip_se_plain": 4.218470264784485e-05,
+   "chip_se_pair_clustered": 8.782332166558511e-05,
+   "chip_se_qubit_dyadic": 0.00011813647053831127,
+   "model": 5.529336479591837e-05,
+   "model_se_plain": 1.221559142101832e-05,
+   "model_se_pair_clustered": 3.245917988990078e-05,
+   "chip_minus_model": 0.0006224741635487529,
+   "chip_minus_model_se_pair_clustered": 8.584984829989407e-05,
+   "chip_mean_of_pair_means": 0.0007465794903067944,
+   "chip_mean_of_pair_means_se": 0.00010444960437765491,
+   "model_exact": 5.5730588030972687e-05,
+   "model_sampled_minus_exact": -4.372232350543197e-07,
+   "model_sampled_minus_exact_se_job_clustered": 1.7030751463051145e-06,
+   "rows_sharing_an_error_mechanism_in_model": 110,
+   "chip_minus_model_exact": 0.0006220369403136985,
+   "chip_minus_model_exact_se_pair_clustered": 8.636389850409995e-05,
+   "per_slot_definition": {
+    "chip": 0.0006492331428571428,
+    "chip_se_plain": 4.050862503192088e-05,
+    "chip_se_pair_clustered": 8.405298256889163e-05,
+    "chip_se_qubit_dyadic": 0.00011207931127980633,
+    "model": 5.5298466269841264e-05,
+    "model_exact": 5.573058803097268e-05
+   },
+   "chip_streak_probability_mean": 0.023653968253968257,
+   "model_streak_probability_mean": 0.00851638888888889,
+   "model_exact_streak_probability_mean": 0.008503311291760856
+  },
+  "same Z gauge, no shared data": {
+   "rows": 100,
+   "physical_pairs": 12,
+   "physical_qubits": 24,
+   "jobs": 15,
+   "rows_per_physical_pair": {
+    "min": 5,
+    "median": 9.0,
+    "max": 14
+   },
+   "chip": 0.0008032435591836736,
+   "chip_se_plain": 8.349796301687751e-05,
+   "chip_se_pair_clustered": 0.0002421635285517282,
+   "chip_se_qubit_dyadic": 0.00023185392674535056,
+   "model": 1.810031122448976e-06,
+   "model_se_plain": 2.9178831724801495e-06,
+   "model_se_pair_clustered": 1.8557468664389946e-06,
+   "chip_minus_model": 0.0008014335280612245,
+   "chip_minus_model_se_pair_clustered": 0.00024223083575684425,
+   "chip_mean_of_pair_means": 0.0007856883001148511,
+   "chip_mean_of_pair_means_se": 0.00021316805778359436,
+   "model_exact": 4.580860057869663e-21,
+   "model_sampled_minus_exact": 1.8100311224489714e-06,
+   "model_sampled_minus_exact_se_job_clustered": 2.9735496187020304e-06,
+   "rows_sharing_an_error_mechanism_in_model": 0,
+   "chip_minus_model_exact": 0.0008032435591836736,
+   "chip_minus_model_exact_se_pair_clustered": 0.0002421635285517282,
+   "per_slot_definition": {
+    "chip": 0.0007679481142857142,
+    "chip_se_plain": 8.057862953952683e-05,
+    "chip_se_pair_clustered": 0.00023540566964420833,
+    "chip_se_qubit_dyadic": 0.00022538376943689843,
+    "model": 1.7992535714285717e-06,
+    "model_exact": 0.0
+   },
+   "chip_streak_probability_mean": 0.025398571428571427,
+   "model_streak_probability_mean": 0.008255,
+   "model_exact_streak_probability_mean": 0.008239888150866898
+  },
+  "same patch, unrelated": {
+   "rows": 2760,
+   "physical_pairs": 396,
+   "physical_qubits": 38,
+   "jobs": 15,
+   "rows_per_physical_pair": {
+    "min": 1,
+    "median": 5.0,
+    "max": 14
+   },
+   "chip": 5.013369772256729e-05,
+   "chip_se_plain": 4.066677764197382e-06,
+   "chip_se_pair_clustered": 4.965198532884504e-06,
+   "chip_se_qubit_dyadic": 7.69203142577474e-06,
+   "model": 4.503011498077495e-07,
+   "model_se_plain": 4.309858259947214e-07,
+   "model_se_pair_clustered": 4.495298288771065e-07,
+   "chip_minus_model": 4.968339657275955e-05,
+   "chip_minus_model_se_pair_clustered": 4.934812507735806e-06,
+   "chip_mean_of_pair_means": 5.260442203940041e-05,
+   "chip_mean_of_pair_means_se": 5.5355558652090845e-06,
+   "model_exact": 3.2914979124712962e-21,
+   "model_sampled_minus_exact": 4.503011498077463e-07,
+   "model_sampled_minus_exact_se_job_clustered": 3.296898043009667e-07,
+   "rows_sharing_an_error_mechanism_in_model": 0,
+   "chip_minus_model_exact": 5.013369772256729e-05,
+   "chip_minus_model_exact_se_pair_clustered": 4.965198532884504e-06,
+   "per_slot_definition": {
+    "chip": 2.7421863354037273e-05,
+    "chip_se_plain": 3.998085481355536e-06,
+    "chip_se_pair_clustered": 4.765808777430453e-06,
+    "chip_se_qubit_dyadic": 4.35020343446093e-06,
+    "model": 4.48737448240166e-07,
+    "model_exact": 0.0
+   },
+   "chip_streak_probability_mean": 0.022462028985507247,
+   "model_streak_probability_mean": 0.008851609730848862,
+   "model_exact_streak_probability_mean": 0.00884865389005621
+  },
+  "different patches": {
+   "rows": 960,
+   "physical_pairs": 192,
+   "physical_qubits": 32,
+   "jobs": 5,
+   "rows_per_physical_pair": {
+    "min": 5,
+    "median": 5.0,
+    "max": 5
+   },
+   "chip": 1.049218027210885e-05,
+   "chip_se_plain": 5.226674149696301e-06,
+   "chip_se_pair_clustered": 5.617668547643622e-06,
+   "chip_se_qubit_dyadic": 5.164766004198098e-06,
+   "model": -6.817676445578166e-08,
+   "model_se_plain": 5.280411923793899e-07,
+   "model_se_pair_clustered": 5.003023047195128e-07,
+   "chip_minus_model": 1.0560357036564629e-05,
+   "chip_minus_model_se_pair_clustered": 5.575608543244464e-06,
+   "chip_mean_of_pair_means": 1.0492180272108848e-05,
+   "chip_mean_of_pair_means_se": 5.617668547643623e-06,
+   "model_exact": -6.885451418891402e-22,
+   "model_sampled_minus_exact": -6.817676445578088e-08,
+   "model_sampled_minus_exact_se_job_clustered": 4.484089768866863e-07,
+   "rows_sharing_an_error_mechanism_in_model": 0,
+   "chip_minus_model_exact": 1.0492180272108848e-05,
+   "chip_minus_model_exact_se_pair_clustered": 5.617668547643622e-06,
+   "per_slot_definition": {
+    "chip": -5.706047619047609e-06,
+    "chip_se_plain": 5.193354590519759e-06,
+    "chip_se_pair_clustered": 5.5497267147864e-06,
+    "chip_se_qubit_dyadic": 5.137012926017562e-06,
+    "model": -6.903497023809513e-08,
+    "model_exact": 0.0
+   },
+   "chip_streak_probability_mean": 0.018671904761904765,
+   "model_streak_probability_mean": 0.006073005952380952,
+   "model_exact_streak_probability_mean": 0.006029386991685059
+  }
+ }
+}
