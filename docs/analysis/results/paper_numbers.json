@@ -14,6 +14,7 @@
    "docs/analysis/results/day_swing.json",
    "docs/analysis/results/decoder.json",
    "docs/analysis/results/decoder_dominant.json",
+   "docs/analysis/results/decoder_ml.json",
    "docs/analysis/results/dependence.json",
    "docs/analysis/results/dephasing_floor.json",
    "docs/analysis/results/detection_events.json",
@@ -22,6 +23,7 @@
    "docs/analysis/results/error_scale.json",
    "docs/analysis/results/f_models.json",
    "docs/analysis/results/f_weighted_mean.json",
+   "docs/analysis/results/fit_bias.json",
    "docs/analysis/results/flags_summary.json",
    "docs/analysis/results/heating.json",
    "docs/analysis/results/hmm_bootstrap.json",
@@ -30,6 +32,7 @@
    "docs/analysis/results/hmm_x_summary.json",
    "docs/analysis/results/idle_f.json",
    "docs/analysis/results/idle_f_t2.json",
+   "docs/analysis/results/idle_test_scope.json",
    "docs/analysis/results/input_noise.json",
    "docs/analysis/results/input_resolution.json",
    "docs/analysis/results/leakage_checks.json",
@@ -21722,6 +21725,134 @@
     "uniform Z": 0.47724410721694
    },
    "Lambda_X_drop_uniform": 0.04320180785566502
+  }
+ },
+ "decoder_ml": {
+  "patch_days": 10,
+  "model_eps3_drop_with_ml_range": [
+   0.02270574720094065,
+   0.07289059257813602
+  ],
+  "device_eps3_change_pp_range": [
+   -0.8748105538431805,
+   1.1635038458180313
+  ],
+  "device_eps3_change_pp_mean": -0.04808289458344217,
+  "n4_miscorrected_single_fault_p": [
+   0.8538832987208088,
+   0.6795627282921798,
+   0.7958496545256519
+  ],
+  "n1to4_miscorrected_single_fault_p": [
+   2.037504942620828,
+   1.5992539759967836,
+   0.7849080228191618
+  ],
+  "n4_share_ml_also_wrong_range": [
+   0.1597556027753448,
+   1.0
+  ],
+  "stored_prediction_against_exact_matching_max_abs_z": 2.377070749235816
+ },
+ "idle_test_scope": {
+  "ancilla_reads_1": {
+   "idle_range": [
+    0.017001664468864468,
+    0.05704664382481391
+   ],
+   "memory_range": [
+    0.28519552614782884,
+    0.3255110050755164
+   ]
+  },
+  "f_left_out_of_the_median": {
+   "qubit_jobs": 11,
+   "median_t2_us": 165.81040624620132,
+   "t2_us": [
+    120.09210297518565,
+    120.09210297518565,
+    156.27617510180468,
+    165.81040624620132,
+    165.81040624620132,
+    165.81040624620132,
+    192.98767872469358,
+    203.31987469875267,
+    203.31987469875267,
+    229.30157681768773,
+    229.30157681768773
+   ],
+   "used_qubit_jobs": 329,
+   "used_median_t2_us": 85.30338475238597
+  }
+ },
+ "fit_bias_weights": {
+  "replicates": 2000,
+  "seed": 7,
+  "bias_pp": {
+   "X d3": {
+    "planned": {
+     "mean": -0.13577835054502524,
+     "range": [
+      -0.2247090233370691,
+      -0.07404640102184057
+     ]
+    },
+    "true_weights": {
+     "mean": 0.0634333655761797,
+     "range": [
+      0.015881185117803953,
+      0.1019948484639599
+     ]
+    }
+   },
+   "X d5": {
+    "planned": {
+     "mean": -0.8700134775554184,
+     "range": [
+      -1.2158704082799758,
+      -0.43726840800893396
+     ]
+    },
+    "true_weights": {
+     "mean": 0.13379803825042863,
+     "range": [
+      0.07437574068023534,
+      0.17034314830638997
+     ]
+    }
+   },
+   "Z d3": {
+    "planned": {
+     "mean": -0.41065321992831466,
+     "range": [
+      -2.392458404014139,
+      -0.10232937300469203
+     ]
+    },
+    "true_weights": {
+     "mean": 0.08409955444891398,
+     "range": [
+      0.02570065233351848,
+      0.21692108199466986
+     ]
+    }
+   },
+   "Z d5": {
+    "planned": {
+     "mean": -3.2845027496100867,
+     "range": [
+      -6.106867703100272,
+      -1.3922107970483155
+     ]
+    },
+    "true_weights": {
+     "mean": 0.18361186140106733,
+     "range": [
+      0.018965582722818564,
+      0.2541102688750685
+     ]
+    }
+   }
   }
  },
  "leakage": {

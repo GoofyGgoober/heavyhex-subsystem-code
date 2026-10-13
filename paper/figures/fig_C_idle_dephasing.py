@@ -17,7 +17,7 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from matplotlib.ticker import FixedLocator, NullLocator
 
-from make_figures import D5, DIAG, GRID, INK, MUTED, OUT, PAGE, label
+from make_figures import COLUMN, D5, DIAG, GRID, INK, MUTED, OUT, label
 
 V_FLOOR = 0.03  # bottom of the decay panels; points with v <= 0.05 are drawn at the 0.05 cut
 
@@ -39,18 +39,18 @@ def decay_panel(ax, q: dict, rounds: list[int], first: bool) -> None:
     ax.yaxis.set_minor_locator(NullLocator())
     ax.set_yticklabels(["0.05", "0.1", "0.2", "0.5", "1"] if first else [])
     ax.set_xlim(0, 17)
-    ax.set_xticks(rounds)
+    ax.set_xticks([1, 8, 16])
     ax.set_xlabel(r"idle rounds $n$")
     ax.set_title(
-        f"q{q['physical_qubit']}, $T_2 = {q['t2_us']:.0f}$ µs",
+        f"q{q['physical_qubit']}, $T_2$ {q['t2_us']:.0f} µs",
         loc="left",
-        fontsize=8,
+        fontsize=7,
         color=INK,
     )
     ax.text(
         0.04,
         0.05,
-        f"$f = {q['f']:.2f} \\pm {q['sigma_f']:.2f}$",
+        f"$f = {q['f']:.2f}$",
         transform=ax.transAxes,
         ha="left",
         va="bottom",
@@ -60,41 +60,32 @@ def decay_panel(ax, q: dict, rounds: list[int], first: bool) -> None:
     )
     if first:
         ax.set_ylabel(r"$v(n) = \sqrt{\langle X\rangle^2 + \langle Y\rangle^2}$")
-        # The band edges, where they are far apart.
-        ax.text(
-            16.6,
-            q["curve_f0"][-1] * 1.12,
-            "$f=0$",
-            ha="right",
-            va="bottom",
-            fontsize=7,
-            color=MUTED,
-        )
-        ax.text(4.6, q["curve_f1"][2], "$f=1$", ha="left", va="center", fontsize=7, color=MUTED)
 
 
 def make(results_dir: Path, out_pdf: Path) -> None:
     data = json.loads((Path(results_dir) / "idle_f_t2.json").read_text())
     decay, t2 = data["decay"], data["f_vs_t2"]
 
-    fig = plt.figure(figsize=(PAGE, 2.15), layout="constrained")
-    grid = fig.add_gridspec(1, 4, width_ratios=[1, 1, 1, 1.75])
+    # Column width: the three decay panels above, f against T2 below.
+    fig = plt.figure(figsize=(COLUMN, 3.9), layout="constrained")
+    grid = fig.add_gridspec(2, 3, height_ratios=[1, 1.15])
     top = [fig.add_subplot(grid[0, k]) for k in range(3)]
-    b = fig.add_subplot(grid[0, 3])
+    b = fig.add_subplot(grid[1, :])
 
     # (a) three data qubits of one job: data, the model's band from f = 0 to f = 1, the fit
     for k, (ax, q) in enumerate(zip(top, decay["qubits"])):
         decay_panel(ax, q, decay["rounds"], first=k == 0)
-    top[1].legend(
+    fig.legend(
         handles=[
             Line2D([], [], marker="o", ms=3.2, color=D5, ls="none", label="device"),
             Line2D([], [], color=D5, lw=1.0, label="fit"),
-            Patch(color=GRID, alpha=0.7, label=r"model, $0 \leq f \leq 1$"),
+            Patch(color=GRID, alpha=0.7, label=r"model, $f = 0$ (top) to 1"),
         ],
-        loc="lower left",
-        bbox_to_anchor=(0.0, 0.12),
+        loc="outside upper center",
+        ncol=3,
         handlelength=1.4,
         handletextpad=0.4,
+        columnspacing=1.0,
     )
     label(top[0], "(a)")
 
@@ -130,7 +121,7 @@ def make(results_dir: Path, out_pdf: Path) -> None:
     b.text(
         0.02,
         0.97,
-        f"Spearman $\\rho = {rho['rho']:.2f}$ ({ci[0]:.2f}\u2013{ci[1]:.2f}), {rho['points']} qubits",
+        f"Spearman $\\rho = {rho['rho']:.2f}$ [{ci[0]:.2f}, {ci[1]:.2f}], {rho['points']} qubits",
         transform=b.transAxes,
         ha="left",
         va="top",

@@ -84,7 +84,7 @@ def make(results_dir: Path, out_pdf: Path) -> None:
 
         # Bottom: what sets the round's length.
         bars = [
-            ("as run", [(k, w) for k, w in data["critical_path_us"]]),
+            ("this work", [(k, w) for k, w in data["critical_path_us"]]),
             ("zero-duration resets", [(k, w) for k, w in data["critical_path_us"] if k != "reset"]),
         ]
         for row, (_, path) in enumerate(bars):

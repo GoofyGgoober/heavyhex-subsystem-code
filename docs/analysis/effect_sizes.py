@@ -1,6 +1,6 @@
 """How far the model is from the device, and what the agreement test could see, from stored
-results only (Sec. agreement, the model-versus-device table; Table placement; App. stats;
-Fig. A_effect_sizes).
+results only (Sec. agreement, the model-versus-device table and its ratios; Table placement;
+App. stats).
 
 The prespecified test, chi2 = sum_i z_i^2 with z = (O - M) / sqrt(sigma_O^2 + sigma_M^2), answers
 pass or fail. This script measures the misses and what the test could have seen. O/M is observed

@@ -21,7 +21,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.lines import Line2D
-from matplotlib.patches import Patch
 
 ROOT = Path(__file__).resolve().parents[2]
 RUNS = ROOT / "runs"
@@ -36,6 +35,11 @@ ROUND_US = 7.9  # one round at both distances
 
 # Two categorical slots, validated for colour-blind separation; d = 5 is the subject.
 D3, D5 = "#eb6834", "#2a78d6"
+# Qubit roles in Fig. 1's colours (docs/figures/draw_blueprint.py): X ancillas and flags, Z
+# ancillas, relays. Detector classes take the colour of the qubits that measure them.
+X_ROLE, Z_ROLE, RELAY_ROLE = "#E4574C", "#1F4E99", "#8C8C8C"
+# Fig. 1 rings the qubits of placement 1 that were weak on every day (Sec. III).
+WEAK_QUBITS = (83, 102, 149, 150)
 INK, MUTED, GRID = "#0b0b0b", "#52514e", "#d9d8d4"
 COLUMN, PAGE = 3.375, 7.0  # revtex column and page widths, inches
 
@@ -125,152 +129,22 @@ def label(ax, text: str) -> None:
     ax.text(-0.02, 1.02, text, transform=ax.transAxes, fontweight="bold", va="bottom", ha="right")
 
 
-def fig_lambda() -> None:
-    """The prespecified Λ_X test per pair-day: (a) observed and predicted with their own errors,
-    and the prespecified pool; (b) z under both choices of σ_f."""
-    combined = load(RUNS / "combined.json")
-    reps = sorted(combined["reps"], key=lambda r: (r["rep"], r["day"]))
-    tests = [r["tests"]["X lambda"] for r in reps]
-    obs = np.array([t["observed"] for t in tests])
-    s_obs = np.array([t["observed_uncertainty"] for t in tests])
-    pred = np.array([t["predicted"] for t in tests])
-    # sigma_M as the test uses it: simulator noise and the f term (the calibration term is 0).
-    s_pred = np.array(
-        [
-            np.sqrt(t["simulator_noise"] ** 2 + t["from_f"] ** 2 + t["calibration_gap"] ** 2 / 2)
-            for t in tests
-        ]
-    )
-    s_test = np.hypot(s_obs, s_pred)
-    assert np.allclose(2 * s_test, [t["bound"] for t in tests], rtol=1e-9)
-    # z with sigma_f as prespecified and from the idle test's noise alone (prespecified_tests.py)
-    tested = load(DIAG / "prespecified_tests.json")
-    by_pair_day = {(r["pair"], r["day"]): r["wls"]["X lambda"] for r in tested["per_pair_day"]}
-    days = [DAYS.index(r["day"]) + 1 for r in reps]
-    z_pre = np.array([by_pair_day[(r["rep"], d)]["z"] for r, d in zip(reps, days)])
-    z_noise = np.array(
-        [by_pair_day[(r["rep"], d)]["z_idle_noise_only"] for r, d in zip(reps, days)]
-    )
-    assert np.allclose(z_pre, (obs - pred) / s_test, atol=1e-9)
-    pool, pool_se, _, _, _, pool_pred = tested["headline"]["pool"][
-        "Lambda_X, se, chi2_0/nu, t_0.95, upper bound, predicted"
-    ]
-    # Pair 1's patches share one job and one f, so its predictions stored before the job at f = 0
-    # and f = 1 bracket the prediction; pair 2's patches ran in two jobs at two f, and are not
-    # bracketed that way (effect_sizes.py, prejob).
-    frozen = {
-        (p["placement"], p["day"]): p
-        for p in load(DIAG / "effect_sizes.json")["prejob"]["wls"]["per_repetition"]
-    }
-
-    # Full column width with constrained layout, so LaTeX prints it at about 1:1 (fonts 7-8 pt).
-    fig, (ax, res) = plt.subplots(
-        1, 2, figsize=(COLUMN, 2.75), sharey=True, width_ratios=[1.45, 1], layout="constrained"
-    )
-    half = len(reps) // 2
-    # Pair 1 on top, then pair 2, each under its own heading.
-    y = np.concatenate([np.arange(half)[::-1] + half + 1.4, np.arange(half)[::-1]]).astype(float)
-    ax.axvspan(pool - pool_se, pool + pool_se, color=D5, alpha=0.13, lw=0, zorder=0)
-    ax.axvline(pool_pred, color=MUTED, lw=0.8, ls=(0, (1, 1.5)), zorder=0)
-    for i, r in enumerate(reps):
-        low = y[i] - 0.3  # the prediction just under the observation
-        if r["rep"] == 1:
-            bracket = sorted(frozen[(1, days[i])][f"X lambda frozen_f{f}"] for f in ("0.0", "1.0"))
-            ax.plot(bracket, [low, low], color=MUTED, lw=2.6, alpha=0.35, solid_capstyle="butt")
-        ax.errorbar(
-            pred[i],
-            low,
-            xerr=s_pred[i],
-            fmt="D",
-            ms=3.2,
-            mfc="white",
-            mec=MUTED,
-            mew=0.8,
-            ecolor=MUTED,
-            elinewidth=0.9,
-            capsize=0,
-        )
-        ax.errorbar(
-            obs[i], y[i], xerr=s_obs[i], fmt="o", ms=3.4, color=D5, elinewidth=1.0, capsize=0
-        )
-        res.plot(z_pre[i], y[i], "o", ms=3.4, color=D5)
-        res.plot(z_noise[i], y[i] - 0.3, "o", ms=3.4, mfc="white", mec=D5, mew=0.9)
-    for pair, top, note in (
-        (1, y[0], "one job, same qubits daily"),
-        (2, y[half], "two jobs a day"),
-    ):
-        ax.text(
-            0.31,
-            top + 0.95,
-            f"pair {pair}: {note}",
-            ha="left",
-            va="center",
-            color=INK,
-            fontsize=7,
-            style="italic",
-            bbox={"facecolor": "white", "edgecolor": "none", "pad": 1},
-            zorder=3,
-        )
-    ax.axvline(1.0, color=MUTED, lw=0.7, ls=(0, (3, 2)))
-    ax.text(0.985, -0.45, r"$\Lambda=1$", ha="right", va="center", color=MUTED, fontsize=7)
-    for edge in (-2, 2):
-        res.axvline(edge, color=MUTED, lw=0.7, ls=(0, (3, 2)))
-    res.axvline(0.0, color=MUTED, lw=0.5)
-    ax.set_yticks(list(y), [f"day {d}" for d in days])
-    ax.tick_params(axis="y", length=0)
-    ax.set_ylim(-0.8, y.max() + 1.6)
-    ax.set_xlim(0.3, 1.05)
-    ax.set_xlabel(r"$\Lambda_\mathrm{X} = \varepsilon_3/\varepsilon_5$")
-    res.set_xlim(-4.2, 4.2)
-    res.set_xticks([-4, -2, 0, 2, 4])
-    res.set_xlabel(r"$z$ of $\Lambda_\mathrm{X}$")
-    res.tick_params(axis="y", length=0)
-    label(ax, "(a)")
-    label(res, "(b)")
-    handles = [
-        Line2D([], [], marker="o", ms=3.4, color=D5, ls="none", label=r"observed, $\pm\sigma_O$"),
-        Line2D(
-            [],
-            [],
-            marker="D",
-            ms=3.2,
-            mfc="white",
-            mec=MUTED,
-            color=MUTED,
-            lw=0.9,
-            label=r"predicted, $\pm\sigma_M$",
-        ),
-        Line2D([], [], color=MUTED, lw=2.6, alpha=0.35, label=r"before the job, $0\leq f\leq 1$"),
-        Patch(color=D5, alpha=0.13, lw=0, label=r"pool, $\pm\sigma$"),
-        Line2D([], [], color=MUTED, lw=0.8, ls=(0, (1, 1.5)), label="pooled prediction"),
-        Line2D(
-            [],
-            [],
-            marker="o",
-            ms=3.4,
-            color=D5,
-            mfc="white",
-            mew=0.9,
-            ls="none",
-            label=r"(b) $\sigma_f$ from idle noise only",
-        ),
-    ]
-    fig.legend(
-        handles=handles,
-        loc="outside lower center",
-        ncol=2,
-        handletextpad=0.3,
-        columnspacing=0.8,
-        fontsize=6.5,
-    )
-    fig.savefig(OUT / "lambda.pdf")
-    plt.close(fig)
+def binomial_curve(rep: int, distance: int, basis: str, n: np.ndarray) -> np.ndarray:
+    """The binomial fit (1 - A (1 - 2 eps)^n) / 2 of each day, averaged over the days."""
+    curves = load(DIAG / "fits.json")["curves"]
+    days = []
+    for day in DAYS:
+        fit = curves[f"{day} r{rep} {basis} d{distance}"]["binomial"]
+        days.append((1 - fit["A"] * (1 - 2 * fit["eps"]) ** n) / 2)
+    return np.mean(days, axis=0)
 
 
 def fig_pn() -> None:
-    """P(n) of each pair, X and Z memory, mean over the five days."""
+    """P(n) of each pair, X and Z memory, mean over the five days: device, its binomial fit and
+    the prediction."""
     fig, axes = plt.subplots(2, 2, figsize=(PAGE, 3.0), sharex=True, sharey=True)
     n = np.array(ROUNDS)
+    smooth = np.linspace(1, 8, 57)
     for col, rep in enumerate((1, 2)):
         for row, basis in enumerate(("X", "Z")):
             ax = axes[row, col]
@@ -282,6 +156,7 @@ def fig_pn() -> None:
                 o = p_of_n(rep, distance, basis, "observed")
                 p = p_of_n(rep, distance, basis, "predicted")
                 ax.plot(n, p.mean(0), color=colour, lw=1.0, ls=dash, alpha=0.9)
+                ax.plot(smooth, binomial_curve(rep, distance, basis, smooth), color=colour, lw=0.6)
                 ax.errorbar(
                     n,
                     o.mean(0),
@@ -293,7 +168,6 @@ def fig_pn() -> None:
                     capsize=0,
                     label=f"$d={distance}$",
                 )
-            # The log-linear fit leaves out points with P >= 1/2.
             ax.axhline(0.5, color=MUTED, lw=0.7, ls=(0, (3, 2)), zorder=0)
             ax.set_ylim(0, 0.55)
             ax.set_xticks(ROUNDS)
@@ -303,45 +177,26 @@ def fig_pn() -> None:
                 ax.set_ylabel(r"logical error $P_\mathrm{L}(n)$")
             if row == 1:
                 ax.set_xlabel(r"rounds $n$")
+    axes[0, 1].text(
+        8.1,
+        0.515,
+        r"$P_\mathrm{L} = 1/2$ (random)",
+        ha="right",
+        va="bottom",
+        fontsize=7,
+        color=MUTED,
+    )
     handles = [
-        Line2D([], [], marker="s", ms=3.2, color=D3, ls="none", label="$d=3$ observed"),
-        Line2D([], [], marker="o", ms=3.2, color=D5, ls="none", label="$d=5$ observed"),
-        Line2D([], [], color=D3, lw=1.0, ls=(0, (5, 1.5, 1, 1.5)), label="$d=3$ predicted"),
-        Line2D([], [], color=D5, lw=1.0, ls=(0, (4, 2)), label="$d=5$ predicted"),
+        Line2D([], [], marker="s", ms=3.2, color=D3, ls="none", label="$d=3$"),
+        Line2D([], [], marker="o", ms=3.2, color=D5, ls="none", label="$d=5$"),
+        Line2D([], [], color=MUTED, lw=0.6, label="binomial fit"),
+        Line2D([], [], color=MUTED, lw=1.0, ls=(0, (4, 2)), label="predicted"),
     ]
-    axes[0, 0].legend(handles=handles, loc="lower right")
+    axes[0, 0].legend(handles=handles, loc="lower right", ncol=2, columnspacing=1.0)
     for ax, tag in zip(axes.flat, "abcd"):
         label(ax, f"({tag})")
     fig.tight_layout(w_pad=1.0, h_pad=0.8)
     fig.savefig(OUT / "pn.pdf")
-    plt.close(fig)
-
-
-def fig_scale() -> None:
-    """Λ on a uniform chip with every error rate scaled together."""
-    data = load(DIAG / "uniform_scale.json")
-    s = np.array(data["scales"])
-    fig, ax = plt.subplots(figsize=(COLUMN, 1.9))
-    for basis, colour, marker in (("X", D5, "o"), ("Z", D3, "s")):
-        lam = np.array(data[basis]["lambda"])
-        ax.plot(s, lam, marker + "-", color=colour, ms=3.2, label=f"{basis} memory")
-        cross = data[basis]["crosses_at"]
-        ax.plot([cross], [1.0], marker="|", ms=7, color=colour, mew=1.2)
-        ax.annotate(
-            f"{cross:.2f}",
-            (cross, 1.0),
-            xytext=(3, 5),
-            textcoords="offset points",
-            ha="left",
-            color=colour,
-            fontsize=7,
-        )
-    ax.axhline(1.0, color=MUTED, lw=0.6, ls=(0, (3, 2)))
-    ax.set_xlabel("error rates relative to Fez's day-5 medians")
-    ax.set_ylabel(r"$\Lambda$")
-    ax.set_xlim(0.15, 1.05)
-    ax.legend(loc="upper right")
-    fig.savefig(OUT / "scale.pdf")
     plt.close(fig)
 
 
@@ -357,11 +212,20 @@ def fig_layout() -> None:
         "matplotlib.rcdefaults(); matplotlib.rcParams.update({'pdf.fonttype': 42, "
         "'font.family': 'serif', 'font.serif': ['Latin Modern Roman', 'CMU Serif'], "
         "'mathtext.fontset': 'cm'}); "
-        "sys.argv = ['figure1.py', '--calibration', sys.argv[1], '--out', sys.argv[2]]; "
+        "sys.argv = ['figure1.py', '--calibration', sys.argv[1], '--out', sys.argv[2], "
+        "'--weak', sys.argv[4]]; "
         "runpy.run_path('figure1.py', run_name='__main__')"
     )
     subprocess.run(
-        [sys.executable, "-c", driver, str(calibration), str(OUT / "layout.pdf"), str(OUT)],
+        [
+            sys.executable,
+            "-c",
+            driver,
+            str(calibration),
+            str(OUT / "layout.pdf"),
+            str(OUT),
+            ",".join(map(str, WEAK_QUBITS)),
+        ],
         cwd=ROOT / "docs" / "figures",
         check=True,
         env={**os.environ, "PYTHONPATH": env_path},
@@ -370,24 +234,17 @@ def fig_layout() -> None:
 
 def fig_analyses() -> None:
     """The figures of the analyses after the run, each drawn by its own script."""
-    import fig_A_effect_sizes
     import fig_B_detector_diagnostics
     import fig_C_idle_dephasing
-    import fig_D_flag_records
     import fig_timing
 
     fig_timing.make(DIAG, OUT / "timing.pdf")
-    fig_A_effect_sizes.make(DIAG, OUT / "A_effect_sizes.pdf")
     fig_B_detector_diagnostics.make(DIAG, OUT / "B_detector_diagnostics.pdf")
-    fig_B_detector_diagnostics.make_pij(DIAG, OUT / "B_detector_diagnostics_pij.pdf")
     fig_C_idle_dephasing.make(DIAG, OUT / "C_idle_dephasing.pdf")
-    fig_D_flag_records.make(DIAG, OUT / "flag_records.pdf")
 
 
 if __name__ == "__main__":
-    fig_lambda()
     fig_pn()
-    fig_scale()
     fig_layout()
     fig_analyses()
     print("wrote", ", ".join(sorted(p.name for p in OUT.glob("*.pdf"))))

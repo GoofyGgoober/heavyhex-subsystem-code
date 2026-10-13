@@ -1481,6 +1481,32 @@ def digest(res: dict) -> str:
         + ", ".join(f"{p:.4f}" for p in q44["decoder_chose_edges_p"])
         + f" (weight {weight(q44['decoder_chose_edges_p']):.2f})"
     )
+    ml = res["decoder_ml"]
+    drop, shift, n4 = (
+        ml["model_eps3_drop_with_ml_range"],
+        ml["device_eps3_change_pp_range"],
+        ml["n4_miscorrected_single_fault_p"],
+    )
+    L.append(
+        f"   exact maximum likelihood (d = 3 X memory, n = 1-4): model eps3 {100 * drop[0]:.1f}-"
+        f"{100 * drop[1]:.1f}% lower than with matching; device eps3 {shift[0]:+.2f} to "
+        f"{shift[1]:+.2f} pp (mean {ml['device_eps3_change_pp_mean']:+.2f}); of the single-fault "
+        f"probability matching miscorrects at n = 4 ({n4[0]:.3f}), ML also misassigns {n4[1]:.3f} "
+        f"({100 * n4[2]:.0f}%)"
+    )
+    scope = res["idle_test_scope"]
+    ones, left = scope["ancilla_reads_1"], scope["f_left_out_of_the_median"]
+    L.append(
+        f"   idle test: ancillas read 1 in {100 * ones['idle_range'][0]:.1f}-"
+        f"{100 * ones['idle_range'][1]:.1f}% (memory {100 * ones['memory_range'][0]:.1f}-"
+        f"{100 * ones['memory_range'][1]:.1f}%); {left['qubit_jobs']} qubit-jobs left out of the "
+        f"median f, median T2 {left['median_t2_us']:.0f} us (used: {left['used_median_t2_us']:.0f} us)"
+    )
+    for kind, ways in res["fit_bias_weights"]["bias_pp"].items():
+        L.append(
+            f"   log-linear bias of eps, {kind}: planned weights {ways['planned']['mean']:+.2f} pp, "
+            f"weights at the true P {ways['true_weights']['mean']:+.2f} pp"
+        )
     L += sensitivity_digest(res["sensitivity"])
     L += dependence_digest(res["dependence"])
     L += scale_and_f_digest(res["error_scale_and_f"])
@@ -1834,6 +1860,16 @@ def main() -> None:
         "f_models": f_models(),
         "heating_exploratory": heating(),
         "decoder_audit": take("decoder.json")["paper"],
+        "decoder_ml": take("decoder_ml.json")["summary"],
+        "idle_test_scope": {
+            "ancilla_reads_1": {
+                k: v
+                for k, v in take("idle_test_scope.json")["ancilla_reads_1"].items()
+                if k != "per_job"
+            },
+            "f_left_out_of_the_median": take("idle_test_scope.json")["f_left_out_of_the_median"],
+        },
+        "fit_bias_weights": take("fit_bias.json"),
         "leakage": leakage(),
         "streak_effects_exploratory": streak_effects(),
         "placements_and_calibration_inputs": placements_and_inputs(),

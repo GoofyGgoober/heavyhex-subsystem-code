@@ -79,6 +79,12 @@
    detection-event fraction device/model, median (share above 1): all 1.20 (76%), X weight 4 1.15 (78%), X weight 2 0.98 (47%), Z 1.19 (99%), flag 1.55 (82%), relay 1.16 (66%)
    f vs T2: rho 0.66 [0.35, 0.85]; f_mem > f_idle in 15/15 (medians 1.45, 0.99); beyond the simulated f in 14/15, at the search edge 2.0 in 1
    miscorrected single faults: 5-61% of predicted eps3; day 1 pair 1: Z on q44 (DEPOLARIZE1) 3.3% per round over 15 mechanisms, largest single 0.0355, 85% of the miscorrected; its own edge 0.0355 (weight 3.30); matching chose edges 0.1344, 0.2042 (weight 3.22)
+   exact maximum likelihood (d = 3 X memory, n = 1-4): model eps3 2.3-7.3% lower than with matching; device eps3 -0.87 to +1.16 pp (mean -0.05); of the single-fault probability matching miscorrects at n = 4 (0.854), ML also misassigns 0.680 (80%)
+   idle test: ancillas read 1 in 1.7-5.7% (memory 28.5-32.6%); 11 qubit-jobs left out of the median f, median T2 166 us (used: 85 us)
+   log-linear bias of eps, X d3: planned weights -0.14 pp, weights at the true P +0.06 pp
+   log-linear bias of eps, X d5: planned weights -0.87 pp, weights at the true P +0.13 pp
+   log-linear bias of eps, Z d3: planned weights -0.41 pp, weights at the true P +0.08 pp
+   log-linear bias of eps, Z d5: planned weights -3.28 pp, weights at the true P +0.18 pp
 18. Sensitivity of the agreement test (sensitivity.py; WL unless named)
    sigma_f prespecified 0.15-0.38, idle-test noise only 0.054-0.136
    prespecified: X lambda 25.0 (8; P2 3.8, k 24.0), X eps3 52.1 (5; P2 23.0, k 10.2), X eps5 19.8 (9; P2 7.8, k 4.0)
