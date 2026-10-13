@@ -125,44 +125,79 @@ def label(ax, text: str) -> None:
 
 
 def fig_lambda() -> None:
-    """Λ in X memory per rep, observed and predicted, grouped by placement."""
+    """The prespecified Λ_X test per repetition: (a) observed and predicted with their own errors,
+    (b) observed minus predicted with the test's agreement interval."""
     combined = load(RUNS / "combined.json")
     reps = sorted(combined["reps"], key=lambda r: (r["rep"], r["day"]))
-    obs = np.array([r["tests"]["X lambda"]["observed"] for r in reps])
-    err = np.array([r["tests"]["X lambda"]["observed_uncertainty"] for r in reps])
-    pred = np.array([r["tests"]["X lambda"]["predicted"] for r in reps])
-    # The predictions frozen before each job, at f = 0 and f = 1 (effect_sizes.py).
+    tests = [r["tests"]["X lambda"] for r in reps]
+    obs = np.array([t["observed"] for t in tests])
+    s_obs = np.array([t["observed_uncertainty"] for t in tests])
+    pred = np.array([t["predicted"] for t in tests])
+    # sigma_M as the test uses it: simulator noise and the f term (the calibration term is 0).
+    s_pred = np.array(
+        [
+            np.sqrt(t["simulator_noise"] ** 2 + t["from_f"] ** 2 + t["calibration_gap"] ** 2 / 2)
+            for t in tests
+        ]
+    )
+    s_test = np.hypot(s_obs, s_pred)
+    assert np.allclose(2 * s_test, [t["bound"] for t in tests], rtol=1e-9)
+    # Pair 1's patches share one job and one f, so its predictions stored before the job at f = 0
+    # and f = 1 bracket the prediction; pair 2's patches ran in two jobs at two f, and are not
+    # bracketed that way (effect_sizes.py, prejob).
     frozen = {
         (p["placement"], p["day"]): p
         for p in load(DIAG / "effect_sizes.json")["prejob"]["wls"]["per_repetition"]
     }
-    bracket = np.array(
-        [
-            sorted(
-                frozen[(r["rep"], DAYS.index(r["day"]) + 1)][f"X lambda frozen_f{f}"]
-                for f in ("0.0", "1.0")
-            )
-            for r in reps
-        ]
-    )
 
-    # Full column width with constrained layout, so LaTeX prints it at about 1:1 (fonts stay 7-8 pt)
-    # and the figure is 2.0 in tall. The prespecified ten-repetition pool is not drawn: it treats
-    # the repetitions as independent, and the paper quotes it once in the text.
-    fig, ax = plt.subplots(figsize=(COLUMN, 2.0), layout="constrained")
+    # Full column width with constrained layout, so LaTeX prints it at about 1:1 (fonts 7-8 pt).
+    # The prespecified ten-repetition pool is not drawn; the paper quotes it in the text.
+    fig, (ax, res) = plt.subplots(
+        1, 2, figsize=(COLUMN, 2.55), sharey=True, width_ratios=[1.45, 1], layout="constrained"
+    )
     half = len(reps) // 2
-    # Placement 1 on top, then placement 2, each under its own heading.
-    y = np.concatenate([np.arange(half)[::-1] + half + 1, np.arange(half)[::-1]]).astype(float)
-    for i in range(len(reps)):
-        low = y[i] - 0.3  # the predictions just under the observation
-        ax.plot(bracket[i], [low, low], color=MUTED, lw=2.4, alpha=0.4, solid_capstyle="butt")
-        ax.errorbar(obs[i], y[i], xerr=err[i], fmt="o", ms=3.6, color=D5, elinewidth=1.0, capsize=0)
-        ax.plot(pred[i], low, marker="D", ms=3.4, mfc="white", mec=MUTED, mew=0.8, ls="none")
-    for placement, top in ((1, y[0]), (2, y[half])):
+    # Pair 1 on top, then pair 2, each under its own heading.
+    y = np.concatenate([np.arange(half)[::-1] + half + 1.4, np.arange(half)[::-1]]).astype(float)
+    for i, r in enumerate(reps):
+        low = y[i] - 0.3  # the prediction just under the observation
+        if r["rep"] == 1:
+            day = DAYS.index(r["day"]) + 1
+            bracket = sorted(frozen[(1, day)][f"X lambda frozen_f{f}"] for f in ("0.0", "1.0"))
+            ax.plot(bracket, [low, low], color=MUTED, lw=2.6, alpha=0.35, solid_capstyle="butt")
+        ax.errorbar(
+            pred[i],
+            low,
+            xerr=s_pred[i],
+            fmt="D",
+            ms=3.2,
+            mfc="white",
+            mec=MUTED,
+            mew=0.8,
+            ecolor=MUTED,
+            elinewidth=0.9,
+            capsize=0,
+        )
+        ax.errorbar(
+            obs[i], y[i], xerr=s_obs[i], fmt="o", ms=3.4, color=D5, elinewidth=1.0, capsize=0
+        )
+        agrees = abs(obs[i] - pred[i]) < 2 * s_test[i]
+        res.errorbar(
+            obs[i] - pred[i],
+            y[i] - 0.15,
+            xerr=2 * s_test[i],
+            fmt="o",
+            ms=3.4,
+            color=D5,
+            mfc="white" if agrees else D5,
+            mew=0.9,
+            elinewidth=1.0,
+            capsize=0,
+        )
+    for pair, top, note in ((1, y[0], "same patches every day"), (2, y[half], "$d=3$ patch moved")):
         ax.text(
             0.31,
-            top + 0.85,
-            f"placement {placement}",
+            top + 0.95,
+            f"pair {pair}: {note}",
             ha="left",
             va="center",
             color=INK,
@@ -170,33 +205,59 @@ def fig_lambda() -> None:
             style="italic",
         )
     ax.axvline(1.0, color=MUTED, lw=0.7, ls=(0, (3, 2)))
-    ax.text(0.985, y.max() + 0.85, r"$\Lambda=1$", ha="right", va="center", color=MUTED, fontsize=7)
-
+    ax.text(0.985, -0.45, r"$\Lambda=1$", ha="right", va="center", color=MUTED, fontsize=7)
+    res.axvline(0.0, color=MUTED, lw=0.7)
     labels = [f"day {DAYS.index(r['day']) + 1}" for r in reps]
     ax.set_yticks(list(y), labels)
     ax.tick_params(axis="y", length=0)
-    ax.set_ylim(-0.8, y.max() + 1.5)
+    ax.set_ylim(-0.8, y.max() + 1.6)
     ax.set_xlim(0.3, 1.05)
-    ax.set_xlabel(r"$\Lambda = \varepsilon_3/\varepsilon_5$, X memory")
+    ax.set_xlabel(r"$\Lambda_\mathrm{X} = \varepsilon_3/\varepsilon_5$")
+    res.set_xlim(-0.38, 0.38)
+    res.set_xticks([-0.3, 0, 0.3])
+    res.set_xlabel("observed $-$ predicted")
+    res.tick_params(axis="y", length=0)
+    label(ax, "(a)")
+    label(res, "(b)")
     handles = [
-        Line2D([], [], marker="o", ms=3.6, color=D5, ls="none", label=r"observed, $\pm1\sigma$"),
-        Line2D([], [], marker="D", ms=3.4, mfc="white", mec=MUTED, ls="none", label="predicted"),
-        Line2D([], [], color=MUTED, lw=2.4, alpha=0.4, label=r"before the job, $0 \leq f \leq 1$"),
+        Line2D([], [], marker="o", ms=3.4, color=D5, ls="none", label=r"observed, $\pm\sigma_O$"),
+        Line2D(
+            [],
+            [],
+            marker="D",
+            ms=3.2,
+            mfc="white",
+            mec=MUTED,
+            color=MUTED,
+            lw=0.9,
+            label=r"predicted, $\pm\sigma_M$",
+        ),
+        Line2D([], [], color=MUTED, lw=2.6, alpha=0.35, label=r"before the job, $0\leq f\leq 1$"),
+        Line2D(
+            [],
+            [],
+            marker="o",
+            ms=3.4,
+            color=D5,
+            mfc="white",
+            lw=1.0,
+            label=r"(b) $\pm2\sqrt{\sigma_O^2+\sigma_M^2}$; open: agrees",
+        ),
     ]
-    # Beside placement 2's points and left of the Lambda = 1 line, which the legend used to cross.
-    ax.legend(
+    fig.legend(
         handles=handles,
-        loc="lower right",
-        bbox_to_anchor=(0.92, 0.15),
+        loc="outside lower center",
+        ncol=2,
         handletextpad=0.3,
-        borderaxespad=0.0,
+        columnspacing=0.8,
+        fontsize=6.5,
     )
     fig.savefig(OUT / "lambda.pdf")
     plt.close(fig)
 
 
 def fig_pn() -> None:
-    """P(n) on each placement, X and Z memory, mean over the five days."""
+    """P(n) of each pair, X and Z memory, mean over the five days."""
     fig, axes = plt.subplots(2, 2, figsize=(PAGE, 3.4), sharex=True, sharey=True)
     n = np.array(ROUNDS)
     for col, rep in enumerate((1, 2)):
@@ -221,11 +282,13 @@ def fig_pn() -> None:
                     capsize=0,
                     label=f"$d={distance}$",
                 )
-            ax.axhline(0.5, color=GRID, lw=1.4, zorder=0)
+            # Near 1/2 a point carries little information about eps: shade P >= 0.45.
+            ax.axhspan(0.45, 0.55, color=GRID, alpha=0.55, lw=0, zorder=0)
+            ax.axhline(0.5, color=MUTED, lw=0.6, ls=(0, (3, 2)), zorder=0)
             ax.set_ylim(0, 0.55)
             ax.set_xticks(ROUNDS)
             ax.grid(axis="y", color=GRID, lw=0.4)
-            ax.set_title(f"{basis} memory, placement {rep}", loc="left", fontsize=8, color=INK)
+            ax.set_title(f"{basis} memory, pair {rep}", loc="left", fontsize=8, color=INK)
             if col == 0:
                 ax.set_ylabel(r"logical error $P_\mathrm{L}(n)$")
             if row == 1:

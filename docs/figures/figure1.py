@@ -120,6 +120,30 @@ def mark_weak_couplers(
         place(ax, text, candidates, taken, arrowprops=LEADER, **LABEL)
 
 
+def flags(layout: HeavyHexLayout) -> set[int]:
+    """The X ancillas that a bulk Z gauge borrows as flags (Z-gauge couplings to an X ancilla)."""
+    x_ancillas = set(layout.x_ancillas.values())
+    return {q for kind, a, b in layout.couplings if kind == "z" for q in (a, b) if q in x_ancillas}
+
+
+def mark_flags(ax: Axes, device: DeviceMap, layout: HeavyHexLayout, size: float) -> None:
+    """Redraw the X ancillas that also serve as flags with a dark edge, at the panel's size."""
+    xy = np.array([device.pos[q] for q in sorted(flags(layout))])
+    ax.scatter(
+        xy[:, 0], xy[:, 1], s=size, color=X_RED, edgecolor=INK, lw=1.5, marker="D", zorder=6.5
+    )
+
+
+def keep_corner_data_labels(ax: Axes, distance: int) -> None:
+    """(c) Keep the Q labels of the four corner data qubits only; the numbering runs down each
+    column (Fig. 1 caption), and 25 labels crowd the panel."""
+    corners = {1, distance, distance * (distance - 1) + 1, distance * distance}
+    for text in list(ax.texts):
+        content = text.get_text()
+        if content.startswith("$Q_{") and int(content[4:-2]) not in corners:
+            text.remove()
+
+
 def tidy_d3_labels(ax: Axes, device: DeviceMap, roles: dict) -> None:
     """(b) Make room for print-size labels: drop the X-gauge names, which the drawing already
     shows (each red diamond joins two data qubits), put the data and X-ancilla numbers under
@@ -173,7 +197,8 @@ def draw_key(fig: Figure, below: Axes) -> None:
     fig.legend(
         handles=[
             marker("o", GOLD, INK, 11, "data qubit"),
-            marker("D", X_RED, "white", 9, "X ancilla (most are also flags)"),
+            marker("D", X_RED, INK, 9, "X ancilla and flag", lw=1.5),
+            marker("D", X_RED, "white", 9, "X ancilla only"),
             marker("o", Z_BLUE, "white", 10, "Z ancilla"),
             marker("o", "white", GREY, 10, "relay", lw=1.8),
             Line2D([], [], color=X_RED, lw=2.8, label="X-gauge CX"),
@@ -255,6 +280,9 @@ def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
     draw_d3_device(ax_d3, device, d3, d3_roles)
     tidy_d3_labels(ax_d3, device, d3_roles)
     draw_d5_device(ax_d5, device, d5, d5_roles)
+    keep_corner_data_labels(ax_d5, 5)
+    for ax, layout, size in ((ax_d3, d3, 130), (ax_d5, d5, 95)):  # draw_blueprint's sizes
+        mark_flags(ax, device, layout, size)
     for text in ax_d3.texts:
         if text.get_text().isdigit():
             text.set_text(f"q{text.get_text()}")

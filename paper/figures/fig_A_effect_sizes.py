@@ -1,4 +1,4 @@
-"""Fig. A_effect_sizes: observed over predicted for each quantity, per placement and over the ten
+"""Fig. A_effect_sizes: observed over predicted for each quantity, per pair and over the ten
 repetitions (binomial fit), from docs/analysis/results/effect_sizes.json.
 
     python paper/figures/fig_A_effect_sizes.py      # writes paper/figures/A_effect_sizes.pdf
@@ -30,13 +30,14 @@ def make(results_dir: Path, out_pdf: Path) -> None:
 
     plt, Line2D = base.plt, base.Line2D
     data = json.loads((Path(results_dir) / "effect_sizes.json").read_text())["ratios"]["binomial"]
-    # Per placement: geometric mean over its five days, t (4 dof) 95% interval. All ten:
-    # random-effects mean of ln(O/M), Hartung-Knapp 95% interval. Open marks for the
-    # placements, a filled diamond for the ten; shape alone separates them in greyscale.
+    # Per pair: geometric mean over its five days, t (4 dof) 95% interval. All ten:
+    # random-effects mean of ln(O/M), Hartung-Knapp 95% interval with its variance factor
+    # floored at one. Open marks for the pairs, a filled diamond for the ten; shape alone
+    # separates them in greyscale.
     open_mark = {"mfc": "white", "mec": base.MUTED, "mew": 0.8}
     marks = (
-        ("placement 1", +0.24, {"marker": "o", "ms": 3.4, **open_mark}),
-        ("placement 2", 0.0, {"marker": "s", "ms": 3.2, **open_mark}),
+        ("pair 1", +0.24, {"marker": "o", "ms": 3.4, **open_mark}),
+        ("pair 2", 0.0, {"marker": "s", "ms": 3.2, **open_mark}),
         ("all ten", -0.24, {"marker": "D", "ms": 3.6, "mfc": base.D5, "mec": base.D5, "mew": 0.8}),
     )
     fig, ax = plt.subplots(figsize=(base.COLUMN, 2.35), layout="constrained")
@@ -47,9 +48,10 @@ def make(results_dir: Path, out_pdf: Path) -> None:
         ys.append(y)
         labels.append(label)
         for name, dy, style in marks:
-            v = data[key][name]
+            v = data[key][name.replace("pair", "placement")]  # pair i's d = 5 patch is placement i
+            ci = v["ci95_factor_at_least_1"] if name == "all ten" else v["ci95"]
             colour = base.D5 if name == "all ten" else base.MUTED
-            ax.plot(v["ci95"], [y + dy] * 2, color=colour, lw=0.9, solid_capstyle="butt")
+            ax.plot(ci, [y + dy] * 2, color=colour, lw=0.9, solid_capstyle="butt")
             ax.plot(v["ratio"], y + dy, ls="none", **style)
     for basis, top in y0.items():
         ax.text(
