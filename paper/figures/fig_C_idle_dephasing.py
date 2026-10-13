@@ -1,4 +1,4 @@
-"""App. f figure: the idle-test decay against its references, f against T2, f from memory.
+"""App. f figure: the idle-test decay against its references, and f against T2.
 
 Draws from docs/analysis/results/idle_f_t2.json (docs/analysis/idle_f_t2.py) in the style of
 make_figures.py, whose fonts and rcParams it imports. Run from the repository root:
@@ -75,13 +75,12 @@ def decay_panel(ax, q: dict, rounds: list[int], first: bool) -> None:
 
 def make(results_dir: Path, out_pdf: Path) -> None:
     data = json.loads((Path(results_dir) / "idle_f_t2.json").read_text())
-    decay, t2, memory = data["decay"], data["f_vs_t2"], data["memory"]
+    decay, t2 = data["decay"], data["f_vs_t2"]
 
-    fig = plt.figure(figsize=(PAGE, 3.9), layout="constrained")
-    grid = fig.add_gridspec(2, 6, height_ratios=[1, 1.08])
-    top = [fig.add_subplot(grid[0, 2 * k : 2 * k + 2]) for k in range(3)]
-    b = fig.add_subplot(grid[1, :4])
-    c = fig.add_subplot(grid[1, 4:])
+    fig = plt.figure(figsize=(PAGE, 2.15), layout="constrained")
+    grid = fig.add_gridspec(1, 4, width_ratios=[1, 1, 1, 1.75])
+    top = [fig.add_subplot(grid[0, k]) for k in range(3)]
+    b = fig.add_subplot(grid[0, 3])
 
     # (a) three data qubits of one job: data, the model's band from f = 0 to f = 1, the fit
     for k, (ax, q) in enumerate(zip(top, decay["qubits"])):
@@ -92,7 +91,8 @@ def make(results_dir: Path, out_pdf: Path) -> None:
             Line2D([], [], color=D5, lw=1.0, label="fit"),
             Patch(color=GRID, alpha=0.7, label=r"model, $0 \leq f \leq 1$"),
         ],
-        loc="lower right",
+        loc="lower left",
+        bbox_to_anchor=(0.0, 0.12),
         handlelength=1.4,
         handletextpad=0.4,
     )
@@ -139,36 +139,6 @@ def make(results_dir: Path, out_pdf: Path) -> None:
     )
     b.legend(loc="upper left", bbox_to_anchor=(0.0, 0.88), handletextpad=0.2)
     label(b, "(b)")
-
-    # (c) f read off the X-memory runs against the idle test's median, one point per job
-    lim = (0.5, 2.25)
-    c.plot(lim, lim, color=MUTED, lw=0.7, ls=(0, (3, 2)))
-    for j in memory["jobs"]:
-        if j["at_search_edge"]:  # the search stops at 2.0: a lower bound, no error bar
-            c.errorbar(
-                j["f_idle"], j["f_mem"], xerr=j["sigma_idle"], fmt="none", ecolor=D5, elinewidth=0.7
-            )
-            c.plot(j["f_idle"], j["f_mem"], marker="^", ms=4.2, mfc="white", mec=D5, mew=0.9)
-        else:
-            c.errorbar(
-                j["f_idle"],
-                j["f_mem"],
-                xerr=j["sigma_idle"],
-                yerr=j["sigma_mem"],
-                fmt="o",
-                ms=3.2,
-                color=D5,
-                elinewidth=0.7,
-                capsize=0,
-            )
-    c.set_xlim(*lim)
-    c.set_ylim(*lim)
-    c.set_aspect("equal")
-    c.set_xticks([0.5, 1.0, 1.5, 2.0])
-    c.set_yticks([0.5, 1.0, 1.5, 2.0])
-    c.set_xlabel(r"$f_\mathrm{idle}$ (job median)")
-    c.set_ylabel(r"$f_\mathrm{mem}$")
-    label(c, "(c)")
 
     fig.savefig(out_pdf)
     plt.close(fig)
