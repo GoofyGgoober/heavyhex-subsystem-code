@@ -257,60 +257,454 @@
    ]
   }
  },
- "weak_day1": {
-  "bars": {
-   "cz": 0.01,
-   "readout": 0.05,
-   "single_qubit": 0.005,
-   "t1_us": 50.0,
-   "t2_us": 20.0
-  },
-  "d3": {
-   "cz": {
-    "17-27": 0.025240017229099132,
-    "26-27": 0.029193789609222975
+ "weak": {
+  "2026-10-04": {
+   "weak": {
+    "placement 1 (d5)": [
+     "coupler 63-64: CZ error 6.2%",
+     "coupler 82-83: CZ error 1.3%",
+     "coupler 83-96: CZ error 1.2%",
+     "coupler 96-103: CZ error 2.3%",
+     "coupler 102-103: CZ error 3.4%",
+     "coupler 127-128: CZ error 1.7%",
+     "coupler 148-149: CZ error 4.1%",
+     "coupler 149-150: CZ error 4.3%",
+     "qubit 63: readout error 5.6%",
+     "qubit 63: T2 22 us",
+     "qubit 65: readout error 7.3%",
+     "qubit 66: T2 17 us",
+     "qubit 70: T2 25 us",
+     "qubit 76: T1 41 us",
+     "qubit 81: T2 22 us",
+     "qubit 83: readout error 13.6%",
+     "qubit 91: T2 22 us",
+     "qubit 98: T2 24 us",
+     "qubit 102: readout error 9.7%",
+     "qubit 107: T2 25 us",
+     "qubit 126: readout error 6.5%",
+     "qubit 131: readout error 7.8%",
+     "qubit 146: T2 28 us",
+     "qubit 149: T1 47 us",
+     "qubit 149: T2 5 us",
+     "qubit 150: T2 6 us"
+    ],
+    "pair 1 d3": [
+     "coupler 17-27: CZ error 2.5%",
+     "coupler 26-27: CZ error 2.9%",
+     "qubit 41: readout error 6.6%",
+     "qubit 43: readout error 8.4%",
+     "qubit 46: T2 16 us"
+    ],
+    "placement 2 (d5)": [
+     "coupler 48-49: CZ error 1.9%",
+     "coupler 49-50: CZ error 1.6%",
+     "coupler 63-64: CZ error 6.2%",
+     "coupler 82-83: CZ error 1.3%",
+     "coupler 83-96: CZ error 1.2%",
+     "coupler 96-103: CZ error 2.3%",
+     "coupler 102-103: CZ error 3.4%",
+     "coupler 127-128: CZ error 1.7%",
+     "qubit 43: readout error 8.4%",
+     "qubit 46: T2 16 us",
+     "qubit 49: T2 26 us",
+     "qubit 51: T1 50 us",
+     "qubit 63: readout error 5.6%",
+     "qubit 63: T2 22 us",
+     "qubit 65: readout error 7.3%",
+     "qubit 66: T2 17 us",
+     "qubit 70: T2 25 us",
+     "qubit 76: T1 41 us",
+     "qubit 81: T2 22 us",
+     "qubit 83: readout error 13.6%",
+     "qubit 91: T2 22 us",
+     "qubit 98: T2 24 us",
+     "qubit 102: readout error 9.7%",
+     "qubit 107: T2 25 us",
+     "qubit 126: readout error 6.5%"
+    ],
+    "pair 2 d3": [
+     "coupler 127-128: CZ error 1.7%",
+     "qubit 107: T2 25 us",
+     "qubit 126: readout error 6.5%",
+     "qubit 146: T2 28 us"
+    ]
    },
-   "readout": {
-    "41": 0.0662841796875,
-    "43": 0.083740234375
-   },
-   "single_qubit": {},
-   "t1_us": {},
-   "t2_us": {
-    "46": 15.69878923724274
+   "recurring": {
+    "cz": {
+     "63-64": 0.06249178931565719,
+     "102-103": 0.03374639963589143,
+     "148-149": 0.04124686904197536,
+     "149-150": 0.04342010362166218
+    },
+    "readout": {
+     "83": 0.1361083984375,
+     "102": 0.0968017578125
+    },
+    "t2_us": {
+     "149": 5.127379141149847,
+     "150": 5.737707857202
+    }
    }
   },
-  "d5": {
-   "cz": {
-    "102-103": 0.03374639963589143,
-    "127-128": 0.01656598782009991,
-    "148-149": 0.04124686904197536,
-    "149-150": 0.04342010362166218,
-    "63-64": 0.06249178931565719,
-    "82-83": 0.012956909266868627,
-    "83-96": 0.012168919323446381,
-    "96-103": 0.02300458550944312
+  "2026-10-05": {
+   "weak": {
+    "placement 1 (d5)": [
+     "coupler 63-64: CZ error 4.8%",
+     "coupler 96-103: CZ error 2.6%",
+     "coupler 102-103: CZ error 5.1%",
+     "coupler 148-149: CZ error 1.3%",
+     "coupler 149-150: CZ error 1.1%",
+     "qubit 65: readout error 5.0%",
+     "qubit 66: T2 19 us",
+     "qubit 81: T2 20 us",
+     "qubit 83: readout error 11.3%",
+     "qubit 90: readout error 8.3%",
+     "qubit 90: T2 24 us",
+     "qubit 91: T2 25 us",
+     "qubit 98: T2 24 us",
+     "qubit 102: readout error 9.0%",
+     "qubit 103: T1 47 us",
+     "qubit 107: T2 28 us",
+     "qubit 126: readout error 5.4%",
+     "qubit 131: readout error 8.1%",
+     "qubit 149: T2 5 us",
+     "qubit 150: T2 6 us"
+    ],
+    "pair 1 d3": [
+     "coupler 17-27: CZ error 3.0%",
+     "coupler 26-27: CZ error 3.4%",
+     "qubit 5: readout error 7.2%",
+     "qubit 16: T2 6 us",
+     "qubit 25: readout error 5.8%",
+     "qubit 41: readout error 5.6%",
+     "qubit 43: readout error 6.8%",
+     "qubit 46: T2 14 us"
+    ],
+    "placement 2 (d5)": [
+     "coupler 49-50: CZ error 1.6%",
+     "coupler 57-67: CZ error 1.1%",
+     "coupler 63-64: CZ error 4.8%",
+     "coupler 96-103: CZ error 2.6%",
+     "coupler 102-103: CZ error 5.1%",
+     "qubit 43: readout error 6.8%",
+     "qubit 46: T2 14 us",
+     "qubit 49: T2 28 us",
+     "qubit 51: T1 37 us",
+     "qubit 65: readout error 5.0%",
+     "qubit 66: T2 19 us",
+     "qubit 81: T2 20 us",
+     "qubit 83: readout error 11.3%",
+     "qubit 90: readout error 8.3%",
+     "qubit 90: T2 24 us",
+     "qubit 91: T2 25 us",
+     "qubit 98: T2 24 us",
+     "qubit 102: readout error 9.0%",
+     "qubit 103: T1 47 us",
+     "qubit 107: T2 28 us",
+     "qubit 126: readout error 5.4%"
+    ],
+    "pair 2 d3": [
+     "qubit 107: T2 28 us",
+     "qubit 126: readout error 5.4%"
+    ]
    },
-   "readout": {
-    "63": 0.0562744140625,
-    "65": 0.0733642578125,
-    "83": 0.1361083984375,
-    "102": 0.0968017578125,
-    "126": 0.0654296875,
-    "131": 0.0780029296875
-   },
-   "single_qubit": {
-    "149": 0.017060418805944156
-   },
-   "t1_us": {
-    "76": 41.36837702970784,
-    "149": 47.42665716232666
-   },
-   "t2_us": {
-    "66": 16.77947464736043,
-    "149": 5.127379141149847,
-    "150": 5.737707857202
+   "recurring": {
+    "cz": {
+     "63-64": 0.04768401927268687,
+     "102-103": 0.050655166460808004,
+     "148-149": 0.013207830944617471,
+     "149-150": 0.010556176649368976
+    },
+    "readout": {
+     "83": 0.11279296875,
+     "102": 0.0899658203125
+    },
+    "t2_us": {
+     "149": 5.127379141149847,
+     "150": 5.665960783367403
+    }
    }
+  },
+  "2026-10-06": {
+   "weak": {
+    "placement 1 (d5)": [
+     "coupler 63-64: CZ error 6.0%",
+     "coupler 102-103: CZ error 5.1%",
+     "coupler 148-149: CZ error 1.3%",
+     "coupler 149-150: CZ error 1.1%",
+     "qubit 65: readout error 5.8%",
+     "qubit 66: T2 19 us",
+     "qubit 67: T2 16 us",
+     "qubit 81: T2 24 us",
+     "qubit 83: readout error 12.2%",
+     "qubit 87: readout error 7.8%",
+     "qubit 91: T2 27 us",
+     "qubit 98: T2 23 us",
+     "qubit 102: readout error 8.4%",
+     "qubit 107: T2 24 us",
+     "qubit 108: T2 26 us",
+     "qubit 109: readout error 5.3%",
+     "qubit 126: readout error 5.9%",
+     "qubit 128: T1 43 us",
+     "qubit 131: readout error 6.3%",
+     "qubit 146: T2 15 us",
+     "qubit 149: T2 5 us",
+     "qubit 150: T2 5 us"
+    ],
+    "pair 1 d3": [
+     "coupler 17-27: CZ error 2.5%",
+     "coupler 26-27: CZ error 3.1%",
+     "qubit 41: readout error 6.5%",
+     "qubit 41: T1 50 us",
+     "qubit 43: readout error 7.8%",
+     "qubit 46: T2 16 us"
+    ],
+    "placement 2 (d5)": [
+     "coupler 63-64: CZ error 6.0%",
+     "coupler 102-103: CZ error 5.1%",
+     "qubit 43: readout error 7.8%",
+     "qubit 46: T2 16 us",
+     "qubit 49: T2 28 us",
+     "qubit 51: readout error 12.2%",
+     "qubit 65: readout error 5.8%",
+     "qubit 66: T2 19 us",
+     "qubit 67: T2 16 us",
+     "qubit 81: T2 24 us",
+     "qubit 83: readout error 12.2%",
+     "qubit 87: readout error 7.8%",
+     "qubit 91: T2 27 us",
+     "qubit 98: T2 23 us",
+     "qubit 102: readout error 8.4%",
+     "qubit 107: T2 24 us",
+     "qubit 108: T2 26 us",
+     "qubit 109: readout error 5.3%",
+     "qubit 126: readout error 5.9%",
+     "qubit 128: T1 43 us"
+    ],
+    "pair 2 d3": [
+     "coupler 102-103: CZ error 5.1%",
+     "qubit 102: readout error 8.4%",
+     "qubit 126: readout error 5.9%",
+     "qubit 146: T2 15 us"
+    ]
+   },
+   "recurring": {
+    "cz": {
+     "63-64": 0.059824663294190256,
+     "102-103": 0.050655166460808004,
+     "148-149": 0.013207830944617471,
+     "149-150": 0.010556176649368976
+    },
+    "readout": {
+     "83": 0.1219482421875,
+     "102": 0.0836181640625
+    },
+    "t2_us": {
+     "149": 4.858153473371667,
+     "150": 5.089730301905566
+    }
+   }
+  },
+  "2026-10-07": {
+   "weak": {
+    "placement 1 (d5)": [
+     "coupler 63-64: CZ error 7.0%",
+     "coupler 102-103: CZ error 6.0%",
+     "coupler 148-149: CZ error 1.3%",
+     "qubit 63: T2 25 us",
+     "qubit 65: readout error 7.6%",
+     "qubit 66: T2 19 us",
+     "qubit 67: readout error 5.3%",
+     "qubit 81: T2 24 us",
+     "qubit 83: readout error 12.5%",
+     "qubit 91: T2 24 us",
+     "qubit 98: T2 21 us",
+     "qubit 101: readout error 5.1%",
+     "qubit 102: readout error 11.3%",
+     "qubit 107: T2 29 us",
+     "qubit 125: T1 50 us",
+     "qubit 126: readout error 6.3%",
+     "qubit 131: readout error 7.2%",
+     "qubit 148: T2 28 us",
+     "qubit 149: T2 5 us",
+     "qubit 150: T2 5 us"
+    ],
+    "pair 1 d3": [
+     "coupler 5-6: CZ error 1.7%",
+     "coupler 17-27: CZ error 2.7%",
+     "coupler 26-27: CZ error 3.1%",
+     "qubit 7: T2 29 us",
+     "qubit 41: readout error 7.1%",
+     "qubit 43: readout error 7.1%",
+     "qubit 46: T2 15 us"
+    ],
+    "placement 2 (d5)": [
+     "coupler 48-49: CZ error 1.4%",
+     "coupler 57-67: CZ error 1.4%",
+     "coupler 63-64: CZ error 7.0%",
+     "coupler 102-103: CZ error 6.0%",
+     "qubit 43: readout error 7.1%",
+     "qubit 46: T2 15 us",
+     "qubit 51: readout error 48.6%",
+     "qubit 51: T1 49 us",
+     "qubit 63: T2 25 us",
+     "qubit 65: readout error 7.6%",
+     "qubit 66: T2 19 us",
+     "qubit 67: readout error 5.3%",
+     "qubit 81: T2 24 us",
+     "qubit 83: readout error 12.5%",
+     "qubit 91: T2 24 us",
+     "qubit 98: T2 21 us",
+     "qubit 101: readout error 5.1%",
+     "qubit 102: readout error 11.3%",
+     "qubit 107: T2 29 us",
+     "qubit 125: T1 50 us",
+     "qubit 126: readout error 6.3%"
+    ],
+    "pair 2 d3": [
+     "qubit 107: T2 29 us",
+     "qubit 125: T1 50 us",
+     "qubit 126: readout error 6.3%",
+     "qubit 148: T2 28 us"
+    ]
+   },
+   "recurring": {
+    "cz": {
+     "63-64": 0.06951941845572024,
+     "102-103": 0.0600900801679122,
+     "148-149": 0.013207830944617471,
+     "149-150": 0.00872770035281964
+    },
+    "readout": {
+     "83": 0.124755859375,
+     "102": 0.11328125
+    },
+    "t2_us": {
+     "149": 4.565041745264472,
+     "150": 5.325696576052159
+    }
+   }
+  },
+  "2026-10-08": {
+   "weak": {
+    "placement 1 (d5)": [
+     "coupler 63-64: CZ error 5.9%",
+     "coupler 102-103: CZ error 6.0%",
+     "coupler 148-149: CZ error 2.9%",
+     "qubit 63: readout error 8.5%",
+     "qubit 63: T2 22 us",
+     "qubit 65: readout error 5.7%",
+     "qubit 66: T2 19 us",
+     "qubit 81: T2 23 us",
+     "qubit 83: readout error 12.7%",
+     "qubit 90: readout error 14.4%",
+     "qubit 91: T2 28 us",
+     "qubit 98: T2 25 us",
+     "qubit 102: readout error 11.0%",
+     "qubit 102: T1 39 us",
+     "qubit 107: T2 29 us",
+     "qubit 126: readout error 5.4%",
+     "qubit 131: readout error 9.5%",
+     "qubit 149: T2 5 us",
+     "qubit 150: T2 6 us"
+    ],
+    "pair 1 d3": [
+     "coupler 17-27: CZ error 2.5%",
+     "coupler 26-27: CZ error 2.6%",
+     "qubit 25: T1 48 us",
+     "qubit 41: readout error 5.7%",
+     "qubit 43: readout error 8.0%",
+     "qubit 46: T2 15 us"
+    ],
+    "placement 2 (d5)": [
+     "coupler 47-57: CZ error 1.6%",
+     "coupler 57-67: CZ error 4.2%",
+     "coupler 63-64: CZ error 5.9%",
+     "coupler 102-103: CZ error 6.0%",
+     "qubit 43: readout error 8.0%",
+     "qubit 46: T2 15 us",
+     "qubit 49: T2 29 us",
+     "qubit 51: T1 49 us",
+     "qubit 63: readout error 8.5%",
+     "qubit 63: T2 22 us",
+     "qubit 65: readout error 5.7%",
+     "qubit 66: T2 19 us",
+     "qubit 81: T2 23 us",
+     "qubit 83: readout error 12.7%",
+     "qubit 90: readout error 14.4%",
+     "qubit 91: T2 28 us",
+     "qubit 98: T2 25 us",
+     "qubit 102: readout error 11.0%",
+     "qubit 102: T1 39 us",
+     "qubit 107: T2 29 us",
+     "qubit 126: readout error 5.4%"
+    ],
+    "pair 2 d3": [
+     "qubit 90: readout error 14.4%",
+     "qubit 91: T2 28 us",
+     "qubit 98: T2 25 us",
+     "qubit 107: T2 29 us",
+     "qubit 126: readout error 5.4%"
+    ]
+   },
+   "recurring": {
+    "cz": {
+     "63-64": 0.059158554603014446,
+     "102-103": 0.0600900801679122,
+     "148-149": 0.02861883727515807,
+     "149-150": 0.00872770035281964
+    },
+    "readout": {
+     "83": 0.1273193359375,
+     "102": 0.10986328125
+    },
+    "t2_us": {
+     "149": 4.565041745264472,
+     "150": 5.899937954056462
+    }
+   }
+  }
+ },
+ "pair2_d3": {
+  "2026-10-04": {
+   "inside placement 1": true,
+   "shared with placement 2": 15,
+   "qubits": 23,
+   "same qubits as day 1": true,
+   "placements 1 and 2 share": 51,
+   "pair 1 d3 shared with placement 1": 0
+  },
+  "2026-10-05": {
+   "inside placement 1": true,
+   "shared with placement 2": 15,
+   "qubits": 23,
+   "same qubits as day 1": true,
+   "placements 1 and 2 share": 51,
+   "pair 1 d3 shared with placement 1": 0
+  },
+  "2026-10-06": {
+   "inside placement 1": true,
+   "shared with placement 2": 15,
+   "qubits": 23,
+   "same qubits as day 1": false,
+   "placements 1 and 2 share": 51,
+   "pair 1 d3 shared with placement 1": 0
+  },
+  "2026-10-07": {
+   "inside placement 1": true,
+   "shared with placement 2": 15,
+   "qubits": 23,
+   "same qubits as day 1": true,
+   "placements 1 and 2 share": 51,
+   "pair 1 d3 shared with placement 1": 0
+  },
+  "2026-10-08": {
+   "inside placement 1": true,
+   "shared with placement 2": 23,
+   "qubits": 23,
+   "same qubits as day 1": false,
+   "placements 1 and 2 share": 51,
+   "pair 1 d3 shared with placement 1": 0
   }
  },
  "round_us": {

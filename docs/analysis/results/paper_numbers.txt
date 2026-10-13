@@ -36,6 +36,11 @@
    excluded 11 -> 12 of 340; sigma_f new/old median 1.029; IQR 0.46-1.53
    largest job change ibm_fez-2026-10-07-r1: median f 1.011 -> 1.143; verdict changes {'pooled_verdict_changed': False, 'any_per_rep_Lambda_verdict_changed': False, 'any_model_agreement_decision_changed': False, 'median_f_reps_agreeing_changed': False, 'per_qubit_f_reps_agreeing_changed': True}
    per-qubit f (side prediction): chi2 X lambda 37.2, X eps3 39.6, X eps5 50.5; predicted Lambda_X placement 1 0.642->0.799, placement 2 0.448->0.477
+   f models (f_models.py): pair 1 - pair 2 predicted Lambda_X against observed 0.182 +- 0.033: stored median 0.195 (z -0.4), stored per_qubit 0.323 (z -4.2), median 0.187 (z -0.2), per_qubit 0.323 (z -4.2), q150 0.202 (z -0.6), shrunk 0.306 (z -3.7), shrunk_scaled 0.293 (z -3.3)
+   pair 1 predicted eps5 / Lambda_X (mean): stored median 16.10% / 0.642, stored per_qubit 14.03% / 0.799, median 16.11% / 0.636, per_qubit 14.03% / 0.799, q150 15.73% / 0.651, shrunk 14.03% / 0.781, shrunk_scaled 14.04% / 0.765; q150 alone gives 0.09 of the per-qubit Lambda_X shift
+   q150 Z-or-Y per round, median f -> own f, days 1-5: 37.3->3.9%, 32.4->10.9%, 39.3->4.3%, 37.9->35.4%, 35.8->13.3%
+   sigma_f prespecified (ddof 0) 0.145-0.383, ddof 1 0.147-0.407; noise only (SD of bootstrap medians, ddof 1) 0.054-0.136
+   dM/df at f = 1.52 (eps3): line 0.0390, secant 0.0303 +- 0.0013 (line/secant 1.29), parabola 0.0273 +- 0.0018 (line/parabola 1.43); X eps3 chi2 line/secant/parabola prespecified 52.1/52.3/52.4 | idle_noise_only 137.5/137.9/138.0
 10. Heating (exploratory; fractional change start->end of a job)
    detection events DL -0.21% [-0.57, +0.15]; rise excluded above (DL/HKSJ/t) 0.15%/0.21%/0.36%
    step q51 at shot 371 in 68/68 pieces
@@ -67,7 +72,8 @@
    d5 stricter bars passing (day 1): {'usable_all': 2, 'stricter (usable distance-5 placements passing)': {'CZ error < 5%': 0, 'readout error < 10%': 0, 'T2 > 10 us': 1, 'all three': 0}}
    q51 readout by day 3.4%, 4.8%, 12.2%, 48.6%, 3.2%; readout gap P(0|1)-P(1|0) median 0.85 points
    SX pair noise / CZ noise by day 0.275, 0.276, 0.267, 0.269, 0.257; snapshot in force / previous, minutes old at the first job 88.2/152.1, 22.9/75.2, 23.2/107.5, 22.5/86.3, 21.3/57.1; equal to previous (T1, T2, CZ, readout) 156of156/155of155/176of176/156of156, 156of156/155of155/176of176/156of156, 156of156/155of155/176of176/156of156, 156of156/155of155/176of176/1of156, 156of156/155of155/176of176/1of156
-   placement 1, day 1: CZ max 63-64 6.2%; readout max q83 13.6%; T2 below 10 us q149 5.1 us, q150 5.7 us; single-qubit error above 0.5% q149 1.71%; round 7.896-7.956 us
+   weak parts by day (placement.weak), placement 1 / placement 2: 26/25, 20/21, 22/20, 20/21, 19/21; placement 1 every day: CZ 63-64 4.8-7.0%, 102-103 3.4-6.0%; readout q83 11.3-13.6%, q102 8.4-11.3%; T2 q149 4.6-5.1 us, q150 5.1-5.9 us; round 7.896-7.956 us
+   pair 2's d3 patch by day: inside placement 1 True, True, True, True, True; shares with placement 2 15/23, 15/23, 15/23, 15/23, 23/23; day 1's qubits True, True, False, True, False
    Fig. timing (day 1, pair 1, d3): round 7.896 us, readout and reset 6.688 us (85%); path reset 1.684 gates 0.280 readout 1.660 reset 1.684 gates 0.928 readout 1.660; zero-duration resets 4.528 us; data idle (any, decoupled) 93.6-96.8%, 86.8-94.1%; flags in readout or reset 84.7%
 17. Diagnostics after the first review
    detection-event fraction device/model, median (share above 1): all 1.20 (76%), X weight 4 1.15 (78%), X weight 2 0.98 (47%), Z 1.19 (99%), flag 1.55 (82%), relay 1.16 (66%)
@@ -174,3 +180,39 @@
      day 4 pair 2: +0.44 [+0.77] +1.43 [+2.21] +0.62 [+1.18] | +2.78 +12.09 +1.46; Lambda_X + 1.645 sigma 0.562
      day 5 pair 1: +0.79 [+0.79] +3.15 [+4.06] +1.61 [+1.86] | +1.60 +15.16 +7.18; Lambda_X + 1.645 sigma 0.757
      day 5 pair 2: +1.08 [+1.71] +3.01 [+5.06] +1.60 [+2.25] | +3.86 +7.59 +5.60; Lambda_X + 1.645 sigma 0.582
+22. Error budget (error_budget.py; binomial; % of the model's eps, mean over the ten pair-days: alone / drop when off / Shapley share)
+   X d3, model 9.4%: cz 13/27/22; sq 5/12/10; readout 1/20/12; t1 10/28/22; dephasing 21/43/35; idle Shapley 56; measure off 9, reset off 8
+   X d5, model 17.8%: cz 8/35/25; sq 1/11/7; readout 1/27/17; t1 3/26/17; dephasing 12/48/34; idle Shapley 51; measure off 13, reset off 13
+   Z d3, model 7.8%: cz 13/33/25; sq 2/13/8; readout 1/21/13; t1 35/68/53; dephasing 0/-0/0; idle Shapley 53; measure off 6, reset off 15
+   Z d5, model 16.6%: cz 12/39/30; sq 1/12/9; readout 1/23/16; t1 23/61/46; dephasing 0/-0/-0; idle Shapley 46; measure off 7, reset off 16
+   X placement 1: Lambda 0.633; with one channel off cz 0.719, sq 0.630, readout 0.682, t1 0.671, dephasing 0.673; x0.573 idles: Lambda 0.655, eps3 x0.71, eps5 x0.69, x0.405 idles: Lambda 0.666, eps3 x0.60, eps5 x0.57
+   X placement 2: Lambda 0.437; with one channel off cz 0.492, sq 0.437, readout 0.494, t1 0.388, dephasing 0.490; x0.573 idles: Lambda 0.426, eps3 x0.69, eps5 x0.71, x0.405 idles: Lambda 0.420, eps3 x0.56, eps5 x0.59
+   Z placement 1: Lambda 0.428; with one channel off cz 0.461, sq 0.426, readout 0.473, t1 0.314, dephasing 0.426; x0.573 idles: Lambda 0.392, eps3 x0.68, eps5 x0.75, x0.405 idles: Lambda 0.369, eps3 x0.56, eps5 x0.64
+   Z placement 2: Lambda 0.508; with one channel off cz 0.567, sq 0.502, readout 0.482, t1 0.463, dephasing 0.511; x0.573 idles: Lambda 0.493, eps3 x0.72, eps5 x0.74, x0.405 idles: Lambda 0.472, eps3 x0.60, eps5 x0.64
+   one channel times k for the device's eps, X (every channel 1.20): cz 1.93 (1.81-2.06), sq 3.27 (3.03-3.53), readout 2.46 (2.27-2.66), t1 1.95 (1.84-2.06), dephasing 1.60 (1.52-1.69)
+   one channel times k for the device's eps, Z (every channel 1.75): cz 4.16 (3.95-4.38, beyond 8 on 1/20), sq beyond 8 on 16/20, readout beyond 8 on 16/20, t1 2.44 (2.34-2.55), dephasing beyond 8 on 20/20
+   one channel times k for the device's bulk detection rate, X d3 (every channel 1.12): cz 1.84, sq 3.02, readout 1.39, t1 1.88, dephasing 1.32 (cz: 1 beyond) (sq: 1 beyond) (t1: 1 beyond)
+   one channel times k for the device's bulk detection rate, X d5 (every channel 1.20): cz 2.07, sq 4.08, readout 1.64, t1 2.43, dephasing 1.58
+   one channel times k for the device's bulk detection rate, Z d3 (every channel 1.76): cz 3.52, sq 7.24, readout 3.47, t1 3.04, dephasing beyond 8 (cz: 1 beyond) (sq: 3 beyond)
+   one channel times k for the device's bulk detection rate, Z d5 (every channel 1.95): cz 4.57, sq beyond 8, readout 4.93, t1 4.11, dephasing beyond 8
+   not simulated: the X ancillas are also the Z4 gauges' flags, so measuring X and Z gauges at once needs a new gadget design. The shortened idles shorten the waits only.
+23. The statistics with the binomial fit first (stat_checks.py)
+   pair 1, observed (predicted) binomial / log-linear: eps3 12.9 (10.2) / 12.7 (10.2); eps5 19.3 (16.1) / 18.5 (16.1); lambda 0.667 (0.642) / 0.686 (0.642); the binomial fit removes 43% of the log-linear Lambda_X gap
+   pair 2, observed (predicted) binomial / log-linear: eps3 11.2 (8.6) / 11.1 (8.6); eps5 22.8 (19.2) / 22.0 (19.2); lambda 0.490 (0.448) / 0.506 (0.448); the binomial fit removes 27% of the log-linear Lambda_X gap
+   binomial X tests (prespecified sigma_f): X lambda 24.6 (p 0.0062), X eps3 56.6 (p 1.6e-08), X eps5 32.6 (p 0.00032)
+   size of 'any chi2 > 18.31': independent 0.143, z_Lambda = (z3 - z5)/sqrt 2 0.121, own correlations 0.125; familywise-5% bound 21.36 (Bonferroni 21.71), passed by X lambda, X eps3; Holm p X lambda 0.011, X eps3 3.3e-07, X eps5 0.031
+   fit-window systematic on Lambda_X, device without / with rounds 3-8: pair 1 +-0.026 / +-0.086; pair 2 +-0.032 / +-0.063
+   Lambda_X O/M (binomial, floored interval): all ten 1.06 (0.92-1.22); without day 2 of pair 1 1.11 (1.01-1.22); without days 1 and 2 of pair 1 1.07 (0.97-1.19); day 2 lowered: q4 q5 q24 q25 at their medians 1.08 (0.99-1.18); day 2 lowered: the distance-3 patch at its medians 1.10 (1.01-1.19); t test on z without day 2 of pair 1: p 0.026
+   Lambda_X O/M (wls, floored interval): all ten 1.09 (0.95-1.26); without day 2 of pair 1 1.16 (1.05-1.27); without days 1 and 2 of pair 1 1.11 (0.99-1.23); day 2 lowered: q4 q5 q24 q25 at their medians 1.12 (1.02-1.22); day 2 lowered: the distance-3 patch at its medians 1.14 (1.05-1.24); t test on z without day 2 of pair 1: p 0.008
+   pair 1, Lambda_X = c M (binomial): all days c 0.981, chi2 21.1; without day 2 c 1.103, chi2 4.6 (p 0.21), at c = 1 8.9 (p 0.064), c = 1 against c p 0.037
+   pair 1, Lambda_X = c M (wls): all days c 1.013, chi2 21.1; without day 2 c 1.149, chi2 4.2 (p 0.24), at c = 1 12.0 (p 0.018), c = 1 against c p 0.005
+   detector bar sqrt(2 ln N) 3.44-3.81, expected largest 2.95-3.34, 95th percentile 3.64-3.97; share beyond: sqrt(2 ln N) 43-65%, the expected largest 46-68%, the 95th percentile 42-63%
+   f read off the memory runs agrees with the idle test: from eps in 10/15, from the detection rates in 13/15
+24. The errors of IBM's inputs in sigma_M (input_noise.py)
+   sum of elasticities 1.32 against error_scale 1.37 (median |diff| 0.10); inputs' sd of ln: readout shot noise median 12%, readout an hour apart 29% (robust 20%), day to day readout 23%, t1 23%, t2 20%, cz 13%, sx 18%
+   shot, wls, sigma_f prespecified: X lambda chi2 25.0 -> 24.8 / 24.8 (p 0.0057), sigma_in/M 0.4-1.1%; X eps3 chi2 52.1 -> 51.9 / 51.9 (p 1.2e-07), sigma_in/M 0.3-1.2%; X eps5 chi2 19.8 -> 19.8 / 19.7 (p 0.032), sigma_in/M 0.4-0.5%
+   shot, binomial, sigma_f prespecified: X lambda chi2 24.6 -> 24.4 / 24.4 (p 0.0066), sigma_in/M 0.4-1.1%; X eps3 chi2 56.6 -> 56.4 / 56.4 (p 1.7e-08), sigma_in/M 0.3-1.2%; X eps5 chi2 32.6 -> 32.6 / 32.5 (p 0.00033), sigma_in/M 0.4-0.5%
+   hour, wls, sigma_f prespecified: X lambda chi2 25.0 -> 21.5 / 21.5 (p 0.018), sigma_in/M 1.9-4.0%; X eps3 chi2 52.1 -> 49.8 / 49.8 (p 3e-07), sigma_in/M 0.8-3.4%; X eps5 chi2 19.8 -> 19.2 / 18.8 (p 0.042), sigma_in/M 1.9-2.1%
+   hour, binomial, sigma_f prespecified: X lambda chi2 24.6 -> 20.3 / 20.3 (p 0.026), sigma_in/M 1.9-4.0%; X eps3 chi2 56.6 -> 54.1 / 54.1 (p 4.7e-08), sigma_in/M 0.8-3.4%; X eps5 chi2 32.6 -> 31.7 / 31.0 (p 0.00058), sigma_in/M 1.9-2.1%
+   days, wls, sigma_f prespecified: X lambda chi2 25.0 -> 17.2 / 17.2 (p 0.071), sigma_in/M 5.3-7.9%; X eps3 chi2 52.1 -> 43.6 / 43.6 (p 3.9e-06), sigma_in/M 5.1-7.8%; X eps5 chi2 19.8 -> 18.2 / 17.3 (p 0.069), sigma_in/M 3.5-3.8%
+   days, binomial, sigma_f prespecified: X lambda chi2 24.6 -> 15.8 / 15.7 (p 0.11), sigma_in/M 5.3-7.9%; X eps3 chi2 56.6 -> 47.3 / 47.3 (p 8.3e-07), sigma_in/M 5.1-7.8%; X eps5 chi2 32.6 -> 29.8 / 28.2 (p 0.0017), sigma_in/M 3.5-3.8%

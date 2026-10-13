@@ -13,12 +13,13 @@ allowed-confusables = ["σ"]
 [lint.isort]
 # Sibling modules of the docs scripts, imported from their own folder.
 known-local-folder = [
-  "common", "costreak", "detectors", "draw_blueprint", "effect_sizes", "exact_sim",
+  "common", "costreak", "detectors", "draw_blueprint", "effect_sizes", "error_scale", "exact_sim",
   "fig_A_effect_sizes", "fig_B_detector_diagnostics", "fig_C_idle_dephasing", "fig_D_flag_records",
   "fig_timing",
   "fits", "fitting", "frame_sim", "hmm", "hmm_bootstrap", "hmm_causes", "idle_f", "leakage",
   "leakage_fit", "leakage_frame_rerun", "leakage_grid", "make_figures", "matching", "perqubit_f",
-  "placements", "properties", "refiring", "refit", "tableau_ref",
+  "placements", "prespecified_tests", "properties", "refiring", "refit", "sensitivity",
+  "tableau_ref",
 ]
 
 [lint.per-file-ignores]
