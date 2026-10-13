@@ -22,15 +22,15 @@ from matplotlib.lines import Line2D
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from make_figures import COLUMN, D3, D5, DIAG, GRID, INK, MUTED, OUT, PAGE, label
 
-# Detector classes, each its own colour and marker (categorical slots 1-4 in order); the device
-# is the markers, the model the line of the same colour.
-AQUA, YELLOW = "#1baf7a", "#eda100"
+# Detector classes, each its own colour and marker; the device is the markers, the model the line
+# of the same colour.
+AQUA, PURPLE = "#1baf7a", "#8b5fbf"
 STYLE = {
     "X weight 4": (D5, "o", "weight-4 X (a, b), weight-2$d$ Z (c, d) stabilizers"),
     "Z": (D5, "o", None),
     "X weight 2": (D3, "s", "weight-2 X stabilizers"),
     "flag": (AQUA, "^", "flags"),
-    "relay": (YELLOW, "D", "relays"),
+    "relay": (PURPLE, "D", "relays"),
 }
 CLASSES = {"X": ("X weight 4", "X weight 2"), "Z": ("Z", "flag", "relay")}
 
