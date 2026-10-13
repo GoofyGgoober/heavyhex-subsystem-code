@@ -503,6 +503,7 @@ def placements_and_inputs() -> dict:
         "weak_parts_pair_1_day_1": pc["weak_day1"],
         "round_us": pc["round_us"],
         "single_qubit_error_median_by_day": cal["single_qubit"],
+        "calibration_age_by_day": cal["age"],
         "readout_gap_P01_minus_P10_flags_relays": cal["readout_gap"],
         "t1_of_the_flag_and_relay_qubits": cal["t1_flags_relays"],
         "drift_rehearsal_largest_change_se (comment above DRIFT_BAR, src/heavyhex/experiment/run.py)": (
@@ -600,6 +601,50 @@ def diagnostics() -> dict:
             "streak_covariance": flags["costreak"],
         },
         "hmm_x_memory": hmm_x,
+    }
+
+
+def scale_and_f() -> dict:
+    """One factor on every error, the dephasing floor, the model at the weighted-mean f and the
+    resolution of the readout inputs (after the third review)."""
+    es = take("error_scale.json")
+    fw = take("f_weighted_mean.json")
+
+    def no_reps(blk: dict) -> dict:
+        return {
+            q: {k: v for k, v in x.items() if k != "per_repetition"} if isinstance(x, dict) else x
+            for q, x in blk.items()
+        }
+
+    return {
+        "error_scale": {
+            "what": es["what"],
+            "k1_against_stored_prediction": es["k1_against_stored_prediction"],
+            "eps": {
+                fit: {b: {d: no_reps(x) for d, x in blk.items()} for b, blk in by_b.items()}
+                for fit, by_b in es["eps"].items()
+            },
+            "detection_rate": {
+                b: {
+                    d: {k: v for k, v in x.items() if k != "per_repetition"} for d, x in blk.items()
+                }
+                for b, blk in es["detection_rate"].items()
+            },
+            "lambda_at_joint_k": es["lambda_at_joint_k"],
+        },
+        "dephasing_floor": take("dephasing_floor.json"),
+        "f_weighted_mean": {
+            "f_by_job": fw["f_by_job"],
+            **{
+                fit: {
+                    "O_over_M": {v: no_reps(blk) for v, blk in fw[fit]["O_over_M"].items()},
+                    **{k: v for k, v in fw[fit].items() if k != "O_over_M"},
+                }
+                for fit in FITS
+            },
+            "f_from_detection_rates_above_idle": fw["f_from_detection_rates_above_idle"],
+        },
+        "input_resolution": take("input_resolution.json"),
     }
 
 
@@ -913,6 +958,27 @@ def digest(res: dict) -> str:
         + ", ".join(f"{100 * v['reported_readout_error']:.1f}%" for v in pi["relay_q51"].values())
         + f"; readout gap P(0|1)-P(1|0) median {100 * pi['readout_gap_P01_minus_P10_flags_relays']['median']:.2f} points"
     )
+    sq, ages = pi["single_qubit_error_median_by_day"], pi["calibration_age_by_day"]
+    L.append(
+        "   SX pair noise / CZ noise by day "
+        + ", ".join(f"{v['sx_pair_noise_over_cz_noise']:.3f}" for v in sq.values())
+        + "; snapshot in force / previous, minutes old at the first job "
+        + ", ".join(
+            f"{a['in_force_minutes_old']:.1f}/{a['previous_minutes_old']:.1f}"
+            for a in ages.values()
+        )
+        + "; equal to previous (T1, T2, CZ, readout) "
+        + ", ".join(
+            "/".join(
+                f"{e[0]}of{e[1]}"
+                for e in (
+                    a["equal_to_previous [equal, compared]"][k]
+                    for k in ("t1", "t2", "cz", "readout")
+                )
+            )
+            for a in ages.values()
+        )
+    )
     w5 = pi["weak_parts_pair_1_day_1"]["d5"]
     r = pi["round_us"]["range"]
     L.append(
@@ -953,7 +1019,66 @@ def digest(res: dict) -> str:
     )
     L += sensitivity_digest(res["sensitivity"])
     L += dependence_digest(res["dependence"])
+    L += scale_and_f_digest(res["error_scale_and_f"])
     return "\n".join(L) + "\n"
+
+
+def scale_and_f_digest(s: dict) -> list[str]:
+    def ci(b: dict) -> str:
+        return f"{b['ratio']:.2f} [{b['ci95'][0]:.2f}, {b['ci95'][1]:.2f}]"
+
+    es = s["error_scale"]
+    L = ["20. One factor on every error; the dephasing floor; f's summary; readout resolution"]
+    for b in BASES:
+        eps, det = es["eps"]["binomial"][b], es["detection_rate"][b]
+        both = eps["both distances"]
+        L.append(
+            f"   k_eps {b} (binomial; all ten, P1, P2): "
+            + "; ".join(
+                f"{d} {ci(eps[d]['all ten'])}, {ci(eps[d]['placement 1'])}, {ci(eps[d]['placement 2'])}"
+                for d in ("d3", "d5")
+            )
+            + f"; both distances k {both['joint']['k']:.2f}, chi2/nu {both['joint']['chi2']:.1f}/{both['joint']['dof']}"
+        )
+        L.append(
+            f"   k_det {b} (all ten, P1, P2): "
+            + "; ".join(
+                f"{d} {ci(det[d]['all ten'])}, {ci(det[d]['placement 1'])}, {ci(det[d]['placement 2'])}"
+                for d in ("d3", "d5")
+            )
+        )
+    fl = s["dephasing_floor"]
+    for label in ("per_physical_qubit (medians, least squares)", "per_physical_qubit, T2 >= 20 us"):
+        fit = fl[label]
+        a, ci = fit["additive"], fit["additive"]["ci95_bootstrap_over_qubits"]
+        L.append(
+            f"   Gamma_dd = k Gamma_phi + Gamma_0, {label}: k {a['params'][0]:.2f}, Gamma_0 "
+            f"{a['params'][1]:.4f}/us (95% {ci['gamma_0_per_us'][0]:.4f}-{ci['gamma_0_per_us'][1]:.4f}); "
+            f"F {fit['F_test_floor_over_multiple']['F']:.1f}, p {fit['F_test_floor_over_multiple']['p']:.2g}; "
+            f"floor phase flip per round {100 * a['floor_phase_flip_per_round']:.2f}% over "
+            f"{fl['decoupled_idle_per_round_us']['median']:.2f} us"
+        )
+    idle = fl["model_idle_error_per_round"]["range"]
+    L.append(
+        "   model idle error per data qubit and round, patch medians at the job's f: every Pauli "
+        f"{100 * idle['all_paulis'][0]:.1f}-{100 * idle['all_paulis'][1]:.1f}%, Z or Y "
+        f"{100 * idle['z_or_y'][0]:.1f}-{100 * idle['z_or_y'][1]:.1f}%"
+    )
+    fw = s["f_weighted_mean"]["binomial"]["O_over_M"]
+    for v in ("median f", "weighted-mean f"):
+        L.append(
+            f"   O/M (binomial) at the {v}: "
+            + "; ".join(
+                f"{q} P1 {fw[v][q]['placement 1']['ratio']:.2f}, P2 {fw[v][q]['placement 2']['ratio']:.2f}"
+                for q in ("X eps3", "X eps5", "X lambda", "Z eps3", "Z eps5")
+            )
+        )
+    ir = s["input_resolution"]
+    L.append(
+        f"   readout error sigma/e (4096 shots per state): median {100 * ir['relative_sigma_median']:.1f}%, "
+        f"{100 * ir['relative_sigma_at_1_percent']:.1f}% at e = 1%"
+    )
+    return L
 
 
 def sensitivity_digest(s: dict) -> list[str]:
@@ -1105,6 +1230,7 @@ def main() -> None:
         "streak_effects_exploratory": streak_effects(),
         "placements_and_calibration_inputs": placements_and_inputs(),
         "diagnostics": diagnostics(),
+        "error_scale_and_f": scale_and_f(),
         **other(),
     }
     res["about"]["inputs"] = sorted(INPUTS | {"docs/analysis/results/placements.json"})
