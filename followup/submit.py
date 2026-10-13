@@ -12,8 +12,10 @@ its checks:
     exp3-2  Exp 3: references and arm B
     exp3-3  Exp 3: references and arm C
     exp1-1  Exp 1: 16 memory circuits x 4096 shots (16 randomizations x 256), 10 idle x 2048
+    life-1  lifetimes: the idle test read in Z, 10 circuits x 1024 shots (4 x 256), as Exp 1's
+            goes; T1 and T2 on the d=5 footprint, 12 circuits x 1024 (4 pieces of 256)
     exp1-2  Exp 1 again
-    exp3-d  Exp 3: references and arm D, optional, after exp3-3
+    exp3-d  Exp 3: references and arm D, optional, after the plan's jobs and within PLAN_SECONDS
 
 Exp 1's circuits are circuits.py's on the placed qubits, in the device's gates as run 1 wrote
 them (H = rz sx rz, CX = H CZ H on its target), with run 1's barriers between the halves. They
@@ -23,25 +25,29 @@ scheduled ALAP and XY4 fills every idle period of the patch's qubits after their
 (Y = rz(pi/2) X rz(-pi/2), so it takes X's time). The idle test is boxed as its X memory is,
 each CZ then replaced by a delay as long: the delays sit between the barriers that close each
 layer, so its data wait as in memory, through the same pulses, and the Paulis pass them
-unchanged. Exp 3's circuits are leakage_control.py's, sent as they are. IBM adds no
+unchanged. life-1's idle test read in Z goes as Exp 1's does; its T1 and T2 circuits and
+Exp 3's are lifetimes.py's and leakage_control.py's, sent as they are. IBM adds no
 decoupling and twirls no readout, rep_delay is 250 us, and IBM returns each circuit's schedule.
 
 A job's QPU time is IBM's billing rule, as run 1 was billed: LOAD_S, then N (t + 253 us) for
 each circuit run N times and t long once scheduled. IBM may load a job of more than
 MAX_EXPERIMENTS circuits (each twirl one) in parts, LOAD_S each, so the caps take that bound.
-A job is refused above JOB_SECONDS, if the follow-up's jobs so far and it would pass
-TOTAL_SECONDS, or if IBM's usage counter would fall below COUNTER_FLOOR_S; IBM cancels it at
-its limit, 1.5 times the bound and 2 s, at most JOB_SECONDS, and while it is queued it is
-cancelled if IBM's own estimate is over that. The ledger claims a job before it is sent and
-counts it at its limit until IBM has counted it, so no job goes twice and the total holds
-whatever happens; a send whose outcome is unknown stays claimed until --fetch settles it.
+A job is refused above JOB_SECONDS (life-1 above its own cap, in SECONDS), if the
+follow-up's jobs so far and it would pass TOTAL_SECONDS (an optional job PLAN_SECONDS), or if
+IBM's usage counter would fall below COUNTER_FLOOR_S; IBM cancels it at its limit, 1.5 times the bound and 2 s, at most its
+cap, and while it is queued it is cancelled if IBM's own estimate is over that. The ledger
+claims a job before it is sent and counts it at its limit until IBM has counted it, so no
+job goes twice and the total holds whatever happens; a send whose outcome is unknown stays
+claimed until --fetch settles it.
 Every job carries TAG, and a ledger that misses one of IBM's jobs with it refuses to go on.
 
 If IBM refuses the client-side route, or fails the job, --untwirled sends Exp 1 without
 twirling (memory in two pieces of the idle's shots); if kerneled data are refused or
 malformed, --classified sends Exp 3 with IBM's 0/1 readout. --sampler legacy sends through
 run 1's SamplerV2 instead of the executor, untwirled only. A job goes again only with a
-fallback it hasn't failed with, and the next job of its experiment goes as it went.
+fallback it hasn't failed with, and the next job of its experiment goes as it went; life-1
+goes as exp1-1 went, since its idle test is Exp 1's, so after a twirled exp1-1 it has no
+fallback. The job after one IBM ended goes only with --despite-checks.
 """
 
 from __future__ import annotations
@@ -67,7 +73,7 @@ import numpy as np
 
 from heavyhex.patches.placement import Calibration, Spot
 
-from . import circuits
+from . import circuits, decoder, lifetimes
 from . import leakage_control as exp3
 from .placement import BACKEND, Placement, chip_map, place
 
@@ -90,7 +96,9 @@ RUN1_CODE = ("a233d4069719d0cc396c71f29f6429bffd40f113", "f8e44350df9165b40fb5a3
 TAG = "heavyhex-followup"  # on every job, so IBM's own list of them needs no ledger
 
 TOTAL_SECONDS = 90  # QPU time approved for the whole follow-up
+PLAN_SECONDS = 80  # the plan's jobs within it, leaving room to send one again; optional jobs too
 JOB_SECONDS = 30  # and for any one job
+SECONDS = {"life-1": 14}  # and for these, approved with them, at most JOB_SECONDS
 MARGIN_SECONDS = 10  # IBM's counter must leave this much beyond a job's bound
 # IBM's counter when the 90 s were approved (375 s), less them. IBM gives run 1's time back
 # from 31 October, after which the floor only loosens; the ledger still holds the total.
@@ -121,16 +129,20 @@ APPROVED_WEAK: dict[tuple[int | tuple[int, int], str], float] = {
 WORSE = 1.5
 MIN_D3_DATA_T2_US = 50
 
-# Each job: what it runs, and the job that must have finished first.
+# Each job: what it runs, the job that must have finished first, and the job whose way it
+# must go (twirled or --untwirled, kerneled or --classified), if any.
 JOBS = {
-    "exp3-1": ("A", None),
-    "exp3-2": ("B", "exp3-1"),
-    "exp3-3": ("C", "exp3-2"),
-    "exp1-1": ("memory", "exp3-3"),
-    "exp1-2": ("memory", "exp1-1"),
-    "exp3-d": ("D", "exp3-3"),
+    "exp3-1": ("A", None, None),
+    "exp3-2": ("B", "exp3-1", "exp3-1"),
+    "exp3-3": ("C", "exp3-2", "exp3-2"),
+    "exp1-1": ("memory", "exp3-3", None),
+    "life-1": ("lifetimes", "exp1-1", "exp1-1"),
+    "exp1-2": ("memory", "life-1", "exp1-1"),
+    "exp3-d": ("D", "exp1-2", "exp3-3"),  # last, so that it can't take the plan's room
 }
 OPTIONAL = ("exp3-d",)
+TWIRLED = ("memory", "lifetimes")  # what goes twirled or --untwirled; Exp 3's arms are kerneled
+DECOUPLING = {"memory": "XY4", "lifetimes": "XY4 in the idle test; T1 and T2 none, but the echo"}
 FLIPS = "measurement_flips."  # the executor's prefix for readout flips a twirl leaves
 
 # The checks a job's data must pass before the next job goes.
@@ -139,6 +151,9 @@ SCHEDULE_GAP = 0.01  # IBM's length of a circuit against ours, at most this apar
 # A memory circuit's detectors may fire as the model's would with its errors this many times
 # larger, 1 - 2 r >= (1 - 2 r_model)^MAX_EXCESS; run 1 was 1.2-1.75 times the model.
 MAX_EXCESS = 3
+# life-1's circuits that should read as prepared (lifetimes.prepared) do so this often, at
+# least: 0.92-0.94 in the model, about 0 with a pulse missing.
+READ_AS_PREPARED = 0.75
 
 
 class Refused(Exception):
@@ -216,7 +231,7 @@ def native(circuit: QuantumCircuit) -> QuantumCircuit:
             h(qubits[1])
             out.cz(*qubits)
             h(qubits[1])
-        elif name in ("rz", "measure", "reset", "barrier"):
+        elif name in ("rz", "x", "measure", "reset", "barrier"):
             out.append(item)
         else:
             raise ValueError(f"unexpected instruction: {name}")
@@ -339,8 +354,14 @@ def scheduled(
     return circuit, samplex
 
 
-def twirled(setting: circuits.Setting, chip: Sequence[int], target: Target) -> Item:
-    """The setting's template, scheduled and decoupled, and the samplex that twirls it."""
+def twirled(
+    setting: circuits.Setting,
+    chip: Sequence[int],
+    target: Target,
+    randomizations: int | None = None,
+) -> Item:
+    """The setting's template, scheduled and decoupled, and the samplex that twirls it; by
+    default with RANDOMIZATIONS of its kind."""
     logical, _ = circuits.logical_circuit(setting, chip, target.num_qubits)
     circuit, samplex = scheduled(logical, target, chip, idle=setting.kind == "idle")
     return _item(
@@ -349,19 +370,25 @@ def twirled(setting: circuits.Setting, chip: Sequence[int], target: Target) -> I
         target,
         SHOTS_PER_RANDOMIZATION,
         samplex,
-        RANDOMIZATIONS[setting.kind],
+        randomizations or RANDOMIZATIONS[setting.kind],
         setting,
         chip,
     )
 
 
-def untwirled(setting: circuits.Setting, chip: Sequence[int], target: Target) -> list[Item]:
-    """The setting's circuit, scheduled and decoupled, in pieces of the shots the idle test's
-    twirls get."""
+def untwirled(
+    setting: circuits.Setting,
+    chip: Sequence[int],
+    target: Target,
+    randomizations: int | None = None,
+    piece: int = RANDOMIZATIONS["idle"],
+) -> list[Item]:
+    """The setting's circuit, scheduled and decoupled, with the shots its randomizations
+    would get, in pieces of `piece` randomizations' shots (by default, the idle test's)."""
     logical, _ = circuits.logical_circuit(setting, chip, target.num_qubits)
     circuit, _ = scheduled(logical, target, chip, idle=setting.kind == "idle", twirl=False)
-    shots = RANDOMIZATIONS["idle"] * SHOTS_PER_RANDOMIZATION
-    pieces = RANDOMIZATIONS[setting.kind] // RANDOMIZATIONS["idle"]
+    shots = piece * SHOTS_PER_RANDOMIZATION
+    pieces = (randomizations or RANDOMIZATIONS[setting.kind]) // piece
     return [_item(str(setting), circuit, target, shots, setting=setting, chip=chip)] * pieces
 
 
@@ -376,6 +403,25 @@ def exp1(
             items.append(twirled(setting, chip, target))
         else:
             items += untwirled(setting, chip, target)
+    return tuple(items)
+
+
+def life(
+    placements: Mapping[int, Placement], target: Target, *, twirl: bool = True
+) -> tuple[Item, ...]:
+    """life-1's circuits: the idle test read in Z on the d=5 footprint, built as Exp 1's idle
+    test is, then T1 and T2 on every qubit of the footprint; each lifetimes.SHOTS shots, in
+    randomizations or pieces of SHOTS_PER_RANDOMIZATION."""
+    chip = placements[5].qubits
+    pieces = lifetimes.SHOTS // SHOTS_PER_RANDOMIZATION
+    items: list[Item] = []
+    for setting in lifetimes.Z_IDLE:
+        if twirl:
+            items.append(twirled(setting, chip, target, pieces))
+        else:
+            items += untwirled(setting, chip, target, pieces, piece=1)
+    for label, circuit in lifetimes.circuits(sorted(chip), target):
+        items += [_item(label, circuit, target, SHOTS_PER_RANDOMIZATION)] * pieces
     return tuple(items)
 
 
@@ -404,10 +450,12 @@ def build(
     memory: tuple[Item, ...] = ()
     jobs = {}
     for name in names:
-        runs, _ = JOBS[name]
+        runs = JOBS[name][0]
         if runs == "memory":
             memory = memory or exp1(placements, target, twirl=twirl)
             jobs[name] = Job(name, memory)
+        elif runs == "lifetimes":
+            jobs[name] = Job(name, life(placements, target, twirl=twirl))
         else:
             meas_type = exp3.MEAS_TYPE if kerneled else "classified"
             jobs[name] = Job(name, exp3_items(runs, selection, target), meas_type)
@@ -457,7 +505,8 @@ def _wires(circuit: QuantumCircuit) -> dict[int, list[tuple]]:
 def check(item: Item, randomizations: int = 2, seed: int = 0) -> None:
     """Raise unless, in each of a few twirls drawn (or as it is, untwirled), the circuit acts
     as its logical circuit does without noise (stim's flows, signs included), a memory
-    circuit's detectors and logical are 0, and an idle test read in X reads 0."""
+    circuit's detectors and logical are 0, and the data of an idle test read in X or Z read
+    as they started: 0 from |+> and |0>, 1 from |1>."""
     if item.setting is None:
         return
     if not item.chip:
@@ -471,10 +520,11 @@ def check(item: Item, randomizations: int = 2, seed: int = 0) -> None:
             own = {(name[0], i): k for (name, i), k in records.items()}  # "m5" -> "m"
             circuits.add_detectors(model, schedule, own, flags=True)
             circuits.noiseless_check(model)
-        elif item.setting.readout == "X":
+        elif item.setting.readout in ("X", "Z"):
             data = [k for (name, _), k in records.items() if name.startswith("d")]
-            if model.compile_sampler(seed=seed).sample(64)[:, data].any():
-                raise ValueError(f"{item.label}: the data don't read 0 without noise")
+            start = item.setting.start == "1"
+            if (model.compile_sampler(seed=seed).sample(64)[:, data] != start).any():
+                raise ValueError(f"{item.label}: the data don't read {start:d} without noise")
 
 
 def instances(item: Item, randomizations: int = 2, seed: int = 0) -> list[QuantumCircuit]:
@@ -507,7 +557,8 @@ def prediction(
 ) -> dict:
     """What the model expects of Exp 1's memory circuits as sent, each data qubit decaying at
     IBM's T2, by every decoder, and of run 1's design on the same qubits and calibration. Its
-    "cap" is the decoder rule's (decoder.CAPS), fixed before the run."""
+    fits at the top are decoder.PRIMARY's, which leads; "rule" is where the single-fault rule
+    (decoder.CAPS) ends."""
     from . import model, native
 
     sent = {}
@@ -604,14 +655,14 @@ def submit(
     """Send one planned job, wait for it, save everything to runs/ and stop.
 
     Uses QPU time. Refuses, before anything is sent: a job out of the plan's order or sent
-    already, or after a job that failed its checks (unless `despite`); a placement other than
-    the one approved; code not committed, or src/ no longer run 1's; a circuit that doesn't
-    act as it should without noise; and a job beyond the caps. Before exp1-1, saves the
-    model's prediction for its circuits. Returns the job's folder.
+    already, or after a job that IBM ended or that failed its checks (unless `despite`); a
+    placement other than the one approved; code not committed, or src/ no longer run 1's; a
+    circuit that doesn't act as it should without noise; and a job beyond the caps. Before
+    exp1-1, saves the model's prediction for its circuits. Returns the job's folder.
     """
     if name not in JOBS:
         raise Refused(f"{name} is not a job of the plan: {', '.join(JOBS)}")
-    if sampler == "legacy" and JOBS[name][0] == "memory" and twirl:
+    if sampler == "legacy" and JOBS[name][0] in TWIRLED and twirl:
         raise Refused("run 1's sampler takes no samplex; add --untwirled")
     flags = {"twirl": twirl, "kerneled": kerneled, "sampler": sampler}
     if service is None:
@@ -773,7 +824,7 @@ def _collect(folder: Path, job: Any, service: Any) -> Path:
         _update(folder.name, status="failed", usage=record.get("usage"), reason=reason)
         raise Refused(
             f"IBM ended {name}, {status} ({reason}); it may go again with a fallback it "
-            "hasn't failed with"
+            "hasn't failed with, if one is left, or the next job with --despite-checks"
         ) from error
     save_results(folder, result)
     finish(folder, job)  # when it ran, IBM's count of it, and the calibration then in force
@@ -846,10 +897,10 @@ def _reason(error: BaseException) -> str:
 
 def _folder(name: str, flags: Mapping[str, Any]) -> str:
     """The job's folder in runs/, the fallbacks it goes with in its name."""
-    memory = JOBS[name][0] == "memory"
+    twirled = JOBS[name][0] in TWIRLED
     parts = [f"{BACKEND}-{datetime.now(timezone.utc):%Y-%m-%d}-{name}"]
-    parts += ["untwirled"] if memory and not flags["twirl"] else []
-    parts += ["classified"] if not memory and not flags["kerneled"] else []
+    parts += ["untwirled"] if twirled and not flags["twirl"] else []
+    parts += ["classified"] if not twirled and not flags["kerneled"] else []
     parts += ["legacy"] if flags["sampler"] == "legacy" else []
     return "-".join(parts)
 
@@ -933,10 +984,13 @@ def check_order(
 ) -> None:
     """Refuse a job that has gone, unless each time it failed (IBM ended it, or its data
     failed their checks) and it now goes with a fallback it hasn't failed with; and a job
-    whose predecessor hasn't finished, or failed its checks or cost over its estimate
-    (unless `despite`). An experiment's next job goes as the one before it went."""
-    memory = JOBS[name][0] == "memory"
-    keys = ("twirl" if memory else "kerneled", "sampler")
+    whose predecessor hasn't gone or is out, or last ended by IBM, failed its checks or cost
+    over its estimate (unless `despite`, so that a job with no fallback left holds up no
+    other). A job goes as the job JOBS names went: an experiment's next job as the one before
+    it, life-1 and exp1-2 as exp1-1."""
+    runs, after, like = JOBS[name]
+    twirled = runs in TWIRLED
+    keys = ("twirl" if twirled else "kerneled", "sampler")
     for attempt in attempts:
         if attempt["job"] != name or attempt["status"] == "refused":
             continue
@@ -949,41 +1003,55 @@ def check_order(
                 f"{name} failed so already ({attempt['folder']}); it goes again only with "
                 "another fallback"
             )
-    after = JOBS[name][1]
     if after is None:
         return
-    done = [a for a in attempts if a["job"] == after and a["status"] == "done"]
-    if not done:
+    tried = [a for a in attempts if a["job"] == after and a["status"] != "refused"]
+    if not tried or any(a["status"] in ("claimed", "sent") for a in tried):
         raise Refused(f"{name} goes after {after}, which hasn't finished")
-    last = done[-1]
-    if (JOBS[after][0] == "memory") == memory and last["flags"][keys[0]] != flags[keys[0]]:
-        fallback = "--untwirled" if memory else "--classified"
-        went = "without" if last["flags"][keys[0]] else "with"
-        raise Refused(f"{name} goes as {after} went, {went} {fallback}")
-    problems = list(last["checks"]["failed"])
-    charged = _charged(last.get("usage"))
-    if charged is not None and charged > last["billed_s"] + 1:
-        problems.append(f"IBM charged {charged:.0f} s against an estimate of {last['billed_s']} s")
+    guide = next(
+        (a for a in reversed(attempts) if a["job"] == like and a["status"] == "done"), None
+    )
+    if guide is not None and guide["flags"][keys[0]] != flags[keys[0]]:
+        fallback = "--untwirled" if twirled else "--classified"
+        went = "without" if guide["flags"][keys[0]] else "with"
+        raise Refused(f"{name} goes as {like} went, {went} {fallback}")
+    last = tried[-1]
+    if last["status"] == "done":
+        what = "failed its checks"
+        problems = list(last["checks"]["failed"])
+        charged = _charged(last.get("usage"))
+        if charged is not None and charged > last["billed_s"] + 1:
+            problems.append(
+                f"IBM charged {charged:.0f} s against an estimate of {last['billed_s']} s"
+            )
+    else:
+        what = "was ended by IBM"
+        problems = [last.get("reason") or "no reason given"]
     if problems and not despite:
         raise Refused(
-            f"{after} failed its checks ({'; '.join(problems)}): send it again with a "
-            "fallback, or go on with --despite-checks"
+            f"{after} {what} ({'; '.join(problems)}): send it again with a fallback it hasn't "
+            "failed with, if one is left, or go on with --despite-checks"
         )
 
 
 def job_limit(job: Job, attempts: Sequence[Mapping], remaining_s: float | None) -> int:
-    """The job's QPU limit once it passes the caps: 1.5 times its bound and 2 s, at most
-    JOB_SECONDS and what TOTAL_SECONDS has left. remaining_s is what IBM's counter leaves."""
-    bound = ceil(job.bound)
-    if bound > JOB_SECONDS:
-        raise Refused(f"{job.name} may need {bound} s, over {JOB_SECONDS} s a job")
+    """The job's QPU limit once it passes the caps: 1.5 times its bound and 2 s, at most its
+    cap and what TOTAL_SECONDS has left. remaining_s is what IBM's counter leaves."""
+    bound, cap = ceil(job.bound), job_cap(job.name)
+    if bound > cap:
+        raise Refused(f"{job.name} may need {bound} s, over its {cap} s")
     used = committed(attempts)
     if used + bound > TOTAL_SECONDS:
         raise Refused(
             f"{job.name} may need {bound} s and {used:.0f} s are counted already, "
             f"over the {TOTAL_SECONDS} s approved"
         )
-    limit = int(min(JOB_SECONDS, TOTAL_SECONDS - used, ceil(1.5 * job.bound) + 2))
+    if job.name in OPTIONAL and used + bound > PLAN_SECONDS:
+        raise Refused(
+            f"{job.name} is optional: it may need {bound} s and {used:.0f} s are counted "
+            f"already, past the plan's {PLAN_SECONDS} s"
+        )
+    limit = int(min(cap, TOTAL_SECONDS - used, ceil(1.5 * job.bound) + 2))
     if remaining_s is None or remaining_s < bound + MARGIN_SECONDS:
         raise Refused(
             f"IBM's counter leaves {remaining_s} s, less than the {bound} s the job may "
@@ -995,6 +1063,11 @@ def job_limit(job: Job, attempts: Sequence[Mapping], remaining_s: float | None) 
             f"{COUNTER_FLOOR_S} s, past the {TOTAL_SECONDS} s approved"
         )
     return limit
+
+
+def job_cap(name: str) -> int:
+    """The most QPU seconds a job may take: its own cap, else JOB_SECONDS, never more."""
+    return min(SECONDS.get(name, JOB_SECONDS), JOB_SECONDS)
 
 
 def remaining(service: Any) -> float | None:
@@ -1093,7 +1166,7 @@ def describe(
         "meas_type": job.meas_type,
         "rep_delay_us": exp3.REP_DELAY_US,
         "twirling": TWIRLING if job.twirled else None,
-        "decoupling": "XY4" if JOBS[job.name][0] == "memory" else None,
+        "decoupling": DECOUPLING.get(JOBS[job.name][0]),
         "items": [
             {
                 "label": item.label,
@@ -1176,10 +1249,11 @@ def load(folder: Path) -> dict[str, dict[str, np.ndarray]]:
 def inspect(folder: Path) -> dict:
     """The checks a job's data must pass before the next job goes: every circuit's shots and
     bits as planned; IQ points where kerneled, each shot's all distinct in IQ_DISTINCT of the
-    shots; IBM's schedule of every circuit within SCHEDULE_GAP of ours; and each memory
+    shots; IBM's schedule of every circuit within SCHEDULE_GAP of ours; each memory
     circuit's detectors firing no more than the model's would with MAX_EXCESS times its
     errors: a readout that doesn't leave its qubit in |m>, or bits read in the wrong order,
-    make them fire about half the time."""
+    make them fire about half the time; and life-1's circuits that should read as prepared
+    doing so READ_AS_PREPARED of the time."""
     run = _read(folder / "run.json")
     data = load(folder)
     failed: list[str] = []
@@ -1221,6 +1295,12 @@ def inspect(folder: Path) -> dict:
         f"{label}: detectors fire {rate['chip']:.1%} of the time, the model's {rate['model']:.1%}"
         for label, rate in found["detection"].items()
         if 1 - 2 * rate["chip"] < (1 - 2 * rate["model"]) ** MAX_EXCESS
+    ]
+    found["prepared"] = lifetimes.prepared(run["items"], data)
+    failed += [
+        f"{label}: reads as prepared {share:.0%} of the time"
+        for label, share in found["prepared"].items()
+        if share < READ_AS_PREPARED
     ]
     found["failed"] = list(dict.fromkeys(failed))
     found["passed"] = not failed
@@ -1271,7 +1351,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--fetch", metavar="JOB", choices=list(JOBS), help="collect this job, if it is out"
     )
     parser.add_argument(
-        "--untwirled", action="store_true", help="Exp 1 untwirled, if IBM refuses the twirling"
+        "--untwirled",
+        action="store_true",
+        help="Exp 1 and life-1 untwirled, if IBM refuses the twirling",
     )
     parser.add_argument(
         "--classified", action="store_true", help="Exp 3 read as 0/1, if IQ data fail"
@@ -1285,7 +1367,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--despite-checks",
         action="store_true",
-        help="send the job though the one before it failed its checks",
+        help="send the job though the one before it failed its checks or was ended by IBM",
     )
     parser.add_argument(
         "--calibration",
@@ -1357,8 +1439,8 @@ def table(found: Mapping) -> str:
     """A prediction as ε per round (%) and Λ for each design and decoder."""
     lines = [
         f"calibration {found['calibrated']}, d=5 at {found['placements'][5]}, d=3 at "
-        f"{found['placements'][3]}; {found['shots']:,} shots a circuit; the rule's cap: "
-        f"{found['as_sent']['cap']}",
+        f"{found['placements'][3]}; {found['shots']:,} shots a circuit; cap "
+        f"{decoder.PRIMARY} leads, the single-fault rule ends at {found['as_sent']['rule']}",
         f"{'design':12} {'decoder':11} {'ε3 X':>6} {'ε5 X':>6} {'Λ X':>6} "
         f"{'ε3 Z':>6} {'ε5 Z':>6} {'Λ Z':>6}",
     ]
@@ -1422,7 +1504,7 @@ def dry(calibration_path: Path | None = None, *, twirl: bool = True, kerneled: b
     )
     lines.append(
         "every circuit checked without noise: acts as its logical circuit (2 twirls each); "
-        "detectors, logical and idle data read 0"
+        "detectors and logical 0, idle data read as they started"
     )
     lines += [
         "",
@@ -1432,11 +1514,11 @@ def dry(calibration_path: Path | None = None, *, twirl: bool = True, kerneled: b
     planned = bound = 0
     for job in jobs.values():
         circuits_run = ", ".join(dict.fromkeys(item.label for item in job.items))
-        if JOBS[job.name][0] == "memory":
+        if JOBS[job.name][0] in TWIRLED:
             circuits_run = f"{len(dict.fromkeys(job.items))} circuits, " + (
                 "twirled" if job.twirled else "untwirled"
             )
-        limit = int(min(JOB_SECONDS, ceil(1.5 * job.bound) + 2))
+        limit = int(min(job_cap(job.name), ceil(1.5 * job.bound) + 2))
         lines.append(
             f"{job.name:8} {job.instances:>8} {sum(i.executions for i in job.items):>10,} "
             f"{job.seconds:>6.2f} {job.bound:>6.2f} {limit:>5}  {circuits_run}, "
@@ -1446,12 +1528,15 @@ def dry(calibration_path: Path | None = None, *, twirl: bool = True, kerneled: b
             planned += job.billed
             bound += ceil(job.bound)
     extra = sum(jobs[name].billed for name in OPTIONAL)
+    own = ", ".join(f"{name} {cap} s" for name, cap in SECONDS.items())
     lines.append(
         f"planned: {planned} s ({bound} s if IBM loads in parts), {planned + extra} s with "
-        f"{', '.join(OPTIONAL)}; caps {JOB_SECONDS} s a job, {TOTAL_SECONDS} s in all, IBM's "
-        f"counter {MARGIN_SECONDS} s over"
+        f"{', '.join(OPTIONAL)}, which goes last and only within {PLAN_SECONDS} s; caps "
+        f"{JOB_SECONDS} s a job ({own}), {TOTAL_SECONDS} s in all, IBM's counter "
+        f"{MARGIN_SECONDS} s over"
     )
-    for name in ("exp3-1", "exp1-1"):
+    shown = ("exp3-1", "exp1-1", "life-1")
+    for name in shown:
         job = jobs[name]
         lines += ["", f"{name}: {'circuit':40} {'randomizations x shots':>23} {'length us':>10}"]
         for item in dict.fromkeys(job.items):
@@ -1459,7 +1544,7 @@ def dry(calibration_path: Path | None = None, *, twirl: bool = True, kerneled: b
             shots = f"{item.randomizations} x {item.shots}" if item.samplex else f"{item.shots}"
             shots += f" (x{count})" if count > 1 else ""
             lines.append(f"        {item.label:40} {shots:>23} {item.seconds * 1e6:>10.3f}")
-    sizes = {name: len(json.dumps(payload(jobs[name]))) for name in ("exp3-1", "exp1-1")}
+    sizes = {name: len(json.dumps(payload(jobs[name]))) for name in shown}
     lines += [
         "",
         "encoded for the executor (nothing sent): "

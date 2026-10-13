@@ -106,6 +106,19 @@ def test_each_data_qubits_own_decay_time_capped_at_2_t1():
     assert by_qubit[1] == idle(4000, 1, t2_us=2 * OCTOBER_13.t1_us[1])
 
 
+def test_a_data_qubit_takes_its_in_situ_t1():
+    c = QuantumCircuit(2)
+    c.sx([0, 1])
+    c.delay(1000, [0, 1], unit="dt")
+    out, _ = model.noisy(c, model.with_t1(OCTOBER_13, {0: 30.0}), DT)
+    by_qubit = {q[0]: args for name, q, args in channels(out) if name == "PAULI_CHANNEL_1"}
+    px = (1 - exp(-4000 / 30e3)) / 4
+    t2 = min(OCTOBER_13.t2_us[0], 60.0) * 1e3
+    assert by_qubit[0] == pytest.approx([px, px, (1 - exp(-4000 / t2)) / 2 - px])
+    assert by_qubit[1] == idle(4000, 1)
+    assert OCTOBER_13.t1_us[0] != 30.0
+
+
 def test_twirled_cz_and_virtual_rz():
     c = QuantumCircuit(2)
     c.rz(3.141592653589793 / 2, 0)
@@ -190,7 +203,8 @@ def test_a_misread_fires_detectors_two_rounds_apart(target, placements):
 def test_predictions(target, placements):
     chips = {d: p.qubits for d, p in placements.items()}
     found = model.predict(native.run1_circuits(chips, target), OCTOBER_13, target.dt, shots=4000)
-    assert found["cap"] is None  # at d=3, 4.5-5.2% data readouts make two-edge detours likelier
+    assert found["rule"] is None  # at d=3, 4.5-5.2% data readouts make two-edge detours likelier
+    assert found["fits"] == found["decoders"][str(decoder.PRIMARY)]["fits"]  # cap 0.1 leads
     assert all(0 < p < 0.5 for p in found["logical_error"].values())
     for basis in "XZ":
         eps, lam = found["fits"][basis]["eps"], found["fits"][basis]["lambda"]

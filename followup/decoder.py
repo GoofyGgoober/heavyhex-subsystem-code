@@ -8,6 +8,11 @@ decoded alone. If any is miscorrected, the cap drops to 0.05, and then every edg
 same weight (CAPS): the rule's cap. CORRELATED, pymatching's correlated matching on the same
 model uncapped, is reported beside it; it reads a fault that fires a flag or relay as one,
 where decomposed matching sees its pieces.
+
+PRIMARY leads, decided before the run: cap 0.1, with uniform weights beside it. On Kingston
+the rule ends at uniform weights, which the model says raise ε₅ in X memory from 5.6% to
+8.8%; each single fault cap 0.1 miscorrects is decoded to a likelier fault set, given the
+4.5-5.2% readout of data qubits 54 and 72.
 """
 
 from __future__ import annotations
@@ -26,6 +31,7 @@ if TYPE_CHECKING:
     import stim
 
 CAPS = (0.1, 0.05, None)  # None: every edge weighs the same
+PRIMARY = 0.1  # the decoder that leads
 CORRELATED = "correlated"
 UNIFORM_P = 0.01  # any p gives equal weights
 # Limits of stim's search for the circuit's smallest undetectable logical error.

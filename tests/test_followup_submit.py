@@ -74,13 +74,14 @@ def chip(distance):
 
 
 def test_the_jobs_go_in_the_plans_order():
-    assert list(JOBS) == ["exp3-1", "exp3-2", "exp3-3", "exp1-1", "exp1-2", "exp3-d"]
+    assert list(JOBS) == ["exp3-1", "exp3-2", "exp3-3", "exp1-1", "life-1", "exp1-2", "exp3-d"]
     order, name = [], "exp1-2"
     while name:
         order.append(name)
         name = JOBS[name][1]
-    assert order[::-1] == ["exp3-1", "exp3-2", "exp3-3", "exp1-1", "exp1-2"]
-    assert JOBS["exp3-d"][1] == "exp3-3"
+    assert order[::-1] == ["exp3-1", "exp3-2", "exp3-3", "exp1-1", "life-1", "exp1-2"]
+    assert JOBS["exp3-d"][1:] == ("exp1-2", "exp3-3")  # last, as exp3-3 went
+    assert JOBS["life-1"][2] == JOBS["exp1-2"][2] == "exp1-1"  # both go as exp1-1 went
 
 
 def test_the_placement_is_the_one_approved():
@@ -223,7 +224,12 @@ def test_exp3_sends_the_arm_in_pieces_of_the_references_shots(target):
     assert isclose(items[-1].seconds, 30 * 4.864e-6)
 
 
-def test_the_cost_is_ibms_billing_rule_and_its_bound_loads_in_parts(target):
+@pytest.fixture(scope="module")
+def jobs(target):
+    return submit.build(list(JOBS), PLACEMENTS, target)
+
+
+def test_the_cost_is_ibms_billing_rule_and_its_bound_loads_in_parts(target, jobs):
     from followup.leakage_control import select
 
     job = Job("exp3-1", exp3_items("A", select(PLACEMENTS[3].layout), target), "kerneled")
@@ -231,10 +237,17 @@ def test_the_cost_is_ibms_billing_rule_and_its_bound_loads_in_parts(target):
     assert isclose(job.seconds, expected) and job.billed == ceil(expected) == 4
     assert job.instances == 5 and job.bound == job.seconds
     assert PER_SHOT_US == 253
-    exp1 = submit.exp1(PLACEMENTS, target)
-    assert sum(max(i.randomizations, 1) for i in exp1) == 16 * 16 + 10 * 8  # two parts of 300
-    assert isclose(Job("exp1-1", exp1).bound, Job("exp1-1", exp1).seconds + 2.1)
-    assert ceil(Job("exp1-1", exp1).bound) <= JOB_SECONDS
+    exp1 = jobs["exp1-1"]
+    assert exp1.instances == 16 * 16 + 10 * 8  # two parts of 300
+    assert isclose(exp1.bound, exp1.seconds + 2.1)
+    assert ceil(exp1.bound) <= JOB_SECONDS
+    life = jobs["life-1"]
+    assert life.instances == 10 * 4 + 12 * 4 and life.bound == life.seconds
+    assert life.billed == 10 <= submit.SECONDS["life-1"] == 14
+    planned = sum(job.billed for name, job in jobs.items() if name not in submit.OPTIONAL)
+    assert planned == 76 <= submit.PLAN_SECONDS == 80  # within the 90 s approved, with a margin
+    assert sum(ceil(job.bound) for name, job in jobs.items() if name not in submit.OPTIONAL) == 80
+    assert planned + jobs["exp3-d"].billed == 81  # so exp3-d waits for an approval
 
 
 def stub(name="exp1-1", billed=27):
@@ -247,8 +260,11 @@ def test_the_caps_refuse_a_dear_job_an_overspent_total_and_a_short_counter():
     assert stub(billed=27).billed == 27
     assert job_limit(stub(), [], 375) == JOB_SECONDS
     assert job_limit(stub(billed=4), [], 375) == ceil(1.5 * stub(billed=4).bound) + 2 == 8
-    with pytest.raises(Refused, match="30 s a job"):
+    with pytest.raises(Refused, match="over its 30 s"):
         job_limit(stub(billed=31), [], 375)
+    assert job_limit(stub("life-1", billed=10), [], 375) == 14  # its own cap, not 17
+    with pytest.raises(Refused, match="over its 14 s"):
+        job_limit(stub("life-1", billed=15), [], 375)
     spent = [{"job": "exp3-1", "status": "sent", "limit_s": 30, "usage": None}] * 2
     assert committed(spent) == 60
     assert job_limit(stub(billed=27), spent[:1], 375) == 30
@@ -261,6 +277,18 @@ def test_the_caps_refuse_a_dear_job_an_overspent_total_and_a_short_counter():
     with pytest.raises(Refused, match="below 285 s"):  # used elsewhere, so the floor holds it
         job_limit(stub(billed=27), [], 300)
     assert job_limit(stub(billed=4), [*spent, {**spent[0], "limit_s": 25}], 375) == 5
+
+
+def test_an_optional_job_stays_within_the_plans_80_s_and_no_cap_passes_30_s(monkeypatch):
+    six = [{"job": "exp1-1", "status": "done", "limit_s": 30,
+            "usage": {"status": "complete", "qpu_charge_time_seconds": s}}
+           for s in (4, 4, 4, 27, 10, 27)]  # fmt: skip
+    with pytest.raises(Refused, match=r"optional.*the plan's 80 s"):
+        job_limit(stub("exp3-d", billed=5), six, 375)  # 76 + 5
+    assert job_limit(stub("exp3-d", billed=4), six, 375) == 8  # 76 + 4
+    assert job_limit(stub("exp1-2", billed=5), six, 375) == 9  # only optional jobs
+    monkeypatch.setitem(submit.SECONDS, "life-1", 45)
+    assert submit.job_cap("life-1") == JOB_SECONDS
 
 
 def test_the_ledger_counts_ibms_charge_once_final_and_the_limit_till_then():
@@ -310,8 +338,35 @@ def test_a_failed_job_goes_again_only_with_a_fallback_and_the_next_goes_alike():
         check_order("exp3-2", [failed, resent], PLAIN)
     check_order("exp3-2", [failed, resent], {**PLAIN, "kerneled": False})
     check_order("exp1-1", [attempt("exp3-3", kerneled=False)], PLAIN)  # another experiment
-    with pytest.raises(Refused, match="without --untwirled"):
-        check_order("exp1-2", [attempt("exp1-1")], {**PLAIN, "twirl": False})
+    with pytest.raises(Refused, match="goes as exp1-1 went, without --untwirled"):
+        check_order("life-1", [attempt("exp1-1")], {**PLAIN, "twirl": False})
+    with pytest.raises(Refused, match="after life-1"):
+        check_order("exp1-2", [attempt("exp1-1")], PLAIN)
+    with pytest.raises(Refused, match="after life-1"):  # skipped by hand: still not
+        check_order("exp1-2", [attempt("exp1-1")], PLAIN, despite=True)
+    # exp1-1 went untwirled, and so did life-1, again with run 1's sampler.
+    untwirled = [attempt("exp1-1", "failed"), attempt("exp1-1", twirl=False)]
+    went = [*untwirled, attempt("life-1", "failed", twirl=False)]
+    check_order("life-1", went, {**PLAIN, "twirl": False, "sampler": "legacy"})
+    went.append(attempt("life-1", twirl=False, sampler="legacy"))
+    check_order("exp1-2", went, {**PLAIN, "twirl": False})
+    with pytest.raises(Refused, match="goes as exp1-1 went, with --untwirled"):
+        check_order("exp1-2", went, PLAIN)
+
+
+def test_life_1_ended_by_ibm_after_a_twirled_exp1_1_holds_exp1_2_only_till_passed_by_hand():
+    ended = {**attempt("life-1", "failed"), "reason": "CANCELLED: over its 14 s"}
+    went = [attempt("exp1-1"), ended]
+    for flags in (PLAIN, {**PLAIN, "twirl": False}, {**PLAIN, "twirl": False, "sampler": "legacy"}):
+        with pytest.raises(Refused, match=r"failed so already|goes as exp1-1 went"):
+            check_order("life-1", went, flags)  # no fallback is left
+    with pytest.raises(Refused, match=r"life-1 was ended by IBM \(CANCELLED: over its 14 s\)"):
+        check_order("exp1-2", went, PLAIN)
+    check_order("exp1-2", went, PLAIN, despite=True)
+    with pytest.raises(Refused, match="goes as exp1-1 went"):
+        check_order("exp1-2", went, {**PLAIN, "twirl": False}, despite=True)
+    with pytest.raises(Refused, match="after life-1"):  # while a life-1 is out, never
+        check_order("exp1-2", [*went, attempt("life-1", "sent")], PLAIN, despite=True)
 
 
 def test_failed_checks_or_an_overcharge_hold_the_next_job():
@@ -323,7 +378,7 @@ def test_failed_checks_or_an_overcharge_hold_the_next_job():
     dear = {**attempt("exp1-1"), "billed_s": 27,
             "usage": {"status": "complete", "qpu_charge_time_seconds": 29}}  # fmt: skip
     with pytest.raises(Refused, match="charged 29 s"):
-        check_order("exp1-2", [dear], PLAIN)
+        check_order("life-1", [dear], PLAIN)
 
 
 def test_the_executor_gets_one_item_a_circuit_and_nothing_is_sent(target):
@@ -391,7 +446,9 @@ def ibm(tmp_path, monkeypatch, target):
         "provenance",
         lambda: {"commit": "c", "code": list(RUN1_CODE), "followup": "f", "changed": False},
     )
-    state = SimpleNamespace(sent=[], jobs={}, listed=[], outcome="DONE", lost=False, iq=None)
+    state = SimpleNamespace(
+        sent=[], jobs={}, listed=[], outcome="DONE", lost=False, iq=None, left=375
+    )
 
     def finish(folder, job):
         record = json.loads((folder / "job.json").read_text())
@@ -441,7 +498,7 @@ def ibm(tmp_path, monkeypatch, target):
     monkeypatch.setattr(submit, "send", send)
     state.service = SimpleNamespace(
         backend=lambda name: SimpleNamespace(name=name, target=target),
-        usage=lambda: {"usage_remaining_seconds": 375},
+        usage=lambda: {"usage_remaining_seconds": state.left},
         job=lambda job_id: state.jobs[job_id],
         jobs=lambda **_: list(state.listed),
     )
@@ -474,6 +531,51 @@ def test_a_submission_end_to_end_against_a_stand_in(tmp_path, ibm, target):
     data = load(folder)
     assert data["R0"]["m"].shape == (1000, 10) and data["A"]["m"].shape == (3000, 300)
     assert not (tmp_path / "followup" / "ledger.lock").exists()
+
+
+def test_life_1_and_exp1_2_go_with_their_own_limits_against_a_stand_in(ibm, jobs, monkeypatch):
+    """After exp1-1, through submit() with IBM replaced, which refuses each job it gets: life-1
+    goes with its own 14 s, the counter's floor holds it, exp1-2 goes with 30 s after it, and
+    after a life-1 IBM ended only by hand."""
+    monkeypatch.setattr(submit, "build", lambda names, *_, **__: {n: jobs[n] for n in names})
+    monkeypatch.setattr(submit, "check", lambda item: None)  # each circuit is checked above
+    monkeypatch.setattr(submit, "payload", lambda job: {})
+    tried = []
+
+    def send(backend, job, limit, tags, sampler="executor"):
+        tried.append((job.name, limit))
+        raise Refused("the stand-in refuses every job")
+
+    monkeypatch.setattr(submit, "send", send)
+
+    def done(job, charged, **fields):
+        usage = {"status": "complete", "qpu_charge_time_seconds": charged}
+        return {**attempt(job), "tags": [submit.TAG, f"heavyhex:f-{job}"], "id": None,
+                "billed_s": charged, "limit_s": 30, "usage": usage, **fields}  # fmt: skip
+
+    before = [done("exp3-1", 4), done("exp3-2", 4), done("exp3-3", 4), done("exp1-1", 27)]
+
+    def go(name, attempts, left=375, **flags):
+        submit._save_ledger(attempts)
+        ibm.left = left
+        with pytest.raises(Refused) as refusal:
+            submit.submit(name, service=ibm.service, **flags)
+        return str(refusal.value)
+
+    assert "the stand-in refuses" in go("life-1", before)
+    assert tried[-1] == ("life-1", 14)
+    assert "below 285 s" in go("life-1", before, left=298) and len(tried) == 1
+    go("life-1", before, left=299)
+    assert tried[-1] == ("life-1", 14)
+    assert "after life-1" in go("exp1-2", before)
+    go("exp1-2", [*before, done("life-1", 10)])
+    assert tried[-1] == ("exp1-2", 30)
+    ended = done("life-1", 14, status="failed", reason="CANCELLED")
+    assert "life-1 was ended by IBM" in go("exp1-2", [*before, ended]) and len(tried) == 3
+    assert "failed so already" in go("life-1", [*before, ended])
+    assert "goes as exp1-1 went" in go("life-1", [*before, ended], twirl=False)
+    go("exp1-2", [*before, ended], despite=True)
+    assert tried[-1] == ("exp1-2", 30) and len(tried) == 4
 
 
 def test_malformed_iq_data_hold_the_next_job_until_it_goes_classified(ibm):
