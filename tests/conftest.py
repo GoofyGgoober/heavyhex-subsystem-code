@@ -12,11 +12,14 @@ HEAVYHEX_WORKERS sets how many jobs are re-analysed at once (default 4).
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 
 import pytest
 
 REPO = Path(__file__).resolve().parents[1]
+# followup/ sits at the repository root, outside the installed package.
+sys.path.append(str(REPO))
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
