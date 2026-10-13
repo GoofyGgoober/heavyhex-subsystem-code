@@ -241,7 +241,7 @@ def fig_lambda() -> None:
             label=r"predicted, $\pm\sigma_M$",
         ),
         Line2D([], [], color=MUTED, lw=2.6, alpha=0.35, label=r"before the job, $0\leq f\leq 1$"),
-        Patch(color=D5, alpha=0.13, lw=0, label=r"prespecified pool, $\pm\sigma$"),
+        Patch(color=D5, alpha=0.13, lw=0, label=r"pool, $\pm\sigma$"),
         Line2D([], [], color=MUTED, lw=0.8, ls=(0, (1, 1.5)), label="pooled prediction"),
         Line2D(
             [],
