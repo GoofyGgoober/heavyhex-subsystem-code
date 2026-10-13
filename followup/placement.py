@@ -143,7 +143,7 @@ def score(layout: HeavyHexLayout, calibration: Calibration, round_us: float | No
 def shortfalls(layout: HeavyHexLayout, calibration: Calibration) -> list[Shortfall]:
     """Every part the patch uses beyond the thresholds: qubits, then couplers."""
     found = []
-    for q, role in sorted(_roles(layout).items()):
+    for q, role in sorted(role_of(layout).items()):
         t1, t2, readout = calibration.t1_us[q], calibration.t2_us[q], calibration.readout[q]
         if t1 < MIN_T1_US:
             found.append(Shortfall(q, role, "T1", t1))
@@ -171,7 +171,8 @@ def by_role(layout: HeavyHexLayout) -> dict[str, list[int]]:
     }
 
 
-def _roles(layout: HeavyHexLayout) -> dict[int, str]:
+def role_of(layout: HeavyHexLayout) -> dict[int, str]:
+    """Each chip qubit's role: data, X ancilla, flag, Z ancilla or relay."""
     qubits = by_role(layout)
     role = dict.fromkeys(qubits["data"], "data")
     role |= dict.fromkeys(qubits["x_ancillas"], "X ancilla")

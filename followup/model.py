@@ -11,6 +11,7 @@ readout and delay sits where the device runs it:
               pz = (1 - e^(-t/T))/2 - px, T a data qubit's own decay time T_q, else IBM's T2
 
 T_q is IBM's T2 before the run and the idle test's after it, so 1/T_phi = 1/T_q - 1/(2 T1).
+T1 is IBM's, or, for the data qubits after life-1, the one both idle tests give (with_t1).
 A qubit has no noise until its first gate.
 
 Without resets a readout leaves the qubit in |m>, and in |1> it decays at T1 until its next
@@ -148,6 +149,14 @@ def decay_times(
     return {q: (measured or {}).get(q, calibration.t2_us[q]) for q in data}
 
 
+def with_t1(calibration: Calibration, t1_us: Mapping[int, float]) -> Calibration:
+    """The calibration with these qubits' T1 in place of IBM's: the in-situ T1 that Exp 1's
+    and life-1's idle tests give together (analysis.in_situ), taken as T_q is taken."""
+    from dataclasses import replace
+
+    return replace(calibration, t1_us={**calibration.t1_us, **t1_us})
+
+
 def sample(
     model: stim.Circuit,
     decoders: Mapping[str, Callable[[np.ndarray], np.ndarray]],
@@ -212,13 +221,13 @@ def predict(
     Returns the rule's cap (the first of decoder.CAPS that corrects every single fault of
     every circuit) and the single faults each cap miscorrects; each circuit's mean detection
     rates; and, for each of `decoders` by str(cap), each circuit's logical error, the fits at
-    the simulated shots and their standard errors at RUN_SHOTS. The rule's decoder's are also
-    at the top, when it is among them.
+    the simulated shots and their standard errors at RUN_SHOTS. decoder.PRIMARY's are also at
+    the top, when it is among them.
     """
     keys = sorted(circuits)
     models = {key: memory(*circuits[key], calibration, dt, decay_us=decay_us) for key in keys}
     dems = {key: models[key][0].detector_error_model(decompose_errors=True) for key in keys}
-    cap, counts = decoder.capped(dems[key] for key in keys)
+    rule, counts = decoder.capped(dems[key] for key in keys)
     logical_error: dict[str, dict] = {str(d): {} for d in decoders}
     detection = {}
     for i, key in enumerate(keys):
@@ -232,13 +241,13 @@ def predict(
         for name, p in logical_error.items()
     }
     return {
-        "cap": cap,
+        "rule": rule,
         "miscorrected": {
             str(c): dict(zip(map(str, keys), n, strict=True)) for c, n in counts.items()
         },
         "detection": detection,
         "decoders": by_decoder,
-        **by_decoder.get(str(cap), {}),
+        **by_decoder.get(str(decoder.PRIMARY), {}),
     }
 
 

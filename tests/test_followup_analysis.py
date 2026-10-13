@@ -1,7 +1,7 @@
 """The follow-up's analysis: the fits, T_q from the idle test, the records read back as sent,
 and run 1's placements. Nothing here contacts IBM."""
 
-from math import exp, pi
+from math import pi
 from pathlib import Path
 
 import pytest
@@ -111,25 +111,25 @@ TOY = Calibration(
 )
 
 
-def test_equator_times_count_delays_with_the_state_off_the_z_axis():
-    times = analysis.equator_times(toy_idle((2500, 700, 300), before_dt=1000), [0], DT)
-    assert times[0] == pytest.approx((2500 + 300) * DT * 1e6)
+def test_axis_times_count_delays_on_the_equator_and_along_z_from_the_first_pulse():
+    times = analysis.axis_times(toy_idle((2500, 700, 300), before_dt=1000), [0], DT)
+    assert times["equator"][0] == pytest.approx((2500 + 300) * DT * 1e6)
+    assert times["Z"][0] == pytest.approx(700 * DT * 1e6)  # not the 1000 before the first H
 
 
-def test_pulses_leave_the_gates_readout_and_t1_and_take_out_the_equator():
-    """G = (1 - 2e)^m (1 - 2p) e^(-t_z/T1): each SX's depolarizing at 3/2 its error e, the
-    readout, and T1 along Z; the equator's e^(-t/T2) is taken out."""
+def test_pulses_leave_the_gates_and_readout_and_take_out_every_delay():
+    """G = (1 - 2e)^m (1 - 2p): each SX's depolarizing at 3/2 its error e, and the readout;
+    the equator's e^(-t/T2) and T1's e^(-t_z/T1) along Z are taken out."""
     for waits in ((0,), (2500,), (25000,), (2500, 700, 300)):
-        t_z = sum(waits[1::2]) * DT * 1e6
-        expected = (1 - 2 * 3e-4) ** (len(waits) + 1) * (1 - 2 * 0.02) * exp(-t_z / 100.0)
+        expected = (1 - 2 * 3e-4) ** (len(waits) + 1) * (1 - 2 * 0.02)
         assert analysis.pulses(toy_idle(waits), TOY, DT)[0] == pytest.approx(expected, rel=1e-9)
 
 
-def test_equator_times_refuse_two_qubit_gates():
+def test_axis_times_refuse_two_qubit_gates():
     qc = QuantumCircuit(2)
     qc.cz(0, 1)
     with pytest.raises(ValueError, match="one-qubit gates only"):
-        analysis.equator_times(qc, [0], DT)
+        analysis.axis_times(qc, [0], DT)
 
 
 def test_decay_time_returns_t_q_on_the_delay_clock():

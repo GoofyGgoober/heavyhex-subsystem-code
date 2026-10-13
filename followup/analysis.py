@@ -3,7 +3,8 @@
 Exp 1, both jobs together:
 
     decode   each memory circuit's detectors from its raw readouts (a value is its readout
-             XOR its carry), matched on the model of the circuit as sent (program.json.gz)
+             XOR its carry), matched on the model of the circuit as sent (program.json.gz);
+             weights capped at 0.1 lead (decoder.PRIMARY), uniform weights beside them
     fit      ε per round from P(n) = [1 - A (1 - 2ε)^n] / 2: run 1's weighted fit of
              ln(1 - 2P), and the binomial likelihood with A profiled out, its interval widened
              by the Pearson dispersion; Λ = ε₃/ε₅, the errors propagated
@@ -19,6 +20,24 @@ Exp 1, both jobs together:
              analysis modelled it; per placement, ε the mean over the days and Λ the
              inverse-variance mean of the days', widened by √(χ²/dof) above 1
 
+life-1:
+
+    T1, T2   every qubit of the footprint, P(1) = A e^(-t/T) + B (lifetimes.decay), compared
+             in the rate 1/T; T1's B gives the excited share at rest, π
+    Z idle   each data qubit's flips per round, p↓ + p↑ (lifetimes.flips), split as π says,
+             and the contrast c = P(1 | 1) - P(1 | 0) over the idle lengths, weighted by
+             Var(ln c) = [p1(1 - p1)/N1 + p0(1 - p0)/N0] / c²
+    in situ  each data qubit's T1 and T_q from both idle tests at once, on the model's clock:
+             ln r = k_X + ln G(n) - t_eq(n)/T_q - t_Z(n)/T1 read in X and Y (Exp 1), and
+             ln c = k_Z + ln G(n) - t_Z(n)/T1 - t_eq(n)/T_q read in Z, t_eq and t_Z the
+             delay time on the equator and along Z, G what the model's pulses and readout
+             leave. A data qubit spends about 2.9 us of a round on one and 2.3 us on the
+             other, swapped between the tests, so neither rate comes from one test alone;
+             what they pin down is the decay a round each memory's data see,
+             t_Z/T1 + t_eq/T_q with each memory's t_Z and t_eq
+    compare  each qubit's T1 and T2: IBM's in force, ours, and in situ (lifetimes.table)
+    model    Exp 1's memory again at the data's in-situ T1 and T_q, and O/M against it
+
 Exp 3: each job's readouts and the cycle period, for leakage_control.analyze.
 """
 
@@ -29,6 +48,7 @@ import json
 from collections import defaultdict
 from dataclasses import dataclass
 from math import exp, pi, sqrt
+from statistics import median
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -36,10 +56,10 @@ import numpy as np
 from heavyhex.patches.placement import Calibration
 from heavyhex.simulation.noisy import fit_per_round
 
-from . import circuits, decoder, model, submit
+from . import circuits, decoder, lifetimes, model, submit
 from . import leakage_control as exp3
-from .circuits import DISTANCES, ROUNDS, Setting
-from .placement import place
+from .circuits import DISTANCES, ROUNDS, Setting, read_into
+from .placement import place, role_of
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -48,7 +68,7 @@ if TYPE_CHECKING:
     import stim
     from qiskit import QuantumCircuit
 
-MIN_R = 0.05  # an idle length whose r is below this says nothing about T_q
+MIN_R = 0.05  # an idle length whose r (or contrast) is below this says nothing about T_q (T1)
 FITS = ("log", "binomial")
 
 
@@ -255,16 +275,20 @@ def fits(failures: Mapping[tuple[str, int, int], int], shots: int) -> dict:
 # The idle test
 
 
-def equator_times(circuit: QuantumCircuit, qubits: Sequence[int], dt: float) -> dict[int, float]:
-    """Each qubit's delay time in us with its state on the equator, up to its readout.
+def axis_times(
+    circuit: QuantumCircuit, qubits: Sequence[int], dt: float
+) -> dict[str, dict[int, float]]:
+    """Each qubit's delay time in us up to its readout, with its state on the equator and
+    along Z, from its first pulse on (before it the model has the qubit quiet in |0>).
 
     In the idle test a data qubit gets one-qubit gates only, so its state stays along X, Y or
-    Z. Each delay takes e^(-t/T) of its ⟨X⟩ on the equator, and e^(-t/T1) along Z, between a
-    wait's H gates: only the equator's time measures T_q.
+    Z. Each delay takes e^(-t/T) of its ⟨X⟩ on the equator, and e^(-t/T1) of its ⟨Z⟩ along Z:
+    read in X or Y only the equator's time measures T_q, read in Z only Z's measures T1.
     """
     swap = {"rz": {"X": "Y", "Y": "X"}, "sx": {"Y": "Z", "Z": "Y"}}
     axis = dict.fromkeys(qubits, "Z")
-    total = dict.fromkeys(qubits, 0.0)
+    started: set[int] = set()
+    total = {"equator": dict.fromkeys(qubits, 0.0), "Z": dict.fromkeys(qubits, 0.0)}
     for item in circuit.data:
         op = item.operation
         for q in (circuit.find_bit(bit).index for bit in item.qubits):
@@ -272,35 +296,30 @@ def equator_times(circuit: QuantumCircuit, qubits: Sequence[int], dt: float) -> 
                 continue
             if op.name == "measure":
                 axis[q] = "read"
-            elif op.name == "delay" and axis[q] != "Z":
-                total[q] += model._ns(op, dt) / 1e3
-            elif op.name == "sx" or (op.name == "rz" and round(float(op.params[0]) / (pi / 2)) % 2):
-                axis[q] = swap[op.name].get(axis[q], axis[q])
-            elif op.name not in ("rz", "x", "delay", "barrier"):
+            elif op.name == "delay":
+                if q in started:
+                    total["Z" if axis[q] == "Z" else "equator"][q] += model._ns(op, dt) / 1e3
+            elif op.name in ("sx", "x", "rz"):
+                if op.name != "rz":
+                    started.add(q)
+                if op.name == "sx" or (
+                    op.name == "rz" and round(float(op.params[0]) / (pi / 2)) % 2
+                ):
+                    axis[q] = swap[op.name].get(axis[q], axis[q])
+            elif op.name != "barrier":
                 raise ValueError(f"{op.name} on qubit {q}: the idle test has one-qubit gates only")
     return total
 
 
-def data_qubits(circuit: QuantumCircuit) -> dict[int, int]:
-    """The chip qubit read into each bit of the data register."""
-    found = {}
-    for item in circuit.data:
-        if item.operation.name == "measure":
-            register, i = circuit.find_bit(item.clbits[0]).registers[0]
-            if register.name.startswith("d"):
-                found[i] = circuit.find_bit(item.qubits[0]).index
-    return dict(sorted(found.items()))
-
-
 def pulses(circuit: QuantumCircuit, calibration: Calibration, dt: float) -> np.ndarray:
-    """G: what the model leaves of each data qubit's ⟨X⟩ but for its decay on the equator, by
-    data bit. The product of 1 - 2p over the errors that flip its readout, times e^(t/T) for
-    the e^(-t/T) its time t on the equator takes (T = IBM's T2, at most 2 T1, as the model
-    has it)."""
+    """G: what the model's pulses and readout leave of each data qubit's contrast, by data bit.
+    The product of 1 - 2p over the errors that flip its readout, times e^(t/T) e^(t'/T1) for
+    the decay its delays take: e^(-t/T) of its time t on the equator (T = IBM's T2, at most
+    2 T1, as the model has it) and e^(-t'/T1) of its time t' along Z, exactly."""
     import stim
 
     noisy, records = model.noisy(circuit, calibration, dt)
-    read = data_qubits(circuit)
+    read = read_into(circuit, "d")
     register = next(name for name, _ in records if name.startswith("d"))
     for k, i in enumerate(read):
         noisy.append(
@@ -314,39 +333,75 @@ def pulses(circuit: QuantumCircuit, calibration: Calibration, dt: float) -> np.n
             for target in line.targets_copy():
                 if isinstance(target, stim.DemTarget) and target.is_logical_observable_id():
                     x[target.val] *= 1 - 2 * line.args_copy()[0]
-    times = equator_times(circuit, list(read.values()), dt)
+    times = axis_times(circuit, list(read.values()), dt)
     for k, q in enumerate(read.values()):
-        x[k] *= exp(times[q] / min(calibration.t2_us[q], 2 * calibration.t1_us[q]))
+        t1 = calibration.t1_us[q]
+        t2 = min(calibration.t2_us[q], 2 * t1)
+        x[k] *= exp(times["equator"][q] / t2 + times["Z"][q] / t1)
     return x
+
+
+def r_of(
+    x: np.ndarray, y: np.ndarray, nx: np.ndarray, ny: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """r = √(⟨X⟩² + ⟨Y⟩²), r² less the shot noise in x² and y², and
+    Var(ln r) = [x²(1 - x²)/N_X + y²(1 - y²)/N_Y] / r⁴."""
+    r = np.sqrt(np.maximum(x**2 + y**2 - (1 - x**2) / nx - (1 - y**2) / ny, 0))
+    return r, (x**2 * (1 - x**2) / nx + y**2 * (1 - y**2) / ny) / np.maximum(r, MIN_R) ** 4
+
+
+def c_of(
+    p0: np.ndarray, p1: np.ndarray, n0: np.ndarray, n1: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """The contrast c = P(1 | 1) - P(1 | 0), and Var(ln c) = [p1(1 - p1)/N1 + p0(1 - p0)/N0] / c²."""
+    c = p1 - p0
+    return c, (p1 * (1 - p1) / n1 + p0 * (1 - p0) / n0) / np.maximum(c, MIN_R) ** 2
+
+
+def log_decay(t: np.ndarray, value: np.ndarray, var: np.ndarray, g: np.ndarray) -> dict:
+    """T and its error from ln(value/G) = c - t/T, weighted by 1/Var(ln value), over the
+    points whose value is above MIN_R, and the rate 1/T in 1/us with its error; NaN with
+    fewer than two, inf if nothing decays."""
+    keep = value > MIN_R
+    nan = float("nan")
+    if keep.sum() < 2:
+        return {
+            "t_us": nan,
+            "sigma_us": nan,
+            "rate": [nan, nan],
+            "offset": nan,
+            "chi2_red": nan,
+            "used": int(keep.sum()),
+        }
+    t, ln, var = t[keep], np.log(value[keep] / g[keep]), var[keep]
+    (b, c), cov = np.polyfit(t, ln, 1, w=1 / np.sqrt(var), cov="unscaled")
+    chi2 = float((((ln - c - b * t) ** 2) / var).sum())
+    return {
+        "t_us": float(-1 / b) if b < 0 else float("inf"),
+        "sigma_us": float(sqrt(cov[0, 0]) / b**2),
+        "rate": [float(-b), float(sqrt(cov[0, 0]))],
+        "offset": float(exp(c)),
+        "chi2_red": chi2 / (keep.sum() - 2) if keep.sum() > 2 else nan,
+        "used": int(keep.sum()),
+    }
 
 
 def decay_time(
     t: np.ndarray, x: np.ndarray, y: np.ndarray, nx: np.ndarray, ny: np.ndarray, g: np.ndarray
 ) -> dict:
     """T_q and its error from one qubit's ⟨X⟩ and ⟨Y⟩ over the idle lengths: ln(r/G) = c - t/T_q,
-    weighted, r² less the shot noise in x² and y². NaN with fewer than two r above MIN_R."""
-    r = np.sqrt(np.maximum(x**2 + y**2 - (1 - x**2) / nx - (1 - y**2) / ny, 0))
-    keep = r > MIN_R
-    nan = float("nan")
-    if keep.sum() < 2:
-        return {
-            "t_q_us": nan,
-            "sigma_us": nan,
-            "offset": nan,
-            "chi2_red": nan,
-            "used": int(keep.sum()),
-        }
-    var = (x**2 * (1 - x**2) / nx + y**2 * (1 - y**2) / ny)[keep] / r[keep] ** 4
-    t, ln = t[keep], np.log(r[keep] / g[keep])
-    (b, c), cov = np.polyfit(t, ln, 1, w=1 / np.sqrt(var), cov="unscaled")
-    chi2 = float((((ln - c - b * t) ** 2) / var).sum())
-    return {
-        "t_q_us": float(-1 / b) if b < 0 else float("inf"),
-        "sigma_us": float(sqrt(cov[0, 0]) / b**2),
-        "offset": float(exp(c)),
-        "chi2_red": chi2 / (keep.sum() - 2) if keep.sum() > 2 else nan,
-        "used": int(keep.sum()),
-    }
+    weighted. NaN with fewer than two r above MIN_R."""
+    fit = log_decay(t, *r_of(x, y, nx, ny), g)
+    return {"t_q_us": fit.pop("t_us"), **fit}
+
+
+def contrast_time(
+    t: np.ndarray, p0: np.ndarray, p1: np.ndarray, n0: np.ndarray, n1: np.ndarray, g: np.ndarray
+) -> dict:
+    """T1 and its error from one data qubit's idle test read in Z: ln(c/G) = k - t/T1 over the
+    idle lengths, weighted. NaN with fewer than two c above MIN_R."""
+    fit = log_decay(t, *c_of(p0, p1, n0, n1), g)
+    return {"t1_us": fit.pop("t_us"), **fit}
 
 
 def idle(
@@ -355,25 +410,18 @@ def idle(
     calibration: Calibration,
     dt: float,
 ) -> dict:
-    """Each data qubit's T_q from the idle test, and the decay times the model takes:
-    the measured T_q where finite, else IBM's T2."""
+    """Each data qubit's T_q from the idle test read in X and Y, its G holding the decay along
+    Z at IBM's T1, and the decay times the model takes: the measured T_q where finite, else
+    IBM's T2."""
     runs: dict[str, dict[int, str]] = {"X": {}, "Y": {}}
     for label, (setting, _) in found.items():
-        if setting is not None and setting.kind == "idle":
+        if setting is not None and setting.kind == "idle" and setting.readout in runs:
             runs[setting.readout][setting.rounds] = label
     rounds = sorted(runs["X"])
     if sorted(runs["Y"]) != rounds:
         raise ValueError("the idle test needs the same lengths read in X and in Y")
-    first = found[runs["X"][rounds[0]]][1]
-    read = data_qubits(first)
+    times, g, read = _waits([found[runs["X"][n]][1] for n in rounds], calibration, dt)
     register = next(name for name in shots[runs["X"][rounds[0]]] if name.startswith("d"))
-    t, g = [], []
-    for n in rounds:
-        circuit = found[runs["X"][n]][1]
-        times = equator_times(circuit, list(read.values()), dt)
-        t.append([times[q] for q in read.values()])
-        g.append(pulses(circuit, calibration, dt))
-    t_us, g_all = np.array(t), np.array(g)
     x, y, nx, ny = ([] for _ in range(4))
     for n in rounds:
         bx, by = shots[runs["X"][n]][register], shots[runs["Y"][n]][register]
@@ -382,21 +430,25 @@ def idle(
         nx.append(len(bx))
         ny.append(len(by))
     x_all, y_all = np.array(x), np.array(y)
+    n_x, n_y = np.array(nx, float), np.array(ny, float)
     rows = []
     for k, (i, q) in enumerate(read.items()):
-        n_x, n_y = np.array(nx, float), np.array(ny, float)
-        fit = decay_time(t_us[:, k], x_all[:, k], y_all[:, k], n_x, n_y, g_all[:, k])
+        equator, along_z = times["equator"][:, k], times["Z"][:, k]
+        held = g[:, k] * np.exp(-along_z / calibration.t1_us[q])
         rows.append(
             {
                 "data": i,
                 "qubit": q,
                 "t1_us": calibration.t1_us[q],
                 "t2_us": calibration.t2_us[q],
-                **fit,
-                "equator_us": t_us[:, k].tolist(),
-                "pulses": g_all[:, k].tolist(),
+                **decay_time(equator, x_all[:, k], y_all[:, k], n_x, n_y, held),
+                "equator_us": equator.tolist(),
+                "along_z_us": along_z.tolist(),
+                "pulses": g[:, k].tolist(),
                 "x": x_all[:, k].tolist(),
                 "y": y_all[:, k].tolist(),
+                "shots_x": nx,
+                "shots_y": ny,
             }
         )
     decay = {  # no decay seen: inf, which the model caps at 2 T1
@@ -404,6 +456,281 @@ def idle(
         for row in rows
     }
     return {"rounds": rounds, "qubits": rows, "decay_us": decay}
+
+
+def z_idle(
+    found: Mapping[str, tuple[Setting | None, QuantumCircuit]],
+    shots: Mapping[str, Mapping[str, np.ndarray]],
+    calibration: Calibration,
+    dt: float,
+) -> dict:
+    """Each data qubit's flips per round (lifetimes.flips) and T1 from the idle test read in
+    Z, its G holding the decay on the equator at IBM's T2. The times are those of the circuit
+    from |1>, whose X is the data's first pulse; from |0> the data wait as long, but quiet in
+    |0> until their next pulse."""
+    runs: dict[str, dict[int, str]] = {"0": {}, "1": {}}
+    for label, (setting, _) in found.items():
+        if setting is not None and setting.kind == "idle" and setting.readout == "Z":
+            runs[setting.start][setting.rounds] = label
+    rounds = sorted(runs["1"])
+    if not rounds or sorted(runs["0"]) != rounds:
+        raise ValueError("the idle test read in Z needs the same lengths from |0> and |1>")
+    times, g, read = _waits([found[runs["1"][n]][1] for n in rounds], calibration, dt)
+    register = next(name for name in shots[runs["1"][rounds[0]]] if name.startswith("d"))
+    ones = {s: np.array([shots[runs[s][n]][register].mean(axis=0) for n in rounds]) for s in "01"}
+    counts = {s: [len(shots[runs[s][n]][register]) for n in rounds] for s in "01"}
+    n0, n1 = (np.array(counts[s], float) for s in "01")
+    rows = []
+    for k, (i, q) in enumerate(read.items()):
+        p0, p1 = ones["0"][:, k], ones["1"][:, k]
+        equator, along_z = times["equator"][:, k], times["Z"][:, k]
+        held = g[:, k] * np.exp(-equator / min(calibration.t2_us[q], 2 * calibration.t1_us[q]))
+        rows.append(
+            {
+                "data": i,
+                "qubit": q,
+                **contrast_time(along_z, p0, p1, n0, n1, held),
+                "per_round": lifetimes.flips(rounds, p0, p1, n0, n1, calibration.readout[q]),
+                "equator_us": equator.tolist(),
+                "along_z_us": along_z.tolist(),
+                "pulses": g[:, k].tolist(),
+                "p0": p0.tolist(),
+                "p1": p1.tolist(),
+                "shots_0": counts["0"],
+                "shots_1": counts["1"],
+            }
+        )
+    return {"rounds": rounds, "qubits": rows}
+
+
+def _waits(
+    by_length: Sequence[QuantumCircuit], calibration: Calibration, dt: float
+) -> tuple[dict[str, np.ndarray], np.ndarray, dict[int, int]]:
+    """An idle test's data over its lengths: their delay times on the equator and along Z
+    (lengths x data bits), the model's G, and the qubit read into each data bit."""
+    read = read_into(by_length[0], "d")
+    times: dict[str, list] = {"equator": [], "Z": []}
+    g = []
+    for circuit in by_length:
+        found = axis_times(circuit, list(read.values()), dt)
+        for side, rows in times.items():
+            rows.append([found[side][q] for q in read.values()])
+        g.append(pulses(circuit, calibration, dt))
+    return {side: np.array(rows) for side, rows in times.items()}, np.array(g), read
+
+
+def together(xy: Mapping, z: Mapping) -> dict:
+    """One data qubit's T1 and T_q from both idle tests at once: least squares weighted by
+    1/Var(ln), over the points above MIN_R, of
+
+        ln(r/G) = k_X - t_eq/T_q - t_Z/T1     read in X and Y (a row of idle(), Exp 1)
+        ln(c/G) = k_Z - t_Z/T1 - t_eq/T_q     read in Z (a row of z_idle(), life-1)
+
+    with G what the model's pulses and readout leave, in the rates the model can take:
+    1/T1 >= 0 and 1/T_q = 1/(2 T1) + 1/T_phi with 1/T_phi >= 0. The data sit on the equator
+    in one test about as long as along Z in the other, so the tests pin down the decay each
+    memory sees, the rates' sums, much better than T1 and T_q apart: their correlation is
+    near -1. The rates 1/T1 and 1/T_q in 1/us, each [value, σ], and their covariance, from
+    the unbounded fit's; NaN with fewer than two points in either test."""
+    from scipy.optimize import lsq_linear
+
+    r, var_r = r_of(*(np.asarray(xy[k], float) for k in ("x", "y", "shots_x", "shots_y")))
+    c, var_c = c_of(*(np.asarray(z[k], float) for k in ("p0", "p1", "shots_0", "shots_1")))
+    design, ln, weight, used = [], [], [], []
+    for which, (value, var, row) in enumerate(((r, var_r, xy), (c, var_c, z))):
+        keep = value > MIN_R
+        g, equator, along_z = (
+            np.asarray(row[k], float)[keep] for k in ("pulses", "equator_us", "along_z_us")
+        )
+        # ln = k - (1/T1)(t_Z + t_eq/2) - (1/T_phi) t_eq
+        design += [
+            [1.0 - which, float(which), -tz - te / 2, -te]
+            for tz, te in zip(along_z, equator, strict=True)
+        ]
+        ln += list(np.log(value[keep] / g))
+        weight += list(1 / var[keep])
+        used.append(int(keep.sum()))
+    nan = float("nan")
+    if min(used) < 2:
+        return {"rate_t1": [nan, nan], "rate_t_q": [nan, nan], "covariance": [[nan] * 2] * 2,
+                "correlation": nan, "chi2_red": nan, "used": used}  # fmt: skip
+    a, y, w = np.array(design), np.array(ln), np.array(weight)
+    root = np.sqrt(w)
+    fit = lsq_linear(a * root[:, None], y * root, bounds=([-np.inf, -np.inf, 0, 0], np.inf))
+    beta = np.where(fit.active_mask == -1, 0.0, fit.x)  # a rate on its bound is 0
+    cov = np.linalg.inv((a.T * w) @ a)
+    chi2 = float((w * (y - a @ beta) ** 2).sum())
+    # From (1/T1, 1/T_phi) to (1/T1, 1/T_q = 1/(2 T1) + 1/T_phi).
+    to_q = np.array([[1.0, 0.0], [0.5, 1.0]])
+    rates, covariance = to_q @ beta[2:], to_q @ cov[2:, 2:] @ to_q.T
+    return {
+        "rate_t1": [float(rates[0]), float(sqrt(covariance[0, 0]))],
+        "rate_t_q": [float(rates[1]), float(sqrt(covariance[1, 1]))],
+        "covariance": covariance.tolist(),
+        "correlation": float(covariance[0, 1] / sqrt(covariance[0, 0] * covariance[1, 1])),
+        "chi2_red": chi2 / (len(y) - 4) if len(y) > 4 else nan,
+        "used": used,
+    }
+
+
+def relaxation(
+    found: Mapping[str, tuple[Setting | None, QuantumCircuit]],
+    shots: Mapping[str, Mapping[str, np.ndarray]],
+    calibration: Calibration,
+    dt: float,
+) -> dict[str, dict[int, dict]]:
+    """T1 and T2 of every qubit read, by kind and qubit: lifetimes.decay's fit at the waits
+    of the circuits as sent, from the calibration's value, with the waits and the share of
+    readouts that read 1 at each."""
+    labels: dict[str, dict[float, str]] = {kind: {} for kind in lifetimes.WAITS_US}
+    for label, (_, circuit) in found.items():
+        if (kind := lifetimes.kind_of(label)) is not None:
+            labels[kind][lifetimes.wait_us(circuit, dt)] = label
+    fitted: dict[str, dict[int, dict]] = {}
+    for kind, by_wait in labels.items():
+        waits = sorted(by_wait)
+        read = read_into(found[by_wait[waits[0]]][1], "m")
+        bits = [shots[by_wait[t]]["m"] for t in waits]
+        (n,) = {len(b) for b in bits}
+        ones = np.array([b.sum(axis=0) for b in bits])
+        guess = calibration.t1_us if kind == "T1" else calibration.t2_us
+        fitted[kind] = {
+            q: {
+                **lifetimes.decay(waits, ones[:, i], n, guess[q]),
+                "waits_us": waits,
+                "ones": (ones[:, i] / n).tolist(),
+            }
+            for i, q in read.items()
+        }
+    return fitted
+
+
+@dataclass(frozen=True)
+class Record:
+    """A job's circuits as sent and its readouts, with its calibration and time step."""
+
+    found: Mapping[str, tuple[Setting | None, QuantumCircuit]]
+    shots: Mapping[str, Mapping[str, np.ndarray]]
+    calibration: Calibration
+    dt: float
+
+
+def record(folders: Sequence[Path]) -> Record:
+    """The jobs' record: the first one's circuits, calibration and dt, every job's shots."""
+    run = json.loads((folders[0] / "run.json").read_text())
+    calibration = Calibration.load(folders[0] / "calibration.json")
+    return Record(sent(folders[0]), readouts(folders), calibration, run["dt"])
+
+
+def in_situ(xy: Record, z: Record) -> dict:
+    """The data qubits' T1 and T_q in situ, Exp 1's idle test (xy) and life-1's (z) fitted
+    together, with the decay a round each memory's data see, t_Z/T1 + t_eq/T_q with the
+    times a round of the test that mimics it (Z memory's read in Z), at those rates and at
+    IBM's T1 and T2 as Exp 1's model took them; and the values the model takes: the fit's,
+    inf (no decay) included, where there is one, else IBM's T1 and T2."""
+    calibration = xy.calibration
+    read_xy = idle(xy.found, xy.shots, calibration, xy.dt)
+    read_z = z_idle(z.found, z.shots, z.calibration, z.dt)
+    by_xy = {row["qubit"]: row for row in read_xy["qubits"]}
+    by_z = {row["qubit"]: row for row in read_z["qubits"]}
+    rows = []
+    for q in sorted(set(by_xy) & set(by_z)):
+        fit = together(by_xy[q], by_z[q])
+        rates = np.array([fit["rate_t1"][0], fit["rate_t_q"][0]])
+        cov = np.array(fit["covariance"])
+        t1 = calibration.t1_us[q]
+        ibm = np.array([1 / t1, 1 / min(calibration.t2_us[q], 2 * t1)])
+        for memory, row, rounds in (
+            ("z", by_z[q], read_z["rounds"]),
+            ("x", by_xy[q], read_xy["rounds"]),
+        ):
+            times = _per_round(row, rounds)
+            fit[f"decay_{memory}"] = [
+                float(times @ rates),
+                float(sqrt(max(times @ cov @ times, 0))),
+            ]
+            fit[f"decay_{memory}_ibm"] = float(times @ ibm)
+        rows.append({"qubit": q, **fit})
+
+    def taken(name: str, ibm: Mapping[int, float]) -> dict[int, float]:
+        found = {}
+        for row in rows:
+            value = row[name][0]
+            found[row["qubit"]] = (
+                ibm[row["qubit"]] if np.isnan(value) else 1 / value if value > 0 else float("inf")
+            )
+        return found
+
+    return {
+        "qubits": rows,
+        "t1_us": taken("rate_t1", calibration.t1_us),
+        "decay_us": taken("rate_t_q", calibration.t2_us),
+    }
+
+
+def _per_round(row: Mapping, rounds: Sequence[int]) -> np.ndarray:
+    """A data qubit's delay time a round along Z and on the equator, in us: the slopes over
+    the idle test's lengths."""
+    n = np.asarray(rounds, float)
+    return np.array([np.polyfit(n, row[side], 1)[0] for side in ("along_z_us", "equator_us")])
+
+
+def life(folder: Path, exp1_folders: Sequence[Path] = ()) -> dict:
+    """life-1 from its record: T1 and T2 of every qubit of the d=5 footprint, the flips per
+    round of each data qubit, and each qubit's T1 and T2 three ways, the rows lifetimes.table
+    prints, as rates in 1/us: IBM's (the calibration in force when life-1 ended), ours, with
+    the excited share at rest π from T1's B, and in situ. In situ, each data qubit's flips a
+    round read in Z, π of them |0> -> |1>; with Exp 1's jobs, both idle tests fitted together
+    (in_situ); without them, the T1 of the test read in Z alone, its G holding IBM's T2 on the
+    equator."""
+    job = record([folder])
+    after = folder / "calibration_after.json"
+    claimed = Calibration.load(after) if after.exists() else job.calibration
+    standard = relaxation(job.found, job.shots, claimed, job.dt)
+    read_z = z_idle(job.found, job.shots, job.calibration, job.dt)
+    situ = in_situ(record(exp1_folders), job) if exp1_folders else None
+    alone = {row["qubit"]: row for row in read_z["qubits"]}
+    joint = {row["qubit"]: row for row in situ["qubits"]} if situ else {}
+    shared = ("rate_t1", "rate_t_q", "correlation", "decay_z", "decay_x", "decay_z_ibm",
+              "decay_x_ibm")  # fmt: skip
+    roles = role_of(place(job.calibration)[5].layout)
+    rows = []
+    for q in sorted(standard["T1"]):
+        t1 = standard["T1"][q]
+        ours = {
+            f"rate_{kind.lower()}": lifetimes.rate(
+                standard[kind][q]["t_us"], standard[kind][q]["sigma_us"]
+            )
+            for kind in lifetimes.WAITS_US
+        }
+        ours["excited"] = lifetimes.excited(t1["offset"], t1["sigma_offset"], claimed.readout[q])
+        here = None
+        if q in alone:
+            flips = alone[q]["per_round"]["flips"]
+            here = {
+                "flips": flips,
+                "up": lifetimes.product(flips, ours["excited"]),
+                "rate_t1": alone[q]["rate"],
+                **{key: joint[q][key] for key in shared if q in joint},
+            }
+        rows.append(
+            {
+                "qubit": q,
+                "role": roles.get(q, ""),
+                "ibm": {"t1_us": claimed.t1_us[q], "t2_us": claimed.t2_us[q]},
+                "ours": ours,
+                "in_situ": here,
+            }
+        )
+    return {
+        "folder": folder.name,
+        "calibration": claimed.calibrated,
+        "standard": standard,
+        "z_idle": read_z,
+        "in_situ": situ,
+        "qubits": rows,
+        "ratios": {name: (median(v) if v else None) for name, v in lifetimes.ratios(rows).items()},
+    }
 
 
 # Flag and relay records
@@ -472,14 +799,17 @@ def records(
 def exp1(
     folders: Sequence[Path],
     *,
-    cap: float | None,
+    cap: float | None = decoder.PRIMARY,
     caps: Sequence[float | str | None] = (*decoder.CAPS, decoder.CORRELATED),
     shots: int = model.SHOTS,
     seed: int = 0,
+    life: Path | None = None,
 ) -> dict:
     """Exp 1 from its jobs: the idle test's T_q, every memory circuit decoded by each decoder,
-    both fits, and the model at the measured T_q by each decoder. `cap` leads: the rule's,
-    from the prediction saved before the run (prediction.json in exp1-1's folder)."""
+    both fits, and the model at the measured T_q by each decoder. `cap` leads, decided before
+    the run: decoder.PRIMARY, with the rule's cap (prediction.json in exp1-1's folder) and
+    uniform weights beside it. With life-1's folder, also the model at the data's in-situ T1
+    and T_q (in_situ), and O/M against it."""
     run = json.loads((folders[0] / "run.json").read_text())
     dt = run["dt"]
     calibration = Calibration.load(folders[0] / "calibration.json")
@@ -506,16 +836,13 @@ def exp1(
     expected = model.predict(
         sent_memory, calibration, dt, decay_us=decay, shots=shots, seed=seed, decoders=caps
     )
-    expected_fits = {
-        name: fits({key: round(p * shots) for key, p in row["logical_error"].items()}, shots)
-        for name, row in expected["decoders"].items()
-    }
+    expected_fits = predicted_fits(expected, shots)
     flagged = [
         records(setting, circuit, data[label], calibration, dt, decay_us=decay, shots=n, seed=seed)
         for label, (setting, circuit) in found.items()
         if setting is not None and setting.decoded and setting.rounds == max(ROUNDS)
     ]
-    return {
+    result = {
         "folders": [folder.name for folder in folders],
         "calibration": calibration.calibrated,
         "cap": cap,
@@ -527,18 +854,52 @@ def exp1(
         },
         "predicted": {
             "cap": cap,
-            "rule": expected["cap"],
+            "rule": expected["rule"],
             "shots": shots,
             "fits": expected_fits,
-            "detection": {
-                str(Setting("memory", *key)): v for key, v in sorted(expected["detection"].items())
-            },
+            "detection": _by_setting(expected["detection"]),
         },
         "observed_over_model": {
             name: against(observed[name], expected_fits[name]) for name in observed
         },
         "flags": flagged,
     }
+    if life is not None:
+        situ = in_situ(Record(found, data, calibration, dt), record([life]))
+        again = model.predict(
+            sent_memory,
+            model.with_t1(calibration, situ["t1_us"]),
+            dt,
+            decay_us=situ["decay_us"],
+            shots=shots,
+            seed=seed,
+            decoders=caps,
+        )
+        again_fits = predicted_fits(again, shots)
+        result["in_situ"] = {
+            "folder": life.name,
+            "qubits": situ["qubits"],
+            "t1_us": situ["t1_us"],
+            "t_q_us": situ["decay_us"],
+            "fits": again_fits,
+            "detection": _by_setting(again["detection"]),
+            "observed_over_model": {
+                name: against(observed[name], again_fits[name]) for name in observed
+            },
+        }
+    return result
+
+
+def predicted_fits(expected: Mapping, shots: int) -> dict:
+    """Both fits of the model's logical errors, by decoder, at the simulated shots."""
+    return {
+        name: fits({key: round(p * shots) for key, p in row["logical_error"].items()}, shots)
+        for name, row in expected["decoders"].items()
+    }
+
+
+def _by_setting(by_key: Mapping[tuple[str, int, int], dict]) -> dict[str, dict]:
+    return {str(Setting("memory", *key)): v for key, v in sorted(by_key.items())}
 
 
 def against(observed: Mapping, expected: Mapping) -> dict:

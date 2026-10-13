@@ -15,6 +15,9 @@ carries() finds them by pushing that X through run 1's gadgets. The detectors ar
 on these values: a stabilizer's value XOR its value the round before, and the last round
 against the data readout. As in run 1, the prep half's gauge values go into no detector, but
 its readouts are carried into round 0.
+
+The idle test is run 1's, read in X or Y, and also in Z for life-1: its data then start in
+|0> or |1> instead of |+>, and nothing else changes.
 """
 
 from __future__ import annotations
@@ -49,16 +52,18 @@ GATES = {
 
 @dataclass(frozen=True)
 class Setting:
-    """One circuit: memory, or the idle test read in X or in Y."""
+    """One circuit: memory, or the idle test read in X, Y or Z."""
 
     kind: str  # "memory" or "idle"
     basis: str
     distance: int
     rounds: int
     readout: str = "X"
+    start: str = "+"  # the idle test's data start in |+>, or, read in Z, in |0> or |1>
 
     def __str__(self) -> str:
-        return f"d={self.distance} {run1.Setting(self.kind, self.basis, self.rounds, self.readout)}"
+        text = f"d={self.distance} {run1.Setting(self.kind, self.basis, self.rounds, self.readout)}"
+        return text if self.start == "+" else f"{text}, from |{self.start}>"
 
     @property
     def decoded(self) -> bool:
@@ -135,7 +140,44 @@ def logical_circuit(
     with_resets, _ = run1.logical_circuit(
         one, {str(setting.distance): list(chip)}, num_qubits or max(chip) + 1
     )
-    return without_resets(with_resets)[0], schedule
+    circuit = without_resets(with_resets)[0]
+    return (read_in_z(circuit, setting.start) if setting.readout == "Z" else circuit), schedule
+
+
+def read_in_z(circuit: QuantumCircuit, start: str) -> QuantumCircuit:
+    """The idle test read in X, its data starting in |start> and read in Z instead: each data
+    qubit's first H, which takes it to |+>, dropped for |0> or made an X for |1>, and its last,
+    before its readout, dropped. Every wait, pulse and readout of the other qubits stays."""
+    if start not in ("0", "1"):
+        raise ValueError(f"the data start in |0> or |1> to be read in Z, not |{start}>")
+    gates: dict[int, list[int]] = {q: [] for q in read_into(circuit, "d").values()}
+    for i, item in enumerate(circuit.data):
+        if item.operation.name not in ("barrier", "measure"):
+            for q in (circuit.find_bit(bit).index for bit in item.qubits):
+                if q in gates:
+                    gates[q].append(i)
+    first = {found[0] for found in gates.values()}
+    last = {found[-1] for found in gates.values()}
+    if any(circuit.data[i].operation.name != "h" for i in first | last):
+        raise ValueError("the data's first and last gates are not the H gates of a read in X")
+    out = circuit.copy_empty_like()
+    for i, item in enumerate(circuit.data):
+        if i in first and start == "1":
+            out.x(item.qubits[0])
+        elif i not in first | last:
+            out.append(item)
+    return out
+
+
+def read_into(circuit: QuantumCircuit, prefix: str) -> dict[int, int]:
+    """The qubit read into each bit of the register whose name starts with prefix."""
+    found = {}
+    for item in circuit.data:
+        if item.operation.name == "measure":
+            register, i = circuit.find_bit(item.clbits[0]).registers[0]
+            if register.name.startswith(prefix):
+                found[i] = circuit.find_bit(item.qubits[0]).index
+    return dict(sorted(found.items()))
 
 
 def without_resets(circuit: QuantumCircuit) -> tuple[QuantumCircuit, dict[int, int]]:
