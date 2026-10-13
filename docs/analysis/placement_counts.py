@@ -17,6 +17,10 @@ each day's calibration:
   relay_q51     placement 2's relay q51: its reported readout error by day, and on each day
                 the fraction of eight-round Z-memory rounds in which it read 1 and in which the
                 detector of the stabilizer it serves fired (runs/*/analysis.json)
+  weak_day1     the weakest reported parts of pair 1's two patches on day 1: each CZ, readout
+                and single-qubit error above a bar, each T1 or T2 below one
+  round_us      the length of one round in each job, from the stored circuit durations:
+                (8-round minus 4-round X-memory circuit) / 4
 
 The score of an embedding is the rule's cost() with every chip qubit moved by the embedding.
 Reads runs/ and docs/figures/fez_map.json; seconds.
@@ -113,6 +117,39 @@ def relay_q51() -> dict:
     return out
 
 
+WEAK = {"cz": 0.01, "readout": 0.05, "single_qubit": 0.005, "t1_us": 50.0, "t2_us": 20.0}
+
+
+def weak_day1() -> dict:
+    """Pair 1's parts on day 1 beyond the WEAK bars, as reported in that day's calibration."""
+    folder = RUNS / f"ibm_fez-{DAYS[0]}-r1"
+    cal = read(folder / "calibration.json")
+    out: dict = {"bars": WEAK}
+    for d, qubits in read(folder / "run.json")["chips"].items():
+        qs = set(qubits)
+        couplers = {k: v for k, v in cal["cz"].items() if set(map(int, k.split("-"))) <= qs}
+        out[f"d{d}"] = {
+            "cz": {k: v for k, v in sorted(couplers.items()) if v > WEAK["cz"]},
+            **{
+                key: {q: cal[key][str(q)] for q in sorted(qs) if cal[key][str(q)] > WEAK[key]}
+                for key in ("readout", "single_qubit")
+            },
+            **{
+                key: {q: cal[key][str(q)] for q in sorted(qs) if cal[key][str(q)] < WEAK[key]}
+                for key in ("t1_us", "t2_us")
+            },
+        }
+    return out
+
+
+def round_us() -> dict:
+    """One round's length in each job, from run.json's per-circuit durations, in us."""
+    i4, i8 = memory_index("X", 4), memory_index("X", 8)
+    return {
+        job.name: (job.info["seconds"][i8] - job.info["seconds"][i4]) / 4 * 1e6 for job in jobs()
+    }
+
+
 def usable(qubit_set, couplers, cal: Calibration) -> bool:
     """The rule's test: no broken coupler and no broken qubit."""
     return not any(broken_coupler(cal.cz.get(c)) for c in couplers) and not any(
@@ -184,6 +221,9 @@ def main() -> None:
                 }
         out[f"d{d}"] = block
     out["relay_q51"] = relay_q51()
+    out["weak_day1"] = weak_day1()
+    rounds = round_us()
+    out["round_us"] = {"by_job": rounds, "range": [min(rounds.values()), max(rounds.values())]}
     write_json("placement_counts.json", out)
     print(json.dumps(out, indent=1))
 

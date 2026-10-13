@@ -11,6 +11,8 @@
    observed/predicted eps3, eps5 range, Z wls: 1.55-2.14
    observed/predicted eps3, eps5 range, X binomial: 1.19-1.30
    observed/predicted eps3, eps5 range, Z binomial: 1.81-2.20
+   Table placement, predicted mean +- sigma_M (WL), X: P1 eps3 10.2 +- 0.4, eps5 16.1 +- 0.7, lambda 0.642 +- 0.004; P2 eps3 8.6 +- 0.6, eps5 19.2 +- 0.9, lambda 0.448 +- 0.036
+   Table placement, predicted mean +- sigma_M (WL), Z: P1 eps3 7.1 +- 0.0, eps5 16.6 +- 0.1, lambda 0.428 +- 0.002; P2 eps3 8.4 +- 0.1, eps5 16.5 +- 0.1, lambda 0.511 +- 0.004
 2. Placements compared
    Lambda_X wls: P1 - P2 = 0.182 +- 0.033
    Lambda_X binomial: P1 - P2 = 0.171 +- 0.031
@@ -42,11 +44,13 @@
 12. Leakage
    fires in 9.1% of rounds (model 6.9%); HMM onset 2.5%, lifetime 31 us, e_L 0.51
    onset per round = 0.32% per CZ x CZs + 0.89% (two CZ counts only)
+   X memory, near stabilizers before/after a streak (lag -2 / 2): +5.6 pts (model -0.0; q 0.19), +8.4 pts (model -0.0; q 0.34); failure RD +4.8 pts (model +0.8), at matched firings +0.2; per firing 0.68 (model 0.38)
+   Z memory, near stabilizers before/after a streak (lag -2 / 2): +1.8 pts (model -0.0; q 0.21), +1.8 pts (model +0.0; q 0.30); failure RD +2.3 pts (model +2.2), at matched firings +0.2; per firing 0.30 (model 0.94)
 13. IBM's reset and readout errors
-   init_error / the model's reset error, medians by day: 0.23, 0.22, 0.19, 0.23, 0.24
-   in the calibration model, change in Z eps (pp, mean over patches): d3 -0.58 +- 0.10; d5 -0.48 +- 0.17
-   X memory, jobs of 15: model's mean detector rate below the device's 15, lowered further 15, per-detector deviation larger 14
-   Z memory, jobs of 15: model's mean detector rate below the device's 15, lowered further 15, per-detector deviation larger 14
+   init_error / the model's reset error, medians by day: 0.23, 0.22, 0.19
+   in the calibration model, change in Z eps (pp, mean over patches): d3 -0.62 +- 0.11; d5 -0.75 +- 0.15
+   X memory, jobs of 9: model's mean detector rate below the device's 9, lowered further 9, per-detector deviation larger 9
+   Z memory, jobs of 9: model's mean detector rate below the device's 9, lowered further 9, per-detector deviation larger 8
 14. Operating characteristics (power.py; 5 and 10 reps, f = 0 and 1)
    Lambda = 1 called, scatter 1x/2x/4x: 2.2-6.0%, 5.9-19.4%, 10.3-38.4%; X tests fail when right 5.8-11.8%; gap 0.06 caught 82.1-98.2%
 15. Effect sizes (effect_sizes.py; binomial O/M, 95%: placements t4, all ten DL-HKSJ)
@@ -61,8 +65,43 @@
 16. Placements (searched / all embeddings) and calibration inputs
    d3 sets 30 / 74 (148 embeddings); usable by day 18/44, 18/44, 18/44, 18/44, 18/44; rep-2 d3 rank among all usable 1, 2, 2, 2, 3
    d5 stricter bars passing (day 1): {'usable_all': 2, 'stricter (usable distance-5 placements passing)': {'CZ error < 5%': 0, 'readout error < 10%': 0, 'T2 > 10 us': 1, 'all three': 0}}
-   q51 readout by day 3.4%, 4.8%, 12.2%, 48.6%, 3.2%; readout gap P(0|1)-P(1|0) median 0.76 points
+   q51 readout by day 3.4%, 4.8%, 12.2%, 48.6%, 3.2%; readout gap P(0|1)-P(1|0) median 0.85 points
+   placement 1, day 1: CZ max 63-64 6.2%; readout max q83 13.6%; T2 below 10 us q149 5.1 us, q150 5.7 us; single-qubit error above 0.5% q149 1.71%; round 7.896-7.956 us
 17. Diagnostics after the first review
    detection-event fraction device/model, median (share above 1): all 1.20 (76%), X weight 4 1.15 (78%), X weight 2 0.98 (47%), Z 1.19 (99%), flag 1.55 (82%), relay 1.16 (66%)
    f vs T2: rho 0.66 [0.35, 0.85]; f_mem > f_idle in 15/15 (medians 1.45, 0.99)
    miscorrected single faults: 5-61% of predicted eps3
+18. Sensitivity of the agreement test (sensitivity.py; WL unless named)
+   sigma_f prespecified 0.15-0.38, idle-test noise only 0.054-0.136
+   prespecified: X lambda 25.0 (8; P2 3.8, k 24.0), X eps3 52.1 (5; P2 23.0, k 10.2), X eps5 19.8 (9; P2 7.8, k 4.0)
+   idle_noise_only: X lambda 33.4 (7; P2 12.0, k 29.6), X eps3 137.5 (2; P2 84.6, k 36.5), X eps5 37.7 (6; P2 16.2, k 8.1)
+   no_f_term: X lambda 38.4 (6; P2 16.9, k 32.7), X eps3 206.9 (2; P2 139.8, k 63.7), X eps5 45.3 (4; P2 19.7, k 10.3)
+   Monte Carlo sd of chi2: X lambda 0.86, X eps3 0.91, X eps5 1.05; eps5 fails in 97%, with the line slope 18.27
+   Lambda_X systematic (half range, windows and fits): placement 1 device 0.026, model 0.004, placement 2 device 0.032, model 0.005, all ten device 0.028, model 0.004
+   binomial O/M, Hartung-Knapp floored: X lambda 1.06 (0.92-1.22), X eps3 1.26 (1.15-1.38), X eps5 1.21 (1.11-1.31), Z eps3 2.04 (1.79-2.34), Z eps5 1.83 (1.71-1.95), Z lambda 1.11 (0.95-1.30)
+   Lambda_X offset t test p 0.23; power at 0.06: prespecified 0.38, idle_noise_only 0.64, no_f_term 0.79; power.json first committed 2026-10-12 08:35:14 UTC (6142bb3)
+   placement 1 follows its prediction: chi2 21.1, without day 2 4.2 (p 0.24); X5X6X8X9 device/model by day 0.331/0.248, 0.368/0.413, 0.375/0.309, 0.332/0.272, 0.325/0.242
+   calibration-scatter test: 80% power at a Lambda_X miss of 0.15
+19. Dependent repetitions, raw counts, Lambda_X margin (dependence.py)
+   X tests (WL) p: prespecified / placements correlated / P1 alone / P2 alone / offset day-block t / sign flip / hierarchical
+     X eps3: 1.1e-07 / 8.8e-05 / 2.3e-05 / 0.00033 / 0.0025 / 0.062 / 0.002
+     X eps5: 0.031 / 0.078 / 0.035 / 0.17 / 0.017 / 0.062 / 0.01
+     X lambda: 0.0054 / 0.029 / 0.00074 / 0.58 / 0.22 / 0.25 / 0.16
+   O/M X eps3: placement 1 1.26 (1.08-1.47), placement 2 1.30 (1.09-1.56), day blocks 1.28 (1.21-1.36), hierarchical 1.26 (1.12-1.43)
+   O/M X eps5: placement 1 1.20 (1.06-1.36), placement 2 1.19 (1.13-1.25), day blocks 1.19 (1.10-1.30), hierarchical 1.21 (1.09-1.33)
+   O/M X lambda: placement 1 1.05 (0.82-1.34), placement 2 1.10 (0.94-1.28), day blocks 1.07 (0.97-1.18), hierarchical 1.06 (0.89-1.25)
+   counts X P1 d3: chi2 348/30 (round 1 134/5), excess pp +7.5 +7.4 +7.4 +6.5 +4.5 +4.1; after round 1 eps x1.25 (1.11-1.40), 2.5 pp/round; F(0) x0.84; round 1 off trend -0.2 pp
+   counts X P1 d5: chi2 300/30 (round 1 103/5), excess pp +7.8 +7.0 +6.1 +4.3 +2.0 +1.7; after round 1 eps x1.15 (0.91-1.47), 2.6 pp/round; F(0) x0.79; round 1 off trend -0.7 pp
+   counts X P2 d3: chi2 119/30 (round 1 44/5), excess pp +4.7 +5.6 +6.0 +5.8 +5.7 +4.3; after round 1 eps x1.30 (1.04-1.62), 2.5 pp/round; F(0) x0.93; round 1 off trend -0.1 pp
+   counts X P2 d5: chi2 241/30 (round 1 49/5), excess pp +7.7 +6.7 +4.7 +3.4 +1.4 +0.2; after round 1 eps x1.13 (0.91-1.39), 2.7 pp/round; F(0) x0.78; round 1 off trend -0.9 pp
+   counts Z P1 d3: chi2 7084/30 (round 1 988/5), excess pp +6.5 +10.7 +13.3 +13.8 +13.2 +10.9; after round 1 eps x1.94 (1.69-2.23), 6.7 pp/round; F(0) x1.01; round 1 off trend -0.2 pp
+   counts Z P1 d5: chi2 6094/30 (round 1 2759/5), excess pp +16.4 +16.8 +12.9 +9.3 +4.8 +1.8; after round 1 eps x1.77 (1.47-2.13), 13.1 pp/round; F(0) x0.81; round 1 off trend -1.3 pp
+   counts Z P2 d3: chi2 10441/30 (round 1 2602/5), excess pp +11.1 +15.3 +15.7 +15.7 +12.2 +9.4; after round 1 eps x2.08 (1.41-3.06), 9.8 pp/round; F(0) x0.91; round 1 off trend -0.8 pp
+   counts Z P2 d5: chi2 5484/30 (round 1 2336/5), excess pp +15.1 +16.3 +12.2 +9.1 +4.3 +1.8; after round 1 eps x1.56 (1.10-2.20), 9.8 pp/round; F(0) x0.68; round 1 off trend -2.5 pp
+   Lambda_X O - M binomial, placement 1: +0.025 (90% -0.103, +0.153), certified 0.153, chance to certify 0.05 0.01/0.16
+   Lambda_X O - M binomial, placement 2: +0.042 (90% -0.015, +0.100), certified 0.100, chance to certify 0.05 0.16/0.03
+   Lambda_X O - M binomial, day blocks: +0.034 (90% -0.018, +0.085), certified 0.085, chance to certify 0.05 0.23/0.24
+   Lambda_X O - M wls, placement 1: +0.044 (90% -0.085, +0.173), certified 0.173, chance to certify 0.05 0.01/0.14
+   Lambda_X O - M wls, placement 2: +0.058 (90% +0.007, +0.109), certified 0.109, chance to certify 0.05 0.24/0.03
+   Lambda_X O - M wls, day blocks: +0.051 (90% -0.003, +0.105), certified 0.105, chance to certify 0.05 0.19/0.22
+   Lambda_X O - M prespecified pool (WL): +0.049 (90% -0.005, +0.103)

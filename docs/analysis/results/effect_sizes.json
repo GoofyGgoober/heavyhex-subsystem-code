@@ -5470,7 +5470,7 @@
   }
  },
  "table": {
-  "convention": "every cell, observed and predicted: plain mean over the five days. Observed error sqrt(sum sigma_i^2) / 5, multiplied by sqrt(chi2/nu) when chi2/nu > 1, chi2 about the plain mean, nu = 4. sigma_i is each estimator's own sampling error: binomial, half the 68% quasi-likelihood profile interval; WL, the delta-method sigma as prespecified in X memory, and in Z memory, where that sigma is unreliable near P = 1/2 (see errors), the parametric-bootstrap sd of the WL estimator. Predicted: plain mean of the daily predictions fitted the same way, with their range.",
+  "convention": "every cell, observed and predicted: plain mean over the five days. Observed error sqrt(sum sigma_i^2) / 5, multiplied by sqrt(chi2/nu) when chi2/nu > 1, chi2 about the plain mean, nu = 4. sigma_i is each estimator's own sampling error: binomial, half the 68% quasi-likelihood profile interval; WL, the delta-method sigma as prespecified in X memory, and in Z memory, where that sigma is unreliable near P = 1/2 (see errors), the parametric-bootstrap sd of the WL estimator. Predicted: plain mean of the daily predictions fitted the same way, with their range and sigma_M = sqrt(sum sigma_M,i^2) / 5 from the agreement test's sigma_M of each day.",
   "cells": {
    "X placement 1 wls eps3": {
     "observed": {
@@ -5485,7 +5485,8 @@
      "range": [
       0.09570654872316176,
       0.11767979426872083
-     ]
+     ],
+     "sigma_M": 0.004114948227418874
     },
     "observed_over_predicted (ratio of the plain means)": 1.2372074068646057,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5508,7 +5509,8 @@
      "range": [
       0.1432070609963697,
       0.17919477045836096
-     ]
+     ],
+     "sigma_M": 0.0065604866546991585
     },
     "observed_over_predicted (ratio of the plain means)": 1.1480650109298116,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5531,7 +5533,8 @@
      "range": [
       0.5433411391625861,
       0.8217457536657637
-     ]
+     ],
+     "sigma_M": 0.00389143492073502
     },
     "observed_over_predicted (ratio of the plain means)": 1.0684326470271153,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5554,7 +5557,8 @@
      "range": [
       0.0957088692584227,
       0.11768939666204412
-     ]
+     ],
+     "sigma_M": 0.004116021780727539
     },
     "observed_over_predicted (ratio of the plain means)": 1.2571755557314435,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5577,7 +5581,8 @@
      "range": [
       0.14323754356883595,
       0.179395107932165
-     ]
+     ],
+     "sigma_M": 0.006562701911244433
     },
     "observed_over_predicted (ratio of the plain means)": 1.1997877470885456,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5600,7 +5605,8 @@
      "range": [
       0.5427822116562888,
       0.8216379151007005
-     ]
+     ],
+     "sigma_M": 0.00389147963761552
     },
     "observed_over_predicted (ratio of the plain means)": 1.0392521604741296,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5623,7 +5629,8 @@
      "range": [
       0.07699965885880455,
       0.10218901394103413
-     ]
+     ],
+     "sigma_M": 0.005586832063369195
     },
     "observed_over_predicted (ratio of the plain means)": 1.292214292764251,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5646,7 +5653,8 @@
      "range": [
       0.1834437802837574,
       0.20125815002550612
-     ]
+     ],
+     "sigma_M": 0.008836900654928443
     },
     "observed_over_predicted (ratio of the plain means)": 1.1423167044731297,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5669,7 +5677,8 @@
      "range": [
       0.40082584468722393,
       0.5378096347705859
-     ]
+     ],
+     "sigma_M": 0.035553733122267325
     },
     "observed_over_predicted (ratio of the plain means)": 1.1299743034621235,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5692,7 +5701,8 @@
      "range": [
       0.0770036780271113,
       0.10219935797708435
-     ]
+     ],
+     "sigma_M": 0.005587214719760316
     },
     "observed_over_predicted (ratio of the plain means)": 1.2996694383684917,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5715,7 +5725,8 @@
      "range": [
       0.18355424213983024,
       0.20142440792826954
-     ]
+     ],
+     "sigma_M": 0.008823196832082917
     },
     "observed_over_predicted (ratio of the plain means)": 1.1864390652439678,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5738,7 +5749,8 @@
      "range": [
       0.4005008757034621,
       0.5377314136382894
-     ]
+     ],
+     "sigma_M": 0.03551825620814705
     },
     "observed_over_predicted (ratio of the plain means)": 1.0943453740915774,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5761,7 +5773,8 @@
      "range": [
       0.06167222573489589,
       0.08186538211244743
-     ]
+     ],
+     "sigma_M": 0.0002573589102187444
     },
     "observed_over_predicted (ratio of the plain means)": 1.9371286504615575,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5798,7 +5811,8 @@
      "range": [
       0.15340455406144188,
       0.17428499136555986
-     ]
+     ],
+     "sigma_M": 0.0005195624192951248
     },
     "observed_over_predicted (ratio of the plain means)": 1.7426052903991422,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5835,7 +5849,8 @@
      "range": [
       0.35385850067570895,
       0.4942609787390816
-     ]
+     ],
+     "sigma_M": 0.0020930329521950323
     },
     "observed_over_predicted (ratio of the plain means)": 1.130059045122596,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5872,7 +5887,8 @@
      "range": [
       0.061673956844500014,
       0.08187995418950117
-     ]
+     ],
+     "sigma_M": 0.0002530060056557833
     },
     "observed_over_predicted (ratio of the plain means)": 1.955522390669089,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5895,7 +5911,8 @@
      "range": [
       0.15341993831235662,
       0.1743169623673438
-     ]
+     ],
+     "sigma_M": 0.0005129835451512371
     },
     "observed_over_predicted (ratio of the plain means)": 1.8698240455275015,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5918,7 +5935,8 @@
      "range": [
       0.35380353126239367,
       0.49421969828384615
-     ]
+     ],
+     "sigma_M": 0.0020609610379281867
     },
     "observed_over_predicted (ratio of the plain means)": 1.0484167690467914,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5941,7 +5959,8 @@
      "range": [
       0.07667528152167408,
       0.08789648303121184
-     ]
+     ],
+     "sigma_M": 0.0005164923214074357
     },
     "observed_over_predicted (ratio of the plain means)": 2.135502678212291,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -5978,7 +5997,8 @@
      "range": [
       0.15420911184660457,
       0.18267788834550525
-     ]
+     ],
+     "sigma_M": 0.0007024329976942597
     },
     "observed_over_predicted (ratio of the plain means)": 1.5539000225372992,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -6015,7 +6035,8 @@
      "range": [
       0.4197294057650555,
       0.569982421782213
-     ]
+     ],
+     "sigma_M": 0.0036396099457638685
     },
     "observed_over_predicted (ratio of the plain means)": 1.3616951826157275,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -6052,7 +6073,8 @@
      "range": [
       0.07672472808540354,
       0.08791486541601995
-     ]
+     ],
+     "sigma_M": 0.0005005265610199449
     },
     "observed_over_predicted (ratio of the plain means)": 2.2048776209817196,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -6075,7 +6097,8 @@
      "range": [
       0.15422534385641012,
       0.18299018199812933
-     ]
+     ],
+     "sigma_M": 0.0007148455453313857
     },
     "observed_over_predicted (ratio of the plain means)": 1.8124168479890008,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
@@ -6098,7 +6121,8 @@
      "range": [
       0.41928330387795276,
       0.5700416236249222
-     ]
+     ],
+     "sigma_M": 0.0035957639351215332
     },
     "observed_over_predicted (ratio of the plain means)": 1.2164633703435455,
     "inverse_variance (each fit's own sigma, Birge-widened)": {
