@@ -5,7 +5,7 @@ this draws figure1.png from the last `heavyhex calibrate`, as on the run days. T
 patches go where heavyhex.patches.placement's day plan puts them for the given
 calibration. Rep 1 is drawn in full, the other reps are boxed on the chip. Runs offline.
 
-    python docs/figures/figure1.py [--calibration PATH] [--out PATH]
+    python docs/figures/figure1.py [--calibration PATH] [--out PATH] [--weak Q,Q,...]
 """
 
 from __future__ import annotations
@@ -49,6 +49,7 @@ from draw_blueprint import (
 )
 
 WEAK_BAND = "#C8C8C8"
+WEAK_RING = "#6F6F6F"
 OTHER_REP = "#1B7A3D"  # boxes of the reps after the first
 QUBIT_NUMBER = "#6B6B6B"  # the Fez qubit numbers, darker than the blueprint's grey for print
 GAP = 3  # points between a label and anything else
@@ -137,6 +138,15 @@ def mark_weak_couplers(
         place(ax, text, candidates, taken, arrowprops=LEADER, **LABEL)
 
 
+def mark_weak_qubits(ax: Axes, device: DeviceMap, layout: HeavyHexLayout, qubits, size) -> None:
+    """Ring each of the given qubits that the patch uses (the caption says why it is weak)."""
+    for q in sorted(set(qubits) & layout.physical_qubits):
+        x, y = device.pos[q]
+        ax.scatter(
+            [x], [y], s=size * 3.2, facecolor="none", edgecolor=WEAK_RING, lw=1.6, zorder=5.8
+        )
+
+
 def flags(layout: HeavyHexLayout) -> set[int]:
     """The X ancillas that a bulk Z gauge borrows as flags (Z-gauge couplings to an X ancilla)."""
     x_ancillas = set(layout.x_ancillas.values())
@@ -221,6 +231,7 @@ def draw_key(fig: Figure, below: Axes) -> None:
             Line2D([], [], color=X_RED, lw=2.8, label="X-gauge CX"),
             Line2D([], [], color=Z_BLUE, lw=2.8, label="Z-gauge CX"),
             Line2D([], [], color=WEAK_BAND, lw=10, label=f"CZ error above {WEAK_CZ:.0%}"),
+            marker("o", "none", WEAK_RING, 15, "poor readout or $T_2$", 1.6),
             Line2D([], [], color=OTHER_REP, lw=1.8, ls=":", label="pair 2, in (a)"),
         ],
         loc="upper center",
@@ -277,7 +288,7 @@ def box_later_reps(ax: Axes, device: DeviceMap, plan: list) -> None:
         )
 
 
-def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
+def build_figure(device: DeviceMap, calibration: Calibration, weak_qubits=()) -> Figure:
     plan = day_plan(device.coords, device.edges, calibration)
     if not plan:
         raise ValueError("no usable placement for the d=5 patch: no rep to draw")
@@ -351,6 +362,7 @@ def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
     draw_key(fig, below=ax_d5)
     taken = taken_boxes(ax_d3)
     mark_weak_couplers(ax_d3, device, d3, calibration, taken)
+    mark_weak_qubits(ax_d3, device, d3, weak_qubits, 130)
     lifted = lift_z_labels(ax_d5, d5)
     taken = taken_boxes(ax_d5)
     for q, style in lifted:
@@ -358,6 +370,7 @@ def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
         sides = [(xy, 9, 0, "left", "center"), (xy, -9, 0, "right", "center")]
         place(ax_d5, f"q{q}", sides, taken, path_effects=HALO, zorder=7, bbox=UNDER, **style)
     mark_weak_couplers(ax_d5, device, d5, calibration, taken)
+    mark_weak_qubits(ax_d5, device, d5, weak_qubits, 95)
     return fig
 
 
@@ -377,8 +390,17 @@ def main(argv: list[str] | None = None) -> None:
         metavar="PATH",
         help="image to write; the suffix picks the format (default: ./figure1.png)",
     )
+    parser.add_argument(
+        "--weak",
+        type=lambda text: [int(q) for q in text.split(",")],
+        default=[],
+        metavar="Q,Q,...",
+        help="qubits to ring as weak (default: none)",
+    )
     args = parser.parse_args(argv)
-    fig = build_figure(load_device_map(FEZ_MAP), Calibration.load(args.calibration))
+    fig = build_figure(
+        load_device_map(FEZ_MAP), Calibration.load(args.calibration), weak_qubits=args.weak
+    )
     fig.savefig(args.out, dpi=300)
     plt.close(fig)
     print(f"wrote {args.out}")

@@ -34,6 +34,8 @@ LIGHT = [
     ["detection_events.py"],
     ["idle_f.py"],
     ["idle_f_t2.py"],
+    ["idle_test_scope.py"],
+    ["fit_bias.py"],
     ["cz_scaled.py"],
     ["error_scale.py"],
     ["error_budget.py"],
@@ -46,6 +48,7 @@ LIGHT = [
     ["leakage_checks.py", "A", "E"],
     ["decoder.py"],
     ["decoder_dominant.py"],
+    ["decoder_ml.py"],
     ["ledger.py"],
 ]
 
