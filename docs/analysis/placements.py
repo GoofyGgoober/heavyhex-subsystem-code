@@ -188,12 +188,12 @@ def per_placement(D: Data) -> dict:
 
 
 def placements_compared(D: Data, pp: dict) -> dict:
-    """Difference between the two placements and their overlap; no estimate across them."""
+    """Difference between the two placements and their overlap; descriptive only."""
     from heavyhex.patches.placement import FEZ_MAP, build_layout
 
     out: dict = {
-        "note": "No estimate, p-value or bound across placements is given: on every day these were "
-        "the only usable distance-5 placements, and they overlap."
+        "note": "The difference between the placements is descriptive: on every day these were the "
+        "only usable distance-5 placements, and they overlap."
     }
     for b in BASES:
         for fit in FITS:

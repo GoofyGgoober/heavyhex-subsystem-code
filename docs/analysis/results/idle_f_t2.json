@@ -3862,7 +3862,8 @@
     "f_idle": 1.0572945121021786,
     "sigma_idle": 0.16133972076502598,
     "agrees_prespecified_allowance": false,
-    "at_search_edge": false
+    "at_search_edge": false,
+    "beyond_simulated_f": true
    },
    {
     "job": "ibm_fez-2026-10-04-r2-d3",
@@ -3874,7 +3875,8 @@
     "f_idle": 0.8833140337009852,
     "sigma_idle": 0.3833440906749466,
     "agrees_prespecified_allowance": true,
-    "at_search_edge": false
+    "at_search_edge": false,
+    "beyond_simulated_f": true
    },
    {
     "job": "ibm_fez-2026-10-04-r2-d5",
@@ -3886,7 +3888,8 @@
     "f_idle": 0.9471254591763452,
     "sigma_idle": 0.1943024849842424,
     "agrees_prespecified_allowance": true,
-    "at_search_edge": false
+    "at_search_edge": false,
+    "beyond_simulated_f": true
    },
    {
     "job": "ibm_fez-2026-10-05-r1",
@@ -3898,7 +3901,8 @@
     "f_idle": 0.7766487485966175,
     "sigma_idle": 0.1452473812876267,
     "agrees_prespecified_allowance": true,
-    "at_search_edge": false
+    "at_search_edge": false,
+    "beyond_simulated_f": false
    },
    {
     "job": "ibm_fez-2026-10-05-r2-d3",
@@ -3910,7 +3914,8 @@
     "f_idle": 0.7209195209657838,
     "sigma_idle": 0.35227741083483016,
     "agrees_prespecified_allowance": false,
-    "at_search_edge": true
+    "at_search_edge": true,
+    "beyond_simulated_f": true
    },
    {
     "job": "ibm_fez-2026-10-05-r2-d5",
@@ -3922,7 +3927,8 @@
     "f_idle": 0.9444411324612529,
     "sigma_idle": 0.20978675904121033,
     "agrees_prespecified_allowance": true,
-    "at_search_edge": false
+    "at_search_edge": false,
+    "beyond_simulated_f": true
    },
    {
     "job": "ibm_fez-2026-10-06-r1",
@@ -3934,7 +3940,8 @@
     "f_idle": 1.050757878545906,
     "sigma_idle": 0.2178717825119017,
     "agrees_prespecified_allowance": false,
-    "at_search_edge": false
+    "at_search_edge": false,
+    "beyond_simulated_f": true
    },
    {
     "job": "ibm_fez-2026-10-06-r2-d3",
@@ -3946,7 +3953,8 @@
     "f_idle": 1.5228084888934883,
     "sigma_idle": 0.3150351233604572,
     "agrees_prespecified_allowance": true,
-    "at_search_edge": false
+    "at_search_edge": false,
+    "beyond_simulated_f": true
    },
    {
     "job": "ibm_fez-2026-10-06-r2-d5",
@@ -3958,7 +3966,8 @@
     "f_idle": 1.1282786023847438,
     "sigma_idle": 0.19074891878924238,
     "agrees_prespecified_allowance": true,
-    "at_search_edge": false
+    "at_search_edge": false,
+    "beyond_simulated_f": true
    },
    {
     "job": "ibm_fez-2026-10-07-r1",
@@ -3970,7 +3979,8 @@
     "f_idle": 1.0109156834362347,
     "sigma_idle": 0.22556460092580455,
     "agrees_prespecified_allowance": true,
-    "at_search_edge": false
+    "at_search_edge": false,
+    "beyond_simulated_f": true
    },
    {
     "job": "ibm_fez-2026-10-07-r2-d3",
@@ -3982,7 +3992,8 @@
     "f_idle": 1.03343690279773,
     "sigma_idle": 0.2534605162372276,
     "agrees_prespecified_allowance": true,
-    "at_search_edge": false
+    "at_search_edge": false,
+    "beyond_simulated_f": true
    },
    {
     "job": "ibm_fez-2026-10-07-r2-d5",
@@ -3994,7 +4005,8 @@
     "f_idle": 1.095717140360736,
     "sigma_idle": 0.280630268125401,
     "agrees_prespecified_allowance": true,
-    "at_search_edge": false
+    "at_search_edge": false,
+    "beyond_simulated_f": true
    },
    {
     "job": "ibm_fez-2026-10-08-r1",
@@ -4006,7 +4018,8 @@
     "f_idle": 0.9907930952407054,
     "sigma_idle": 0.15440693715474568,
     "agrees_prespecified_allowance": false,
-    "at_search_edge": false
+    "at_search_edge": false,
+    "beyond_simulated_f": true
    },
    {
     "job": "ibm_fez-2026-10-08-r2-d3",
@@ -4018,7 +4031,8 @@
     "f_idle": 0.791187681715852,
     "sigma_idle": 0.19479438350123326,
     "agrees_prespecified_allowance": false,
-    "at_search_edge": false
+    "at_search_edge": false,
+    "beyond_simulated_f": true
    },
    {
     "job": "ibm_fez-2026-10-08-r2-d5",
@@ -4030,7 +4044,8 @@
     "f_idle": 0.9805896625605671,
     "sigma_idle": 0.19882583337210402,
     "agrees_prespecified_allowance": true,
-    "at_search_edge": false
+    "at_search_edge": false,
+    "beyond_simulated_f": true
    }
   ],
   "above": 15,
@@ -4044,7 +4059,8 @@
    1.2790804790342163
   ],
   "agree_within_allowance": 10,
-  "at_search_edge_2.0": 1
+  "at_search_edge_2.0": 1,
+  "beyond_simulated_f": 14
  },
  "decode": {
   "basis": "X (Z memory is unchanged in every job)",

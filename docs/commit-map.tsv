@@ -1,8 +1,9 @@
-# Commits recorded in runs/ and their hashes after the history was rewritten on 12 October 2026.
+# Commits recorded in runs/ and docs/figures/figure3.json, and their hashes after the history was rewritten on 12 October 2026.
 # src/, pyproject.toml and runs/ are byte-identical at every commit.
 old	new
 023830c053865207eb43bf04da6925f661b36227	e8ef0b053048bb3a2739f1d7efcb99a706be6f45
 079c7ae4cf8c56e8cef32c2653f7621425d25e44	bd1106908dcba953a63c70ccfe737a93265f647a
+1c86fce02f50d2665dbc2d3d3bc84482870ec801	375462ebb60c66f54535fbf7b925406d69f4c056
 3ed59202f9b4be9986721f143968fb22518fd44f	bb79d4d7fb0e7093d6b25d0ad5f5a3aefa8f13ac
 616998e6703b1479a8892c5a3191fbad05e6aaf5	d0a5fe348f8d120be84dd948c659660aa5d23689
 7eab3b16441f2853fd5242671c1b3f70dd5f2c9a	4903e90c70da8e55811af8a979d5a44276125b2f

@@ -68,10 +68,11 @@
    q51 readout by day 3.4%, 4.8%, 12.2%, 48.6%, 3.2%; readout gap P(0|1)-P(1|0) median 0.85 points
    SX pair noise / CZ noise by day 0.275, 0.276, 0.267, 0.269, 0.257; snapshot in force / previous, minutes old at the first job 88.2/152.1, 22.9/75.2, 23.2/107.5, 22.5/86.3, 21.3/57.1; equal to previous (T1, T2, CZ, readout) 156of156/155of155/176of176/156of156, 156of156/155of155/176of176/156of156, 156of156/155of155/176of176/156of156, 156of156/155of155/176of176/1of156, 156of156/155of155/176of176/1of156
    placement 1, day 1: CZ max 63-64 6.2%; readout max q83 13.6%; T2 below 10 us q149 5.1 us, q150 5.7 us; single-qubit error above 0.5% q149 1.71%; round 7.896-7.956 us
+   Fig. timing (day 1, pair 1, d3): round 7.896 us, readout and reset 6.688 us (85%); path reset 1.684 gates 0.280 readout 1.660 reset 1.684 gates 0.928 readout 1.660; zero-duration resets 4.528 us; data idle (any, decoupled) 93.6-96.8%, 86.8-94.1%; flags in readout or reset 84.7%
 17. Diagnostics after the first review
    detection-event fraction device/model, median (share above 1): all 1.20 (76%), X weight 4 1.15 (78%), X weight 2 0.98 (47%), Z 1.19 (99%), flag 1.55 (82%), relay 1.16 (66%)
-   f vs T2: rho 0.66 [0.35, 0.85]; f_mem > f_idle in 15/15 (medians 1.45, 0.99)
-   miscorrected single faults: 5-61% of predicted eps3
+   f vs T2: rho 0.66 [0.35, 0.85]; f_mem > f_idle in 15/15 (medians 1.45, 0.99); beyond the simulated f in 14/15, at the search edge 2.0 in 1
+   miscorrected single faults: 5-61% of predicted eps3; day 1 pair 1: Z on q44 (DEPOLARIZE1) 3.3% per round over 15 mechanisms, largest single 0.0355, 85% of the miscorrected; matching chose edges 0.11, 0.20
 18. Sensitivity of the agreement test (sensitivity.py; WL unless named)
    sigma_f prespecified 0.15-0.38, idle-test noise only 0.054-0.136
    prespecified: X lambda 25.0 (8; P2 3.8, k 24.0), X eps3 52.1 (5; P2 23.0, k 10.2), X eps5 19.8 (9; P2 7.8, k 4.0)
@@ -117,3 +118,58 @@
    O/M (binomial) at the median f: X eps3 P1 1.26, P2 1.30; X eps5 P1 1.20, P2 1.19; X lambda P1 1.05, P2 1.10; Z eps3 P1 1.96, P2 2.16; Z eps5 P1 1.86, P2 1.81
    O/M (binomial) at the weighted-mean f: X eps3 P1 1.87, P2 1.81; X eps5 P1 1.74, P2 1.67; X lambda P1 1.07, P2 1.08; Z eps3 P1 1.97, P2 2.16; Z eps5 P1 1.87, P2 1.81
    readout error sigma/e (4096 shots per state): median 11.1%, 11.0% at e = 1%
+21. The tests fixed before the run, both sigma_f (prespecified_tests.py; WL unless named)
+   X tests, chi2 p (|z| < 2): sigma_f prespecified / idle noise only / no f term
+     wls      X lambda: 25.0 0.0054 (8) / 33.4 0.00023 (7) / 38.4 3.2e-05 (6); Holm p 0.011 / 0.00023
+     wls      X eps3: 52.1 1.1e-07 (5) / 137.5 1.4e-24 (2) / 206.9 6e-39 (2); Holm p 3.3e-07 / 4.1e-24
+     wls      X eps5: 19.8 0.031 (9) / 37.7 4.2e-05 (6) / 45.3 1.9e-06 (4); Holm p 0.031 / 8.5e-05
+     wls      per pair (5 dof), chi2 p, prespecified -> idle noise: X lambda P1 21.2 0.00074 -> 21.4 0.00067; X lambda P2 3.8 0.58 -> 12.0 0.035; X eps3 P1 29.1 2.3e-05 -> 52.9 3.6e-10; X eps3 P2 23.0 0.00033 -> 84.6 9.1e-17; X eps5 P1 12.0 0.035 -> 21.5 0.00065; X eps5 P2 7.8 0.17 -> 16.2 0.0063
+     binomial X lambda: 24.6 0.0062 (8) / 32.1 0.00038 (7) / 37.2 5.2e-05 (6); Holm p 0.0062 / 0.00038
+     binomial X eps3: 56.6 1.6e-08 (5) / 149.2 5.4e-27 (2) / 222.7 2.9e-42 (2); Holm p 4.8e-08 / 1.6e-26
+     binomial X eps5: 32.6 0.00032 (7) / 61.4 2e-09 (4) / 74.7 5.4e-12 (2); Holm p 0.00064 / 4e-09
+     binomial per pair (5 dof), chi2 p, prespecified -> idle noise: X lambda P1 21.4 0.00069 -> 21.7 0.00059; X lambda P2 3.2 0.67 -> 10.4 0.065; X eps3 P1 32.6 4.5e-06 -> 59.7 1.4e-11; X eps3 P2 24.0 0.00022 -> 89.5 8.5e-18; X eps5 P1 19.7 0.0014 -> 34.2 2.1e-06; X eps5 P2 12.9 0.024 -> 27.1 5.4e-05
+   Z memory (computed, not decided): Z lambda 35.2 (p 0.00012), Z eps3 1239.6 (p 4.2e-260), Z eps5 270.5 (p 2.6e-52)
+   pool: 0.554 + 1.833 x 0.030 = 0.609 < 1: d = 5 worse (t_9,0.95; chi2_0/nu 3.94, unwidened se 0.0149); predicted 0.505, O/M 1.097; per pair-day verdicts {'d = 5 worse': 10} (largest Lambda + 1.645 sigma 0.864); within pairs chi2_0/nu 0.38, 0.77
+   sigma_f prespecified 0.145-0.383, idle noise 0.054-0.136; per-qubit idle fits: median reduced chi2 1.65 over 325, p < 0.05 in 33%, p < 0.001 in 11%; uniformity chi2/nu 12.1-80.0, with scaled errors 8.9-43.3
+   fit-window systematic on Lambda_X, device / model (device with rounds 3-8): P1 +-0.026 / +-0.004 (+-0.086); P2 +-0.032 / +-0.005 (+-0.063); leaving out round 1: device +0.039 +- 0.024, model -0.006
+   pairs' table, errors widened alike (observed / predicted [chi2_0/4 of the predictions])
+     X pair 1 wls eps3: 12.7 +- 0.3 / 10.2 +- 0.4 [1.07], range 9.6-11.8
+     X pair 1 wls eps5: 18.5 +- 0.6 / 16.1 +- 0.7 [1.24], range 14.3-17.9
+     X pair 1 wls lambda: 0.69 +- 0.03 (stat) +- 0.03 (syst) / 0.64 +- 0.05 [146.72], range 0.543-0.822
+     X pair 1 binomial eps3: 12.9 +- 0.4 / 10.2 +- 0.4 [1.07], range 9.6-11.8
+     X pair 1 binomial eps5: 19.3 +- 0.6 / 16.1 +- 0.7 [1.25], range 14.3-17.9
+     X pair 1 binomial lambda: 0.67 +- 0.03 (stat) +- 0.03 (syst) / 0.64 +- 0.05 [146.32], range 0.543-0.822
+     X pair 2 wls eps3: 11.1 +- 0.4 / 8.6 +- 0.6 [0.63], range 7.7-10.2
+     X pair 2 wls eps5: 22.0 +- 0.6 / 19.2 +- 0.9 [0.14], range 18.3-20.1
+     X pair 2 wls lambda: 0.51 +- 0.02 (stat) +- 0.03 (syst) / 0.45 +- 0.04 [0.44], range 0.401-0.538
+     X pair 2 binomial eps3: 11.2 +- 0.4 / 8.6 +- 0.6 [0.63], range 7.7-10.2
+     X pair 2 binomial eps5: 22.8 +- 0.6 / 19.2 +- 0.9 [0.14], range 18.4-20.1
+     X pair 2 binomial lambda: 0.49 +- 0.02 (stat) +- 0.03 (syst) / 0.45 +- 0.04 [0.44], range 0.401-0.538
+     Z pair 1 wls eps3: 13.7 +- 0.3 / 7.1 +- 0.6 [540.12], range 6.2-8.2
+     Z pair 1 wls eps5: 29.0 +- 2.3 / 16.6 +- 0.4 [64.67], range 15.3-17.4
+     Z pair 1 wls lambda: 0.48 +- 0.05 / 0.43 +- 0.04 [397.50], range 0.354-0.494
+     Z pair 1 binomial eps3: 13.9 +- 0.4 / 7.1 +- 0.6 [539.80], range 6.2-8.2
+     Z pair 1 binomial eps5: 31.1 +- 1.3 / 16.6 +- 0.4 [65.90], range 15.3-17.4
+     Z pair 1 binomial lambda: 0.45 +- 0.02 / 0.43 +- 0.04 [400.77], range 0.354-0.494
+     Z pair 2 wls eps3: 17.9 +- 3.2 / 8.4 +- 0.3 [37.34], range 7.7-8.8
+     Z pair 2 wls eps5: 25.6 +- 1.4 / 16.5 +- 0.4 [30.90], range 15.4-18.3
+     Z pair 2 wls lambda: 0.70 +- 0.08 / 0.51 +- 0.02 [34.75], range 0.420-0.570
+     Z pair 2 binomial eps3: 18.4 +- 2.9 / 8.4 +- 0.3 [37.65], range 7.7-8.8
+     Z pair 2 binomial eps5: 29.9 +- 1.4 / 16.5 +- 0.4 [31.35], range 15.4-18.3
+     Z pair 2 binomial lambda: 0.62 +- 0.09 / 0.51 +- 0.02 [35.55], range 0.419-0.570
+   power at a Lambda_X miss of 0.06: one pair-day P1 / P2, a pair's chi2 P1 / P2, all ten; 80% at
+     prespecified: 0.13-0.18 / 0.09-0.11, 0.34 / 0.17, 0.38; 80% at 0.092 (median sigma 0.075); eps3, eps5 relative at 80% 0.161, 0.154
+     idle_noise_only: 0.13-0.18 / 0.18-0.28, 0.34 / 0.52, 0.64; 80% at 0.070 (median sigma 0.056); eps3, eps5 relative at 80% 0.101, 0.106
+     no_f_term: 0.13-0.18 / 0.26-0.41, 0.34 / 0.74, 0.79; 80% at 0.061 (median sigma 0.049); eps3, eps5 relative at 80% 0.080, 0.095
+   design study (f known): f = 0.0, 10 pair-days: sigma 0.036, caught 0.982; f = 1.0, 10 pair-days: sigma 0.033, caught 0.976
+   per pair-day z (WL; X: prespecified [idle noise]): Lambda_X eps3 eps5 | Lambda_Z eps3 eps5
+     day 1 pair 1: +3.04 [+3.04] +3.27 [+4.34] -0.17 [-0.23] | +2.09 +13.72 +4.31; Lambda_X + 1.645 sigma 0.864
+     day 1 pair 2: +0.61 [+1.32] +1.23 [+3.20] +0.80 [+1.27] | +0.17 +9.66 +1.87; Lambda_X + 1.645 sigma 0.512
+     day 2 pair 1: -3.04 [-3.07] +0.11 [+0.18] +2.46 [+3.04] | +0.09 +7.92 +7.39; Lambda_X + 1.645 sigma 0.743
+     day 2 pair 2: +1.42 [+2.57] +3.15 [+6.51] +1.76 [+2.47] | +1.80 +11.74 +3.05; Lambda_X + 1.645 sigma 0.614
+     day 3 pair 1: +1.03 [+1.03] +2.31 [+3.39] +1.54 [+2.43] | +1.39 +11.91 +1.94; Lambda_X + 1.645 sigma 0.792
+     day 3 pair 2: -0.19 [-0.32] +0.69 [+1.24] +1.06 [+1.42] | +0.57 +6.88 +7.92; Lambda_X + 1.645 sigma 0.592
+     day 4 pair 1: +1.04 [+1.05] +1.76 [+2.46] +0.97 [+1.69] | -0.18 +11.59 +5.73; Lambda_X + 1.645 sigma 0.785
+     day 4 pair 2: +0.44 [+0.77] +1.43 [+2.21] +0.62 [+1.18] | +2.78 +12.09 +1.46; Lambda_X + 1.645 sigma 0.562
+     day 5 pair 1: +0.79 [+0.79] +3.15 [+4.06] +1.61 [+1.86] | +1.60 +15.16 +7.18; Lambda_X + 1.645 sigma 0.757
+     day 5 pair 2: +1.08 [+1.71] +3.01 [+5.06] +1.60 [+2.25] | +3.86 +7.59 +5.60; Lambda_X + 1.645 sigma 0.582

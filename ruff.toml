@@ -15,6 +15,7 @@ allowed-confusables = ["σ"]
 known-local-folder = [
   "common", "costreak", "detectors", "draw_blueprint", "effect_sizes", "exact_sim",
   "fig_A_effect_sizes", "fig_B_detector_diagnostics", "fig_C_idle_dephasing", "fig_D_flag_records",
+  "fig_timing",
   "fits", "fitting", "frame_sim", "hmm", "hmm_bootstrap", "hmm_causes", "idle_f", "leakage",
   "leakage_fit", "leakage_frame_rerun", "leakage_grid", "make_figures", "matching", "perqubit_f",
   "placements", "properties", "refiring", "refit", "tableau_ref",

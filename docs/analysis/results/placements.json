@@ -1763,7 +1763,7 @@
   }
  },
  "placements_compared": {
-  "note": "No estimate, p-value or bound across placements is given: on every day these were the only usable distance-5 placements, and they overlap.",
+  "note": "The difference between the placements is descriptive: on every day these were the only usable distance-5 placements, and they overlap.",
   "Lambda_X wls": {
    "placement_1_minus_placement_2": 0.18157750888994517,
    "se": 0.03270529930482157,
