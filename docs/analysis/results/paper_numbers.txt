@@ -22,7 +22,7 @@
 3. Per repetition
    Lambda_X range wls 0.457-0.751, binomial 0.438-0.718; verdicts {'X wls': {'d = 5 worse': 10}, 'X binomial': {'d = 5 worse': 10}, 'Z wls': {'d = 5 worse': 9, 'undecided': 1}, 'Z binomial': {'d = 5 worse': 9, 'undecided': 1}}
    binomial lowers Lambda_X in 8 of 10 (max rise 0.0039); eps5 shift (pp) {'X': {'mean': 0.850937725686431, 'max': 1.5113432142570604}, 'Z': {'mean': 3.1991322479146302, 'max': 8.161421356882926}}
-4. Prespecified 10-repetition rule (record only)
+4. Prespecified summary value: Lambda_X pooled over the 10 repetitions
    Lambda_X 0.554 +- 0.030, chi2/nu 3.94 (nu 9): d = 5 worse; predicted 0.505
 5. Agreement tests (chi2 vs 18.31; reps agreeing)
    wls: X lambda 25.0 (8), X eps3 52.1 (5), X eps5 19.8 (9), Z lambda 35.2 (7), Z eps3 1239.6 (0), Z eps5 270.5 (3); all three X: 4

@@ -19,6 +19,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
+from matplotlib.text import Text
 from matplotlib.transforms import Bbox
 
 from heavyhex.patches.layout import HeavyHexLayout, build_layout
@@ -78,19 +79,35 @@ def taken_boxes(ax: Axes) -> list[Bbox]:
 def place(ax: Axes, text: str, candidates, taken: list[Bbox], **style) -> None:
     """Put text at the first (xy, dx, dy, ha, va) that stays in the panel and clears taken.
 
-    Offsets are in points. If no candidate fits, the first one.
+    Offsets are in points. If no candidate fits, the one in the panel whose text overlaps the
+    taken boxes least (beside a short coupler, its own end's qubit number can block every
+    leader).
     """
-    for i, (xy, dx, dy, ha, va) in enumerate([*candidates, candidates[0]]):
-        label = ax.annotate(
+    pad = GAP * ax.figure.dpi / 72
+
+    def put(xy, dx, dy, ha, va):
+        return ax.annotate(
             text, xy, xytext=(dx, dy), textcoords="offset points", ha=ha, va=va, **style
         )
+
+    fallback, least = candidates[0], float("inf")
+    for candidate in candidates:
+        label = put(*candidate)
         box = label.get_window_extent()
-        inside = all(ax.bbox.contains(x, y) for x, y in box.corners())
-        clear = not any(box.padded(GAP * ax.figure.dpi / 72).overlaps(t) for t in taken)
-        if i == len(candidates) or (inside and clear):
-            taken.append(box)
-            return
+        if all(ax.bbox.contains(x, y) for x, y in box.corners()):
+            if not any(box.padded(pad).overlaps(t) for t in taken):
+                taken.append(box)
+                return
+            words = Text.get_window_extent(label)  # the text alone, without its leader
+            overlap = sum(
+                max(0.0, min(words.x1 + pad, t.x1) - max(words.x0 - pad, t.x0))
+                * max(0.0, min(words.y1 + pad, t.y1) - max(words.y0 - pad, t.y0))
+                for t in taken
+            )
+            if overlap < least:
+                fallback, least = candidate, overlap
         label.remove()
+    taken.append(put(*fallback).get_window_extent())
 
 
 def mark_weak_couplers(
@@ -114,7 +131,7 @@ def mark_weak_couplers(
             candidates = [
                 (mid, dx, dy, ha, "center")
                 for dx, ha in ((9, "left"), (-9, "right"))
-                for dy in (0, -8, 8, -16, 16)
+                for dy in (0, -8, 8, -16, 16, -24, -32)
             ]
         text = "broken" if broken_coupler(error) else f"{error:.1%}"
         place(ax, text, candidates, taken, arrowprops=LEADER, **LABEL)

@@ -26,7 +26,7 @@ from make_figures import COLUMN, D3, D5, DIAG, GRID, INK, MUTED, OUT, PAGE, labe
 # is the markers, the model the line of the same colour.
 AQUA, YELLOW = "#1baf7a", "#eda100"
 STYLE = {
-    "X weight 4": (D5, "o", "weight-4 X, and Z stabilizers"),
+    "X weight 4": (D5, "o", "weight-4 X (a, b) and Z (c, d) stabilizers"),
     "Z": (D5, "o", None),
     "X weight 2": (D3, "s", "weight-2 X stabilizers"),
     "flag": (AQUA, "^", "flags"),
