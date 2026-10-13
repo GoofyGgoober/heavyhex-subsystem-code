@@ -317,7 +317,8 @@ def prespecified_record(D: Data) -> dict:
         "t9_critical": px["critical"],
         "verdict": px["verdict"],
         "predicted_inverse_variance_weighted": px["predicted"],
-        "note": "Record only (appendix): the rule treats the ten repetitions as independent.",
+        "note": "The prespecified summary value, quoted in the paper's results and abstract; the "
+        "rule treats the ten repetitions as independent, which they are not.",
     }
     rp = D.refits["summary"]["pooled_lambda"]
     assert abs(rp["X wls"]["lambda"] - px["lambda"]) < 1e-12

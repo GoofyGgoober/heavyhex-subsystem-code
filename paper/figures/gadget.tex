@@ -1,6 +1,6 @@
 % Fig. 2: the bulk Z-gauge gadget, gate for gate as in Z4_GATES (src/heavyhex/circuits/flagged.py),
-% for the gauge Z2Z3Z5Z6 of Fig. 1(b): arm 0 is the flag q23 (gauge X2X5) with Q2 and Q5,
-% arm 1 the flag q3 (gauge X3X6) with Q3 and Q6, and q16 the Z ancilla.
+% for the gauge Z2Z3Z5Z6 of Fig. 1(b): arm 0 is the flag q23 (gauge X2X5) with Q2 (q22) and Q5 (q24),
+% arm 1 the flag q3 (gauge X3X6) with Q3 (q2) and Q6 (q4), and q16 the Z ancilla.
 % Build: latexmk -pdf gadget.tex
 \documentclass[border=1pt]{standalone}
 \usepackage[T1]{fontenc}
@@ -10,12 +10,12 @@
 \usetikzlibrary{quantikz}
 \begin{document}
 \begin{quantikz}[row sep={0.68cm,between origins}, column sep=0.2cm]
-\lstick{data $Q_2$} & \ctrl{2} & \qw & \qw & \qw & \ctrl{2} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw \\
-\lstick{data $Q_5$} & \qw & \qw & \qw & \qw & \qw & \ctrl{1} & \qw & \qw & \qw & \qw & \ctrl{1} & \qw & \qw \\
+\lstick{data $Q_2$ (q22)} & \ctrl{2} & \qw & \qw & \qw & \ctrl{2} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw \\
+\lstick{data $Q_5$ (q24)} & \qw & \qw & \qw & \qw & \qw & \ctrl{1} & \qw & \qw & \qw & \qw & \ctrl{1} & \qw & \qw \\
 \lstick{flag q23: $\ket{0}$} & \targ{} & \ctrl{1} & \qw & \qw & \targ{} & \targ{} & \ctrl{1} & \qw & \qw & \qw & \targ{} & \qw & \meter{} \\
 \lstick{Z ancilla q16: $\ket{0}$} & \qw & \targ{} & \qw & \targ{} & \qw & \qw & \targ{} & \qw & \qw & \targ{} & \qw & \qw & \meter{} \\
 \lstick{flag q3: $\ket{0}$} & \qw & \qw & \targ{} & \ctrl{-1} & \qw & \qw & \qw & \targ{} & \targ{} & \ctrl{-1} & \qw & \targ{} & \meter{} \\
-\lstick{data $Q_3$} & \qw & \qw & \ctrl{-1} & \qw & \qw & \qw & \qw & \ctrl{-1} & \qw & \qw & \qw & \qw & \qw \\
-\lstick{data $Q_6$} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{-2} & \qw & \qw & \ctrl{-2} & \qw \\
+\lstick{data $Q_3$ (q2)} & \qw & \qw & \ctrl{-1} & \qw & \qw & \qw & \qw & \ctrl{-1} & \qw & \qw & \qw & \qw & \qw \\
+\lstick{data $Q_6$ (q4)} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{-2} & \qw & \qw & \ctrl{-2} & \qw \\
 \end{quantikz}
 \end{document}

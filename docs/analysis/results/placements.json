@@ -2706,7 +2706,7 @@
    "t9_critical": 1.833112932656237,
    "verdict": "d = 5 worse",
    "predicted_inverse_variance_weighted": 0.5054871811981743,
-   "note": "Record only (appendix): the rule treats the ten repetitions as independent."
+   "note": "The prespecified summary value, quoted in the paper's results and abstract; the rule treats the ten repetitions as independent, which they are not."
   },
   "same_rule_other_fits_and_Z": {
    "X wls": {

@@ -694,7 +694,7 @@ def digest(res: dict) -> str:
         f"eps5 shift (pp) {pr['eps5_binomial_minus_wls_pp']}"
     )
     rec = res["prespecified_pooled_record"]["prespecified"]
-    L.append("4. Prespecified 10-repetition rule (record only)")
+    L.append("4. Prespecified summary value: Lambda_X pooled over the 10 repetitions")
     L.append(
         f"   Lambda_X {fmt_pm(rec['Lambda_X'], rec['se'])}, chi2/nu {rec['chi2_per_dof']:.2f} (nu 9): {rec['verdict']}; "
         f"predicted {rec['predicted_inverse_variance_weighted']:.3f}"
