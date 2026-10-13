@@ -234,12 +234,10 @@ def fig_layout() -> None:
 
 def fig_analyses() -> None:
     """The figures of the analyses after the run, each drawn by its own script."""
-    import fig_B_detector_diagnostics
     import fig_C_idle_dephasing
     import fig_timing
 
     fig_timing.make(DIAG, OUT / "timing.pdf")
-    fig_B_detector_diagnostics.make(DIAG, OUT / "B_detector_diagnostics.pdf")
     fig_C_idle_dephasing.make(DIAG, OUT / "C_idle_dephasing.pdf")
 
 
