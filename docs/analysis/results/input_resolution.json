@@ -1,0 +1,60 @@
+{
+ "what": "binomial standard error of IBM's reported readout error (4096 shots per prepared state), relative to the error, over the qubits of every job's patches",
+ "readout_values_whole_multiples_of_1_over_8192": [
+  2340,
+  2340
+ ],
+ "qubit_jobs": 880,
+ "with_split": 497,
+ "reported_e_not_the_mean_of_the_split (qubits per day)": {
+  "2026-10-04": [
+   16,
+   33,
+   50,
+   67,
+   84,
+   101,
+   118,
+   135,
+   152
+  ],
+  "2026-10-05": [
+   16,
+   33,
+   50,
+   67,
+   84,
+   101,
+   118,
+   135,
+   152
+  ],
+  "2026-10-06": [
+   16,
+   33,
+   50,
+   67,
+   84,
+   101,
+   135,
+   152
+  ]
+ },
+ "e_median": 0.0098876953125,
+ "e_quartiles": [
+  0.0062255859375,
+  0.01873779296875
+ ],
+ "relative_sigma_median": 0.1105604300816783,
+ "relative_sigma_quartiles": [
+  0.07995462071249568,
+  0.13946312465725075
+ ],
+ "relative_sigma_range": [
+  0.01137155626217365,
+  0.24975574004915282
+ ],
+ "relative_sigma_at_1_percent": 0.10993161937086163,
+ "step_1_over_8192_relative_to_median_e": 0.012345679012345678,
+ "qubit_jobs_below_0.5_percent": 126
+}
