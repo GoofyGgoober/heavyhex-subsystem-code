@@ -1,8 +1,9 @@
 """Why do some qubits leak and err more than the calibration says? Per readout qubit.
 
-Joins each flag's and relay's fitted leakage (hmm.json, Z memory) with IBM's properties for
-that day (properties.json) and with what the qubit does in the circuit as sent, then ranks the
-candidate causes by Spearman correlation:
+Joins each flag's and relay's fitted leakage (hmm.json, Z memory) with the job's calibration
+(calibration.json; P(1|0), P(0|1) and the initialization error where properties.py has them
+for the calibration in force, days 1-3) and with what the qubit does in the circuit as sent,
+then ranks the candidate causes by Spearman correlation:
 
 - leak per CZ: the fitted leak rate per round over the CZs the qubit takes part in per round;
 - leak per event: the same over its readouts plus resets per round;
@@ -17,8 +18,9 @@ leaves out the preparation half: a flag takes part in 8 CZs, 2 readouts and 2 re
 round, a relay in 3, 1 and 1. The correlations are given over the 320 series and, since the
 series come from 38 physical qubits, over qubits (each qubit's mean over its series), with a
 95% interval from a bootstrap over qubits. Also the onset rate by role under each
-normalization, the qubits that served in both roles, and the line through onset rate
-against CZs per round, which with two CZ counts only joins the two roles' means.
+normalization, the qubits that served in both roles (onset and exit rate as a flag against
+as a relay), and the line through onset rate against CZs per round, which with two CZ
+counts only joins the two roles' means.
 Paper: Sec. VI (onset rate by role, the normalizations, the correlations) and Fig. leak (b).
 Under a minute.
 
@@ -34,6 +36,7 @@ import numpy as np
 from scipy.stats import binomtest, spearmanr
 
 from common import REPO, RESULTS, Job, job_folders, memory_index, write_json
+from properties import init_error, readout_split
 
 FEZ = json.loads((REPO / "docs/figures/fez_map.json").read_text())
 FEATURES = [
@@ -148,21 +151,21 @@ def spearman_ci(x: np.ndarray, y: np.ndarray, rng) -> dict:
 
 def main() -> None:
     hmm = json.loads((RESULTS / "hmm.json").read_text())
-    props = json.loads((RESULTS / "properties.json").read_text())
     nb = neighbours()
-    feats_by_job = {}
+    feats_by_job, cal = {}, {}
     for j in map(Job, job_folders()):  # one job in memory at a time
         cz, events = steady_state(j)
         feats_by_job[j.name] = (cz, events, exposure(schedule(j, memory_index("Z", 8)), nb))
+        cal[j.name] = j.calibration
     rows = []
     for r in hmm:
         q, day = r["qubit"], r["day"]
-        P, C = props[day]["qubits"], props[day]["cz"]
-        pq = P[str(q)]
+        C = cal[r["job"]]
+        p10, p01 = readout_split(day).get(q, (None, None))
         per_round, events, crowd = feats_by_job[r["job"]]
         n_cz = per_round.get(q, np.nan)
         n_ev = events.get(q, np.nan)
-        couplers = [C.get("-".join(map(str, sorted((q, n))))) for n in nb[q]]
+        couplers = [C.cz.get(tuple(sorted((q, n)))) for n in nb[q]]
         couplers = [c for c in couplers if c is not None and c < 0.5]
         rows.append(
             {
@@ -173,6 +176,7 @@ def main() -> None:
                 "leak_per_round": r["chip"]["a"],
                 "leak_per_cz": r["chip"]["a"] / n_cz if n_cz else np.nan,
                 "leak_per_event": r["chip"]["a"] / n_ev if n_ev else np.nan,
+                "exit_per_round": r["chip"]["b"],
                 "lifetime_rounds": 1 / max(r["chip"]["b"], 1e-6),
                 "read_leaked": r["chip"]["e_L"],
                 "fresh_excess": r["chip"]["e_N"] - r["model"]["e_N"],
@@ -181,11 +185,11 @@ def main() -> None:
                 "crowding": crowd.get(q, np.nan),
                 "cz_error_mean": float(np.mean(couplers)) if couplers else np.nan,
                 "cz_error_max": float(np.max(couplers)) if couplers else np.nan,
-                "p10": pq["prob_meas1_prep0"],
-                "p01": pq["prob_meas0_prep1"],
-                "readout": pq["readout_error"],
-                "init_error": pq.get("init_error"),
-                "t1": pq["T1"],
+                "p10": p10,
+                "p01": p01,
+                "readout": C.readout[q],
+                "init_error": init_error(day).get(q),
+                "t1": C.t1_us[q] * 1e-6,
                 "llr": r["chip"]["llr"],
             }
         )
@@ -270,6 +274,25 @@ def main() -> None:
         f"{b['geometric_mean_ratio_ci95_over_qubits'][1]:.2f}), above 1 in {b['flag_above_relay']} "
         f"(sign test p {b['sign_test_p_two_sided']:.3f}); predicted per readout or reset "
         f"{b['ratio_predicted']['per_readout_or_reset']:.2f}, per CZ {b['ratio_predicted']['per_cz']:.2f}"
+    )
+    # The exit rate b on the same qubits: if readouts and resets ended the state, a flag (two
+    # of each per round) would leave it faster than a relay (one of each).
+    exits = defaultdict(lambda: defaultdict(list))
+    for r in rows:
+        exits[r["qubit"]][r["role"]].append(r["exit_per_round"])
+    exit_ratio = {q: float(np.mean(exits[q]["z_flag"]) / np.mean(exits[q]["relay"])) for q in both}
+    elogs = np.log(list(exit_ratio.values()))
+    erng = np.random.default_rng(SEED + 1)  # own stream: the intervals below do not depend on it
+    egeo = [np.exp(elogs[erng.integers(0, len(elogs), len(elogs))].mean()) for _ in range(BOOT)]
+    b["flag_over_relay_exit"] = exit_ratio
+    b["exit_geometric_mean_ratio"] = float(np.exp(elogs.mean()))
+    b["exit_geometric_mean_ratio_ci95_over_qubits"] = np.percentile(egeo, [2.5, 97.5]).tolist()
+    b["exit_flag_below_relay"] = int((elogs < 0).sum())
+    print(
+        f"   exit rate as a flag / as a relay: geometric mean {b['exit_geometric_mean_ratio']:.2f} "
+        f"({b['exit_geometric_mean_ratio_ci95_over_qubits'][0]:.2f}-"
+        f"{b['exit_geometric_mean_ratio_ci95_over_qubits'][1]:.2f}), "
+        f"below 1 in {b['exit_flag_below_relay']} of {len(both)}"
     )
 
     # Over qubits: each physical qubit's mean over its series, so the 320 series count as 38

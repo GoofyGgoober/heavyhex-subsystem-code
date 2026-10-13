@@ -5,9 +5,9 @@ The leakage model (Sec. leakage): every qubit leaks with probability `leak` per 
 partner of a leaked qubit's CZ gets an X error with probability `strength` and leaks with
 probability `spread`; a leaked qubit returns after an exponential lifetime and reads 1 with
 probability `read` (the hidden Markov fits, hmm.py); each reset and readout has IBM's
-reported error for the job's day (properties.json). It is fitted to six detection statistics
-of the 8-round circuits of four jobs (FIT_JOBS), and simulated either by frame_sim.py or,
-exactly, by exact_sim.py.
+reported error for the job's day where recorded (ibm_errors). It is fitted to six detection
+statistics of the 8-round circuits of four jobs (FIT_JOBS), and simulated either by
+frame_sim.py or, exactly, by exact_sim.py.
 
   stats(det, labels)       the six statistics as fitted (pooled co-streak excess)
   stats_full(det, labels)  the same plus the round-conditioned versions (per slot) and more
@@ -45,6 +45,7 @@ from common import (
     readout_series,
     z4_of,
 )
+from properties import init_error, readout_split
 
 FIT_JOBS = ("2026-10-08-r1", "2026-10-08-r2-d5", "2026-10-08-r2-d3", "2026-10-06-r1")
 CASES = [(j, b) for j in FIT_JOBS for b in "XZ"]  # the fit's eight circuits, 8 rounds each
@@ -77,19 +78,11 @@ def hmm_inputs(jobs_subset=None) -> tuple[float, float]:
     return life, read
 
 
-PROPS = json.loads((RESULTS / "properties.json").read_text())
-
-
 def ibm_errors(day: str) -> tuple[dict, dict]:
-    """IBM's reset error (init_error) and (P(1|0), P(0|1)) per qubit, for the day's calibration."""
-    q = PROPS[day]["qubits"]
-    reset = {int(k): v["init_error"] for k, v in q.items() if v.get("init_error") is not None}
-    readout = {
-        int(k): (v["prob_meas1_prep0"], v["prob_meas0_prep1"])
-        for k, v in q.items()
-        if v.get("prob_meas1_prep0") is not None
-    }
-    return reset, readout
+    """IBM's reset error (init_error) and (P(1|0), P(0|1)) per qubit, for the day's calibration
+    (properties.py says which are recorded). A qubit missing from either keeps the model's error,
+    the readout error in force."""
+    return init_error(day), readout_split(day)
 
 
 class AllQubits(dict):
@@ -435,8 +428,9 @@ def _leakage(name, pt: Point):
 
 
 def path_of(kind, name, basis, rounds, pt: Point, shots, seed, sim: str | None = None) -> Path:
+    # inforce/: resets and readouts as ibm_errors gives them; older caches used the snapshot before
     sim = SIM if sim is None else sim
-    folder = CACHE / (f"exact_{kind}" if sim == "t" else f"exact_{kind}_{sim}")
+    folder = CACHE / (f"exact_{kind}" if sim == "t" else f"exact_{kind}_{sim}") / "inforce"
     return folder / f"{name}_{basis}{rounds}_{pt.tag()}_n{shots}_s{seed}.npz"
 
 

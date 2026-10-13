@@ -1,15 +1,16 @@
 """The calibration model with IBM's own reset and readout errors.
 
 The model gives every reset and every readout the calibration's readout error, the mean of
-P(1|0) and P(0|1), as a symmetric flip. IBM also reports a reset error (init_error,
-properties.json), several times smaller, and the two readout errors separately. For every
-job and both bases this samples each memory circuit twice: as the model has it, and with each
-reset's own init_error (where IBM reports one) and each readout flipping a 0 with P(1|0) and
-a 1 with P(0|1). Both are decoded with the model's priors and fitted with the prespecified
-fit. For the 8-round circuits it also compares each detector's rate with the device's.
-readout.py summarizes the result.
+P(1|0) and P(0|1), as a symmetric flip. IBM also reports a reset error (init_error), several
+times smaller, and the two readout errors separately (properties.py says which are recorded).
+For every job and both bases this samples each memory circuit three times: as the model has
+it ("model"); with each reset's own init_error where IBM reports one and each readout
+flipping a 0 with P(1|0) and a 1 with P(0|1) where those are recorded for the calibration in
+force ("ibm"); and with the init_errors only ("ibm_reset"). All are decoded with the model's
+priors and fitted with the prespecified fit. For the 8-round circuits it also compares each
+detector's rate with the device's. readout.py summarizes the result.
 
-About 4 minutes (10,000 shots per circuit).
+About 6 minutes (10,000 shots per circuit).
 
     python docs/analysis/readout_ibm.py [--shots 10000]   # writes results/readout_ibm.json
 """
@@ -86,13 +87,18 @@ def main() -> None:
         "variants": {
             "model": "as run: each reset and readout flips with the calibration's readout error",
             "ibm": "resets flip with IBM's init_error, readouts with P(1|0) and P(0|1)",
+            "ibm_reset": "resets flip with IBM's init_error, readouts as in the model",
         },
         "jobs": {},
     }
     longest = ROUNDS[-1]
     for job in jobs():
         reset_error, readout = ibm_errors(job.day)
-        variants = {"model": {}, "ibm": {"reset_error": reset_error, "readout": readout}}
+        variants = {
+            "model": {},
+            "ibm": {"reset_error": reset_error, "readout": readout},
+            "ibm_reset": {"reset_error": reset_error},
+        }
         found = {}
         for basis in "XZ":
             failed: dict = {v: {} for v in variants}

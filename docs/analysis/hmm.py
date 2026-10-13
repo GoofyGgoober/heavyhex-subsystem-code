@@ -168,12 +168,21 @@ def summarize(rows: list[dict]) -> dict:
         v = {k: np.array([r[src][k] for r in rows]) for k in ("a", "b", "e_N", "e_L", "pi", "llr")}
         life = -ROUND_US / np.log(1 - v["b"])
         occupancy = v["a"] / (v["a"] + v["b"])  # stationary share of rounds in the state
+        # share of the measured rounds in the state: P(state at round t) = s + (pi - s)(1-a-b)^t
+        # from pi at the first readout, over the rounds of the 4-, 6- and 8-round circuits
+        t = np.concatenate([np.arange(n) for n in LENGTHS])
+        measured = (
+            occupancy[:, None]
+            + (v["pi"] - occupancy)[:, None] * (1 - v["a"] - v["b"])[:, None] ** t[None, :]
+        ).mean(1)
         out[src] = {
             "a_median": float(np.median(v["a"])),
             "a_iqr": np.percentile(v["a"], [25, 75]).tolist(),
             "b_median": float(np.median(v["b"])),
             "occupancy_median": float(np.median(occupancy)),
             "occupancy_iqr": np.percentile(occupancy, [25, 75]).tolist(),
+            "occupancy_measured_rounds_median": float(np.median(measured)),
+            "occupancy_measured_rounds_iqr": np.percentile(measured, [25, 75]).tolist(),
             "lifetime_us_median": float(np.median(life)),
             "lifetime_us_iqr": np.percentile(life, [25, 75]).tolist(),
             "round_us_times_median_1_over_b": float(np.median(1 / np.maximum(v["b"], 1e-6)))

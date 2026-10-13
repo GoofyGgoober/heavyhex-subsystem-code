@@ -16,6 +16,11 @@
    0.0705845533114262,
    0.1587906919857084
   ],
+  "occupancy_measured_rounds_median": 0.06329317960451944,
+  "occupancy_measured_rounds_iqr": [
+   0.044823450763355546,
+   0.09243256120543601
+  ],
   "lifetime_us_median": 31.24166796484372,
   "lifetime_us_iqr": [
    26.121526397083237,
@@ -40,6 +45,11 @@
   "occupancy_iqr": [
    0.004795451679119941,
    0.009207789067339538
+  ],
+  "occupancy_measured_rounds_median": 0.007237352294782447,
+  "occupancy_measured_rounds_iqr": [
+   0.006003504976268998,
+   0.009158051029049213
   ],
   "lifetime_us_median": 4.735564628381648,
   "lifetime_us_iqr": [

@@ -8,7 +8,9 @@ prespecified weighted-log fit (heavyhex.simulation.noisy.fit_per_round) and by b
 likelihood (fitting.py). Leakage settings as in leakage_frame_rerun.py's fit-bitflip
 variant: every qubit leaks with the same probability per CZ; partner X error and transfer
 as given; the hidden Markov lifetime and leaked readout; each day's IBM reset errors and
-P(1|0), P(0|1). The chip and the calibration model come from leakage_frame_rerun_bitflip.json.
+P(1|0), P(0|1) where recorded (leakage.ibm_errors). The chip and the calibration model come
+from leakage_frame_rerun_bitflip.json. With --jobs only those jobs are simulated and the
+others are kept from the existing results file, if any, which must have the same parameters.
 
     python docs/analysis/leakage_rerun.py TAG --channel identity --leak 0.002 --strength 0.25 --spread 0.05
            [--shots 10000] [--workers 2] [--jobs ...]
@@ -112,8 +114,13 @@ def main() -> None:
                     counts[name][basis].setdefault(p, {})[rounds] = v
             print(f"{i + 1}/{len(tasks)} {name} {basis} [{time.time() - t0:.0f}s]", flush=True)
     orig = json.loads((RESULTS / "leakage_frame_rerun_bitflip.json").read_text())
-    params = {k: v for k, v in vars(a).items() if k != "workers"}
+    path = RESULTS / f"leakage_rerun_{a.tag}.json"
+    params = {k: v for k, v in vars(a).items() if k not in ("workers", "jobs")}
     out = {"params": params, "rounds": list(ROUNDS), "jobs": {}}
+    if a.jobs and path.exists():  # keep the other jobs from the existing results
+        kept = json.loads(path.read_text())
+        assert all(kept["params"][k] == v for k, v in params.items()), (kept["params"], params)
+        out["jobs"] = {n: v for n, v in kept["jobs"].items() if n not in names}
     for n in names:
         leak, k_out = {}, {}
         for b in "XZ":
@@ -129,7 +136,7 @@ def main() -> None:
             "leak": leak,
             "counts": k_out,
         }
-    path = RESULTS / f"leakage_rerun_{a.tag}.json"
+    out["jobs"] = dict(sorted(out["jobs"].items()))
     path.write_text(json.dumps(out, indent=1) + "\n")
     print("wrote", path.relative_to(REPO), f"[{time.time() - t0:.0f}s]")
 
