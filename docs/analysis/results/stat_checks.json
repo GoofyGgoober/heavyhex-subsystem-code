@@ -1,0 +1,996 @@
+{
+ "binomial_primary": {
+  "what": "plain means over each pair's five days (the pairs' table), observed and predicted at the measured f, each with its error as in that table; O/M per pair the geometric mean with Student t (4 dof), over all ten the DerSimonian-Laird mean with the Hartung-Knapp interval floored at the inverse-variance one",
+  "pair 1": {
+   "eps3": {
+    "binomial": {
+     "observed": 0.12881390078031066,
+     "observed_se": 0.004071794071036209,
+     "predicted": 0.10246293780773108,
+     "predicted_se": 0.0042627162704282975,
+     "observed_minus_predicted": 0.026350962972579578,
+     "O_over_M": 1.2588216657205866,
+     "O_over_M_ci95": [
+      1.0807374745598401,
+      1.4662506144084038
+     ]
+    },
+    "wls": {
+     "observed": 0.12675556212222414,
+     "observed_se": 0.0034240952145544257,
+     "predicted": 0.102452960933571,
+     "predicted_se": 0.004263496190120385,
+     "observed_minus_predicted": 0.024302601188653142,
+     "O_over_M": 1.2391983468807977,
+     "O_over_M_ci95": [
+      1.0701101164603868,
+      1.4350042292763865
+     ]
+    }
+   },
+   "eps5": {
+    "binomial": {
+     "observed": 0.19328453550065267,
+     "observed_se": 0.005652509136665589,
+     "predicted": 0.1610989410165964,
+     "predicted_se": 0.007323285050781788,
+     "observed_minus_predicted": 0.03218559448405628,
+     "O_over_M": 1.201633245391625,
+     "O_over_M_ci95": [
+      1.06448732261316,
+      1.3564487108083088
+     ]
+    },
+    "wls": {
+     "observed": 0.1848785175362063,
+     "observed_se": 0.00565703372845759,
+     "predicted": 0.16103488546042719,
+     "predicted_se": 0.007304992638112303,
+     "observed_minus_predicted": 0.02384363207577911,
+     "O_over_M": 1.1499721173166528,
+     "O_over_M_ci95": [
+      1.0177929949342464,
+      1.2993171275374917
+     ]
+    }
+   },
+   "lambda": {
+    "binomial": {
+     "observed": 0.667345723048857,
+     "observed_se": 0.026600156183625802,
+     "predicted": 0.6421403278530585,
+     "predicted_se": 0.047072485567529805,
+     "observed_minus_predicted": 0.025205395195798452,
+     "O_over_M": 1.0475922420990635,
+     "O_over_M_ci95": [
+      0.8198344642052419,
+      1.3386232875316175
+     ],
+     "systematic (fit window)": 0.02630502078207142
+    },
+    "wls": {
+     "observed": 0.686256563946026,
+     "observed_se": 0.027738844687708236,
+     "predicted": 0.6423021290630869,
+     "predicted_se": 0.04713587333966804,
+     "observed_minus_predicted": 0.04395443488293904,
+     "O_over_M": 1.0775899069382182,
+     "O_over_M_ci95": [
+      0.8435966200867325,
+      1.376487268779872
+     ],
+     "systematic (fit window)": 0.02630502078207142
+    },
+    "share of the log-linear gap removed by the binomial fit": 0.4265562675774054,
+    "binomial minus log-linear, observed / predicted": [
+     -0.01891084089716899,
+     -0.00016180121002840053
+    ]
+   }
+  },
+  "pair 2": {
+   "eps3": {
+    "binomial": {
+     "observed": 0.11178005785018046,
+     "observed_se": 0.004035064301857486,
+     "predicted": 0.08600652946837069,
+     "predicted_se": 0.005587214719760316,
+     "observed_minus_predicted": 0.025773528381809768,
+     "O_over_M": 1.3031809732635347,
+     "O_over_M_ci95": [
+      1.0888456625767098,
+      1.5597074107428417
+     ]
+    },
+    "wls": {
+     "observed": 0.11113107054274114,
+     "observed_se": 0.004027989403509078,
+     "predicted": 0.08600049633022877,
+     "predicted_se": 0.005586832063369195,
+     "observed_minus_predicted": 0.02513057421251237,
+     "O_over_M": 1.2955563466735907,
+     "O_over_M_ci95": [
+      1.0814033400264276,
+      1.552118608552848
+     ]
+    }
+   },
+   "eps5": {
+    "binomial": {
+     "observed": 0.22819208913622235,
+     "observed_se": 0.006428673878331885,
+     "predicted": 0.19233359370992995,
+     "predicted_se": 0.008823196832082917,
+     "observed_minus_predicted": 0.03585849542629241,
+     "O_over_M": 1.186621478907891,
+     "O_over_M_ci95": [
+      1.1273941504792975,
+      1.24896029805275
+     ]
+    },
+    "wls": {
+     "observed": 0.21957935258694014,
+     "observed_se": 0.006367837825860763,
+     "predicted": 0.19222283253593556,
+     "predicted_se": 0.008836900654928443,
+     "observed_minus_predicted": 0.027356520051004585,
+     "O_over_M": 1.142266022055931,
+     "O_over_M_ci95": [
+      1.0772683909433023,
+      1.2111853240221473
+     ]
+    }
+   },
+   "lambda": {
+    "binomial": {
+     "observed": 0.489813774673023,
+     "observed_se": 0.01729107132787841,
+     "predicted": 0.44758609692083756,
+     "predicted_se": 0.03551825620814705,
+     "observed_minus_predicted": 0.042227677752185444,
+     "O_over_M": 1.0982280334778023,
+     "O_over_M_ci95": [
+      0.9406443902805207,
+      1.2822112436739608
+     ],
+     "systematic (fit window)": 0.031979865127167606
+    },
+    "wls": {
+     "observed": 0.5060045210121371,
+     "observed_se": 0.01810434483033576,
+     "predicted": 0.44780179466187153,
+     "predicted_se": 0.035553733122267325,
+     "observed_minus_predicted": 0.05820272635026558,
+     "O_over_M": 1.1341984455965495,
+     "O_over_M_ci95": [
+      0.9887113508768803,
+      1.3010937042977462
+     ],
+     "systematic (fit window)": 0.031979865127167606
+    },
+    "share of the log-linear gap removed by the binomial fit": 0.27447251357164715,
+    "binomial minus log-linear, observed / predicted": [
+     -0.016190746339114104,
+     -0.0002156977410339711
+    ]
+   }
+  },
+  "all ten (O/M)": {
+   "X lambda": {
+    "binomial": {
+     "ratio": 1.0582531917534574,
+     "ci95": [
+      0.9200995374540532,
+      1.2171507236653778
+     ]
+    },
+    "wls": {
+     "ratio": 1.0921017635574803,
+     "ci95": [
+      0.9479978598540797,
+      1.2581107115040773
+     ]
+    }
+   },
+   "X eps3": {
+    "binomial": {
+     "ratio": 1.259814351839772,
+     "ci95": [
+      1.1459943980851708,
+      1.3849388825577038
+     ]
+    },
+    "wls": {
+     "ratio": 1.246583050291225,
+     "ci95": [
+      1.13647868449598,
+      1.3673545509237146
+     ]
+    }
+   },
+   "X eps5": {
+    "binomial": {
+     "ratio": 1.2057584826335481,
+     "ci95": [
+      1.112621036107663,
+      1.3066924597514749
+     ]
+    },
+    "wls": {
+     "ratio": 1.1523500505510893,
+     "ci95": [
+      1.0617247101191136,
+      1.2507108729306315
+     ]
+    }
+   }
+  },
+  "X tests [chi2, p, |z| < 2, Holm p] by fit and sigma_f": {
+   "binomial": {
+    "prespecified": {
+     "X lambda": {
+      "chi2": 24.592414387938668,
+      "p": 0.006174011896659436,
+      "abs_z_below_2": 8,
+      "p_holm_over_the_three_X_tests": 0.006174011896659436
+     },
+     "X eps3": {
+      "chi2": 56.600852300062854,
+      "p": 1.5839178088057953e-08,
+      "abs_z_below_2": 5,
+      "p_holm_over_the_three_X_tests": 4.751753426417386e-08
+     },
+     "X eps5": {
+      "chi2": 32.60115221610294,
+      "p": 0.0003177609641089352,
+      "abs_z_below_2": 7,
+      "p_holm_over_the_three_X_tests": 0.0006355219282178704
+     }
+    },
+    "idle_noise_only": {
+     "X lambda": {
+      "chi2": 32.10428288991382,
+      "p": 0.0003847241646124183,
+      "abs_z_below_2": 7,
+      "p_holm_over_the_three_X_tests": 0.0003847241646124183
+     },
+     "X eps3": {
+      "chi2": 149.22624589330073,
+      "p": 5.377415083668115e-27,
+      "abs_z_below_2": 2,
+      "p_holm_over_the_three_X_tests": 1.6132245251004347e-26
+     },
+     "X eps5": {
+      "chi2": 61.367092880005174,
+      "p": 1.9958573071205582e-09,
+      "abs_z_below_2": 4,
+      "p_holm_over_the_three_X_tests": 3.9917146142411164e-09
+     }
+    }
+   },
+   "wls": {
+    "prespecified": {
+     "X lambda": {
+      "chi2": 24.969855471470645,
+      "p": 0.005402937407426006,
+      "abs_z_below_2": 8,
+      "p_holm_over_the_three_X_tests": 0.010805874814852012
+     },
+     "X eps3": {
+      "chi2": 52.078477845188345,
+      "p": 1.1035700238479796e-07,
+      "abs_z_below_2": 5,
+      "p_holm_over_the_three_X_tests": 3.3107100715439384e-07
+     },
+     "X eps5": {
+      "chi2": 19.79926101839467,
+      "p": 0.031209542431283266,
+      "abs_z_below_2": 9,
+      "p_holm_over_the_three_X_tests": 0.031209542431283266
+     }
+    },
+    "idle_noise_only": {
+     "X lambda": {
+      "chi2": 33.43835514769866,
+      "p": 0.00022982051296219344,
+      "abs_z_below_2": 7,
+      "p_holm_over_the_three_X_tests": 0.00022982051296219344
+     },
+     "X eps3": {
+      "chi2": 137.50130198135017,
+      "p": 1.3693016313370541e-24,
+      "abs_z_below_2": 2,
+      "p_holm_over_the_three_X_tests": 4.1079048940111626e-24
+     },
+     "X eps5": {
+      "chi2": 37.72258091394878,
+      "p": 4.241129623380438e-05,
+      "abs_z_below_2": 6,
+      "p_holm_over_the_three_X_tests": 8.482259246760875e-05
+     }
+    }
+   }
+  },
+  "pool, prespecified rule on the binomial fit": {
+   "Lambda_X": 0.5375121856120855,
+   "se": 0.028760487505446127,
+   "se_unwidened": 0.014153138067059803,
+   "chi2_0_per_dof": 4.129400441968524,
+   "dof": 9,
+   "birge_ratio": 2.0320926263260057,
+   "predicted (same weights)": 0.5084625616580999,
+   "observed_minus_predicted": 0.02904962395398558,
+   "observed_over_predicted": 1.0571322770731724,
+   "t_0.95": 1.833112932656237,
+   "upper_bound (Lambda + t se)": 0.5902334072078169,
+   "lower_bound (Lambda - t se)": 0.4847909640163541,
+   "verdict": "d = 5 worse"
+  }
+ },
+ "rule_size": {
+  "what": "P(any of the three chi2 over the ten pair-days > 18.31) when the model is right; 1,000,000 simulated experiments per case, seed 5",
+  "independent tests (exact)": 0.1426250000000001,
+  "z_Lambda = (z3 - z5)/sqrt(2), z3 and z5 independent": {
+   "each test (Lambda, eps3, eps5)": [
+    0.050069,
+    0.049891,
+    0.050257
+   ],
+   "any of the three": 0.12095,
+   "mc_se": 0.0003260691606086046,
+   "bound for a familywise 5% (95th percentile of the largest chi2)": 21.241977362475204
+  },
+  "each pair-day's own correlations (WL, prespecified sigma_f)": {
+   "each test (Lambda, eps3, eps5)": [
+    0.049594,
+    0.050082,
+    0.04952
+   ],
+   "any of the three": 0.125012,
+   "mc_se": 0.0003307325201065054,
+   "bound for a familywise 5% (95th percentile of the largest chi2)": 21.362055418907975,
+   "corr(z_Lambda, z3) range": [
+    0.28878876350896737,
+    0.8595273271396559
+   ],
+   "corr(z_Lambda, z5) range": [
+    -0.7552317526180843,
+    -0.3515318500386018
+   ],
+   "corr(z3, z5) range": [
+    0.0,
+    0.6651974103714822
+   ]
+  },
+  "bonferroni bound (chi2_10 at 1 - 0.05/3)": 21.70739074792915,
+  "observed chi2 (prespecified)": {
+   "X lambda": 24.969855471470645,
+   "X eps3": 52.078477845188345,
+   "X eps5": 19.79926101839467
+  },
+  "holm p (prespecified)": {
+   "X lambda": 0.010805874814852012,
+   "X eps3": 3.3107100715439384e-07,
+   "X eps5": 0.031209542431283266
+  },
+  "rejected at the familywise-5% bound": {
+   "X lambda": true,
+   "X eps3": true,
+   "X eps5": false
+  }
+ },
+ "fit_window": {
+  "what": "plain means over each pair's five days of Lambda_X, device and model (the prediction at the measured f), both curves fitted on the same window by the same fit (sensitivity.py). Systematic = half the range over the ten choices below; rounds 3-8 are left out because there the distance-5 P(n) is 0.38-0.51 throughout and Lambda_X mostly noise.",
+  "pair 1": {
+   "device": {
+    "rounds 3-8 left out": 0.02630502078207142,
+    "with rounds 3-8": 0.08586421933757526
+   },
+   "model": {
+    "rounds 3-8 left out": 0.004016811132197706,
+    "with rounds 3-8": 0.005149241635517665
+   },
+   "device_minus_model": {
+    "rounds 3-8 left out": 0.030052108337678296,
+    "with rounds 3-8": 0.09072196160553059
+   },
+   "rounds 3-8 (device, model)": {
+    "wls 3-8": [
+     0.8382302684307193,
+     0.6345798542914565
+    ],
+    "binomial 3-8": [
+     0.7547825341436958,
+     0.6342753305992993
+    ]
+   }
+  },
+  "pair 2": {
+   "device": {
+    "rounds 3-8 left out": 0.031979865127167606,
+    "with rounds 3-8": 0.0633677015364007
+   },
+   "model": {
+    "rounds 3-8 left out": 0.004999235660220286,
+    "with rounds 3-8": 0.005874283264305724
+   },
+   "device_minus_model": {
+    "rounds 3-8 left out": 0.03652253600560773,
+    "with rounds 3-8": 0.06884379613974093
+   },
+   "rounds 3-8 (device, model)": {
+    "wls 3-8": [
+     0.6131662693939854,
+     0.43889606490786565
+    ],
+    "binomial 3-8": [
+     0.4954662079323466,
+     0.43814961911719214
+    ]
+   }
+  },
+  "all ten": {
+   "device": {
+    "rounds 3-8 left out": 0.02808574391533636,
+    "with rounds 3-8": 0.07355926139770497
+   },
+   "model": {
+    "rounds 3-8 left out": 0.0043872980988042265,
+    "with rounds 3-8": 0.0055056847591436475
+   },
+   "device_minus_model": {
+    "rounds 3-8 left out": 0.031609957416023404,
+    "with rounds 3-8": 0.07810551411701627
+   },
+   "rounds 3-8 (device, model)": {
+    "wls 3-8": [
+     0.7256982689123526,
+     0.5367379595996611
+    ],
+    "binomial 3-8": [
+     0.6251243710380213,
+     0.5362124748582457
+    ]
+   }
+  }
+ },
+ "lambda_offset": {
+  "what": "observed over predicted Lambda_X over the pair-days: DerSimonian-Laird mean of ln(O/M), variances (sigma_O/O)^2 + (sigma_M/M)^2 (effect_sizes.random_effects)",
+  "day-2 prediction lowered by (day_swing.json)": {
+   "q4 q5 q24 q25 at their medians": 0.1464100423034116,
+   "the distance-3 patch at its medians": 0.2120744813801242
+  },
+  "binomial": {
+   "all ten": {
+    "ratio": 1.0582531917534574,
+    "ci95 (floored, as the paper)": [
+     0.9200995374540532,
+     1.2171507236653778
+    ],
+    "ci95 (Hartung-Knapp)": [
+     0.9368516400435628,
+     1.195386515846101
+    ],
+    "tau": 0.14338819551435264,
+    "k": 10
+   },
+   "without day 2 of pair 1": {
+    "ratio": 1.1114318334846398,
+    "ci95 (floored, as the paper)": [
+     1.014190440841394,
+     1.2179968088224264
+    ],
+    "ci95 (Hartung-Knapp)": [
+     1.0203459007881945,
+     1.2106489765174742
+    ],
+    "tau": 0.0,
+    "k": 9
+   },
+   "without days 1 and 2 of pair 1": {
+    "ratio": 1.0710221975182443,
+    "ci95 (floored, as the paper)": [
+     0.9658027842033113,
+     1.1877047429750787
+    ],
+    "ci95 (Hartung-Knapp)": [
+     1.0021066775374683,
+     1.1446770820803358
+    ],
+    "tau": 0.0,
+    "k": 8
+   },
+   "day 2 lowered: q4 q5 q24 q25 at their medians": {
+    "ratio": 1.0801687667668132,
+    "ci95 (floored, as the paper)": [
+     0.9877101375197125,
+     1.1812823624838535
+    ],
+    "ci95 (Hartung-Knapp)": [
+     0.99001427360818,
+     1.178533073514363
+    ],
+    "tau": 0.04423056377266946,
+    "k": 10
+   },
+   "day 2 lowered: the distance-3 patch at its medians": {
+    "ratio": 1.0980314807026932,
+    "ci95 (floored, as the paper)": [
+     1.0123996495317331,
+     1.1909063117236467
+    ],
+    "ci95 (Hartung-Knapp)": [
+     1.0196467726093272,
+     1.182441964219404
+    ],
+    "tau": 0.0,
+    "k": 10
+   },
+   "t test on z (prespecified sigma_f)": {
+    "all ten": {
+     "mean_z": 0.3706114434142491,
+     "t": 0.7296580703896463,
+     "p": 0.48415583959246977,
+     "n": 10
+    },
+    "without day 2 of pair 1": {
+     "mean_z": 0.8041593814419772,
+     "t": 2.718092712644244,
+     "p": 0.026326298788242646,
+     "n": 9
+    }
+   }
+  },
+  "wls": {
+   "all ten": {
+    "ratio": 1.0921017635574803,
+    "ci95 (floored, as the paper)": [
+     0.9479978598540797,
+     1.2581107115040773
+    ],
+    "ci95 (Hartung-Knapp)": [
+     0.9685984447510598,
+     1.2313526502428898
+    ],
+    "tau": 0.14486715613029788,
+    "k": 10
+   },
+   "without day 2 of pair 1": {
+    "ratio": 1.1555669877037986,
+    "ci95 (floored, as the paper)": [
+     1.0515721122635553,
+     1.2698464018758198
+    ],
+    "ci95 (Hartung-Knapp)": [
+     1.0623811610996385,
+     1.2569265269055283
+    ],
+    "tau": 0.0,
+    "k": 9
+   },
+   "without days 1 and 2 of pair 1": {
+    "ratio": 1.105000331104298,
+    "ci95 (floored, as the paper)": [
+     0.9918033956272267,
+     1.2311167083355457
+    ],
+    "ci95 (Hartung-Knapp)": [
+     1.0501656610993628,
+     1.1626982075022156
+    ],
+    "tau": 0.0,
+    "k": 8
+   },
+   "day 2 lowered: q4 q5 q24 q25 at their medians": {
+    "ratio": 1.1183215915973477,
+    "ci95 (floored, as the paper)": [
+     1.0228549585128672,
+     1.2226984596634698
+    ],
+    "ci95 (Hartung-Knapp)": [
+     1.0251528980875282,
+     1.219957710275179
+    ],
+    "tau": 0.03795458008074087,
+    "k": 10
+   },
+   "day 2 lowered: the distance-3 patch at its medians": {
+    "ratio": 1.1394150406159005,
+    "ci95 (floored, as the paper)": [
+     1.0483156731331822,
+     1.2384310070472417
+    ],
+    "ci95 (Hartung-Knapp)": [
+     1.0587538833135641,
+     1.2262213676313243
+    ],
+    "tau": 0.0,
+    "k": 10
+   },
+   "t test on z (prespecified sigma_f)": {
+    "all ten": {
+     "mean_z": 0.6204252115864339,
+     "t": 1.280730527046223,
+     "p": 0.23230631005516936,
+     "n": 10
+    },
+    "without day 2 of pair 1": {
+     "mean_z": 1.0266883183637079,
+     "t": 3.4802141361887244,
+     "p": 0.00831701464303801,
+     "n": 9
+    }
+   }
+  }
+ },
+ "tracking": {
+  "what": "pair 1, Lambda_X: O_i = c M_i with one c, sigma_i^2 = sigma_O,i^2 + c^2 sigma_M,i^2 (effect_sizes.track); at c = 1 the chi2 is the sum of the prespecified z^2",
+  "binomial": {
+   "all days": {
+    "c": 0.9813296958536318,
+    "chi2 at c": 21.149229591490457,
+    "dof at c": 4,
+    "p at c": 0.0002958078483808181,
+    "chi2 at c = 1": 21.37303237967668,
+    "dof at c = 1": 5,
+    "p at c = 1": 0.0006885847419148838,
+    "c = 1 against c: Delta chi2": 0.223802788186223,
+    "c = 1 against c: p (1 dof)": 0.636157536271748
+   },
+   "without day 2": {
+    "c": 1.1029561392998335,
+    "chi2 at c": 4.573427952139713,
+    "dof at c": 3,
+    "p at c": 0.20583345201203407,
+    "chi2 at c = 1": 8.902811445502522,
+    "dof at c = 1": 4,
+    "p at c = 1": 0.06357517490266079,
+    "c = 1 against c: Delta chi2": 4.329383493362808,
+    "c = 1 against c: p (1 dof)": 0.03745981140111065
+   }
+  },
+  "wls": {
+   "all days": {
+    "c": 1.0131644882461348,
+    "chi2 at c": 21.096594689364625,
+    "dof at c": 4,
+    "p at c": 0.00030300558065350603,
+    "chi2 at c = 1": 21.194780254906064,
+    "dof at c = 1": 5,
+    "p at c = 1": 0.000744208863751943,
+    "c = 1 against c: Delta chi2": 0.09818556554143854,
+    "c = 1 against c: p (1 dof)": 0.7540179875567854
+   },
+   "without day 2": {
+    "c": 1.148748377567057,
+    "chi2 at c": 4.22819283762929,
+    "dof at c": 3,
+    "p at c": 0.23785436192869558,
+    "chi2 at c = 1": 11.977831877216792,
+    "dof at c = 1": 4,
+    "p at c = 1": 0.017516876665970453,
+    "c = 1 against c: Delta chi2": 7.749639039587501,
+    "c = 1 against c: p (1 dof)": 0.005372327794303329
+   }
+  }
+ },
+ "detector_bar": {
+  "what": "one-sided: a detector counts when it fires more often than predicted (against the predictions from the calibrations before and after the job, the smaller excess)",
+  "detectors range": [
+   372,
+   1428
+  ],
+  "bar range": [
+   3.440608624727069,
+   3.811569268136034
+  ],
+  "expected largest range": [
+   2.945596751077353,
+   3.3423497650770266
+  ],
+  "95th percentile range": [
+   3.637075252122119,
+   3.9701146425914082
+  ],
+  "share beyond sqrt(2 ln N)": [
+   0.42803030303030304,
+   0.6478494623655914
+  ],
+  "share beyond the expected largest": [
+   0.4583333333333333,
+   0.6827956989247311
+  ],
+  "share beyond the 95th percentile": [
+   0.41761363636363635,
+   0.6263440860215054
+  ],
+  "per_job": {
+   "2026-10-04-r1": {
+    "detectors": 1428,
+    "bar sqrt(2 ln N)": 3.811569268136034,
+    "expected largest": 3.3423497650770266,
+    "median largest": 3.298924880241361,
+    "95th percentile of the largest": 3.9701146425914082,
+    "beyond sqrt(2 ln N)": 757,
+    "beyond the expected largest": 806,
+    "beyond the 95th percentile": 740
+   },
+   "2026-10-04-r2-d3": {
+    "detectors": 372,
+    "bar sqrt(2 ln N)": 3.440608624727069,
+    "expected largest": 2.945596751077353,
+    "median largest": 2.9007146028199706,
+    "95th percentile of the largest": 3.637075252122119,
+    "beyond sqrt(2 ln N)": 171,
+    "beyond the expected largest": 185,
+    "beyond the 95th percentile": 167
+   },
+   "2026-10-04-r2-d5": {
+    "detectors": 1056,
+    "bar sqrt(2 ln N)": 3.731552884327437,
+    "expected largest": 3.257048686334355,
+    "median largest": 3.2132657516986143,
+    "95th percentile of the largest": 3.897616652891398,
+    "beyond sqrt(2 ln N)": 556,
+    "beyond the expected largest": 601,
+    "beyond the 95th percentile": 546
+   },
+   "2026-10-05-r1": {
+    "detectors": 1428,
+    "bar sqrt(2 ln N)": 3.811569268136034,
+    "expected largest": 3.3423497650770266,
+    "median largest": 3.298924880241361,
+    "95th percentile of the largest": 3.9701146425914082,
+    "beyond sqrt(2 ln N)": 781,
+    "beyond the expected largest": 829,
+    "beyond the 95th percentile": 770
+   },
+   "2026-10-05-r2-d3": {
+    "detectors": 372,
+    "bar sqrt(2 ln N)": 3.440608624727069,
+    "expected largest": 2.945596751077353,
+    "median largest": 2.9007146028199706,
+    "95th percentile of the largest": 3.637075252122119,
+    "beyond sqrt(2 ln N)": 236,
+    "beyond the expected largest": 254,
+    "beyond the 95th percentile": 231
+   },
+   "2026-10-05-r2-d5": {
+    "detectors": 1056,
+    "bar sqrt(2 ln N)": 3.731552884327437,
+    "expected largest": 3.257048686334355,
+    "median largest": 3.2132657516986143,
+    "95th percentile of the largest": 3.897616652891398,
+    "beyond sqrt(2 ln N)": 588,
+    "beyond the expected largest": 624,
+    "beyond the 95th percentile": 583
+   },
+   "2026-10-06-r1": {
+    "detectors": 1428,
+    "bar sqrt(2 ln N)": 3.811569268136034,
+    "expected largest": 3.3423497650770266,
+    "median largest": 3.298924880241361,
+    "95th percentile of the largest": 3.9701146425914082,
+    "beyond sqrt(2 ln N)": 763,
+    "beyond the expected largest": 802,
+    "beyond the 95th percentile": 748
+   },
+   "2026-10-06-r2-d3": {
+    "detectors": 372,
+    "bar sqrt(2 ln N)": 3.440608624727069,
+    "expected largest": 2.945596751077353,
+    "median largest": 2.9007146028199706,
+    "95th percentile of the largest": 3.637075252122119,
+    "beyond sqrt(2 ln N)": 241,
+    "beyond the expected largest": 250,
+    "beyond the 95th percentile": 233
+   },
+   "2026-10-06-r2-d5": {
+    "detectors": 1056,
+    "bar sqrt(2 ln N)": 3.731552884327437,
+    "expected largest": 3.257048686334355,
+    "median largest": 3.2132657516986143,
+    "95th percentile of the largest": 3.897616652891398,
+    "beyond sqrt(2 ln N)": 452,
+    "beyond the expected largest": 484,
+    "beyond the 95th percentile": 441
+   },
+   "2026-10-07-r1": {
+    "detectors": 1428,
+    "bar sqrt(2 ln N)": 3.811569268136034,
+    "expected largest": 3.3423497650770266,
+    "median largest": 3.298924880241361,
+    "95th percentile of the largest": 3.9701146425914082,
+    "beyond sqrt(2 ln N)": 834,
+    "beyond the expected largest": 871,
+    "beyond the 95th percentile": 818
+   },
+   "2026-10-07-r2-d3": {
+    "detectors": 372,
+    "bar sqrt(2 ln N)": 3.440608624727069,
+    "expected largest": 2.945596751077353,
+    "median largest": 2.9007146028199706,
+    "95th percentile of the largest": 3.637075252122119,
+    "beyond sqrt(2 ln N)": 202,
+    "beyond the expected largest": 215,
+    "beyond the 95th percentile": 196
+   },
+   "2026-10-07-r2-d5": {
+    "detectors": 1056,
+    "bar sqrt(2 ln N)": 3.731552884327437,
+    "expected largest": 3.257048686334355,
+    "median largest": 3.2132657516986143,
+    "95th percentile of the largest": 3.897616652891398,
+    "beyond sqrt(2 ln N)": 506,
+    "beyond the expected largest": 535,
+    "beyond the 95th percentile": 502
+   },
+   "2026-10-08-r1": {
+    "detectors": 1428,
+    "bar sqrt(2 ln N)": 3.811569268136034,
+    "expected largest": 3.3423497650770266,
+    "median largest": 3.298924880241361,
+    "95th percentile of the largest": 3.9701146425914082,
+    "beyond sqrt(2 ln N)": 768,
+    "beyond the expected largest": 813,
+    "beyond the 95th percentile": 751
+   },
+   "2026-10-08-r2-d3": {
+    "detectors": 372,
+    "bar sqrt(2 ln N)": 3.440608624727069,
+    "expected largest": 2.945596751077353,
+    "median largest": 2.9007146028199706,
+    "95th percentile of the largest": 3.637075252122119,
+    "beyond sqrt(2 ln N)": 233,
+    "beyond the expected largest": 243,
+    "beyond the 95th percentile": 231
+   },
+   "2026-10-08-r2-d5": {
+    "detectors": 1056,
+    "bar sqrt(2 ln N)": 3.731552884327437,
+    "expected largest": 3.257048686334355,
+    "median largest": 3.2132657516986143,
+    "95th percentile of the largest": 3.897616652891398,
+    "beyond sqrt(2 ln N)": 618,
+    "beyond the expected largest": 654,
+    "beyond the 95th percentile": 608
+   }
+  }
+ },
+ "f_read_off": {
+  "what": "run._dephasing_from_memory, fixed before the run: f read off the X-memory runs by the curve through the predictions at f = 0, the idle test's f and f = 1, from eps (distance 3 where the job has it) and from the stabilizer detection rates; agrees if |f_mem - f_idle| < 2 sqrt(sigma_mem^2 + sigma_idle^2 + 0.1^2), sigma_mem = 0 for the rates",
+  "jobs": 15,
+  "from eps agrees": 10,
+  "from detection rates agrees": 13,
+  "from eps median": 1.448,
+  "from detection rates median, range": [
+   1.226,
+   [
+    0.9139999999999999,
+    1.604
+   ]
+  ],
+  "per_job": {
+   "2026-10-04-r1": {
+    "idle test f (median)": 1.0572945121021786,
+    "its error": 0.16133972076502598,
+    "from eps": 1.783,
+    "from eps agrees": false,
+    "from detection rates": 1.06,
+    "from detection rates agrees": true
+   },
+   "2026-10-04-r2-d3": {
+    "idle test f (median)": 0.8833140337009852,
+    "its error": 0.3833440906749466,
+    "from eps": 1.328,
+    "from eps agrees": true,
+    "from detection rates": 0.9139999999999999,
+    "from detection rates agrees": true
+   },
+   "2026-10-04-r2-d5": {
+    "idle test f (median)": 0.9471254591763452,
+    "its error": 0.1943024849842424,
+    "from eps": 1.1400000000000001,
+    "from eps agrees": true,
+    "from detection rates": 1.296,
+    "from detection rates agrees": true
+   },
+   "2026-10-05-r1": {
+    "idle test f (median)": 0.7766487485966175,
+    "its error": 0.1452473812876267,
+    "from eps": 0.7949999999999999,
+    "from eps agrees": true,
+    "from detection rates": 1.078,
+    "from detection rates agrees": true
+   },
+   "2026-10-05-r2-d3": {
+    "idle test f (median)": 0.7209195209657838,
+    "its error": 0.35227741083483016,
+    "from eps": 2.0,
+    "from eps agrees": false,
+    "from detection rates": 1.497,
+    "from detection rates agrees": false
+   },
+   "2026-10-05-r2-d5": {
+    "idle test f (median)": 0.9444411324612529,
+    "its error": 0.20978675904121033,
+    "from eps": 1.5390000000000001,
+    "from eps agrees": true,
+    "from detection rates": 1.344,
+    "from detection rates agrees": true
+   },
+   "2026-10-06-r1": {
+    "idle test f (median)": 1.050757878545906,
+    "its error": 0.2178717825119017,
+    "from eps": 1.698,
+    "from eps agrees": false,
+    "from detection rates": 1.097,
+    "from detection rates agrees": true
+   },
+   "2026-10-06-r2-d3": {
+    "idle test f (median)": 1.5228084888934883,
+    "its error": 0.3150351233604572,
+    "from eps": 1.641,
+    "from eps agrees": true,
+    "from detection rates": 1.364,
+    "from detection rates agrees": true
+   },
+   "2026-10-06-r2-d5": {
+    "idle test f (median)": 1.1282786023847438,
+    "its error": 0.19074891878924238,
+    "from eps": 1.352,
+    "from eps agrees": true,
+    "from detection rates": 1.218,
+    "from detection rates agrees": true
+   },
+   "2026-10-07-r1": {
+    "idle test f (median)": 1.0109156834362347,
+    "its error": 0.22556460092580455,
+    "from eps": 1.5310000000000001,
+    "from eps agrees": true,
+    "from detection rates": 1.1600000000000001,
+    "from detection rates agrees": true
+   },
+   "2026-10-07-r2-d3": {
+    "idle test f (median)": 1.03343690279773,
+    "its error": 0.2534605162372276,
+    "from eps": 1.448,
+    "from eps agrees": true,
+    "from detection rates": 1.094,
+    "from detection rates agrees": true
+   },
+   "2026-10-07-r2-d5": {
+    "idle test f (median)": 1.095717140360736,
+    "its error": 0.280630268125401,
+    "from eps": 1.2630000000000001,
+    "from eps agrees": true,
+    "from detection rates": 1.298,
+    "from detection rates agrees": true
+   },
+   "2026-10-08-r1": {
+    "idle test f (median)": 0.9907930952407054,
+    "its error": 0.15440693715474568,
+    "from eps": 1.6520000000000001,
+    "from eps agrees": false,
+    "from detection rates": 1.274,
+    "from detection rates agrees": true
+   },
+   "2026-10-08-r2-d3": {
+    "idle test f (median)": 0.791187681715852,
+    "its error": 0.19479438350123326,
+    "from eps": 1.381,
+    "from eps agrees": false,
+    "from detection rates": 1.604,
+    "from detection rates agrees": false
+   },
+   "2026-10-08-r2-d5": {
+    "idle test f (median)": 0.9805896625605671,
+    "its error": 0.19882583337210402,
+    "from eps": 1.385,
+    "from eps agrees": true,
+    "from detection rates": 1.226,
+    "from detection rates agrees": true
+   }
+  }
+ }
+}

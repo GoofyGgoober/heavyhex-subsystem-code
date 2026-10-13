@@ -17,8 +17,11 @@ each day's calibration:
   relay_q51     placement 2's relay q51: its reported readout error by day, and on each day
                 the fraction of eight-round Z-memory rounds in which it read 1 and in which the
                 detector of the stabilizer it serves fired (runs/*/analysis.json)
-  weak_day1     the weakest reported parts of pair 1's two patches on day 1: each CZ, readout
-                and single-qubit error above a bar, each T1 or T2 below one
+  weak          every patch's weak parts on every day, by the rule's own test (placement.weak:
+                CZ error above 1%, readout error above 5%, T1 below 50 us, T2 below 30 us), and
+                the reported values of the parts that recur in placement 1
+  pair2_d3      where pair 2's distance-3 patch sat: inside placement 1, its overlap with
+                placement 2, and whether it used day 1's qubits
   round_us      the length of one round in each job, from the stored circuit durations:
                 (8-round minus 4-round X-memory circuit) / 4
 
@@ -36,6 +39,7 @@ import networkx as nx
 from networkx.algorithms import isomorphism
 
 from heavyhex.circuits.flagged import one_round
+from heavyhex.patches.layout import build_layout
 from heavyhex.patches.operators import build_operators
 from heavyhex.patches.placement import (
     ROUND_US,
@@ -44,6 +48,7 @@ from heavyhex.patches.placement import (
     broken_qubit,
     chip_qubits,
     spots,
+    weak,
 )
 
 from common import REPO, RUNS, jobs, memory_index, read, write_json
@@ -117,27 +122,65 @@ def relay_q51() -> dict:
     return out
 
 
-WEAK = {"cz": 0.01, "readout": 0.05, "single_qubit": 0.005, "t1_us": 50.0, "t2_us": 20.0}
+# The parts of placement 1 that were weak on every day (Sec. III).
+RECURRING = {
+    "cz": ["63-64", "102-103", "148-149", "149-150"],
+    "readout": [83, 102],
+    "t2_us": [149, 150],
+}
 
 
-def weak_day1() -> dict:
-    """Pair 1's parts on day 1 beyond the WEAK bars, as reported in that day's calibration."""
-    folder = RUNS / f"ibm_fez-{DAYS[0]}-r1"
-    cal = read(folder / "calibration.json")
-    out: dict = {"bars": WEAK}
-    for d, qubits in read(folder / "run.json")["chips"].items():
-        qs = set(qubits)
-        couplers = {k: v for k, v in cal["cz"].items() if set(map(int, k.split("-"))) <= qs}
-        out[f"d{d}"] = {
-            "cz": {k: v for k, v in sorted(couplers.items()) if v > WEAK["cz"]},
-            **{
-                key: {q: cal[key][str(q)] for q in sorted(qs) if cal[key][str(q)] > WEAK[key]}
-                for key in ("readout", "single_qubit")
+def patches(day: str, coords: list, edges: list) -> dict:
+    """The day's four patches as laid out: pair 1's two and pair 2's two."""
+    out = {}
+    for name, folder, d in (
+        ("placement 1 (d5)", "r1", "5"),
+        ("pair 1 d3", "r1", "3"),
+        ("placement 2 (d5)", "r2-d5", "5"),
+        ("pair 2 d3", "r2-d3", "3"),
+    ):
+        run = read(RUNS / f"ibm_fez-{day}-{folder}" / "run.json")
+        origin, direction = run["rep"]["spots"][d]
+        layout = build_layout(
+            int(d), coords, edges, origin=tuple(origin), direction=tuple(direction)
+        )
+        assert set(layout.physical_qubits) == set(run["chips"][d])
+        out[name] = layout
+    return out
+
+
+def weak_by_day(coords: list, edges: list) -> dict:
+    """Each patch's weak parts by the rule's test, and placement 1's recurring ones, by day."""
+    out: dict = {}
+    for day in DAYS:
+        cal = Calibration.load(RUNS / f"ibm_fez-{day}-r1" / "calibration.json")
+        out[day] = {
+            "weak": {
+                name: weak(layout, cal) for name, layout in patches(day, coords, edges).items()
             },
-            **{
-                key: {q: cal[key][str(q)] for q in sorted(qs) if cal[key][str(q)] < WEAK[key]}
-                for key in ("t1_us", "t2_us")
+            "recurring": {
+                "cz": {c: cal.cz.get(tuple(map(int, c.split("-")))) for c in RECURRING["cz"]},
+                "readout": {q: cal.readout[q] for q in RECURRING["readout"]},
+                "t2_us": {q: cal.t2_us[q] for q in RECURRING["t2_us"]},
             },
+        }
+    return out
+
+
+def pair2_d3(coords: list, edges: list) -> dict:
+    """Where pair 2's distance-3 patch sat relative to the two distance-5 placements."""
+    out = {}
+    first = None
+    for day in DAYS:
+        q = {name: set(lay.physical_qubits) for name, lay in patches(day, coords, edges).items()}
+        first = first or q["pair 2 d3"]
+        out[day] = {
+            "inside placement 1": q["pair 2 d3"] <= q["placement 1 (d5)"],
+            "shared with placement 2": len(q["pair 2 d3"] & q["placement 2 (d5)"]),
+            "qubits": len(q["pair 2 d3"]),
+            "same qubits as day 1": q["pair 2 d3"] == first,
+            "placements 1 and 2 share": len(q["placement 1 (d5)"] & q["placement 2 (d5)"]),
+            "pair 1 d3 shared with placement 1": len(q["pair 1 d3"] & q["placement 1 (d5)"]),
         }
     return out
 
@@ -221,7 +264,8 @@ def main() -> None:
                 }
         out[f"d{d}"] = block
     out["relay_q51"] = relay_q51()
-    out["weak_day1"] = weak_day1()
+    out["weak"] = weak_by_day(coords, edges)
+    out["pair2_d3"] = pair2_d3(coords, edges)
     rounds = round_us()
     out["round_us"] = {"by_job": rounds, "range": [min(rounds.values()), max(rounds.values())]}
     write_json("placement_counts.json", out)

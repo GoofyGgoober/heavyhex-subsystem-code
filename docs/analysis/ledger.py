@@ -229,6 +229,108 @@ def per_qubit_f_side() -> dict:
     }
 
 
+F_MODELS = (
+    "stored median",
+    "stored per_qubit",
+    "median",
+    "per_qubit",
+    "q150",
+    "shrunk",
+    "shrunk_scaled",
+)
+
+
+def f_models() -> dict:
+    """The q150 artefact and the f model behind the placement result (f_models.py)."""
+    r = take("f_models.json")
+    slope = r["slope"]
+    return {
+        "q150": r["q150"],
+        "pair_1_predicted (eps3, eps5, Lambda_X)": {
+            m: {
+                q: {
+                    k: r["per_pair"]["pair 1"][m][q][k]
+                    for k in ("by_day", "mean", "sim_se_of_mean")
+                }
+                for q in QUANTITIES
+            }
+            for m in F_MODELS
+        },
+        "pair_2_predicted_Lambda_X_mean": {
+            m: r["per_pair"]["pair 2"][m]["lambda"]["mean"] for m in F_MODELS
+        },
+        "placement_difference": r["placement"],
+        "share_of_the_per_qubit_Lambda_X_shift_from_q150": r[
+            "share_of_the_per_qubit_shift_from_q150 (pair 1 Lambda_X, reruns)"
+        ],
+        "X_tests (chi2, agreeing pair-days)": {
+            label: {
+                m: {q: [v["chi2"], v["agree"]] for q, v in by.items()} for m, by in by_model.items()
+            }
+            for label, by_model in r["tests"].items()
+        },
+        "sigma_f": {k: v for k, v in r["sigma_f"].items() if k != "per_job"},
+        "slope": {
+            "by_job": slope["by_job"],
+            "X_tests (chi2, agreeing pair-days)": {
+                where: {
+                    label: {
+                        k: {q: [v["chi2"], v["agree"]] for q, v in b.items()}
+                        for k, b in by_slope.items()
+                    }
+                    for label, by_slope in by_label.items()
+                }
+                for where, by_label in slope["tests"].items()
+            },
+        },
+        "reruns_check": r["reruns_check"],
+    }
+
+
+def f_models_digest(f: dict) -> list[str]:
+    pl = f["placement_difference"]
+    o = pl["observed (WL, inverse-variance over the days; placements.py)"]
+    p1 = f["pair_1_predicted (eps3, eps5, Lambda_X)"]
+    q = list(f["q150"].values())
+    steep = f["slope"]["by_job"]["ibm_fez-2026-10-06-r2-d3"]["eps3"]
+    eps3 = f["slope"]["X_tests (chi2, agreeing pair-days)"]["f = 1.52 only"]
+    sf = f["sigma_f"]
+    return [
+        "   f models (f_models.py): pair 1 - pair 2 predicted Lambda_X against observed "
+        f"{fmt_pm(o['value'], o['se'])}: "
+        + ", ".join(
+            f"{m} {pl[m]['predicted_difference']:.3f} (z {pl[m]['z (with sim se)']:+.1f})"
+            for m in F_MODELS
+        ),
+        "   pair 1 predicted eps5 / Lambda_X (mean): "
+        + ", ".join(
+            f"{m} {100 * p1[m]['eps5']['mean']:.2f}% / {p1[m]['lambda']['mean']:.3f}"
+            for m in F_MODELS
+        )
+        + f"; q150 alone gives {f['share_of_the_per_qubit_Lambda_X_shift_from_q150']:.2f} "
+        "of the per-qubit Lambda_X shift",
+        "   q150 Z-or-Y per round, median f -> own f, days 1-5: "
+        + ", ".join(
+            f"{100 * d['z_or_y_per_round']['median']:.1f}->{100 * d['z_or_y_per_round']['per_qubit']:.1f}%"
+            for d in q
+        ),
+        f"   sigma_f prespecified (ddof 0) {sf['range prespecified (ddof 0)'][0]:.3f}-"
+        f"{sf['range prespecified (ddof 0)'][1]:.3f}, ddof 1 {sf['range same with ddof 1'][0]:.3f}-"
+        f"{sf['range same with ddof 1'][1]:.3f}; noise only (SD of bootstrap medians, ddof 1) "
+        f"{sf['range idle_noise_only (bootstrap, ddof 1)'][0]:.3f}-"
+        f"{sf['range idle_noise_only (bootstrap, ddof 1)'][1]:.3f}",
+        f"   dM/df at f = 1.52 (eps3): line {steep['slope']:.4f}, secant "
+        f"{fmt_pm(steep['slope_secant_from_1'], steep['slope_secant_from_1 mc_sd'], 4)} "
+        f"(line/secant {steep['line_over_secant']:.2f}), parabola "
+        f"{fmt_pm(steep['slope_parabola'], steep['slope_parabola mc_sd'], 4)} "
+        f"(line/parabola {steep['line_over_parabola']:.2f}); X eps3 chi2 line/secant/parabola "
+        + " | ".join(
+            f"{label} " + "/".join(f"{v['X eps3'][0]:.1f}" for v in by.values())
+            for label, by in eps3.items()
+        ),
+    ]
+
+
 def heating() -> dict:
     h = take("heating.json")
 
@@ -551,7 +653,14 @@ def placements_and_inputs() -> dict:
             }
             for day, v in pc["relay_q51"].items()
         },
-        "weak_parts_pair_1_day_1": pc["weak_day1"],
+        "weak_parts_by_day (placement.weak)": {
+            day: {name: len(parts) for name, parts in v["weak"].items()}
+            for day, v in pc["weak"].items()
+        },
+        "recurring_weak_parts_of_placement_1_by_day": {
+            day: v["recurring"] for day, v in pc["weak"].items()
+        },
+        "pair_2_d3_location_by_day": pc["pair2_d3"],
         "round_us": pc["round_us"],
         "single_qubit_error_median_by_day": cal["single_qubit"],
         "calibration_age_by_day": cal["age"],
@@ -708,6 +817,215 @@ def scale_and_f() -> dict:
         },
         "input_resolution": take("input_resolution.json"),
     }
+
+
+def error_budget() -> dict:
+    """The model's error budget, one channel at a time, and what the model says would change
+    eps and Lambda (error_budget.py), without the per-curve detail."""
+    return {k: v for k, v in take("error_budget.json").items() if k != "per_curve"}
+
+
+def error_budget_digest(b: dict) -> list[str]:
+    fit = "binomial"
+    channels = list(b["channels"])
+    full = "+".join(channels)
+    off = {c: "+".join(x for x in channels if x != c) for c in channels}
+    L = [
+        "22. Error budget (error_budget.py; binomial; % of the model's eps, mean over the ten "
+        "pair-days: alone / drop when off / Shapley share)"
+    ]
+    for bd, blk in b["budget"][fit].items():
+        a = blk["all ten"]
+        idle = a["t1"]["shapley"]["mean"] + a["dephasing"]["shapley"]["mean"]
+        L.append(
+            f"   {bd}, model {100 * a['model_eps']['mean']:.1f}%: "
+            + "; ".join(
+                f"{c} {100 * a[c]['only']['mean']:.0f}/{100 * a[c]['off']['mean']:.0f}/"
+                f"{100 * a[c]['shapley']['mean']:.0f}"
+                for c in channels
+            )
+            + f"; idle Shapley {100 * idle:.0f}; measure off {100 * a['measure (off)']['mean']:.0f},"
+            f" reset off {100 * a['reset (off)']['mean']:.0f}"
+        )
+    for bp, blk in b["lambda"][fit].items():
+        model = blk[full]
+        idles = [(k, v) for k, v in blk.items() if k.startswith("idles")]
+        L.append(
+            f"   {bp}: Lambda {model['lambda']:.3f}; with one channel off "
+            + ", ".join(f"{c} {blk[off[c]]['lambda']:.3f}" for c in channels)
+            + "; "
+            + ", ".join(
+                f"{k.split()[1]} idles: Lambda {v['lambda']:.3f}, eps3 x{v['eps3'] / model['eps3']:.2f},"
+                f" eps5 x{v['eps5'] / model['eps5']:.2f}"
+                for k, v in idles
+            )
+        )
+    top = max(b["grid"])
+    for basis, blk in b["excess"][fit].items():
+
+        def k_of(j: dict) -> str:
+            beyond = j["beyond_the_grid"]
+            if "k" not in j or 2 * beyond > j["curves"]:
+                return f"beyond {top:g} on {beyond}/{j['curves']}"
+            more = f", beyond {top:g} on {beyond}/{j['curves']}" if beyond else ""
+            return f"{j['k']:.2f} ({j['ci68'][0]:.2f}-{j['ci68'][1]:.2f}{more})"
+
+        L.append(
+            f"   one channel times k for the device's eps, {basis} (every channel "
+            f"{blk['every channel (error_scale.py)']['k']:.2f}): "
+            + ", ".join(f"{c} {k_of(blk[c]['both distances'])}" for c in channels)
+        )
+    for bd, blk in b["excess_detection_rate"].items():
+        L.append(
+            f"   one channel times k for the device's bulk detection rate, {bd} (every channel "
+            f"{blk['every channel (error_scale.py)']['ratio']:.2f}): "
+            + ", ".join(
+                f"{c} {blk[c]['ratio']:.2f}" if "ratio" in blk[c] else f"{c} beyond {top:g}"
+                for c in channels
+            )
+            + "".join(
+                f" ({c}: {blk[c]['beyond_the_grid']} beyond)"
+                for c in channels
+                if "ratio" in blk[c] and blk[c]["beyond_the_grid"]
+            )
+        )
+    L.append(f"   {b['parallel_schedule']}")
+    return L
+
+
+def stat_checks() -> dict:
+    """The statistics with the binomial fit first, the size of the decision rule, the fit-window
+    systematic with rounds 3-8, Lambda_X without day 2 of pair 1, the detector check's bar and
+    the f read-offs (stat_checks.py), without the detector check's per-job detail."""
+    s = take("stat_checks.json")
+    return {**s, "detector_bar": {k: v for k, v in s["detector_bar"].items() if k != "per_job"}}
+
+
+def stat_checks_digest(s: dict) -> list[str]:
+    b = s["binomial_primary"]
+    L = ["23. The statistics with the binomial fit first (stat_checks.py)"]
+    for p in PLACEMENTS:
+        blk = b[f"pair {p}"]
+        L.append(
+            f"   pair {p}, observed (predicted) binomial / log-linear: "
+            + "; ".join(
+                f"{q} "
+                + " / ".join(
+                    f"{scale * blk[q][fit]['observed']:.{d}f} ({scale * blk[q][fit]['predicted']:.{d}f})"
+                    for fit in ("binomial", "wls")
+                )
+                for q, scale, d in (("eps3", 100, 1), ("eps5", 100, 1), ("lambda", 1, 3))
+            )
+            + f"; the binomial fit removes "
+            f"{100 * blk['lambda']['share of the log-linear gap removed by the binomial fit']:.0f}% "
+            "of the log-linear Lambda_X gap"
+        )
+    t = b["X tests [chi2, p, |z| < 2, Holm p] by fit and sigma_f"]["binomial"]["prespecified"]
+    L.append(
+        "   binomial X tests (prespecified sigma_f): "
+        + ", ".join(f"{q} {v['chi2']:.1f} (p {v['p']:.2g})" for q, v in t.items())
+    )
+    r = s["rule_size"]
+    own = r["each pair-day's own correlations (WL, prespecified sigma_f)"]
+    bound = own["bound for a familywise 5% (95th percentile of the largest chi2)"]
+    L.append(
+        f"   size of 'any chi2 > 18.31': independent {r['independent tests (exact)']:.3f}, "
+        f"z_Lambda = (z3 - z5)/sqrt 2 "
+        f"{r['z_Lambda = (z3 - z5)/sqrt(2), z3 and z5 independent']['any of the three']:.3f}, "
+        f"own correlations {own['any of the three']:.3f}; familywise-5% bound {bound:.2f} "
+        f"(Bonferroni {r['bonferroni bound (chi2_10 at 1 - 0.05/3)']:.2f}), passed by "
+        + ", ".join(q for q, v in r["rejected at the familywise-5% bound"].items() if v)
+        + "; Holm p "
+        + ", ".join(f"{q} {p:.2g}" for q, p in r["holm p (prespecified)"].items())
+    )
+    w = s["fit_window"]
+    L.append(
+        "   fit-window systematic on Lambda_X, device without / with rounds 3-8: "
+        + "; ".join(
+            f"{p} +-{w[p]['device']['rounds 3-8 left out']:.3f} / +-"
+            f"{w[p]['device']['with rounds 3-8']:.3f}"
+            for p in ("pair 1", "pair 2")
+        )
+    )
+    o = s["lambda_offset"]
+    for fit in ("binomial", "wls"):
+        L.append(
+            f"   Lambda_X O/M ({fit}, floored interval): "
+            + "; ".join(
+                f"{k} {v['ratio']:.2f} ({v['ci95 (floored, as the paper)'][0]:.2f}-"
+                f"{v['ci95 (floored, as the paper)'][1]:.2f})"
+                for k, v in o[fit].items()
+                if k != "t test on z (prespecified sigma_f)"
+            )
+            + f"; t test on z without day 2 of pair 1: p "
+            f"{o[fit]['t test on z (prespecified sigma_f)']['without day 2 of pair 1']['p']:.3f}"
+        )
+    for fit, blk in s["tracking"].items():
+        if fit == "what":
+            continue
+        a, x = blk["all days"], blk["without day 2"]
+        L.append(
+            f"   pair 1, Lambda_X = c M ({fit}): all days c {a['c']:.3f}, chi2 {a['chi2 at c']:.1f}; "
+            f"without day 2 c {x['c']:.3f}, chi2 {x['chi2 at c']:.1f} (p {x['p at c']:.2f}), at c = 1 "
+            f"{x['chi2 at c = 1']:.1f} (p {x['p at c = 1']:.3f}), c = 1 against c p "
+            f"{x['c = 1 against c: p (1 dof)']:.3f}"
+        )
+    d = s["detector_bar"]
+    L.append(
+        f"   detector bar sqrt(2 ln N) {d['bar range'][0]:.2f}-{d['bar range'][1]:.2f}, expected "
+        f"largest {d['expected largest range'][0]:.2f}-{d['expected largest range'][1]:.2f}, 95th "
+        f"percentile {d['95th percentile range'][0]:.2f}-{d['95th percentile range'][1]:.2f}; "
+        "share beyond: "
+        + ", ".join(
+            f"{k.removeprefix('share beyond ')} {100 * v[0]:.0f}-{100 * v[1]:.0f}%"
+            for k, v in d.items()
+            if k.startswith("share beyond")
+        )
+    )
+    f = s["f_read_off"]
+    L.append(
+        f"   f read off the memory runs agrees with the idle test: from eps in "
+        f"{f['from eps agrees']}/{f['jobs']}, from the detection rates in "
+        f"{f['from detection rates agrees']}/{f['jobs']}"
+    )
+    return L
+
+
+def input_noise() -> dict:
+    """What the errors of IBM's inputs add to sigma_M (input_noise.py), without the per-curve
+    check."""
+    n = take("input_noise.json")
+    return {**n, "check": {k: v for k, v in n["check"].items() if k != "per_curve"}}
+
+
+def input_noise_digest(n: dict) -> list[str]:
+    c, i = n["check"], n["inputs"]
+    hour = i["hour: day 1's two readout calibrations 56 minutes apart (the jobs' qubits)"]
+    days = i["days: sd of ln x over the five days, by kind (the patches' qubits and couplers)"]
+    shot = i["shot: readout errors' binomial sd of ln, median and range over the qubit-days"]
+    L = [
+        "24. The errors of IBM's inputs in sigma_M (input_noise.py)",
+        f"   sum of elasticities {c['median here / error_scale'][0]:.2f} against error_scale "
+        f"{c['median here / error_scale'][1]:.2f} (median |diff| "
+        f"{c['median |here - error_scale|']:.2f}); inputs' sd of ln: readout shot noise median "
+        f"{100 * shot[0]:.0f}%, readout an hour apart {100 * hour['sd_per_calibration (rms)']:.0f}% "
+        f"(robust {100 * hour['sd_per_calibration (robust, 1.4826 MAD)']:.0f}%), day to day "
+        + ", ".join(f"{k} {100 * v['median']:.0f}%" for k, v in days.items()),
+    ]
+    for case, blk in n["headline"].items():
+        for key, tests in blk.items():
+            L.append(
+                f"   {case}, {key}: "
+                + "; ".join(
+                    f"{q} chi2 {v['chi2 [as tested, diagonal, covariance]'][0]:.1f} -> "
+                    f"{v['chi2 [as tested, diagonal, covariance]'][1]:.1f} / "
+                    f"{v['chi2 [as tested, diagonal, covariance]'][2]:.1f} (p "
+                    f"{v['p [diagonal, covariance]'][1]:.2g}), sigma_in/M "
+                    f"{100 * v['sigma_in / M range'][0]:.1f}-{100 * v['sigma_in / M range'][1]:.1f}%"
+                    for q, v in tests.items()
+                )
+            )
+    return L
 
 
 def stored_pl8() -> dict:
@@ -913,6 +1231,7 @@ def digest(res: dict) -> str:
             for k, v in pq["predicted_Lambda_X_mean"].items()
         )
     )
+    L += f_models_digest(res["f_models"])
     h = res["heating_exploratory"]
     det = h["detection_events"]
     L.append("10. Heating (exploratory; fractional change start->end of a job)")
@@ -1081,23 +1400,39 @@ def digest(res: dict) -> str:
             for a in ages.values()
         )
     )
-    w5 = pi["weak_parts_pair_1_day_1"]["d5"]
+    rec = pi["recurring_weak_parts_of_placement_1_by_day"]
+    counts = pi["weak_parts_by_day (placement.weak)"]
     r = pi["round_us"]["range"]
+
+    def span(kind: str, part, scale: float = 100.0) -> str:
+        values = [scale * day[kind][str(part)] for day in rec.values()]
+        return f"{min(values):.1f}-{max(values):.1f}"
+
     L.append(
-        "   placement 1, day 1: CZ max "
-        + ", ".join(
-            f"{k} {100 * v:.1f}%" for k, v in sorted(w5["cz"].items(), key=lambda x: -x[1])[:1]
-        )
-        + "; readout max "
-        + ", ".join(
-            f"q{k} {100 * v:.1f}%"
-            for k, v in sorted(w5["readout"].items(), key=lambda x: -x[1])[:1]
-        )
-        + "; T2 below 10 us "
-        + ", ".join(f"q{k} {v:.1f} us" for k, v in w5["t2_us"].items() if v < 10)
-        + "; single-qubit error above 0.5% "
-        + ", ".join(f"q{k} {100 * v:.2f}%" for k, v in w5["single_qubit"].items())
-        + f"; round {r[0]:.3f}-{r[1]:.3f} us"
+        "   weak parts by day (placement.weak), placement 1 / placement 2: "
+        + ", ".join(f"{c['placement 1 (d5)']}/{c['placement 2 (d5)']}" for c in counts.values())
+        + "; placement 1 every day: CZ 63-64 "
+        + span("cz", "63-64")
+        + "%, 102-103 "
+        + span("cz", "102-103")
+        + "%; readout q83 "
+        + span("readout", 83)
+        + "%, q102 "
+        + span("readout", 102)
+        + "%; T2 q149 "
+        + span("t2_us", 149, 1.0)
+        + " us, q150 "
+        + span("t2_us", 150, 1.0)
+        + f" us; round {r[0]:.3f}-{r[1]:.3f} us"
+    )
+    loc = pi["pair_2_d3_location_by_day"]
+    L.append(
+        "   pair 2's d3 patch by day: inside placement 1 "
+        + ", ".join(str(v["inside placement 1"]) for v in loc.values())
+        + "; shares with placement 2 "
+        + ", ".join(f"{v['shared with placement 2']}/{v['qubits']}" for v in loc.values())
+        + "; day 1's qubits "
+        + ", ".join(str(v["same qubits as day 1"]) for v in loc.values())
     )
     tm = res["timing"]
     roles = tm["patches"]["3"]["by_role"]
@@ -1150,6 +1485,9 @@ def digest(res: dict) -> str:
     L += dependence_digest(res["dependence"])
     L += scale_and_f_digest(res["error_scale_and_f"])
     L += prespecified_tests_digest(res["prespecified_tests"])
+    L += error_budget_digest(res["error_budget"])
+    L += stat_checks_digest(res["stat_checks"])
+    L += input_noise_digest(res["input_noise"])
     return "\n".join(L) + "\n"
 
 
@@ -1493,6 +1831,7 @@ def main() -> None:
         "prespecified_tests": prespecified_tests(),
         "xy_variance_correction": take("idle_f.json")["correction"],
         "per_qubit_f_side_prediction": per_qubit_f_side(),
+        "f_models": f_models(),
         "heating_exploratory": heating(),
         "decoder_audit": take("decoder.json")["paper"],
         "leakage": leakage(),
@@ -1500,6 +1839,9 @@ def main() -> None:
         "placements_and_calibration_inputs": placements_and_inputs(),
         "diagnostics": diagnostics(),
         "error_scale_and_f": scale_and_f(),
+        "error_budget": error_budget(),
+        "stat_checks": stat_checks(),
+        "input_noise": input_noise(),
         **other(),
     }
     res["about"]["inputs"] = sorted(INPUTS | {"docs/analysis/results/placements.json"})
