@@ -27,7 +27,8 @@ compare sets each re-analysed job, and combined.json, against runs/ in four tier
      about five times what the simulator's noise in the predictions moves it (3-5%
      between two 200,000-shot samples), and each verdict, and whether the model matches
      the device in each basis, equal unless the stored chi2 lies within that 25% of the
-     bound. The per-repetition Lambda verdicts are tier A.
+     bound. Such a borderline test (X eps5, at 19.8 against 18.31) is printed as a note,
+     with whether its verdict came back. The per-repetition Lambda verdicts are tier A.
 
 A job that was asked for but not re-analysed counts as a failure. combined.json is
 compared when no --job is named.
@@ -213,6 +214,7 @@ class Report:
 
     identical: bool = False  # LF-normalised bytes, code.analyzed aside
     failures: list[str] = field(default_factory=list)
+    notes: list[str] = field(default_factory=list)  # tier D: verdicts too close to call
     worst_relative: float = 0.0  # tier B
     worst_standard_errors: float = 0.0  # tier C
     squares: list[float] = field(default_factory=list)  # tier C, each value's z**2
@@ -397,7 +399,12 @@ def compare_combined(
 
 
 def compare_decisions(new: dict, old: dict, report: Report) -> None:
-    """Tier D: the model-agreement tests and verdicts of a combined.json."""
+    """Tier D: the model-agreement tests and verdicts of a combined.json.
+
+    A verdict whose stored chi2 lies within DECISION_RELATIVE of its bound can flip with the
+    simulator's noise, so a change there is not a failure; every such test is still listed in
+    report.notes, with whether its verdict came back, and so is the basis verdict it feeds.
+    """
     near_bound = {"X": False, "Z": False}
     for name, want in old.get("model", {}).items():
         got = new.get("model", {}).get(name)
@@ -410,10 +417,24 @@ def compare_decisions(new: dict, old: dict, report: Report) -> None:
             report.failures.append(f"model/{name}/chi2: {got['chi2']!r} != {want['chi2']!r}")
         if got["agrees"] != want["agrees"] and not near:
             report.failures.append(f"model/{name}/agrees: {got['agrees']} != {want['agrees']}")
+        if near:
+            outcome = (
+                "verdict reproduced"
+                if got["agrees"] == want["agrees"]
+                else f"verdict changed: agrees {got['agrees']}, stored {want['agrees']}"
+            )
+            report.notes.append(
+                f"model/{name}: chi2 {got['chi2']:.2f} (stored {want['chi2']:.2f}) against the "
+                f"bound {want['bar']:.2f}, borderline; {outcome}"
+            )
     for basis, want in old.get("matches", {}).items():
         got = new.get("matches", {}).get(basis)
-        if got is not None and got != want and not near_bound.get(basis, False):
+        if got is None:
+            continue
+        if got != want and not near_bound.get(basis, False):
             report.failures.append(f"matches/{basis}: {got} != {want}")
+        elif got != want:
+            report.notes.append(f"matches/{basis}: {got}, stored {want}, through a borderline test")
 
 
 def _compare_command(args: argparse.Namespace, out: Path, names: list[str]) -> int:
@@ -448,6 +469,8 @@ def _compare_command(args: argparse.Namespace, out: Path, names: list[str]) -> i
             print(f"    {line}")
         if len(report.failures) > 10:
             print(f"    ... and {len(report.failures) - 10} more")
+        for line in report.notes:
+            print(f"    note: {line}")
     print(f"{compared} files compared, {failed} failed{' (strict)' if args.strict else ''}")
     return 1 if failed else 0
 
