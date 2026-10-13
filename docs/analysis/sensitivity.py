@@ -292,10 +292,15 @@ def sigma_f_section(D: Data, boot: dict) -> dict:
 
 
 # --------------------------------------------------------------------------- Monte Carlo
+def parabola_weights(f: float) -> np.ndarray:
+    """dM/df at f of the parabola through M(0), M(f), M(1), as weights on those three."""
+    return np.array([(f - 1) / f, (2 * f - 1) / (f * (f - 1)), f / (1 - f)])
+
+
 def slope_weights(f: float) -> np.ndarray:
     """dM/df at f as weights on M(0), M(f), M(1): run._slopes's parabola, or its line."""
     if 0.05 < f < 0.95:
-        return np.array([(f - 1) / f, (2 * f - 1) / (f * (f - 1)), f / (1 - f)])
+        return parabola_weights(f)
     return np.array([-1.0, 0.0, 1.0])
 
 
@@ -327,6 +332,18 @@ def job_predictions(D: Data, rng: np.random.Generator | None) -> dict:
                 "sim": at[PRED][q][1],
                 "slope": sum(wk * at[src][q][0] for wk, src in zip(w, (F0, PRED, F1))),
                 "slope_line": at[F1][q][0] - at[F0][q][0],
+                # what the line rule leaves out above f = 1 (none of it enters a test)
+                **(
+                    {
+                        "slope_parabola": sum(
+                            wk * at[src][q][0]
+                            for wk, src in zip(parabola_weights(j["f"]), (F0, PRED, F1))
+                        ),
+                        "slope_secant_from_1": (at[PRED][q][0] - at[F1][q][0]) / (j["f"] - 1),
+                    }
+                    if j["f"] > 1.05
+                    else {}
+                ),
             }
             for q in at[PRED]
         }
@@ -449,6 +466,11 @@ def monte_carlo(D: Data, boot: dict, rng: np.random.Generator) -> dict:
                     "slope_line": float(stored[name][q]["slope_line"][0]),
                     "from_f": float(stored[name][q]["slope"][0] * sf),
                     "from_f_mc_sd": float(redrawn[name][q]["slope"].std(ddof=1) * sf),
+                    **{
+                        k: float(stored[name][q][k][0])
+                        for k in ("slope_parabola", "slope_secant_from_1")
+                        if k in stored[name][q]
+                    },
                 }
                 for q in stored[name]
             },

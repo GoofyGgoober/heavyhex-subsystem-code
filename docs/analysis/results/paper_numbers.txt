@@ -72,13 +72,14 @@
 17. Diagnostics after the first review
    detection-event fraction device/model, median (share above 1): all 1.20 (76%), X weight 4 1.15 (78%), X weight 2 0.98 (47%), Z 1.19 (99%), flag 1.55 (82%), relay 1.16 (66%)
    f vs T2: rho 0.66 [0.35, 0.85]; f_mem > f_idle in 15/15 (medians 1.45, 0.99); beyond the simulated f in 14/15, at the search edge 2.0 in 1
-   miscorrected single faults: 5-61% of predicted eps3; day 1 pair 1: Z on q44 (DEPOLARIZE1) 3.3% per round over 15 mechanisms, largest single 0.0355, 85% of the miscorrected; matching chose edges 0.11, 0.20
+   miscorrected single faults: 5-61% of predicted eps3; day 1 pair 1: Z on q44 (DEPOLARIZE1) 3.3% per round over 15 mechanisms, largest single 0.0355, 85% of the miscorrected; its own edge 0.0355 (weight 3.30); matching chose edges 0.1344, 0.2042 (weight 3.22)
 18. Sensitivity of the agreement test (sensitivity.py; WL unless named)
    sigma_f prespecified 0.15-0.38, idle-test noise only 0.054-0.136
    prespecified: X lambda 25.0 (8; P2 3.8, k 24.0), X eps3 52.1 (5; P2 23.0, k 10.2), X eps5 19.8 (9; P2 7.8, k 4.0)
    idle_noise_only: X lambda 33.4 (7; P2 12.0, k 29.6), X eps3 137.5 (2; P2 84.6, k 36.5), X eps5 37.7 (6; P2 16.2, k 8.1)
    no_f_term: X lambda 38.4 (6; P2 16.9, k 32.7), X eps3 206.9 (2; P2 139.8, k 63.7), X eps5 45.3 (4; P2 19.7, k 10.3)
    Monte Carlo sd of chi2: X lambda 0.86, X eps3 0.91, X eps5 1.05; eps5 fails in 97%, with the line slope 18.27
+   line slope at the largest f (ibm_fez-2026-10-06-r2-d3, f 1.52, eps3): 0.0390, 29% above the secant from f = 1 (0.0303), 43% above the parabola (0.0273)
    Lambda_X systematic (half range, windows and fits): placement 1 device 0.026, model 0.004, placement 2 device 0.032, model 0.005, all ten device 0.028, model 0.004
    binomial O/M, Hartung-Knapp floored: X lambda 1.06 (0.92-1.22), X eps3 1.26 (1.15-1.38), X eps5 1.21 (1.11-1.31), Z eps3 2.04 (1.79-2.34), Z eps5 1.83 (1.71-1.95), Z lambda 1.11 (0.95-1.30)
    Lambda_X offset t test p 0.23; power at 0.06: prespecified 0.38, idle_noise_only 0.64, no_f_term 0.79; power.json first committed 2026-10-12 08:35:14 UTC (6142bb3)

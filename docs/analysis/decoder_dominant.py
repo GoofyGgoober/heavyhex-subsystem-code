@@ -5,10 +5,11 @@ weighted by their probability and traced to the circuit. For the X-memory distan
 every job, eight-round circuit, each mechanism of the decomposed detector error model is
 decoded alone (as in decoder_faults.py). The miscorrected ones are grouped by the circuit
 fault behind them (stim's explanation: Pauli, qubit and instruction), and the largest group is
-kept with the matching edges the decoder chose instead. A group sums many mechanisms (one fault
-at several points of each round, over eight rounds), so it also keeps its largest single
-mechanism, the one the matching weights compare with the edges chosen instead. Shares are of the
-patch's predicted eps3 (runs/combined.json). Under a minute.
+kept. A group sums many mechanisms (one fault at several points of each round, over eight
+rounds), so it also keeps its largest single mechanism with that mechanism's own matching edges
+and the edges the decoder chose instead. Matching compares weights ln[(1-p)/p], that is,
+products of odds p/(1-p), not of probabilities. Shares are of the patch's predicted eps3
+(runs/combined.json). Under a minute.
 
     python docs/analysis/decoder_dominant.py      # writes results/decoder_dominant.json
 """
@@ -40,6 +41,21 @@ def explain(model: stim.Circuit, dem_line: str) -> str:
     return f"{paulis} ({loc.instruction_targets.gate})"
 
 
+def edge_probability(matching, u: int, v: int) -> float:
+    if v == -1:
+        return matching.get_boundary_edge_data(int(u))["error_probability"]
+    return matching.get_edge_data(int(u), int(v))["error_probability"]
+
+
+def own_edges(matching, component: str) -> list[float]:
+    """The matching edges of one mechanism: each ^-separated part is one edge."""
+    edges = []
+    for part in component.split(" ^ "):
+        ds = [int(t[1:]) for t in part.split() if t.startswith("D")]
+        edges.append(edge_probability(matching, ds[0], ds[1] if len(ds) == 2 else -1))
+    return edges
+
+
 def main() -> None:
     combined = read(RUNS / "combined.json")
     predicted = {}
@@ -58,6 +74,7 @@ def main() -> None:
         groups: dict[str, float] = defaultdict(float)
         largest_one: dict[str, float] = defaultdict(float)
         count: dict[str, int] = defaultdict(int)
+        own: dict[str, list] = {}
         chosen: dict[str, list] = {}
         for p, ds, o, comp in zip(probs, dets, obs, comps):
             if not ds or any(det_patch[d] != 3 for d in ds):
@@ -68,15 +85,13 @@ def main() -> None:
                 continue
             fault = explain(model, f"error({p}) {comp}")
             groups[fault] += float(p)
-            largest_one[fault] = max(largest_one[fault], float(p))
             count[fault] += 1
-            if fault not in chosen:
-                edges = matching.decode_to_edges_array(syndrome)
+            if p > largest_one[fault]:
+                largest_one[fault] = float(p)
+                own[fault] = own_edges(matching, comp)
                 chosen[fault] = [
-                    matching.get_boundary_edge_data(int(u))["error_probability"]
-                    if v == -1
-                    else matching.get_edge_data(int(u), int(v))["error_probability"]
-                    for u, v in edges
+                    edge_probability(matching, u, v)
+                    for u, v in matching.decode_to_edges_array(syndrome)
                 ]
         total = sum(groups.values())
         top = max(groups, key=groups.get) if groups else None
@@ -93,6 +108,7 @@ def main() -> None:
                 "share_of_miscorrected": groups[top] / total,
                 "mechanisms": count[top],
                 "largest_single_mechanism_p": largest_one[top],
+                "largest_single_mechanism_edges_p": own[top],
                 "decoder_chose_edges_p": chosen[top],
             },
         }

@@ -11,8 +11,11 @@
     "share_of_miscorrected": 0.8477714079169332,
     "mechanisms": 15,
     "largest_single_mechanism_p": 0.035470025046061414,
+    "largest_single_mechanism_edges_p": [
+     0.035470025046061414
+    ],
     "decoder_chose_edges_p": [
-     0.10952248534535096,
+     0.13439642360798013,
      0.2041876075032077
     ]
    }
@@ -27,6 +30,9 @@
     "share_of_miscorrected": 0.7719532067480804,
     "mechanisms": 8,
     "largest_single_mechanism_p": 0.0065979072737166215,
+    "largest_single_mechanism_edges_p": [
+     0.0065979072737166215
+    ],
     "decoder_chose_edges_p": [
      0.059795460866084324,
      0.15092676095378887
@@ -43,6 +49,9 @@
     "share_of_miscorrected": 0.5547053912656602,
     "mechanisms": 8,
     "largest_single_mechanism_p": 0.003003218664586647,
+    "largest_single_mechanism_edges_p": [
+     0.003003218664586647
+    ],
     "decoder_chose_edges_p": [
      0.09105070180762523,
      0.1440413969040114
@@ -59,6 +68,9 @@
     "share_of_miscorrected": 0.778374081890596,
     "mechanisms": 8,
     "largest_single_mechanism_p": 0.007322722018495268,
+    "largest_single_mechanism_edges_p": [
+     0.007322722018495268
+    ],
     "decoder_chose_edges_p": [
      0.07271633115067988,
      0.11590686247444344
@@ -75,6 +87,9 @@
     "share_of_miscorrected": 0.5242357336935997,
     "mechanisms": 8,
     "largest_single_mechanism_p": 0.002577836818227959,
+    "largest_single_mechanism_edges_p": [
+     0.002577836818227959
+    ],
     "decoder_chose_edges_p": [
      0.10192324167942338,
      0.2008189100509404
@@ -91,8 +106,11 @@
     "share_of_miscorrected": 0.7266634870391047,
     "mechanisms": 15,
     "largest_single_mechanism_p": 0.04934198056448939,
+    "largest_single_mechanism_edges_p": [
+     0.04934198056448939
+    ],
     "decoder_chose_edges_p": [
-     0.1591162937605875,
+     0.20728043025704543,
      0.3088047403894273
     ]
    }
@@ -107,6 +125,9 @@
     "share_of_miscorrected": 0.7872008974045165,
     "mechanisms": 7,
     "largest_single_mechanism_p": 0.034894028856794955,
+    "largest_single_mechanism_edges_p": [
+     0.034894028856794955
+    ],
     "decoder_chose_edges_p": [
      0.14465722318747237,
      0.2089284947159006
@@ -123,6 +144,9 @@
     "share_of_miscorrected": 0.6431633550450955,
     "mechanisms": 8,
     "largest_single_mechanism_p": 0.0067716777329181,
+    "largest_single_mechanism_edges_p": [
+     0.0067716777329181
+    ],
     "decoder_chose_edges_p": [
      0.0570189355367991,
      0.1849383986381408
@@ -139,6 +163,9 @@
     "share_of_miscorrected": 0.7914029039057446,
     "mechanisms": 7,
     "largest_single_mechanism_p": 0.032712526201388495,
+    "largest_single_mechanism_edges_p": [
+     0.032712526201388495
+    ],
     "decoder_chose_edges_p": [
      0.1439647020159693,
      0.19906836225560223
@@ -155,6 +182,9 @@
     "share_of_miscorrected": 0.46150257305317993,
     "mechanisms": 8,
     "largest_single_mechanism_p": 0.002860681407128359,
+    "largest_single_mechanism_edges_p": [
+     0.002860681407128359
+    ],
     "decoder_chose_edges_p": [
      0.08584328497133414,
      0.09706710562421131

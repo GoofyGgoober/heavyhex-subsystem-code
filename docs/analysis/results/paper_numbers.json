@@ -10492,6 +10492,109 @@
     }
    }
   },
+  "line_slope_above_f_1.05 (against the secant from f = 1 and the parabola)": {
+   "ibm_fez-2026-10-04-r1": {
+    "f": 1.0572945121021786,
+    "rule": "line",
+    "eps3": {
+     "slope": 0.048565306998231195,
+     "slope_mc_sd": 0.00046678266517721594,
+     "slope_line": 0.048565306998231195,
+     "from_f": 0.007835513069962384,
+     "from_f_mc_sd": 7.531058485764663e-05,
+     "slope_parabola": 0.05728892601366953,
+     "slope_secant_from_1": 0.05684049570940403
+    },
+    "eps5": {
+     "slope": 0.09032124872801722,
+     "slope_mc_sd": 0.0009103500305085215,
+     "slope_line": 0.09032124872801722,
+     "from_f": 0.014572405048926757,
+     "from_f_mc_sd": 0.00014687561972067775,
+     "slope_parabola": 0.08354837013001193,
+     "slope_secant_from_1": 0.0838965242624976
+    },
+    "lambda": {
+     "slope": -0.0020926570786846677,
+     "slope_mc_sd": 0.004824259785795464,
+     "slope_line": -0.0020926570786846677,
+     "from_f": -0.00033762870873193927,
+     "from_f_mc_sd": 0.0007783447267381842,
+     "slope_parabola": 0.06815723637882165,
+     "slope_secant_from_1": 0.06454609964279474
+    }
+   },
+   "ibm_fez-2026-10-06-r1": {
+    "f": 1.050757878545906,
+    "rule": "line",
+    "eps3": {
+     "slope": 0.05007785325704828,
+     "slope_mc_sd": 0.000500293723964292,
+     "slope_line": 0.05007785325704828,
+     "from_f": 0.01091055115348255,
+     "from_f_mc_sd": 0.00010899988541961762,
+     "slope_parabola": 0.04406856816590743,
+     "slope_secant_from_1": 0.044345476199986855
+    },
+    "eps5": {
+     "slope": 0.07798798986365851,
+     "slope_mc_sd": 0.0008194600903532754,
+     "slope_line": 0.07798798986365851,
+     "from_f": 0.0169913823661154,
+     "from_f_mc_sd": 0.00017853723058263213,
+     "slope_parabola": 0.07565773156661804,
+     "slope_secant_from_1": 0.07576510993761287
+    },
+    "lambda": {
+     "slope": 0.01340379418001958,
+     "slope_mc_sd": 0.0053900886772734686,
+     "slope_line": 0.01340379418001958,
+     "from_f": 0.0029203085304235197,
+     "from_f_mc_sd": 0.001174348228014789,
+     "slope_parabola": -0.020850304076438064,
+     "slope_secant_from_1": -0.01927187421939204
+    }
+   },
+   "ibm_fez-2026-10-06-r2-d3": {
+    "f": 1.5228084888934883,
+    "rule": "line",
+    "eps3": {
+     "slope": 0.038953282183123994,
+     "slope_mc_sd": 0.00047904142175156795,
+     "slope_line": 0.038953282183123994,
+     "from_f": 0.012271652057855166,
+     "from_f_mc_sd": 0.00015091487339627402,
+     "slope_parabola": 0.027313108174270184,
+     "slope_secant_from_1": 0.030288045247098785
+    }
+   },
+   "ibm_fez-2026-10-06-r2-d5": {
+    "f": 1.1282786023847438,
+    "rule": "line",
+    "eps5": {
+     "slope": 0.08954729700778125,
+     "slope_mc_sd": 0.0009315200462818039,
+     "slope_line": 0.08954729700778125,
+     "from_f": 0.017081050084733432,
+     "from_f_mc_sd": 0.00017768644165875913,
+     "slope_parabola": 0.054222227902730236,
+     "slope_secant_from_1": 0.057828470799385176
+    }
+   },
+   "ibm_fez-2026-10-07-r2-d5": {
+    "f": 1.095717140360736,
+    "rule": "line",
+    "eps5": {
+     "slope": 0.09275410940568296,
+     "slope_mc_sd": 0.000981486315727039,
+     "slope_line": 0.09275410940568296,
+     "from_f": 0.026029610592249588,
+     "from_f_mc_sd": 0.00027543476794389095,
+     "slope_parabola": 0.061052193810193334,
+     "slope_secant_from_1": 0.06359905413967765
+    }
+   }
+  },
   "control_rerun": {
    "X lambda": {
     "chi2": 25.243836569355935,
@@ -32718,8 +32821,11 @@
      "share_of_miscorrected": 0.8477714079169332,
      "mechanisms": 15,
      "largest_single_mechanism_p": 0.035470025046061414,
+     "largest_single_mechanism_edges_p": [
+      0.035470025046061414
+     ],
      "decoder_chose_edges_p": [
-      0.10952248534535096,
+      0.13439642360798013,
       0.2041876075032077
      ]
     },
@@ -32729,6 +32835,9 @@
      "share_of_miscorrected": 0.7719532067480804,
      "mechanisms": 8,
      "largest_single_mechanism_p": 0.0065979072737166215,
+     "largest_single_mechanism_edges_p": [
+      0.0065979072737166215
+     ],
      "decoder_chose_edges_p": [
       0.059795460866084324,
       0.15092676095378887
@@ -32740,6 +32849,9 @@
      "share_of_miscorrected": 0.5547053912656602,
      "mechanisms": 8,
      "largest_single_mechanism_p": 0.003003218664586647,
+     "largest_single_mechanism_edges_p": [
+      0.003003218664586647
+     ],
      "decoder_chose_edges_p": [
       0.09105070180762523,
       0.1440413969040114
@@ -32751,6 +32863,9 @@
      "share_of_miscorrected": 0.778374081890596,
      "mechanisms": 8,
      "largest_single_mechanism_p": 0.007322722018495268,
+     "largest_single_mechanism_edges_p": [
+      0.007322722018495268
+     ],
      "decoder_chose_edges_p": [
       0.07271633115067988,
       0.11590686247444344
@@ -32762,6 +32877,9 @@
      "share_of_miscorrected": 0.5242357336935997,
      "mechanisms": 8,
      "largest_single_mechanism_p": 0.002577836818227959,
+     "largest_single_mechanism_edges_p": [
+      0.002577836818227959
+     ],
      "decoder_chose_edges_p": [
       0.10192324167942338,
       0.2008189100509404
@@ -32773,8 +32891,11 @@
      "share_of_miscorrected": 0.7266634870391047,
      "mechanisms": 15,
      "largest_single_mechanism_p": 0.04934198056448939,
+     "largest_single_mechanism_edges_p": [
+      0.04934198056448939
+     ],
      "decoder_chose_edges_p": [
-      0.1591162937605875,
+      0.20728043025704543,
       0.3088047403894273
      ]
     },
@@ -32784,6 +32905,9 @@
      "share_of_miscorrected": 0.7872008974045165,
      "mechanisms": 7,
      "largest_single_mechanism_p": 0.034894028856794955,
+     "largest_single_mechanism_edges_p": [
+      0.034894028856794955
+     ],
      "decoder_chose_edges_p": [
       0.14465722318747237,
       0.2089284947159006
@@ -32795,6 +32919,9 @@
      "share_of_miscorrected": 0.6431633550450955,
      "mechanisms": 8,
      "largest_single_mechanism_p": 0.0067716777329181,
+     "largest_single_mechanism_edges_p": [
+      0.0067716777329181
+     ],
      "decoder_chose_edges_p": [
       0.0570189355367991,
       0.1849383986381408
@@ -32806,6 +32933,9 @@
      "share_of_miscorrected": 0.7914029039057446,
      "mechanisms": 7,
      "largest_single_mechanism_p": 0.032712526201388495,
+     "largest_single_mechanism_edges_p": [
+      0.032712526201388495
+     ],
      "decoder_chose_edges_p": [
       0.1439647020159693,
       0.19906836225560223
@@ -32817,6 +32947,9 @@
      "share_of_miscorrected": 0.46150257305317993,
      "mechanisms": 8,
      "largest_single_mechanism_p": 0.002860681407128359,
+     "largest_single_mechanism_edges_p": [
+      0.002860681407128359
+     ],
      "decoder_chose_edges_p": [
       0.08584328497133414,
       0.09706710562421131
