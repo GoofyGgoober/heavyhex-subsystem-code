@@ -20,8 +20,7 @@ ROWS = (
     ("X", "X lambda", r"$\Lambda$"),
     ("Z", "Z eps3", r"$\varepsilon_3$"),
     ("Z", "Z eps5", r"$\varepsilon_5$"),
-    ("Z", "Z lambda", r"$\Lambda$"),
-)
+)  # no Lambda_Z: distance-5 Z memory is close to random (Supplementary, Statistics)
 
 
 def make(results_dir: Path, out_pdf: Path) -> None:
@@ -40,11 +39,12 @@ def make(results_dir: Path, out_pdf: Path) -> None:
         ("pair 2", 0.0, {"marker": "s", "ms": 3.2, **open_mark}),
         ("all ten", -0.24, {"marker": "D", "ms": 3.6, "mfc": base.D5, "mec": base.D5, "mew": 0.8}),
     )
-    fig, ax = plt.subplots(figsize=(base.COLUMN, 2.35), layout="constrained")
-    y0 = {"X": 4.6, "Z": 0.0}  # a gap between the two blocks for their headings
+    fig, ax = plt.subplots(figsize=(base.COLUMN, 2.1), layout="constrained")
+    y0 = {"X": 3.6, "Z": 0.0}  # a gap between the two blocks for their headings
+    count = {b: sum(r[0] == b for r in ROWS) for b in y0}
     ys, labels = [], []
-    for i, (basis, key, label) in enumerate(ROWS):
-        y = y0[basis] + 2 - (i % 3)
+    for basis, key, label in ROWS:
+        y = y0[basis] + count[basis] - 1 - [r[1] for r in ROWS if r[0] == basis].index(key)
         ys.append(y)
         labels.append(label)
         for name, dy, style in marks:
@@ -54,8 +54,9 @@ def make(results_dir: Path, out_pdf: Path) -> None:
             ax.plot(ci, [y + dy] * 2, color=colour, lw=0.9, solid_capstyle="butt")
             ax.plot(v["ratio"], y + dy, ls="none", **style)
     for basis, top in y0.items():
+        heading = top + count[basis] - 0.25
         ax.text(
-            0.77, top + 2.75, f"{basis} memory", ha="left", va="center", fontsize=7, style="italic"
+            0.77, heading, f"{basis} memory", ha="left", va="center", fontsize=7, style="italic"
         )
     ax.axvline(1.0, color=base.MUTED, lw=0.7, ls=(0, (3, 2)))
     ax.set_xscale("log")
@@ -65,7 +66,7 @@ def make(results_dir: Path, out_pdf: Path) -> None:
     ax.set_xlim(0.75, 3.3)
     ax.set_yticks(ys, labels)
     ax.tick_params(axis="y", length=0)
-    ax.set_ylim(-0.6, y0["X"] + 3.2)
+    ax.set_ylim(-0.6, y0["X"] + count["X"] + 0.2)
     ax.grid(axis="x", color=base.GRID, lw=0.4)
     ax.set_axisbelow(True)
     ax.set_xlabel("observed / predicted (95% interval)")
