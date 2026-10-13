@@ -193,7 +193,10 @@ def fig_lambda() -> None:
             elinewidth=1.0,
             capsize=0,
         )
-    for pair, top, note in ((1, y[0], "same patches every day"), (2, y[half], "$d=3$ patch moved")):
+    for pair, top, note in (
+        (1, y[0], "one job, same qubits daily"),
+        (2, y[half], "two jobs a day"),
+    ):
         ax.text(
             0.31,
             top + 0.95,

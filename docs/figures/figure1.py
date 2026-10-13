@@ -234,28 +234,47 @@ def draw_key(fig: Figure, below: Axes) -> None:
 
 
 def box_later_reps(ax: Axes, device: DeviceMap, plan: list) -> None:
-    """(a) Box each patch of the reps after the first. The boxes carry no labels, which would
-    sit on the drawing; the caption says which is which."""
-    for jobs in plan[1:]:
+    """(a) Box each patch of the reps after the first and label it in one column right of the
+    boxes, the distance-5 patch level with its top row and the distance-3 patch with its bottom
+    row, each joined to its box by a leader line."""
+    boxes = []
+    for rep, jobs in enumerate(plan[1:], start=2):
         for job in jobs:
             for d, spot in job.items():
                 layout = build_layout(
                     d, device.coords, device.edges, origin=spot.origin, direction=spot.direction
                 )
-                x0, x1, y0, y1 = bounds(device.pos, layout.physical_qubits)
-                pad = 0.45  # inside rep 1's boxes, so the two stay apart
-                ax.add_patch(
-                    Rectangle(
-                        (x0 - pad, y0 - pad),
-                        x1 - x0 + 2 * pad,
-                        y1 - y0 + 2 * pad,
-                        facecolor="none",
-                        edgecolor=OTHER_REP,
-                        lw=1.8,
-                        linestyle=":",
-                        zorder=6,
-                    )
-                )
+                boxes.append((rep, d, bounds(device.pos, layout.physical_qubits)))
+    if not boxes:
+        return
+    pad = 0.45  # inside rep 1's boxes, so the two stay apart
+    column = max(x1 for *_, (_, x1, _, _) in boxes) + 1.0
+    for rep, d, (x0, x1, y0, y1) in boxes:
+        ax.add_patch(
+            Rectangle(
+                (x0 - pad, y0 - pad),
+                x1 - x0 + 2 * pad,
+                y1 - y0 + 2 * pad,
+                facecolor="none",
+                edgecolor=OTHER_REP,
+                lw=1.8,
+                linestyle=":",
+                zorder=6,
+            )
+        )
+        y = y0 + 0.6 if d == 5 else y1 - 0.2
+        ax.annotate(
+            f"pair {rep}, d={d}",
+            xy=(x1 + pad, y),
+            xytext=(column, y),
+            fontsize=9,
+            fontweight="bold",
+            color=OTHER_REP,
+            va="center",
+            bbox=UNDER,
+            zorder=8,
+            arrowprops={"arrowstyle": "-", "color": OTHER_REP, "lw": 0.9, "shrinkA": 0},
+        )
 
 
 def build_figure(device: DeviceMap, calibration: Calibration) -> Figure:
