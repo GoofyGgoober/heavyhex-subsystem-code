@@ -155,6 +155,48 @@ def dependence() -> dict:
     }
 
 
+def prespecified_tests() -> dict:
+    """The tests fixed before the run under both sigma_f, the pooled verdict, the pairs' table
+    with predictions widened like observations, the fit-window systematic and the power
+    (prespecified_tests.py); the ten z values of each test are kept once, per pair-day."""
+    t = take("prespecified_tests.json")
+
+    def no_z(blk: dict) -> dict:
+        return {q: {k: v for k, v in x.items() if k != "z"} for q, x in blk.items()}
+
+    od = t["sigma_f"]["per_qubit_fits_overdispersed"]
+    return {
+        "headline": t["headline"],
+        "per_pair_day": [
+            {
+                "day": r["day"],
+                "pair": r["pair"],
+                "verdict (WL)": r["verdict (WL)"],
+                **{
+                    fit: {
+                        q: {k: v for k, v in c.items() if k.startswith(("z", "sigma_M"))}
+                        for q, c in r[fit].items()
+                    }
+                    for fit in FITS
+                },
+            }
+            for r in t["per_pair_day"]
+        ],
+        "chi2": {
+            "bounds": t["chi2"]["bounds"],
+            **{fit: {label: no_z(b) for label, b in t["chi2"][fit].items()} for fit in FITS},
+        },
+        "pool": t["pool"],
+        "sigma_f": {
+            **{k: v for k, v in t["sigma_f"].items() if k != "per_qubit_fits_overdispersed"},
+            "per_qubit_fits_overdispersed": {k: v for k, v in od.items() if k != "per_job"},
+        },
+        "windows": t["windows"],
+        "table_pairs": t["table_pairs"],
+        "power": t["power"],
+    }
+
+
 def per_qubit_f_side() -> dict:
     r = take("perqubit_f.json")
     model = r["versions"]["per_qubit_f"]["model"]
@@ -680,11 +722,29 @@ def stored_pl8() -> dict:
     return out
 
 
+def timing() -> dict:
+    """One round as compiled (Fig. timing), without the drawn qubits' segment lists."""
+    t = take("timing.json")
+    return {k: v for k, v in t.items() if k != "patches"} | {
+        "patches": {
+            p: {k: v for k, v in body.items() if k != "drawn"}
+            | {
+                "drawn_us": {
+                    role: {"qubit": d["qubit"], **d["total_us"]}
+                    for role, d in body["drawn"].items()
+                }
+            }
+            for p, body in t["patches"].items()
+        }
+    }
+
+
 def other() -> dict:
     out = {
         "readout": take("readout.json"),
         "uniform_scale": take("uniform_scale.json"),
         "no_reset": take("no_reset.json"),
+        "timing": timing(),
         "day_swing (placement 1, reported values set to the other days' median)": take(
             "day_swing.json"
         ),
@@ -1030,6 +1090,24 @@ def digest(res: dict) -> str:
         + ", ".join(f"q{k} {100 * v:.2f}%" for k, v in w5["single_qubit"].items())
         + f"; round {r[0]:.3f}-{r[1]:.3f} us"
     )
+    tm = res["timing"]
+    roles = tm["patches"]["3"]["by_role"]
+    L.append(
+        f"   Fig. timing (day 1, pair 1, d3): round {tm['round_us']:.3f} us, readout and reset "
+        f"{tm['readout_and_reset_us']:.3f} us ({100 * tm['readout_and_reset_share_of_round']:.0f}%)"
+        f"; path "
+        + " ".join(f"{k} {v:.3f}" for k, v in tm["critical_path_us"])
+        + f"; zero-duration resets {tm['round_us_zero_duration_resets']:.3f} us"
+        + "; data idle (any, decoupled) "
+        + "-".join(f"{100 * roles['data']['share_idle_any'][m]:.1f}" for m in ("min", "max"))
+        + "%, "
+        + "-".join(
+            f"{100 * roles['data']['share_of_round']['idle_decoupled'][m]:.1f}"
+            for m in ("min", "max")
+        )
+        + "%; flags in readout or reset "
+        + f"{100 * roles['flag']['share_readout_and_reset']['median']:.1f}%"
+    )
     dg = res["diagnostics"]
     pdet = dg["detection_event_fraction"]["per_detector (device / model)"]
     L.append("17. Diagnostics after the first review")
@@ -1044,16 +1122,151 @@ def digest(res: dict) -> str:
     m = dg["f_memory_against_idle"]
     L.append(
         f"   f vs T2: rho {t['rho']:.2f} [{t['ci95_bootstrap_over_qubits'][0]:.2f}, {t['ci95_bootstrap_over_qubits'][1]:.2f}]; "
-        f"f_mem > f_idle in {m['above']}/{m['of']} (medians {m['median_f_mem']:.2f}, {m['median_f_idle']:.2f})"
+        f"f_mem > f_idle in {m['above']}/{m['of']} (medians {m['median_f_mem']:.2f}, {m['median_f_idle']:.2f}); "
+        f"beyond the simulated f in {m['beyond_simulated_f']}/{m['of']}, at the search edge 2.0 in {m['at_search_edge_2.0']}"
     )
     ms = dg["miscorrected_single_faults_X_d3"]["share_of_predicted_eps3_range"]
+    q44 = dg["miscorrected_single_faults_X_d3"]["largest_by_patch"]["2026-10-04-r1"]
     L.append(
-        f"   miscorrected single faults: {100 * ms[0]:.0f}-{100 * ms[1]:.0f}% of predicted eps3"
+        f"   miscorrected single faults: {100 * ms[0]:.0f}-{100 * ms[1]:.0f}% of predicted eps3; "
+        f"day 1 pair 1: {q44['fault']} {100 * q44['p_per_round']:.1f}% per round over "
+        f"{q44['mechanisms']} mechanisms, largest single {q44['largest_single_mechanism_p']:.4f}, "
+        f"{100 * q44['share_of_miscorrected']:.0f}% of the miscorrected; matching chose edges "
+        + ", ".join(f"{p:.2f}" for p in q44["decoder_chose_edges_p"])
     )
     L += sensitivity_digest(res["sensitivity"])
     L += dependence_digest(res["dependence"])
     L += scale_and_f_digest(res["error_scale_and_f"])
+    L += prespecified_tests_digest(res["prespecified_tests"])
     return "\n".join(L) + "\n"
+
+
+def prespecified_tests_digest(t: dict) -> list[str]:
+    labels = ("prespecified", "idle_noise_only", "no_f_term")
+    L = [
+        "21. The tests fixed before the run, both sigma_f (prespecified_tests.py; WL unless named)"
+    ]
+    L.append("   X tests, chi2 p (|z| < 2): sigma_f prespecified / idle noise only / no f term")
+    for fit in FITS:
+        c = t["chi2"][fit]
+        for q in ("X lambda", "X eps3", "X eps5"):
+            L.append(
+                f"     {fit:8s} {q}: "
+                + " / ".join(
+                    f"{c[x][q]['chi2']:.1f} {c[x][q]['p']:.2g} ({c[x][q]['abs_z_below_2']})"
+                    for x in labels
+                )
+                + "; Holm p "
+                + " / ".join(f"{c[x][q]['p_holm_over_the_three_X_tests']:.2g}" for x in labels[:2])
+            )
+        L.append(
+            f"     {fit:8s} per pair (5 dof), chi2 p, prespecified -> idle noise: "
+            + "; ".join(
+                f"{q} P{p} "
+                + " -> ".join(
+                    f"{c[x][q]['per_pair'][f'pair {p}']['chi2']:.1f} "
+                    f"{c[x][q]['per_pair'][f'pair {p}']['p']:.2g}"
+                    for x in labels[:2]
+                )
+                for q in ("X lambda", "X eps3", "X eps5")
+                for p in PLACEMENTS
+            )
+        )
+    z = t["chi2"]["wls"]["Z memory (computed, not decided; prespecified sigma_f)"]
+    L.append(
+        "   Z memory (computed, not decided): "
+        + ", ".join(f"{q} {v['chi2']:.1f} (p {v['p']:.2g})" for q, v in z.items())
+    )
+    pl = t["pool"]
+    pre = pl["prespecified"]
+    within = [pl["after the run"][f"pair {p} (WL, same rule)"] for p in PLACEMENTS]
+    L.append(
+        f"   pool: {pre['statement']} (t_9,0.95; chi2_0/nu {pre['chi2_0_per_dof']:.2f}, "
+        f"unwidened se {pre['se_unwidened']:.4f}); predicted {pre['predicted (same weights)']:.3f}, "
+        f"O/M {pre['observed_over_predicted']:.3f}; per pair-day verdicts "
+        f"{pl['per_pair_day_verdicts (Lambda_X + 1.645 sigma_O < 1)']} (largest Lambda + 1.645 "
+        f"sigma {pl['largest Lambda_X + 1.645 sigma_O']:.3f}); within pairs chi2_0/nu "
+        + ", ".join(f"{w['chi2_0_per_dof']:.2f}" for w in within)
+    )
+    sf = t["sigma_f"]
+    od = sf["per_qubit_fits_overdispersed"]
+    L.append(
+        f"   sigma_f prespecified {sf['prespecified_range'][0]:.3f}-{sf['prespecified_range'][1]:.3f}, "
+        f"idle noise {sf['idle_noise_range'][0]:.3f}-{sf['idle_noise_range'][1]:.3f}; per-qubit idle "
+        f"fits: median reduced chi2 {od['median_reduced_chi2']:.2f} over {od['fits_with_dof']}, "
+        f"p < 0.05 in {100 * od['share_p_below_0.05']:.0f}%, p < 0.001 in "
+        f"{100 * od['share_p_below_0.001']:.0f}%; uniformity chi2/nu "
+        f"{od['uniformity_chi2_per_dof_range'][0]:.1f}-{od['uniformity_chi2_per_dof_range'][1]:.1f}, "
+        f"with scaled errors {od['with_scaled_errors_range'][0]:.1f}-{od['with_scaled_errors_range'][1]:.1f}"
+    )
+    w = t["windows"]
+    sys_key = "systematic (half range, rounds 3-8 left out)"
+    drop = w["leaving out round 1 (rounds 2-8 minus 1-8)"]["wls"]["all ten"]
+    L.append(
+        "   fit-window systematic on Lambda_X, device / model (device with rounds 3-8): "
+        + "; ".join(
+            f"P{p} +-{w[f'pair {p}']['device'][sys_key]:.3f} / +-{w[f'pair {p}']['model'][sys_key]:.3f} "
+            f"(+-{w[f'pair {p}']['device']['half range with rounds 3-8']:.3f})"
+            for p in PLACEMENTS
+        )
+        + f"; leaving out round 1: device {drop['device']:+.3f} +- "
+        f"{drop['device_se_over_repetitions']:.3f}, model {drop['model']:+.3f}"
+    )
+    L.append(
+        "   pairs' table, errors widened alike (observed / predicted [chi2_0/4 of the predictions])"
+    )
+    for k, c in t["table_pairs"]["cells"].items():
+        L.append(
+            f"     {k}: {c['observed']['shown']} / {c['predicted']['shown']} "
+            f"[{c['predicted']['chi2_per_dof']:.2f}], range "
+            + "-".join(
+                f"{(1 if k.endswith('lambda') else 100) * x:.{3 if k.endswith('lambda') else 1}f}"
+                for x in c["predicted"]["range"]
+            )
+        )
+    pw = t["power"]
+    L.append(
+        "   power at a Lambda_X miss of 0.06: one pair-day P1 / P2, a pair's chi2 P1 / P2, all ten; "
+        "80% at"
+    )
+    for x in labels:
+        lx = pw[x]["Lambda_X"]
+        one = [lx[f"pair {p}"]["power_one_pair_day_range"] for p in PLACEMENTS]
+        L.append(
+            f"     {x}: {one[0][0]:.2f}-{one[0][1]:.2f} / {one[1][0]:.2f}-{one[1][1]:.2f}, "
+            + " / ".join(f"{lx[f'pair {p}']['power_chi2_5dof']:.2f}" for p in PLACEMENTS)
+            + f", {lx['power_chi2_10dof']:.2f}; 80% at {lx['miss_found_at_80pct_chi2_10dof']:.3f} "
+            f"(median sigma {lx['median_sigma']:.3f}); eps3, eps5 relative at 80% "
+            + ", ".join(
+                f"{pw[x][q]['relative_miss_found_at_80pct_chi2_10dof']:.3f}"
+                for q in ("X eps3", "X eps5")
+            )
+        )
+    ds = next(v for k, v in pw.items() if k.startswith("design study"))
+    L.append(
+        "   design study (f known): "
+        + "; ".join(
+            f"{f}, 10 pair-days: sigma {v['10 reps']['sigma_one_pair_day']:.3f}, caught "
+            f"{v['10 reps']['caught']:.3f}"
+            for f, v in ds.items()
+        )
+    )
+    L.append(
+        "   per pair-day z (WL; X: prespecified [idle noise]): Lambda_X eps3 eps5 | Lambda_Z eps3 eps5"
+    )
+    for r in t["per_pair_day"]:
+        c = r["wls"]
+        L.append(
+            f"     day {r['day']} pair {r['pair']}: "
+            + " ".join(
+                f"{c[q]['z']:+.2f} [{c[q]['z_idle_noise_only']:+.2f}]"
+                for q in ("X lambda", "X eps3", "X eps5")
+            )
+            + " | "
+            + " ".join(f"{c[q]['z']:+.2f}" for q in ("Z lambda", "Z eps3", "Z eps5"))
+            + f"; Lambda_X + 1.645 sigma {r['verdict (WL)']['Lambda_X + 1.645 sigma_O']:.3f}"
+        )
+    return L
 
 
 def scale_and_f_digest(s: dict) -> list[str]:
@@ -1255,6 +1468,7 @@ def main() -> None:
         "effect_sizes": effect_sizes(),
         "sensitivity": sensitivity(),
         "dependence": dependence(),
+        "prespecified_tests": prespecified_tests(),
         "xy_variance_correction": take("idle_f.json")["correction"],
         "per_qubit_f_side_prediction": per_qubit_f_side(),
         "heating_exploratory": heating(),

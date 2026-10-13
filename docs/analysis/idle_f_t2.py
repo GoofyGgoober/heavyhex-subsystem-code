@@ -376,6 +376,9 @@ def memory() -> dict:
                 "sigma_idle": m["idle_test_uncertainty"],
                 "agrees_prespecified_allowance": m["eps3_agrees"],
                 "at_search_edge": m["from_eps3"] >= 2.0,
+                # The job's predictions were simulated at f = 0, 1 and the idle test's f; beyond
+                # them f_mem is an extrapolation.
+                "beyond_simulated_f": m["from_eps3"] > max(1.0, m["idle_test"]),
             }
         )
     diff = np.array([j["f_mem"] - j["f_idle"] for j in jobs])
@@ -391,6 +394,7 @@ def memory() -> dict:
         "difference_range": [float(diff.min()), float(diff.max())],
         "agree_within_allowance": sum(j["agrees_prespecified_allowance"] for j in jobs),
         "at_search_edge_2.0": sum(j["at_search_edge"] for j in jobs),
+        "beyond_simulated_f": sum(j["beyond_simulated_f"] for j in jobs),
     }
 
 

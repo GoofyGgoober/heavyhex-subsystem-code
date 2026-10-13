@@ -5,8 +5,10 @@ weighted by their probability and traced to the circuit. For the X-memory distan
 every job, eight-round circuit, each mechanism of the decomposed detector error model is
 decoded alone (as in decoder_faults.py). The miscorrected ones are grouped by the circuit
 fault behind them (stim's explanation: Pauli, qubit and instruction), and the largest group is
-kept with the matching edges the decoder chose instead. Shares are of the patch's predicted
-eps3 (runs/combined.json). Under a minute.
+kept with the matching edges the decoder chose instead. A group sums many mechanisms (one fault
+at several points of each round, over eight rounds), so it also keeps its largest single
+mechanism, the one the matching weights compare with the edges chosen instead. Shares are of the
+patch's predicted eps3 (runs/combined.json). Under a minute.
 
     python docs/analysis/decoder_dominant.py      # writes results/decoder_dominant.json
 """
@@ -54,6 +56,8 @@ def main() -> None:
         k = {p: i for i, p in patch_of_observable(job, labels).items()}["3"]
         det_patch = np.array([int(str(p)) for p, _, _ in labels])
         groups: dict[str, float] = defaultdict(float)
+        largest_one: dict[str, float] = defaultdict(float)
+        count: dict[str, int] = defaultdict(int)
         chosen: dict[str, list] = {}
         for p, ds, o, comp in zip(probs, dets, obs, comps):
             if not ds or any(det_patch[d] != 3 for d in ds):
@@ -64,6 +68,8 @@ def main() -> None:
                 continue
             fault = explain(model, f"error({p}) {comp}")
             groups[fault] += float(p)
+            largest_one[fault] = max(largest_one[fault], float(p))
+            count[fault] += 1
             if fault not in chosen:
                 edges = matching.decode_to_edges_array(syndrome)
                 chosen[fault] = [
@@ -85,6 +91,8 @@ def main() -> None:
                 "fault": top,
                 "p_per_round": groups[top] / ROUNDS,
                 "share_of_miscorrected": groups[top] / total,
+                "mechanisms": count[top],
+                "largest_single_mechanism_p": largest_one[top],
                 "decoder_chose_edges_p": chosen[top],
             },
         }
