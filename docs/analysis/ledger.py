@@ -673,7 +673,7 @@ def placements_and_inputs() -> dict:
 
 
 def diagnostics() -> dict:
-    """The detector, decoder-prior, dephasing and flag-record analyses after the first review."""
+    """The detector, decoder-prior, dephasing and flag-record analyses added after the run."""
     de = take("detection_events.json")
     pij = take("pij.json")
     pd = take("pij_decode.json")
@@ -777,7 +777,7 @@ def diagnostics() -> dict:
 
 def scale_and_f() -> dict:
     """One factor on every error, the dephasing floor, the model at the weighted-mean f and the
-    resolution of the readout inputs (after the third review)."""
+    resolution of the readout inputs."""
     es = take("error_scale.json")
     fw = take("f_weighted_mean.json")
 
@@ -1454,7 +1454,7 @@ def digest(res: dict) -> str:
     )
     dg = res["diagnostics"]
     pdet = dg["detection_event_fraction"]["per_detector (device / model)"]
-    L.append("17. Diagnostics after the first review")
+    L.append("17. Diagnostics added after the run")
     L.append(
         "   detection-event fraction device/model, median (share above 1): "
         + ", ".join(
