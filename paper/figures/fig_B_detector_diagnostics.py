@@ -22,13 +22,15 @@ from matplotlib.lines import Line2D
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from make_figures import COLUMN, D3, D5, DIAG, GRID, INK, MUTED, OUT, PAGE, label
 
-# Detector classes: marker for the device, dash for the model.
+# Detector classes, each its own colour and marker (categorical slots 1-4 in order); the device
+# is the markers, the model the line of the same colour.
+AQUA, YELLOW = "#1baf7a", "#eda100"
 STYLE = {
-    "X weight 4": ("o", "-", "weight-4 stabilizers"),
-    "X weight 2": ("s", (0, (4, 2)), "weight-2 stabilizers"),
-    "Z": ("o", "-", "stabilizers"),
-    "flag": ("s", (0, (4, 2)), "flags"),
-    "relay": ("^", (0, (1.2, 1.4)), "relays"),
+    "X weight 4": (D5, "o", "weight-4 X, and Z stabilizers"),
+    "Z": (D5, "o", None),
+    "X weight 2": (D3, "s", "weight-2 X stabilizers"),
+    "flag": (AQUA, "^", "flags"),
+    "relay": (YELLOW, "D", "relays"),
 }
 CLASSES = {"X": ("X weight 4", "X weight 2"), "Z": ("Z", "flag", "relay")}
 
@@ -37,77 +39,61 @@ def _load(results_dir: Path, name: str) -> dict:
     return json.loads((Path(results_dir) / name).read_text())
 
 
-def _fill(marker: str) -> str:
-    return D5 if marker == "o" else "white"
-
-
 def make(results_dir: Path = DIAG, out_pdf: Path = OUT / "B_detector_diagnostics.pdf") -> None:
     """Detection-event fraction per round, 8-round circuits, mean over the ten repetitions."""
     curves = _load(results_dir, "detection_events.json")["rounds"]
-    fig, axes = plt.subplots(2, 2, figsize=(COLUMN, 3.0), sharex=True)
+    fig, axes = plt.subplots(2, 2, figsize=(COLUMN, 3.1), sharex=True, layout="constrained")
     for row, basis in enumerate("XZ"):
         for col, d in enumerate("35"):
             ax = axes[row, col]
             for c in CLASSES[basis]:
-                marker, dash, _ = STYLE[c]
+                colour, marker, _ = STYLE[c]
                 k = curves[f"{basis} d{d} {c} placement both"]
-                t = np.array(k["t"])
+                # Flags and relays lie close together: set them a little apart in t.
+                t = np.array(k["t"]) + {"flag": -0.15, "relay": 0.15}.get(c, 0.0)
                 dev, mod = np.array(k["device"]), np.array(k["model"])
-                ax.plot(t, mod[:, 0], color=MUTED, lw=0.9, ls=dash)
+                ax.plot(t, mod[:, 0], color=colour, lw=1.0, alpha=0.85)
                 ax.errorbar(
                     t,
                     dev[:, 0],
                     yerr=dev[:, 1],
                     fmt=marker,
                     ms=2.8,
-                    color=D5,
-                    mfc=_fill(marker),
-                    mew=0.8,
+                    color=colour,
+                    mec="white",
+                    mew=0.4,
                     elinewidth=0.7,
                     capsize=0,
                 )
             ax.axvline(8.5, color=GRID, lw=0.6)  # t = 9 is the final layer, from the data readout
             ax.set_xticks(range(1, 10))
             ax.set_xlim(0.5, 9.5)
-            ax.set_ylim(0, None)
+            ax.set_ylim(0, 0.52)
             ax.grid(axis="y", color=GRID, lw=0.4)
             ax.set_title(f"{basis} memory, $d={d}$", loc="left", fontsize=8, color=INK)
             if col == 0:
                 ax.set_ylabel("detection-event fraction")
             if row == 1:
                 ax.set_xlabel("round $t$")
-    # Each legend in an empty band: X classes below the data of (b), Z classes mid-height in (d).
-    for (row, col, where), basis in zip(((0, 1, "lower right"), (1, 1, "center right")), "XZ"):
-        handles = [
-            Line2D(
-                [],
-                [],
-                marker=STYLE[c][0],
-                ms=2.8,
-                mec=D5,
-                mfc=_fill(STYLE[c][0]),
-                color=MUTED,
-                lw=0.9,
-                ls=STYLE[c][1],
-                label=STYLE[c][2],
-            )
-            for c in CLASSES[basis]
-        ]
-        axes[row, col].legend(
-            handles=handles, loc=where, handlelength=2.2, handletextpad=0.3, borderaxespad=0.2
-        )
-    axes[0, 0].legend(
-        handles=[
-            Line2D([], [], marker="o", ms=2.8, color=D5, ls="none", label="device"),
-            Line2D([], [], color=MUTED, lw=0.9, label="model"),
-        ],
-        loc="lower right",
+    handles = [
+        Line2D([], [], marker=m, ms=3.0, color=c, mec="white", mew=0.4, ls="none", label=name)
+        for c, m, name in STYLE.values()
+        if name
+    ] + [
+        Line2D([], [], marker="o", ms=3.0, color=MUTED, ls="none", label="device"),
+        Line2D([], [], color=MUTED, lw=1.0, label="model"),
+    ]
+    fig.legend(
+        handles=handles,
+        loc="outside lower center",
+        ncol=3,
+        handlelength=1.4,
         handletextpad=0.3,
-        borderaxespad=0.2,
+        columnspacing=0.8,
+        fontsize=6.5,
     )
     for ax, tag in zip(axes.flat, "abcd"):
         label(ax, f"({tag})")
-    fig.tight_layout(w_pad=0.6, h_pad=0.6)
     fig.savefig(out_pdf)
     plt.close(fig)
 
