@@ -89,6 +89,72 @@ def effect_sizes() -> dict:
     }
 
 
+def sensitivity() -> dict:
+    """The agreement test under other sigma_f, its Monte Carlo spread, Lambda_X's dependence on
+    the window and the fit, intervals, power and day-to-day tracking (sensitivity.py)."""
+    s = take("sensitivity.json")
+    sf, mc, w = s["sigma_f"], s["monte_carlo"], s["windows"]
+    keys = (
+        "chi2",
+        "p",
+        "agree",
+        "per_placement",
+        "offset",
+        "scatter",
+        "offset_t_test",
+        "constant_multiple (O = k M, 9 dof)",
+    )
+    return {
+        "sigma_f_range": sf["sigma_f_range"],
+        "sigma_f_idle_noise_over_prespecified": sf["ratio_range"],
+        "f_term_share (WL)": sf["f_term_share_of_the_z_variance (WL, prespecified) [min, max]"],
+        "x_tests by sigma_f": {
+            fit: {
+                label: {q: {k: v[k] for k in keys} for q, v in blk.items()}
+                for label, blk in sf[fit].items()
+            }
+            for fit in FITS
+        },
+        "monte_carlo (WL)": {label: mc[label] for label in ("prespecified", "idle_noise_only")},
+        "monte_carlo_slopes, parabola jobs": {
+            j: v for j, v in mc["slopes_by_job"].items() if v["rule"] == "parabola"
+        },
+        "control_rerun": next(v for k, v in mc.items() if k.startswith("control_rerun")),
+        "seeds_check": mc["seeds_check"],
+        "Lambda_X windows and fits": {
+            "systematic": {
+                label: {x: b[x] for x in ("device", "model", "device_minus_model")}
+                for label, b in w["shifts"].items()
+            },
+            "leaving_out_round_1": w["leaving_out_round_1 (2-8 minus 1-8)"],
+        },
+        "intervals": s["intervals"],
+        "power": s["power"],
+        "tracking placement 1 Lambda_X": {
+            fit: {k: s["tracking"][fit][k] for k in ("all days", "without day 1", "without day 2")}
+            for fit in FITS
+        },
+        "X5X6X8X9 detection fraction by day (placement 1, d = 3, bulk rounds)": {
+            day: v["stabilizers"]["X5X6X8X9"] if day.startswith("day") else v
+            for day, v in s["tracking"]["stabilizers (placement 1, distance 3)"].items()
+        },
+        "calibration_scatter_test_power": s["scatter_power"],
+    }
+
+
+def dependence() -> dict:
+    """The X tests with the repetitions' dependence allowed for, the raw counts against the model
+    and Lambda_X against a practical margin (dependence.py), without the per-curve detail."""
+    d = take("dependence.json")
+    return {
+        "headline": d["headline"],
+        "structure": d["structure"],
+        "blocks": d["blocks"],
+        "counts": {k: d["counts"][k] for k in ("what", "tally", "groups")},
+        "equivalence": d["equivalence"],
+    }
+
+
 def per_qubit_f_side() -> dict:
     r = take("perqubit_f.json")
     model = r["versions"]["per_qubit_f"]["model"]
@@ -256,8 +322,9 @@ def leakage() -> dict:
         },
         "hmm_on_simulated_leakage (lifetime in us -> fitted tau_P, e_P, Delta(1))": {
             k: {"tau_P_us": v["life_us_cont"], "e_P": v["e_P"], "refire_lag_1": v["refire"][0]}
-            for k, v in life.items()
+            for k, v in life["lifetimes"].items()
         },
+        "simulated_lifetime_matching_the_device (us, and Delta(1) there)": life["matching_device"],
         "parameter_recovery_rank_of_truth": {
             t: {"truth": v["truth"], "pooled": [r["pooled rank_of_truth"] for r in v["rows"]]}
             for t, v in recovery["grid_fit"].items()
@@ -323,6 +390,76 @@ def leakage() -> dict:
     }
 
 
+def streak_effects() -> dict:
+    """What a flag or relay streak predicts (streak_effects.py, exploratory): the near- and
+    far-stabilizer detection differences, streak against quiet and against a single firing, by
+    lag, and the logical failure of shots with a streak, device against model."""
+    s = take("streak_effects.json")
+    keep = (
+        "units",
+        "physical_qubits",
+        "chip_quiet",
+        "chip_single",
+        "chip",
+        "chip_ci95_qubits",
+        "model",
+        "chip_minus_model_ci95_qubits",
+        "qubits_with_chip_effect_above_zero",
+        "chip_flip_equivalent",
+        "chip_flip_equivalent_ci95_qubits",
+    )
+    groups = [f"{b} d{d} both" for b in "XZ" for d in ("3", "5", "both")]
+    groups += [f"{b} dboth {r}" for b in "XZ" for r in ("flag", "relay")]
+    det = s["detection_events_after_a_streak"]
+    failure = s["logical_failure"]
+    cells = [f"{b} d{d}" for b in "XZ" for d in ("3", "5", "both")]
+    return {
+        "about": s["about"],
+        "detection_events": {
+            g: {
+                lag: {
+                    o: {
+                        c: {k: v[c][k] for k in keep if k in v[c]}
+                        for c in v
+                        if c != "single - quiet"
+                    }
+                    for o, v in by_o.items()
+                }
+                for lag, by_o in det[g].items()
+            }
+            for g in groups
+        },
+        "logical_failure": {
+            cell: {
+                exp: {
+                    src: {
+                        k: failure[cell][exp][src][k]
+                        for k in (
+                            "failure_reference",
+                            "failure_exposed",
+                            "rd",
+                            "rd_ci95",
+                            "rr",
+                            "rr_ci95",
+                        )
+                    }
+                    for src in ("chip", "model")
+                }
+                | {"chip_minus_model_rd": failure[cell][exp]["chip_minus_model_rd"]}
+                for exp in ("any", "count matched", "flag only", "relay only")
+            }
+            | {
+                "failure_per_firing": failure[cell]["failure_per_firing"],
+                "shots_with_a_streak_8_rounds": failure[cell]["shots_with_a_streak_8_rounds"],
+            }
+            for cell in cells
+        },
+        "per_repetition_summary": {
+            k: v for k, v in failure["per_repetition_any_streak_chip"].items() if "summary" in k
+        },
+    }
+
+
 def placements_and_inputs() -> dict:
     """Placement counts and ranks, relay q51, and the calibration medians the paper quotes."""
     pc = take("placement_counts.json")
@@ -363,6 +500,8 @@ def placements_and_inputs() -> dict:
             }
             for day, v in pc["relay_q51"].items()
         },
+        "weak_parts_pair_1_day_1": pc["weak_day1"],
+        "round_us": pc["round_us"],
         "single_qubit_error_median_by_day": cal["single_qubit"],
         "readout_gap_P01_minus_P10_flags_relays": cal["readout_gap"],
         "t1_of_the_flag_and_relay_qubits": cal["t1_flags_relays"],
@@ -515,6 +654,21 @@ def digest(res: dict) -> str:
                 L.append(f"   {b} placement {pl} {fit:8s}: " + "; ".join(parts))
     for k, v in pp["observed_over_predicted_range_eps3_eps5_both_placements"].items():
         L.append(f"   observed/predicted eps3, eps5 range, {k}: {v[0]:.2f}-{v[1]:.2f}")
+    cells = res["effect_sizes"]["table_one_convention"]["cells"]
+    for b in BASES:
+        L.append(
+            f"   Table placement, predicted mean +- sigma_M (WL), {b}: "
+            + "; ".join(
+                f"P{pl} "
+                + ", ".join(
+                    f"{q} {(100 if q != 'lambda' else 1) * c['mean']:.{1 if q != 'lambda' else 3}f} +- "
+                    f"{(100 if q != 'lambda' else 1) * c['sigma_M']:.{1 if q != 'lambda' else 3}f}"
+                    for q in QUANTITIES
+                    for c in [cells[f"{b} placement {pl} wls {q}"]["predicted"]]
+                )
+                for pl in PLACEMENTS
+            )
+        )
     pc = res["placements_compared"]
     L.append("2. Placements compared")
     for b in BASES:
@@ -647,6 +801,23 @@ def digest(res: dict) -> str:
     L.append(
         f"   onset per round = {100 * on['per_cz']:.2f}% per CZ x CZs + {100 * on['per_round']:.2f}% (two CZ counts only)"
     )
+    se = res["streak_effects_exploratory"]
+    for b in "XZ":
+        near = {
+            lag: se["detection_events"][f"{b} dboth both"][f"lag {lag}"]["near"]["streak - quiet"]
+            for lag in (-2, 2)
+        }
+        lf = se["logical_failure"][f"{b} dboth"]
+        L.append(
+            f"   {b} memory, near stabilizers before/after a streak (lag -2 / 2): "
+            + ", ".join(
+                f"{100 * v['chip']:+.1f} pts (model {100 * v['model']:+.1f}; q {v['chip_flip_equivalent']:.2f})"
+                for v in near.values()
+            )
+            + f"; failure RD {100 * lf['any']['chip']['rd']:+.1f} pts (model {100 * lf['any']['model']['rd']:+.1f}),"
+            f" at matched firings {100 * lf['count matched']['chip']['rd']:+.1f}; per firing "
+            f"{100 * lf['failure_per_firing']['chip']['slope']:.2f} (model {100 * lf['failure_per_firing']['model']['slope']:.2f})"
+        )
     rs = res["readout"]["resets"]
     cm = rs["calibration_model_with_ibm_errors"]
     L.append("13. IBM's reset and readout errors")
@@ -742,6 +913,24 @@ def digest(res: dict) -> str:
         + ", ".join(f"{100 * v['reported_readout_error']:.1f}%" for v in pi["relay_q51"].values())
         + f"; readout gap P(0|1)-P(1|0) median {100 * pi['readout_gap_P01_minus_P10_flags_relays']['median']:.2f} points"
     )
+    w5 = pi["weak_parts_pair_1_day_1"]["d5"]
+    r = pi["round_us"]["range"]
+    L.append(
+        "   placement 1, day 1: CZ max "
+        + ", ".join(
+            f"{k} {100 * v:.1f}%" for k, v in sorted(w5["cz"].items(), key=lambda x: -x[1])[:1]
+        )
+        + "; readout max "
+        + ", ".join(
+            f"q{k} {100 * v:.1f}%"
+            for k, v in sorted(w5["readout"].items(), key=lambda x: -x[1])[:1]
+        )
+        + "; T2 below 10 us "
+        + ", ".join(f"q{k} {v:.1f} us" for k, v in w5["t2_us"].items() if v < 10)
+        + "; single-qubit error above 0.5% "
+        + ", ".join(f"q{k} {100 * v:.2f}%" for k, v in w5["single_qubit"].items())
+        + f"; round {r[0]:.3f}-{r[1]:.3f} us"
+    )
     dg = res["diagnostics"]
     pdet = dg["detection_event_fraction"]["per_detector (device / model)"]
     L.append("17. Diagnostics after the first review")
@@ -762,7 +951,123 @@ def digest(res: dict) -> str:
     L.append(
         f"   miscorrected single faults: {100 * ms[0]:.0f}-{100 * ms[1]:.0f}% of predicted eps3"
     )
+    L += sensitivity_digest(res["sensitivity"])
+    L += dependence_digest(res["dependence"])
     return "\n".join(L) + "\n"
+
+
+def sensitivity_digest(s: dict) -> list[str]:
+    L = ["18. Sensitivity of the agreement test (sensitivity.py; WL unless named)"]
+    r = s["sigma_f_range"]
+    L.append(
+        f"   sigma_f prespecified {r['prespecified'][0]:.2f}-{r['prespecified'][1]:.2f}, "
+        f"idle-test noise only {r['idle_noise_only'][0]:.3f}-{r['idle_noise_only'][1]:.3f}"
+    )
+    for label, blk in s["x_tests by sigma_f"]["wls"].items():
+        L.append(
+            f"   {label}: "
+            + ", ".join(
+                f"{q} {v['chi2']:.1f} ({v['agree']}; P2 {v['per_placement']['placement 2']['chi2']:.1f}, "
+                f"k {v['constant_multiple (O = k M, 9 dof)']['chi2']:.1f})"
+                for q, v in blk.items()
+            )
+        )
+    mc = s["monte_carlo (WL)"]["prespecified"]
+    L.append(
+        "   Monte Carlo sd of chi2: "
+        + ", ".join(
+            f"{q} {v['prespecified_slope']['chi2_redrawn']['sd']:.2f}" for q, v in mc.items()
+        )
+        + f"; eps5 fails in {100 * mc['X eps5']['prespecified_slope']['fails (chi2 > 18.31)']:.0f}%"
+        f", with the line slope {mc['X eps5']['line_slope']['chi2_stored']:.2f}"
+    )
+    sy = s["Lambda_X windows and fits"]["systematic"]
+    L.append(
+        "   Lambda_X systematic (half range, windows and fits): "
+        + ", ".join(
+            f"{p} device {v['device']['systematic (half range without 3-8)']:.3f}, model "
+            f"{v['model']['systematic (half range without 3-8)']:.3f}"
+            for p, v in sy.items()
+        )
+    )
+    iv = s["intervals"]["binomial"]["prespecified"]
+    L.append(
+        "   binomial O/M, Hartung-Knapp floored: "
+        + ", ".join(
+            f"{q} {v['ratio']:.2f} ({v['hartung_knapp_floored_ci95'][0]:.2f}-"
+            f"{v['hartung_knapp_floored_ci95'][1]:.2f})"
+            for q, v in iv.items()
+        )
+    )
+    off = s["intervals"]["offset"]["wls"]["X lambda"]
+    pw = s["power"]
+    made = pw["provenance"]["docs/analysis/results/power.json first committed"] or {}
+    L.append(
+        f"   Lambda_X offset t test p {off['t_test (9 dof)']['p']:.2f}; power at 0.06: "
+        + ", ".join(
+            f"{k} {pw[k]['X lambda']['absolute']['0.06']:.2f}"
+            for k in ("prespecified", "idle_noise_only", "no_f_term")
+        )
+        + f"; power.json first committed {made.get('utc')} UTC ({made.get('commit')})"
+    )
+    t = s["tracking placement 1 Lambda_X"]["wls"]
+    st = s["X5X6X8X9 detection fraction by day (placement 1, d = 3, bulk rounds)"]
+    L.append(
+        f"   placement 1 follows its prediction: chi2 {t['all days']['follows_prediction']['chi2']:.1f}, "
+        f"without day 2 {t['without day 2']['follows_prediction']['chi2']:.1f} "
+        f"(p {t['without day 2']['follows_prediction']['p']:.2f}); X5X6X8X9 device/model by day "
+        + ", ".join(
+            f"{v['device']:.3f}/{v['model']:.3f}" for k, v in st.items() if k.startswith("day")
+        )
+    )
+    sc = s["calibration_scatter_test_power"]["X lambda"]
+    L.append(
+        f"   calibration-scatter test: 80% power at a Lambda_X miss of {sc['absolute_found_at_80pct']:.2f}"
+    )
+    return L
+
+
+def dependence_digest(d: dict) -> list[str]:
+    h = d["headline"]
+    L = ["19. Dependent repetitions, raw counts, Lambda_X margin (dependence.py)"]
+    L.append(
+        "   X tests (WL) p: prespecified / placements correlated / P1 alone / P2 alone / "
+        "offset day-block t / sign flip / hierarchical"
+    )
+    for q, v in h["X tests (WL), p"].items():
+        L.append(f"     {q}: " + " / ".join(f"{p:.2g}" for p in v.values()))
+    for q, v in h["O/M (binomial) [ratio, 95% low, high]"].items():
+        L.append(
+            f"   O/M {q}: "
+            + ", ".join(
+                f"{k} {x[0]:.2f} ({x[1]:.2f}-{x[2]:.2f})"
+                for k, x in v.items()
+                if not k.startswith("tau")
+            )
+        )
+    for c, v in h["raw counts against the model (prespecified sigma_f)"].items():
+        x = v["chi2/dof [all, round 1, rounds 2-8, P_model < 0.45]"]
+        r = v["eps after round 1, device / model [ratio, 95% low, high]"]
+        a0 = v["fidelity ratio at n = 0 [ratio, 95% low, high]"]
+        L.append(
+            f"   counts {c}: chi2 {x[0][0]:.0f}/{x[0][1]} (round 1 {x[1][0]:.0f}/{x[1][1]}), excess pp "
+            + " ".join(f"{e:+.1f}" for e in v["excess_pp by n"].values())
+            + f"; after round 1 eps x{r[0]:.2f} ({r[1]:.2f}-{r[2]:.2f}), "
+            f"{v['excess eps per round after round 1 (pp)']:.1f} pp/round; F(0) x{a0[0]:.2f}; "
+            f"round 1 off trend {v['round 1 above the trend (pp)']:+.1f} pp"
+        )
+    for k, v in h["Lambda_X O - M"].items():
+        extra = (
+            f", certified {v['certified_margin']:.3f}, chance to certify 0.05 "
+            f"{v['chance to certify 0.05 if exact [observed sd, stated errors]'][0]:.2f}/"
+            f"{v['chance to certify 0.05 if exact [observed sd, stated errors]'][1]:.2f}"
+            if "certified_margin" in v
+            else ""
+        )
+        L.append(
+            f"   Lambda_X O - M {k}: {v['mean']:+.3f} (90% {v['ci90'][0]:+.3f}, {v['ci90'][1]:+.3f}){extra}"
+        )
+    return L
 
 
 def main() -> None:
@@ -790,11 +1095,14 @@ def main() -> None:
         },
         "model_vs_device": model_vs_device(),
         "effect_sizes": effect_sizes(),
+        "sensitivity": sensitivity(),
+        "dependence": dependence(),
         "xy_variance_correction": take("idle_f.json")["correction"],
         "per_qubit_f_side_prediction": per_qubit_f_side(),
         "heating_exploratory": heating(),
         "decoder_audit": take("decoder.json")["paper"],
         "leakage": leakage(),
+        "streak_effects_exploratory": streak_effects(),
         "placements_and_calibration_inputs": placements_and_inputs(),
         "diagnostics": diagnostics(),
         **other(),

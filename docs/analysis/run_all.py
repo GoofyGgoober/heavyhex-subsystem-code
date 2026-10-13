@@ -24,6 +24,8 @@ LIGHT = [
     ["placements.py"],
     ["model_vs_device.py"],
     ["effect_sizes.py"],
+    ["sensitivity.py"],
+    ["dependence.py"],
     ["placement_counts.py"],
     ["calibration_inputs.py"],
     ["detection_events.py"],

@@ -564,7 +564,8 @@ def table(D: Data) -> dict:
         "the 68% quasi-likelihood profile interval; WL, the delta-method sigma as prespecified in "
         "X memory, and in Z memory, where that sigma is unreliable near P = 1/2 (see errors), the "
         "parametric-bootstrap sd of the WL estimator. Predicted: plain mean of the daily "
-        "predictions fitted the same way, with their range.",
+        "predictions fitted the same way, with their range and sigma_M = sqrt(sum "
+        "sigma_M,i^2) / 5 from the agreement test's sigma_M of each day.",
         "cells": {},
     }
     diffs = []
@@ -584,6 +585,7 @@ def table(D: Data) -> dict:
                     ]
                     sig = boot if (b == "Z" and fit == "wls") else own
                     pred = np.array([per_rep[k][b]["predicted"][q][fit] for k in keys])
+                    sM = D.terms(fit, f"{b} {q}").sM[[D.keys.index(k) for k in keys]]
                     cell = plain_mean(v, sig)
                     iv_v, iv_se, iv_red = FT.pooled(v, own)
                     cell_out = {
@@ -591,6 +593,7 @@ def table(D: Data) -> dict:
                         "predicted": {
                             "mean": float(pred.mean()),
                             "range": [float(pred.min()), float(pred.max())],
+                            "sigma_M": float(sqrt((sM**2).sum()) / len(sM)),
                         },
                         "observed_over_predicted (ratio of the plain means)": cell["value"]
                         / float(pred.mean()),
