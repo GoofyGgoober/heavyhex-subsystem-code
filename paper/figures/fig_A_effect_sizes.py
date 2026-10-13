@@ -17,10 +17,10 @@ HERE = Path(__file__).resolve().parent
 ROWS = (
     ("X", "X eps3", r"$\varepsilon_3$"),
     ("X", "X eps5", r"$\varepsilon_5$"),
-    ("X", "X lambda", r"$\Lambda$"),
+    ("X", "X lambda", r"$\Lambda_\mathrm{X}$"),
     ("Z", "Z eps3", r"$\varepsilon_3$"),
     ("Z", "Z eps5", r"$\varepsilon_5$"),
-)  # no Lambda_Z: distance-5 Z memory is close to random (Supplementary, Statistics)
+)  # no Lambda_Z: distance-5 Z memory is close to random (Supplementary, Robustness)
 
 
 def make(results_dir: Path, out_pdf: Path) -> None:

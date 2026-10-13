@@ -1,7 +1,7 @@
 """Every number the paper quotes, collected from the results files, each section with its source.
 
-No computation: this only selects from results/*.json (and runs/combined.json, docs/figures/
-figure3.json) and writes results/paper_numbers.json and a readable digest,
+No computation: this only selects from results/*.json (and runs/combined.json, the stored
+predictions in runs/*/prediction.json, docs/figures/figure3.json) and writes results/paper_numbers.json and a readable digest,
 results/paper_numbers.txt. Run it after the scripts whose results it reads; it takes a second.
 
     python docs/analysis/ledger.py
@@ -12,7 +12,7 @@ from __future__ import annotations
 import re
 import sys
 
-from common import REPO, RESULTS, read, result, write_json
+from common import REPO, RESULTS, jobs, memory_index, read, result, write_json
 
 FITS = ("wls", "binomial")
 BASES = ("X", "Z")
@@ -536,7 +536,18 @@ def diagnostics() -> dict:
         },
         "pij": {
             "classes (median device / model)": {
-                c: {k: v[k] for k in ("types", "median_ratio", "median_ratio_se", "share_above_1")}
+                c: {
+                    k: v[k]
+                    for k in (
+                        "types",
+                        "median_model_p",
+                        "median_device_p",
+                        "median_ratio",
+                        "median_ratio_se",
+                        "share_above_1",
+                        "control_median_ratio",
+                    )
+                }
                 for c, v in pij["classes"]["X dboth"].items()
             },
             "classes Z d3 (median device / model)": {
@@ -648,6 +659,27 @@ def scale_and_f() -> dict:
     }
 
 
+def stored_pl8() -> dict:
+    """P_L(8) of each patch as stored before its job at f = 0 and f = 1 (Sec. discussion)."""
+    out = {}
+    for job in jobs():
+        INPUTS.add(f"runs/{job.folder.name}/prediction.json")
+        stored = read(job.folder / "prediction.json")
+        out[job.name] = {
+            f"f = {f}": {
+                b: dict(
+                    zip(
+                        (f"d{d}" for d in job.info["chips"]),
+                        stored[f]["settings"][memory_index(b, 8)]["logical_error"],
+                    )
+                )
+                for b in BASES
+            }
+            for f in stored
+        }
+    return out
+
+
 def other() -> dict:
     out = {
         "readout": take("readout.json"),
@@ -657,6 +689,7 @@ def other() -> dict:
             "day_swing.json"
         ),
         "repredict (a stored prediction derived again)": take("repredict.json"),
+        "stored P_L(8) by job, f, basis and patch": stored_pl8(),
     }
     INPUTS.add("docs/figures/figure3.json")
     out["prerun_figure3_rows"] = read(REPO / "docs/figures/figure3.json")["rows"]
