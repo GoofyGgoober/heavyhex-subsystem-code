@@ -138,12 +138,15 @@ def test_the_decisions_are_compared(run_folders, tmp_path):
     """combined.json's chi2 within 25%, and its verdicts equal away from the bound."""
     combined = json.loads((reproduce.RUNS / reproduce.COMBINED).read_text())
 
-    def passes(change) -> bool:
+    def compared(change) -> reproduce.Report:
         document = json.loads(json.dumps(combined))
         change(document)
         path = tmp_path / reproduce.COMBINED
         path.write_text(json.dumps(document, indent=1) + "\n")
-        return reproduce.compare_combined(path, reproduce.RUNS / reproduce.COMBINED).passed
+        return reproduce.compare_combined(path, reproduce.RUNS / reproduce.COMBINED)
+
+    def passes(change) -> bool:
+        return compared(change).passed
 
     def scale(name, factor):
         return lambda d: d["model"][name].update(chi2=d["model"][name]["chi2"] * factor)
@@ -164,6 +167,10 @@ def test_the_decisions_are_compared(run_folders, tmp_path):
     assert not passes(flip("model", "X eps3", "agrees"))  # chi2 52, far from the bound
     assert passes(flip("model", "X eps5", "agrees"))  # chi2 19.8, within 25% of 18.31
     assert not passes(flip("matches", "Z"))
+    # The borderline test is reported either way, and a flip of its verdict is named.
+    assert any("X eps5" in note and "reproduced" in note for note in compared(lambda d: None).notes)
+    flipped = compared(flip("model", "X eps5", "agrees")).notes
+    assert any("X eps5" in note and "verdict changed" in note for note in flipped)
 
 
 def test_a_missing_or_extra_key_fails(one_job):
