@@ -2,7 +2,7 @@
 
 Top: the middle round of day 1's 3-round X-memory circuit on pair 1's distance-3 patch, as the
 compiled circuit ran it, for one qubit of each role (the gadget figure's q24, q23 and q16, and
-the relay q21). Bottom: the round's critical path, the same with resets that take no time
+the relay q21). Bottom: the round's critical path, the same with zero-duration resets
 (no_reset.py's stand-in for a reset-free schedule), and the parallel, reset-free round of Harper
 et al. on Heron r2. Draws from docs/analysis/results/timing.json (docs/analysis/timing.py) in
 the style of make_figures.py, whose fonts and rcParams it imports. Run from the repository root:
@@ -85,7 +85,7 @@ def make(results_dir: Path, out_pdf: Path) -> None:
         # Bottom: what sets the round's length.
         bars = [
             ("as run", [(k, w) for k, w in data["critical_path_us"]]),
-            ("zero-time resets", [(k, w) for k, w in data["critical_path_us"] if k != "reset"]),
+            ("zero-duration resets", [(k, w) for k, w in data["critical_path_us"] if k != "reset"]),
         ]
         for row, (_, path) in enumerate(bars):
             x = 0.0
@@ -133,7 +133,7 @@ def make(results_dir: Path, out_pdf: Path) -> None:
         handles = [
             Patch(facecolor=D5, label="readout"),
             Patch(facecolor="white", edgecolor=D5, hatch="//////", lw=0.4, label="reset"),
-            Patch(facecolor=INK, label="CZ"),
+            Patch(facecolor=INK, label="CZ, gates"),
             Line2D([], [], color=INK, lw=0, marker="|", ms=3.5, mew=0.9, label=r"$\sqrt{X}$, $X$"),
             Patch(facecolor=GRID, label="decoupled idle"),
         ]

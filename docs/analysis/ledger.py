@@ -9,6 +9,7 @@ results/paper_numbers.txt. Run it after the scripts whose results it reads; it t
 
 from __future__ import annotations
 
+import math
 import re
 import sys
 
@@ -19,6 +20,11 @@ BASES = ("X", "Z")
 QUANTITIES = ("eps3", "eps5", "lambda")
 PLACEMENTS = (1, 2)
 INPUTS: set[str] = set()
+
+
+def weight(edges: list[float]) -> float:
+    """Total matching weight of a set of edges, sum of ln[(1-p)/p]."""
+    return sum(math.log((1 - p) / p) for p in edges)
 
 
 def take(name: str) -> dict:
@@ -118,6 +124,9 @@ def sensitivity() -> dict:
         "monte_carlo (WL)": {label: mc[label] for label in ("prespecified", "idle_noise_only")},
         "monte_carlo_slopes, parabola jobs": {
             j: v for j, v in mc["slopes_by_job"].items() if v["rule"] == "parabola"
+        },
+        "line_slope_above_f_1.05 (against the secant from f = 1 and the parabola)": {
+            j: v for j, v in mc["slopes_by_job"].items() if v["f"] > 1.05
         },
         "control_rerun": next(v for k, v in mc.items() if k.startswith("control_rerun")),
         "seeds_check": mc["seeds_check"],
@@ -1131,8 +1140,11 @@ def digest(res: dict) -> str:
         f"   miscorrected single faults: {100 * ms[0]:.0f}-{100 * ms[1]:.0f}% of predicted eps3; "
         f"day 1 pair 1: {q44['fault']} {100 * q44['p_per_round']:.1f}% per round over "
         f"{q44['mechanisms']} mechanisms, largest single {q44['largest_single_mechanism_p']:.4f}, "
-        f"{100 * q44['share_of_miscorrected']:.0f}% of the miscorrected; matching chose edges "
-        + ", ".join(f"{p:.2f}" for p in q44["decoder_chose_edges_p"])
+        f"{100 * q44['share_of_miscorrected']:.0f}% of the miscorrected; its own edge "
+        + ", ".join(f"{p:.4f}" for p in q44["largest_single_mechanism_edges_p"])
+        + f" (weight {weight(q44['largest_single_mechanism_edges_p']):.2f}); matching chose edges "
+        + ", ".join(f"{p:.4f}" for p in q44["decoder_chose_edges_p"])
+        + f" (weight {weight(q44['decoder_chose_edges_p']):.2f})"
     )
     L += sensitivity_digest(res["sensitivity"])
     L += dependence_digest(res["dependence"])
@@ -1351,6 +1363,16 @@ def sensitivity_digest(s: dict) -> list[str]:
         )
         + f"; eps5 fails in {100 * mc['X eps5']['prespecified_slope']['fails (chi2 > 18.31)']:.0f}%"
         f", with the line slope {mc['X eps5']['line_slope']['chi2_stored']:.2f}"
+    )
+    above = s["line_slope_above_f_1.05 (against the secant from f = 1 and the parabola)"]
+    name, job = max(above.items(), key=lambda kv: kv[1]["f"])
+    q = next(k for k in job if k.startswith("eps"))
+    v = job[q]
+    L.append(
+        f"   line slope at the largest f ({name}, f {job['f']:.2f}, {q}): {v['slope_line']:.4f}, "
+        f"{100 * (v['slope_line'] / v['slope_secant_from_1'] - 1):.0f}% above the secant from f = 1 "
+        f"({v['slope_secant_from_1']:.4f}), {100 * (v['slope_line'] / v['slope_parabola'] - 1):.0f}% "
+        f"above the parabola ({v['slope_parabola']:.4f})"
     )
     sy = s["Lambda_X windows and fits"]["systematic"]
     L.append(

@@ -208,6 +208,8 @@ def fig_lambda() -> None:
             color=INK,
             fontsize=7,
             style="italic",
+            bbox={"facecolor": "white", "edgecolor": "none", "pad": 1},
+            zorder=3,
         )
     ax.axvline(1.0, color=MUTED, lw=0.7, ls=(0, (3, 2)))
     ax.text(0.985, -0.45, r"$\Lambda=1$", ha="right", va="center", color=MUTED, fontsize=7)
