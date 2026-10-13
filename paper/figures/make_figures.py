@@ -21,6 +21,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 
 ROOT = Path(__file__).resolve().parents[2]
 RUNS = ROOT / "runs"
@@ -125,8 +126,8 @@ def label(ax, text: str) -> None:
 
 
 def fig_lambda() -> None:
-    """The prespecified Λ_X test per repetition: (a) observed and predicted with their own errors,
-    (b) observed minus predicted with the test's agreement interval."""
+    """The prespecified Λ_X test per pair-day: (a) observed and predicted with their own errors,
+    and the prespecified pool; (b) z under both choices of σ_f."""
     combined = load(RUNS / "combined.json")
     reps = sorted(combined["reps"], key=lambda r: (r["rep"], r["day"]))
     tests = [r["tests"]["X lambda"] for r in reps]
@@ -142,6 +143,18 @@ def fig_lambda() -> None:
     )
     s_test = np.hypot(s_obs, s_pred)
     assert np.allclose(2 * s_test, [t["bound"] for t in tests], rtol=1e-9)
+    # z with sigma_f as prespecified and from the idle test's noise alone (prespecified_tests.py)
+    tested = load(DIAG / "prespecified_tests.json")
+    by_pair_day = {(r["pair"], r["day"]): r["wls"]["X lambda"] for r in tested["per_pair_day"]}
+    days = [DAYS.index(r["day"]) + 1 for r in reps]
+    z_pre = np.array([by_pair_day[(r["rep"], d)]["z"] for r, d in zip(reps, days)])
+    z_noise = np.array(
+        [by_pair_day[(r["rep"], d)]["z_idle_noise_only"] for r, d in zip(reps, days)]
+    )
+    assert np.allclose(z_pre, (obs - pred) / s_test, atol=1e-9)
+    pool, pool_se, _, _, _, pool_pred = tested["headline"]["pool"][
+        "Lambda_X, se, chi2_0/nu, t_0.95, upper bound, predicted"
+    ]
     # Pair 1's patches share one job and one f, so its predictions stored before the job at f = 0
     # and f = 1 bracket the prediction; pair 2's patches ran in two jobs at two f, and are not
     # bracketed that way (effect_sizes.py, prejob).
@@ -151,18 +164,18 @@ def fig_lambda() -> None:
     }
 
     # Full column width with constrained layout, so LaTeX prints it at about 1:1 (fonts 7-8 pt).
-    # The prespecified ten-repetition pool is not drawn; the paper quotes it in the text.
     fig, (ax, res) = plt.subplots(
-        1, 2, figsize=(COLUMN, 2.55), sharey=True, width_ratios=[1.45, 1], layout="constrained"
+        1, 2, figsize=(COLUMN, 2.75), sharey=True, width_ratios=[1.45, 1], layout="constrained"
     )
     half = len(reps) // 2
     # Pair 1 on top, then pair 2, each under its own heading.
     y = np.concatenate([np.arange(half)[::-1] + half + 1.4, np.arange(half)[::-1]]).astype(float)
+    ax.axvspan(pool - pool_se, pool + pool_se, color=D5, alpha=0.13, lw=0, zorder=0)
+    ax.axvline(pool_pred, color=MUTED, lw=0.8, ls=(0, (1, 1.5)), zorder=0)
     for i, r in enumerate(reps):
         low = y[i] - 0.3  # the prediction just under the observation
         if r["rep"] == 1:
-            day = DAYS.index(r["day"]) + 1
-            bracket = sorted(frozen[(1, day)][f"X lambda frozen_f{f}"] for f in ("0.0", "1.0"))
+            bracket = sorted(frozen[(1, days[i])][f"X lambda frozen_f{f}"] for f in ("0.0", "1.0"))
             ax.plot(bracket, [low, low], color=MUTED, lw=2.6, alpha=0.35, solid_capstyle="butt")
         ax.errorbar(
             pred[i],
@@ -180,19 +193,8 @@ def fig_lambda() -> None:
         ax.errorbar(
             obs[i], y[i], xerr=s_obs[i], fmt="o", ms=3.4, color=D5, elinewidth=1.0, capsize=0
         )
-        agrees = abs(obs[i] - pred[i]) < 2 * s_test[i]
-        res.errorbar(
-            obs[i] - pred[i],
-            y[i] - 0.15,
-            xerr=2 * s_test[i],
-            fmt="o",
-            ms=3.4,
-            color=D5,
-            mfc="white" if agrees else D5,
-            mew=0.9,
-            elinewidth=1.0,
-            capsize=0,
-        )
+        res.plot(z_pre[i], y[i], "o", ms=3.4, color=D5)
+        res.plot(z_noise[i], y[i] - 0.3, "o", ms=3.4, mfc="white", mec=D5, mew=0.9)
     for pair, top, note in (
         (1, y[0], "one job, same qubits daily"),
         (2, y[half], "two jobs a day"),
@@ -209,16 +211,17 @@ def fig_lambda() -> None:
         )
     ax.axvline(1.0, color=MUTED, lw=0.7, ls=(0, (3, 2)))
     ax.text(0.985, -0.45, r"$\Lambda=1$", ha="right", va="center", color=MUTED, fontsize=7)
-    res.axvline(0.0, color=MUTED, lw=0.7)
-    labels = [f"day {DAYS.index(r['day']) + 1}" for r in reps]
-    ax.set_yticks(list(y), labels)
+    for edge in (-2, 2):
+        res.axvline(edge, color=MUTED, lw=0.7, ls=(0, (3, 2)))
+    res.axvline(0.0, color=MUTED, lw=0.5)
+    ax.set_yticks(list(y), [f"day {d}" for d in days])
     ax.tick_params(axis="y", length=0)
     ax.set_ylim(-0.8, y.max() + 1.6)
     ax.set_xlim(0.3, 1.05)
     ax.set_xlabel(r"$\Lambda_\mathrm{X} = \varepsilon_3/\varepsilon_5$")
-    res.set_xlim(-0.38, 0.38)
-    res.set_xticks([-0.3, 0, 0.3])
-    res.set_xlabel("observed $-$ predicted")
+    res.set_xlim(-4.2, 4.2)
+    res.set_xticks([-4, -2, 0, 2, 4])
+    res.set_xlabel(r"$z$ of $\Lambda_\mathrm{X}$")
     res.tick_params(axis="y", length=0)
     label(ax, "(a)")
     label(res, "(b)")
@@ -236,6 +239,8 @@ def fig_lambda() -> None:
             label=r"predicted, $\pm\sigma_M$",
         ),
         Line2D([], [], color=MUTED, lw=2.6, alpha=0.35, label=r"before the job, $0\leq f\leq 1$"),
+        Patch(color=D5, alpha=0.13, lw=0, label=r"prespecified pool, $\pm\sigma$"),
+        Line2D([], [], color=MUTED, lw=0.8, ls=(0, (1, 1.5)), label="pooled prediction"),
         Line2D(
             [],
             [],
@@ -243,8 +248,9 @@ def fig_lambda() -> None:
             ms=3.4,
             color=D5,
             mfc="white",
-            lw=1.0,
-            label=r"(b) $\pm2\sqrt{\sigma_O^2+\sigma_M^2}$; open: agrees",
+            mew=0.9,
+            ls="none",
+            label=r"(b) $\sigma_f$ from idle noise only",
         ),
     ]
     fig.legend(
@@ -261,7 +267,7 @@ def fig_lambda() -> None:
 
 def fig_pn() -> None:
     """P(n) of each pair, X and Z memory, mean over the five days."""
-    fig, axes = plt.subplots(2, 2, figsize=(PAGE, 3.4), sharex=True, sharey=True)
+    fig, axes = plt.subplots(2, 2, figsize=(PAGE, 3.0), sharex=True, sharey=True)
     n = np.array(ROUNDS)
     for col, rep in enumerate((1, 2)):
         for row, basis in enumerate(("X", "Z")):
@@ -285,9 +291,8 @@ def fig_pn() -> None:
                     capsize=0,
                     label=f"$d={distance}$",
                 )
-            # Near 1/2 a point carries little information about eps: shade P >= 0.45.
-            ax.axhspan(0.45, 0.55, color=GRID, alpha=0.55, lw=0, zorder=0)
-            ax.axhline(0.5, color=MUTED, lw=0.6, ls=(0, (3, 2)), zorder=0)
+            # The log-linear fit leaves out points with P >= 1/2.
+            ax.axhline(0.5, color=MUTED, lw=0.7, ls=(0, (3, 2)), zorder=0)
             ax.set_ylim(0, 0.55)
             ax.set_xticks(ROUNDS)
             ax.grid(axis="y", color=GRID, lw=0.4)
@@ -307,52 +312,6 @@ def fig_pn() -> None:
         label(ax, f"({tag})")
     fig.tight_layout(w_pad=1.0, h_pad=0.8)
     fig.savefig(OUT / "pn.pdf")
-    plt.close(fig)
-
-
-def fig_leakage() -> None:
-    """(a) The lag-l persistence of the flag and relay readouts in both bases. (b) Onset rate by
-    role."""
-    from fig_D_flag_records import delta_panel
-
-    causes = load(DIAG / "hmm_causes.json")
-    fig, (a, b) = plt.subplots(1, 2, figsize=(PAGE, 2.1))
-    delta_panel(a)
-    label(a, "(a)")
-
-    rng = np.random.default_rng(1)
-    for role, colour, marker, name in (("relay", D3, "s", "relay"), ("z_flag", D5, "o", "flag")):
-        rows = [r for r in causes if r["role"] == role]
-        x = np.array([r["cz_per_round"] for r in rows]) + rng.uniform(-0.35, 0.35, len(rows))
-        y = np.array([r["leak_per_round"] for r in rows]) * 100
-        b.plot(
-            x,
-            y,
-            marker,
-            ms=2.2,
-            color=colour,
-            alpha=0.45,
-            mew=0,
-            label=f"{name} ({len(rows)} series)",
-        )
-        b.plot(
-            np.mean([r["cz_per_round"] for r in rows]),
-            np.median(y),
-            marker,
-            ms=5,
-            color=colour,
-            mec=INK,
-            mew=0.6,
-        )
-    b.set_ylabel("onset rate (% per round)")
-    b.set_xlim(1.5, 9.8)
-    b.set_xticks([3, 8], ["relays\n3 CZ, 1 readout, 1 reset", "flags\n8 CZ, 2 readouts, 2 resets"])
-    b.tick_params(axis="x", length=0, labelsize=6.5)
-    b.set_ylim(0, None)
-    b.legend(loc="upper left", handletextpad=0.2)
-    label(b, "(b)")
-    fig.tight_layout(w_pad=1.6)
-    fig.savefig(OUT / "leakage.pdf")
     plt.close(fig)
 
 
@@ -413,18 +372,19 @@ def fig_analyses() -> None:
     import fig_B_detector_diagnostics
     import fig_C_idle_dephasing
     import fig_D_flag_records
+    import fig_timing
 
+    fig_timing.make(DIAG, OUT / "timing.pdf")
     fig_A_effect_sizes.make(DIAG, OUT / "A_effect_sizes.pdf")
     fig_B_detector_diagnostics.make(DIAG, OUT / "B_detector_diagnostics.pdf")
     fig_B_detector_diagnostics.make_pij(DIAG, OUT / "B_detector_diagnostics_pij.pdf")
     fig_C_idle_dephasing.make(DIAG, OUT / "C_idle_dephasing.pdf")
-    fig_D_flag_records.make_trace(DIAG, OUT / "hmm_trace.pdf")
+    fig_D_flag_records.make(DIAG, OUT / "flag_records.pdf")
 
 
 if __name__ == "__main__":
     fig_lambda()
     fig_pn()
-    fig_leakage()
     fig_scale()
     fig_layout()
     fig_analyses()
