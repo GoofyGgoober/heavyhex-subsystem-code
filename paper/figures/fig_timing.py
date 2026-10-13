@@ -133,7 +133,7 @@ def make(results_dir: Path, out_pdf: Path) -> None:
         handles = [
             Patch(facecolor=D5, label="readout"),
             Patch(facecolor="white", edgecolor=D5, hatch="//////", lw=0.4, label="reset"),
-            Patch(facecolor=INK, label="CZ, gates"),
+            Patch(facecolor=INK, label="gates and short waits"),
             Line2D([], [], color=INK, lw=0, marker="|", ms=3.5, mew=0.9, label=r"$\sqrt{X}$, $X$"),
             Patch(facecolor=GRID, label="decoupled idle"),
         ]
