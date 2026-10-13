@@ -7,8 +7,9 @@ b = 0.20 and 0.508, while the device gives b = 0.22. Here the same model (leak 0
 partner X error 25%, transfer 5%, leaked readout 0.508) is simulated exactly at shorter
 lifetimes, on the 4-, 6- and 8-round Z-memory circuits of the four fit jobs (2500 shots,
 seed 101; leakage.ensure), and fitted with the published procedure, to find the simulator
-lifetime whose fitted b matches the device's. So the paper's 35 us is an effective
-persistence, not the leaked state's lifetime. Heavy the first time (the simulations are cached).
+lifetime whose fitted b matches the device's (interpolated: "matching_device"). So the
+paper's 35 us is an effective persistence, not the leaked state's lifetime. About 4 minutes on
+2 workers the first time (the simulations are cached).
 
     python docs/analysis/leakage_lifetime.py [--workers 2]
 
@@ -26,7 +27,7 @@ import numpy as np
 
 import hmm_bootstrap as H
 import leakage as E
-from common import RESULTS, ROUND_US, WORKERS, jobs, memory_index, readout_series
+from common import RESULTS, ROUND_US, WORKERS, jobs, memory_index, readout_series, result
 from leakage import FIT_JOBS, Point
 
 LIVES = (10.0, 17.7, 25.0)  # us; 35.4 us (the paper's) is leakage_recovery.py's truth A
@@ -77,7 +78,20 @@ def main() -> None:
             + " ".join(f"{100 * v:.2f}" for v in m["refire"]),
             flush=True,
         )
-    (RESULTS / "leakage_lifetime.json").write_text(json.dumps(out, indent=1) + "\n")
+    # the simulator lifetime whose fitted persistence matches the device's (all fifteen jobs),
+    # interpolated linearly between the lifetimes run, and the lag-1 re-firing excess there
+    lives = sorted(out, key=float)
+    x = [float(k) for k in lives]
+    device = result("hmm_summary.json")["chip"]["lifetime_us_median"]
+    match = float(np.interp(device, [out[k]["life_us_cont"] for k in lives], x))
+    refire = float(np.interp(match, x, [out[k]["refire"][0] for k in lives]))
+    print(f"device {device:.1f} us: simulator lifetime {match:.1f} us, lag-1 excess {refire:.3f}")
+    summary = {
+        "lifetimes": out,
+        "device_tau_s_us": device,
+        "matching_device": {"lifetime_us": match, "refire_lag_1": refire},
+    }
+    (RESULTS / "leakage_lifetime.json").write_text(json.dumps(summary, indent=1) + "\n")
     print(
         "device (fit jobs): median b 0.2245, e_P 0.512, a 0.0258; re-firing excess 14.87 10.74 7.72 5.75 4.09 3.03"
     )

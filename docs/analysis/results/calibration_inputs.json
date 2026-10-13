@@ -28,11 +28,12 @@
  },
  "readout_gap": {
   "qubits": 38,
-  "values": 190,
-  "median": 0.007568359375,
+  "values": 114,
+  "days": "qubit-days with the split for the calibration in force (properties.py)",
+  "median": 0.008544921875,
   "quartiles": [
-   0.0029296875,
-   0.01470947265625
+   0.0040283203125,
+   0.016357421875
   ]
  },
  "t1_flags_relays": {
