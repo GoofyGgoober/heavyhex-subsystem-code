@@ -139,11 +139,18 @@ def mark_weak_couplers(
 
 
 def mark_weak_qubits(ax: Axes, device: DeviceMap, layout: HeavyHexLayout, qubits, size) -> None:
-    """Ring each of the given qubits that the patch uses (the caption says why it is weak)."""
+    """Ring each of the given qubits that the patch uses (the caption says why they are weak)."""
     for q in sorted(set(qubits) & layout.physical_qubits):
         x, y = device.pos[q]
         ax.scatter(
-            [x], [y], s=size * 3.2, facecolor="none", edgecolor=WEAK_RING, lw=1.6, zorder=5.8
+            [x],
+            [y],
+            s=size * 3.2,
+            facecolor="none",
+            edgecolor=WEAK_RING,
+            lw=1.6,
+            zorder=7.5,  # over the white boxes of the qubit numbers
+            clip_on=False,  # a ring at the panel's edge stays whole
         )
 
 
@@ -231,7 +238,7 @@ def draw_key(fig: Figure, below: Axes) -> None:
             Line2D([], [], color=X_RED, lw=2.8, label="X-gauge CX"),
             Line2D([], [], color=Z_BLUE, lw=2.8, label="Z-gauge CX"),
             Line2D([], [], color=WEAK_BAND, lw=10, label=f"CZ error above {WEAK_CZ:.0%}"),
-            marker("o", "none", WEAK_RING, 15, "poor readout or $T_2$", 1.6),
+            marker("o", "none", WEAK_RING, 15, "weak qubit", 1.6),
             Line2D([], [], color=OTHER_REP, lw=1.8, ls=":", label="pair 2, in (a)"),
         ],
         loc="upper center",
@@ -401,7 +408,8 @@ def main(argv: list[str] | None = None) -> None:
     fig = build_figure(
         load_device_map(FEZ_MAP), Calibration.load(args.calibration), weak_qubits=args.weak
     )
-    fig.savefig(args.out, dpi=300)
+    # The key hangs below the axes; a tight box keeps its last row.
+    fig.savefig(args.out, dpi=300, bbox_inches="tight", pad_inches=0.05)
     plt.close(fig)
     print(f"wrote {args.out}")
 

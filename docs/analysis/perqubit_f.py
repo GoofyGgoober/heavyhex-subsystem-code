@@ -163,7 +163,7 @@ def combine(jobs: dict[str, dict], infos: dict[str, dict]) -> tuple[list[dict], 
 
 
 def pooled(values, sigmas) -> tuple[float, float, float]:
-    """Inverse-variance mean, its SE widened by sqrt(chi2/dof) when above 1 (paper Table II)."""
+    """Inverse-variance mean, its SE widened by sqrt(chi2/dof) when above 1."""
     values, w = np.asarray(values), 1 / np.asarray(sigmas) ** 2
     m = float((w * values).sum() / w.sum())
     spread = float((w * (values - m) ** 2).sum() / (len(values) - 1))

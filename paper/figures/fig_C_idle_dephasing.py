@@ -67,7 +67,7 @@ def make(results_dir: Path, out_pdf: Path) -> None:
     decay, t2 = data["decay"], data["f_vs_t2"]
 
     # Column width: the three decay panels above, f against T2 below.
-    fig = plt.figure(figsize=(COLUMN, 3.9), layout="constrained")
+    fig = plt.figure(figsize=(COLUMN, 3.4), layout="constrained")
     grid = fig.add_gridspec(2, 3, height_ratios=[1, 1.15])
     top = [fig.add_subplot(grid[0, k]) for k in range(3)]
     b = fig.add_subplot(grid[1, :])
@@ -121,7 +121,7 @@ def make(results_dir: Path, out_pdf: Path) -> None:
     b.text(
         0.02,
         0.97,
-        f"Spearman $\\rho = {rho['rho']:.2f}$ [{ci[0]:.2f}, {ci[1]:.2f}], {rho['points']} qubits",
+        f"Spearman $\\rho = {rho['rho']:.2f}$ ({ci[0]:.2f}, {ci[1]:.2f}), {rho['points']} qubits",
         transform=b.transAxes,
         ha="left",
         va="top",

@@ -8,12 +8,14 @@
   "chip_level_inference": "none: results are per placement",
   "inputs": [
    "docs/analysis/results/calibration_inputs.json",
+   "docs/analysis/results/channels.json",
    "docs/analysis/results/corr_matching.json",
    "docs/analysis/results/costreak.json",
    "docs/analysis/results/cz_scaled.json",
    "docs/analysis/results/day_swing.json",
    "docs/analysis/results/decoder.json",
    "docs/analysis/results/decoder_dominant.json",
+   "docs/analysis/results/decoder_graph.json",
    "docs/analysis/results/decoder_ml.json",
    "docs/analysis/results/dependence.json",
    "docs/analysis/results/dephasing_floor.json",
@@ -22,6 +24,7 @@
    "docs/analysis/results/error_budget.json",
    "docs/analysis/results/error_scale.json",
    "docs/analysis/results/f_models.json",
+   "docs/analysis/results/f_treatments.json",
    "docs/analysis/results/f_weighted_mean.json",
    "docs/analysis/results/fit_bias.json",
    "docs/analysis/results/flags_summary.json",
@@ -21753,6 +21756,563 @@
    1.0
   ],
   "stored_prediction_against_exact_matching_max_abs_z": 2.377070749235816
+ },
+ "decoder_graph": {
+  "pymatching_behaviour": {
+   "error(0.1) D0 ^ L0": [
+    [
+     0,
+     null,
+     []
+    ]
+   ],
+   "error(0.01) D0, then error(0.1) D0 L0": [
+    [
+     0,
+     null,
+     []
+    ]
+   ],
+   "error(0.1) D0 L0, then error(0.01) D0": [
+    [
+     0,
+     null,
+     [
+      0
+     ]
+    ]
+   ],
+   "pymatching": "2.4.0",
+   "stim": "1.16.0"
+  },
+  "pieces": {
+   "count_by_basis_and_patch": {
+    "Z d3": 240
+   },
+   "per_circuit": "one per round, distance-3 Z memory only",
+   "fault_probability_range": [
+    0.0015040618796690467,
+    0.001982492350414736
+   ],
+   "faults_example_day1_pair1": [
+    "X on data Q2 (DEPOLARIZE2)",
+    "X on data Q2 (PAULI_CHANNEL_1)",
+    "X on data Q2, X on Z1Z2 relay (DEPOLARIZE2)",
+    "X on data Q2, Y on X2X5 ancilla (DEPOLARIZE2)",
+    "X on data Q2, Z on X2X5 ancilla (DEPOLARIZE2)",
+    "Y on data Q2 (DEPOLARIZE2)",
+    "Y on data Q2 (PAULI_CHANNEL_1)",
+    "Y on data Q2, X on Z1Z2 relay (DEPOLARIZE2)",
+    "Y on data Q2, Y on X2X5 ancilla (DEPOLARIZE2)",
+    "Y on data Q2, Z on X2X5 ancilla (DEPOLARIZE2)"
+   ],
+   "graph_unchanged_without_pieces_every_circuit": true,
+   "edges_with_mixed_observables_max": 0,
+   "graph_unchanged_folded_into_any_piece_every_circuit": true,
+   "correlated_matching_on_the_paper_model": [
+    "Encountered a decomposed error instruction with an undetectable component (0 detectors). This is not supported."
+   ],
+   "shots_decoded_differently": {
+    "device shots": 150000,
+    "device matching_folded_vs_paper": 0,
+    "device correlated_folded_vs_dropped": 0,
+    "model shots": 600000,
+    "model matching_folded_vs_paper": 0,
+    "model correlated_folded_vs_dropped": 0
+   },
+   "faults_decoded_alone": {
+    "faults": 240,
+    "calibrated_wrong": 100,
+    "calibrated_wrong_using_exactly_its_own_pieces": 100,
+    "uniform_wrong": 240,
+    "uniform_wrong_using_exactly_its_own_pieces": 240
+   },
+   "z_d3_single_scan (decoder_faults.py's, repeated)": {
+    "mechanisms": 11700,
+    "with_observable_only_piece": 240,
+    "calibrated_wrong": 328,
+    "calibrated_wrong_with_observable_only_piece": 100,
+    "calibrated_wrong_p": 1.0355310504961481,
+    "calibrated_wrong_p_with_observable_only_piece": 0.17036388320806342,
+    "uniform_wrong": 240,
+    "uniform_wrong_with_observable_only_piece": 240,
+    "uniform_wrong_p": 0.41246741739061665,
+    "uniform_wrong_p_with_observable_only_piece": 0.41246741739061665
+   },
+   "share_of_predicted_Z_eps3_range": [
+    0.0,
+    0.022701753503129467
+   ]
+  },
+  "uniform_chip": {
+   "2026-10-04": {
+    "X d3 pre-run simulator f=1": {
+     "n=1": [
+      3,
+      33
+     ],
+     "n=2": [
+      6,
+      55
+     ],
+     "n=2 by symptom": [
+      6,
+      41
+     ],
+     "n=8": [
+      24,
+      187
+     ],
+     "boundary_p": [
+      0.035483246325378026,
+      0.10238716853220332
+     ],
+     "share_of_eps3": 0.10951650161258933
+    },
+    "X d5 pre-run simulator f=1": {
+     "n=1": [
+      0,
+      99
+     ],
+     "n=2": [
+      0,
+      165
+     ],
+     "n=2 by symptom": [
+      0,
+      141
+     ],
+     "n=8": [
+      0,
+      561
+     ],
+     "boundary_p": [
+      0.0362401648159736,
+      0.11951112098462936
+     ]
+    },
+    "X d3 per-job model": {
+     "n=1": [
+      3,
+      33
+     ],
+     "n=2": [
+      6,
+      55
+     ],
+     "n=2 by symptom": [
+      6,
+      41
+     ],
+     "n=8": [
+      24,
+      187
+     ],
+     "boundary_p": [
+      0.03634577054551767,
+      0.10400207510245624
+     ],
+     "share_of_eps3": 0.10950637726666754
+    },
+    "X d5 per-job model": {
+     "n=1": [
+      0,
+      99
+     ],
+     "n=2": [
+      0,
+      165
+     ],
+     "n=2 by symptom": [
+      0,
+      141
+     ],
+     "n=8": [
+      0,
+      561
+     ],
+     "boundary_p": [
+      0.037196526740697254,
+      0.1216056880378651
+     ]
+    },
+    "X d3 pre-run simulator f=0": {
+     "n=8": [
+      9,
+      187
+     ],
+     "boundary_p": [
+      0.02072332887728569,
+      0.07733629323811107
+     ]
+    },
+    "X d3 pre-run simulator f=1 no idle": {
+     "n=8": [
+      0,
+      187
+     ],
+     "boundary_p": [
+      0.009283102287833793,
+      0.05670538044465737
+     ]
+    },
+    "X eps3_simulated": 0.06666526269782791,
+    "Z d3 pre-run simulator f=1": {
+     "n=1": [
+      0,
+      51
+     ],
+     "n=2": [
+      4,
+      99
+     ],
+     "n=2 by symptom": [
+      4,
+      75
+     ],
+     "n=8": [
+      28,
+      387
+     ],
+     "boundary_p": [
+      0.024549057043040504,
+      0.10375974799445845
+     ],
+     "share_of_eps3": 0.10741294038371624
+    },
+    "Z d5 pre-run simulator f=1": {
+     "n=1": [
+      0,
+      134
+     ],
+     "n=2": [
+      0,
+      263
+     ],
+     "n=2 by symptom": [
+      0,
+      223
+     ],
+     "n=8": [
+      0,
+      1037
+     ],
+     "boundary_p": [
+      0.0018068966989726323,
+      0.16064570722693353
+     ]
+    },
+    "Z d3 per-job model": {
+     "n=1": [
+      0,
+      51
+     ],
+     "n=2": [
+      4,
+      99
+     ],
+     "n=2 by symptom": [
+      4,
+      75
+     ],
+     "n=8": [
+      28,
+      387
+     ],
+     "boundary_p": [
+      0.024721577715253948,
+      0.1044062121935105
+     ],
+     "share_of_eps3": 0.11651174089183984
+    },
+    "Z d5 per-job model": {
+     "n=1": [
+      0,
+      134
+     ],
+     "n=2": [
+      0,
+      263
+     ],
+     "n=2 by symptom": [
+      0,
+      223
+     ],
+     "n=8": [
+      0,
+      1037
+     ],
+     "boundary_p": [
+      0.001987841409091857,
+      0.16182397249791422
+     ]
+    },
+    "Z d3 pre-run simulator f=0": {
+     "n=8": [
+      28,
+      387
+     ],
+     "boundary_p": [
+      0.024549057043040504,
+      0.10375974799445312
+     ]
+    },
+    "Z d3 pre-run simulator f=1 no idle": {
+     "n=8": [
+      0,
+      387
+     ],
+     "boundary_p": [
+      0.01871439907541332,
+      0.05157397596264334
+     ]
+    },
+    "Z eps3_simulated": 0.06955749893779833
+   },
+   "2026-10-08": {
+    "X d3 pre-run simulator f=1": {
+     "n=1": [
+      3,
+      33
+     ],
+     "n=2": [
+      6,
+      55
+     ],
+     "n=2 by symptom": [
+      6,
+      41
+     ],
+     "n=8": [
+      24,
+      187
+     ],
+     "boundary_p": [
+      0.039981555555438995,
+      0.11507097158339326
+     ],
+     "share_of_eps3": 0.0995707043149824
+    },
+    "X d5 pre-run simulator f=1": {
+     "n=1": [
+      0,
+      99
+     ],
+     "n=2": [
+      0,
+      165
+     ],
+     "n=2 by symptom": [
+      0,
+      141
+     ],
+     "n=8": [
+      0,
+      561
+     ],
+     "boundary_p": [
+      0.040859774543320466,
+      0.12495540097163178
+     ]
+    },
+    "X d3 per-job model": {
+     "n=1": [
+      3,
+      33
+     ],
+     "n=2": [
+      6,
+      55
+     ],
+     "n=2 by symptom": [
+      6,
+      41
+     ],
+     "n=8": [
+      24,
+      187
+     ],
+     "boundary_p": [
+      0.0409027886497431,
+      0.116945752080333
+     ],
+     "share_of_eps3": 0.09955761056418518
+    },
+    "X d5 per-job model": {
+     "n=1": [
+      0,
+      99
+     ],
+     "n=2": [
+      0,
+      165
+     ],
+     "n=2 by symptom": [
+      0,
+      141
+     ],
+     "n=8": [
+      0,
+      561
+     ],
+     "boundary_p": [
+      0.04188111174049578,
+      0.1274331012899885
+     ]
+    },
+    "X d3 pre-run simulator f=0": {
+     "n=8": [
+      9,
+      187
+     ],
+     "boundary_p": [
+      0.021299128616639754,
+      0.08113505969129689
+     ]
+    },
+    "X d3 pre-run simulator f=1 no idle": {
+     "n=8": [
+      0,
+      187
+     ],
+     "boundary_p": [
+      0.008703213284883467,
+      0.05846023140840449
+     ]
+    },
+    "X eps3_simulated": 0.07791277673859909,
+    "Z d3 pre-run simulator f=1": {
+     "n=1": [
+      0,
+      51
+     ],
+     "n=2": [
+      4,
+      99
+     ],
+     "n=2 by symptom": [
+      4,
+      75
+     ],
+     "n=8": [
+      28,
+      387
+     ],
+     "boundary_p": [
+      0.024424151808838182,
+      0.10967499002442543
+     ],
+     "share_of_eps3": 0.10155367402028594
+    },
+    "Z d5 pre-run simulator f=1": {
+     "n=1": [
+      0,
+      134
+     ],
+     "n=2": [
+      0,
+      263
+     ],
+     "n=2 by symptom": [
+      0,
+      223
+     ],
+     "n=8": [
+      0,
+      1037
+     ],
+     "boundary_p": [
+      0.0018116236672328372,
+      0.16672165057529878
+     ]
+    },
+    "Z d3 per-job model": {
+     "n=1": [
+      0,
+      51
+     ],
+     "n=2": [
+      4,
+      99
+     ],
+     "n=2 by symptom": [
+      4,
+      75
+     ],
+     "n=8": [
+      28,
+      387
+     ],
+     "boundary_p": [
+      0.02461141637979286,
+      0.1103651427247724
+     ],
+     "share_of_eps3": 0.11074508109856439
+    },
+    "Z d5 per-job model": {
+     "n=1": [
+      0,
+      134
+     ],
+     "n=2": [
+      0,
+      263
+     ],
+     "n=2 by symptom": [
+      0,
+      223
+     ],
+     "n=8": [
+      0,
+      1037
+     ],
+     "boundary_p": [
+      0.0020079107857091764,
+      0.1680737756986399
+     ]
+    },
+    "Z d3 pre-run simulator f=0": {
+     "n=8": [
+      28,
+      387
+     ],
+     "boundary_p": [
+      0.024424151808838182,
+      0.10967499002442212
+     ]
+    },
+    "Z d3 pre-run simulator f=1 no idle": {
+     "n=8": [
+      0,
+      387
+     ],
+     "boundary_p": [
+      0.019864304297177157,
+      0.05360837890050069
+     ]
+    },
+    "Z eps3_simulated": 0.07469091421289115
+   }
+  },
+  "path": {
+   "shortest_logical_edges_seen": {
+    "X d3": [
+     3
+    ],
+    "X d5": [
+     5
+    ],
+    "Z d3": [
+     3
+    ],
+    "Z d5": [
+     3
+    ]
+   },
+   "z_d5_path_edges_never_a_whole_line (n = 1, 2)": [
+    2
+   ]
+  }
  },
  "idle_test_scope": {
   "ancilla_reads_1": {
@@ -47944,6 +48504,2073 @@
     ]
    ]
   }
+ },
+ "channels": {
+  "what": "error_budget.py's one-channel factors with Birge-widened 95% intervals, whether one factor on a channel fits several targets, two channels fitted together, and what 'plausible' can be measured against. Binomial fit; fixed decoder (the full model's graph), as the device's shots.",
+  "intervals": "eps: sigma from Delta chi2 = 1 times sqrt(max(1, chi2/nu)), Student t with nu = n - 1; detection rate (exact in the model): t interval of the curves' ln k. '> 8': more than half the curves need a factor beyond the simulated grid.",
+  "checks": {
+   "Z eps without dephasing / with (median, range)": [
+    0.9931639431404506,
+    0.9735013613382103,
+    1.06021127301256
+   ],
+   "X eps without dephasing / with (median, range)": [
+    0.5254213910076098,
+    0.46830861253506056,
+    0.6787552726174708
+   ]
+  },
+  "factors": {
+   "X d3": {
+    "cz": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 2.1355242846050664,
+      "ci95": [
+       1.7444140111962174,
+       2.614324318004463
+      ],
+      "sigma_ln_k": 0.08942503967708347,
+      "chi2": 45.70105719074653,
+      "dof": 9,
+      "p_scatter": 6.842421779524916e-07,
+      "birge_factor": 2.2534185681795296
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 1,
+      "k": 1.8408373823339546,
+      "ci95": [
+       1.3910114670054001,
+       2.436128204962505
+      ],
+      "sigma_ln_k": 0.12150429667103485,
+      "dof": 8
+     }
+    },
+    "sq": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 3.4102513525392797,
+      "ci95": [
+       2.6119854695706275,
+       4.452480468586895
+      ],
+      "sigma_ln_k": 0.11788542146380494,
+      "chi2": 42.22962911959414,
+      "dof": 9,
+      "p_scatter": 2.9836373934803724e-06,
+      "birge_factor": 2.1661442734241496
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 1,
+      "k": 3.020716279791457,
+      "ci95": [
+       2.0928181070328447,
+       4.360019063450284
+      ],
+      "sigma_ln_k": 0.1591421464067039,
+      "dof": 8
+     }
+    },
+    "readout": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 2.764638936397039,
+      "ci95": [
+       2.130303925372737,
+       3.5878582194816286
+      ],
+      "sigma_ln_k": 0.11521983955914683,
+      "chi2": 37.96869281797811,
+      "dof": 9,
+      "p_scatter": 1.765823308105188e-05,
+      "birge_factor": 2.053958043982888
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 1.3938342073300425,
+      "ci95": [
+       1.0974565196018458,
+       1.7702512699347768
+      ],
+      "sigma_ln_k": 0.10567927314707047,
+      "dof": 9
+     }
+    },
+    "t1": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 1.971852541380526,
+      "ci95": [
+       1.6242529570822795,
+       2.3938404593908795
+      ],
+      "sigma_ln_k": 0.08572591199120182,
+      "chi2": 48.520296867613325,
+      "dof": 9,
+      "p_scatter": 2.0413619906272946e-07,
+      "birge_factor": 2.321883738777952
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 1,
+      "k": 1.8782417642384237,
+      "ci95": [
+       1.4647775332609947,
+       2.408414960513245
+      ],
+      "sigma_ln_k": 0.10781972466889723,
+      "dof": 8
+     }
+    },
+    "dephasing": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 1.6500780483834125,
+      "ci95": [
+       1.3470100206463937,
+       2.02133430637007
+      ],
+      "sigma_ln_k": 0.08970873268597117,
+      "chi2": 71.65892675358648,
+      "dof": 9,
+      "p_scatter": 7.193469306100626e-12,
+      "birge_factor": 2.8217198607623546
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 1.3191591928441346,
+      "ci95": [
+       1.057046311516074,
+       1.646267488100238
+      ],
+      "sigma_ln_k": 0.09792247953778571,
+      "dof": 9
+     }
+    },
+    "all channels (error_scale.py)": {
+     "eps": {
+      "k": 1.216676787286311,
+      "ci95": [
+       1.1332868466792547,
+       1.3062027579856819
+      ]
+     },
+     "detection": {
+      "k": 1.1152687548008529,
+      "ci95": [
+       1.0195185126647632,
+       1.22001158388385
+      ]
+     }
+    }
+   },
+   "X d5": {
+    "cz": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 1.6303287390227343,
+      "ci95": [
+       1.4434620913900271,
+       1.841386630890931
+      ],
+      "sigma_ln_k": 0.05381465916041731,
+      "chi2": 7.593571234173193,
+      "dof": 9,
+      "p_scatter": 0.5755647745980769,
+      "birge_factor": 1.0
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 2.0689334661263725,
+      "ci95": [
+       1.80365497665327,
+       2.373228662169215
+      ],
+      "sigma_ln_k": 0.0606580719844877,
+      "dof": 9
+     }
+    },
+    "sq": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 2.9795950471786763,
+      "ci95": [
+       2.4513468126646862,
+       3.621677112069289
+      ],
+      "sigma_ln_k": 0.08626713091069697,
+      "chi2": 6.669811759191764,
+      "dof": 9,
+      "p_scatter": 0.6714528832976645,
+      "birge_factor": 1.0
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 4.076079776756454,
+      "ci95": [
+       3.3233382454178604,
+       4.999318492299278
+      ],
+      "sigma_ln_k": 0.09025275408691846,
+      "dof": 9
+     }
+    },
+    "readout": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 1.9972476491046103,
+      "ci95": [
+       1.6785515989219177,
+       2.376452516810269
+      ],
+      "sigma_ln_k": 0.07684646412509728,
+      "chi2": 5.538675269706207,
+      "dof": 9,
+      "p_scatter": 0.7850530937008087,
+      "birge_factor": 1.0
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 1.640661171698899,
+      "ci95": [
+       1.4609834484645912,
+       1.842436396626736
+      ],
+      "sigma_ln_k": 0.051273851427376435,
+      "dof": 9
+     }
+    },
+    "t1": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 1.8789072419434303,
+      "ci95": [
+       1.6271570507453323,
+       2.169607673832338
+      ],
+      "sigma_ln_k": 0.06359239956488986,
+      "chi2": 6.662748159536357,
+      "dof": 9,
+      "p_scatter": 0.6721853280840897,
+      "birge_factor": 1.0
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 2.4295362458312875,
+      "ci95": [
+       2.0640286731261743,
+       2.8597695597260517
+      ],
+      "sigma_ln_k": 0.07207308888267341,
+      "dof": 9
+     }
+    },
+    "dephasing": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 1.503298875770744,
+      "ci95": [
+       1.353673157425419,
+       1.6694631916848754
+      ],
+      "sigma_ln_k": 0.046345227716219746,
+      "chi2": 8.533607892994873,
+      "dof": 9,
+      "p_scatter": 0.48138955121814975,
+      "birge_factor": 1.0
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 1.5762068647886431,
+      "ci95": [
+       1.3930456169971681,
+       1.7834506281009275
+      ],
+      "sigma_ln_k": 0.05460663948094639,
+      "dof": 9
+     }
+    },
+    "all channels (error_scale.py)": {
+     "eps": {
+      "k": 1.1526400193424164,
+      "ci95": [
+       1.1122168708243412,
+       1.1945323336131235
+      ]
+     },
+     "detection": {
+      "k": 1.195489033627669,
+      "ci95": [
+       1.141340325247247,
+       1.2522067238922916
+      ]
+     }
+    }
+   },
+   "Z d3": {
+    "cz": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 1,
+      "k": 4.131792171917786,
+      "ci95": [
+       3.423871765422022,
+       4.986082342314842
+      ],
+      "sigma_ln_k": 0.0814999609151158,
+      "chi2": 81.8979650236641,
+      "dof": 8,
+      "p_scatter": 2.026970409766794e-14,
+      "birge_factor": 3.1995696004240965
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 1,
+      "k": 3.5180607163743796,
+      "ci95": [
+       2.9165697123362384,
+       4.2435986192089175
+      ],
+      "sigma_ln_k": 0.08131023375713374,
+      "dof": 8
+     }
+    },
+    "sq": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 8,
+      "bound": "> 8"
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 3,
+      "k": 7.238270105553243,
+      "ci95": [
+       6.665488490742781,
+       7.860272235667348
+      ],
+      "sigma_ln_k": 0.033691037637073776,
+      "dof": 6
+     }
+    },
+    "readout": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 7,
+      "bound": "> 8"
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 3.4721088273571326,
+      "ci95": [
+       2.5530055047703692,
+       4.722097028966517
+      ],
+      "sigma_ln_k": 0.13592815353183393,
+      "dof": 9
+     }
+    },
+    "t1": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 2.391423347843075,
+      "ci95": [
+       2.0770385541169216,
+       2.7533940654464364
+      ],
+      "sigma_ln_k": 0.0623058498759402,
+      "chi2": 103.65113007937745,
+      "dof": 9,
+      "p_scatter": 2.867125576296099e-18,
+      "birge_factor": 3.393639967798874
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 3.0397080097313163,
+      "ci95": [
+       2.3880130908962216,
+       3.869252149265653
+      ],
+      "sigma_ln_k": 0.10666800162149215,
+      "dof": 9
+     }
+    },
+    "dephasing": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 10,
+      "bound": "> 8"
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 10,
+      "bound": "> 8"
+     }
+    },
+    "all channels (error_scale.py)": {
+     "eps": {
+      "k": 1.7837164658822244,
+      "ci95": [
+       1.5694382118316632,
+       2.027250519755176
+      ]
+     },
+     "detection": {
+      "k": 1.762794175335344,
+      "ci95": [
+       1.4496567473487225,
+       2.1435717871002353
+      ]
+     }
+    }
+   },
+   "Z d5": {
+    "cz": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 4.310798550637834,
+      "ci95": [
+       3.7909410466159295,
+       4.901944903830615
+      ],
+      "sigma_ln_k": 0.05680811311588657,
+      "chi2": 8.986532111286534,
+      "dof": 9,
+      "p_scatter": 0.43851832623770237,
+      "birge_factor": 1.0
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 4.573559237113406,
+      "ci95": [
+       4.1411138406185,
+       5.051163744936125
+      ],
+      "sigma_ln_k": 0.04390806025076301,
+      "dof": 9
+     }
+    },
+    "sq": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 8,
+      "bound": "> 8"
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 9,
+      "bound": "> 8"
+     }
+    },
+    "readout": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 9,
+      "bound": "> 8"
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 4.930875417310922,
+      "ci95": [
+       4.148808213972486,
+       5.8603654657155015
+      ],
+      "sigma_ln_k": 0.07634103806845718,
+      "dof": 9
+     }
+    },
+    "t1": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 2.7626401962513496,
+      "ci95": [
+       2.4915165179134475,
+       3.0632672105803915
+      ],
+      "sigma_ln_k": 0.04566227696527081,
+      "chi2": 9.223468204419653,
+      "dof": 9,
+      "p_scatter": 0.41690722691270643,
+      "birge_factor": 1.012338777530068
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 0,
+      "k": 4.106688728158986,
+      "ci95": [
+       3.553908326133321,
+       4.745449449546492
+      ],
+      "sigma_ln_k": 0.06390763165234414,
+      "dof": 9
+     }
+    },
+    "dephasing": {
+     "eps": {
+      "curves": 10,
+      "beyond_the_grid": 10,
+      "bound": "> 8"
+     },
+     "detection": {
+      "curves": 10,
+      "beyond_the_grid": 10,
+      "bound": "> 8"
+     }
+    },
+    "all channels (error_scale.py)": {
+     "eps": {
+      "k": 1.7989888990533642,
+      "ci95": [
+       1.6810766856796722,
+       1.9251715799084739
+      ]
+     },
+     "detection": {
+      "k": 1.9468221217499886,
+      "ci95": [
+       1.817862773262631,
+       2.0849298580072526
+      ]
+     }
+    }
+   }
+  },
+  "one factor": {
+   "cz": {
+    "X: eps and detection, d3 and d5": {
+     "k": 1.8599919903546551,
+     "ci95": [
+      1.736200800114325,
+      1.9926094976777262
+     ],
+     "chi2": 11.471370454866554,
+     "dof": 3,
+     "p": 0.009431882637653625
+    },
+    "Z: eps and detection, d3 and d5": {
+     "k": 4.286339824167276,
+     "ci95": [
+      4.043603528477002,
+      4.543647506204031
+     ],
+     "chi2": 8.296285692284311,
+     "dof": 3,
+     "p": 0.04026925941784291
+    },
+    "X and Z eps, d3 and d5": {
+     "k": 2.716028967443467,
+     "ci95": [
+      2.547026554641464,
+      2.8962451681350583
+     ],
+     "chi2": 189.80592045149785,
+     "dof": 3,
+     "p": 6.722538230203962e-41
+    },
+    "all eight": {
+     "k": 3.025136886685556,
+     "ci95": [
+      2.8934790306613727,
+      3.1627853826519
+     ],
+     "chi2": 348.62606705818047,
+     "dof": 7,
+     "p": 2.425477563688295e-71
+    },
+    "Z against X, eps, d3": {
+     "Z / X": 1.9347905344386656,
+     "z": 5.454895199759668,
+     "p": 4.9001737013882145e-08
+    },
+    "Z against X, eps, d5": {
+     "Z / X": 2.6441284186782172,
+     "z": 12.425970867031278,
+     "p": 1.8891885052511124e-35
+    },
+    "Z against X, detection, d3": {
+     "Z / X": 1.9111197708913932,
+     "z": 4.430138050492937,
+     "p": 9.417278337423688e-06
+    },
+    "Z against X, detection, d5": {
+     "Z / X": 2.21058787631117,
+     "z": 10.593441635209487,
+     "p": 3.1961994891607536e-26
+    }
+   },
+   "sq": {
+    "X: eps and detection, d3 and d5": {
+     "k": 3.4006986071445398,
+     "ci95": [
+      3.0706504853089283,
+      3.7662218712174007
+     ],
+     "chi2": 6.931896296864204,
+     "dof": 3,
+     "p": 0.07410044036376724
+    },
+    "Z: eps and detection, d3 and d5": {
+     "beyond the grid": [
+      "Z d3 eps",
+      "Z d5 eps",
+      "Z d5 detection"
+     ],
+     "verdict": "incompatible: Z d3 eps, Z d5 eps, Z d5 detection need more than 8, the others' 95% intervals end at 7.86"
+    },
+    "X and Z eps, d3 and d5": {
+     "beyond the grid": [
+      "Z d3 eps",
+      "Z d5 eps"
+     ],
+     "verdict": "incompatible: Z d3 eps, Z d5 eps need more than 8, the others' 95% intervals end at 4.45"
+    },
+    "all eight": {
+     "beyond the grid": [
+      "Z d3 eps",
+      "Z d5 eps",
+      "Z d5 detection"
+     ],
+     "verdict": "incompatible: Z d3 eps, Z d5 eps, Z d5 detection need more than 8, the others' 95% intervals end at 7.86"
+    },
+    "Z against X, eps, d3": {
+     "Z": "> 8",
+     "X ci95": [
+      2.6119854695706275,
+      4.452480468586895
+     ]
+    },
+    "Z against X, eps, d5": {
+     "Z": "> 8",
+     "X ci95": [
+      2.4513468126646862,
+      3.621677112069289
+     ]
+    },
+    "Z against X, detection, d3": {
+     "Z / X": 2.396209850616277,
+     "z": 5.372176153478615,
+     "p": 7.779205752251643e-08
+    },
+    "Z against X, detection, d5": {
+     "Z": "> 8",
+     "X ci95": [
+      3.3233382454178604,
+      4.999318492299278
+     ]
+    }
+   },
+   "readout": {
+    "X: eps and detection, d3 and d5": {
+     "k": 1.7794094451710791,
+     "ci95": [
+      1.6536085933546267,
+      1.914780792920695
+     ],
+     "chi2": 24.730883711126708,
+     "dof": 3,
+     "p": 1.7575935270997906e-05
+    },
+    "Z: eps and detection, d3 and d5": {
+     "beyond the grid": [
+      "Z d3 eps",
+      "Z d5 eps"
+     ],
+     "verdict": "incompatible: Z d3 eps, Z d5 eps need more than 8, the others' 95% intervals end at 5.86"
+    },
+    "X and Z eps, d3 and d5": {
+     "beyond the grid": [
+      "Z d3 eps",
+      "Z d5 eps"
+     ],
+     "verdict": "incompatible: Z d3 eps, Z d5 eps need more than 8, the others' 95% intervals end at 3.59"
+    },
+    "all eight": {
+     "beyond the grid": [
+      "Z d3 eps",
+      "Z d5 eps"
+     ],
+     "verdict": "incompatible: Z d3 eps, Z d5 eps need more than 8, the others' 95% intervals end at 5.86"
+    },
+    "Z against X, eps, d3": {
+     "Z": "> 8",
+     "X ci95": [
+      2.130303925372737,
+      3.5878582194816286
+     ]
+    },
+    "Z against X, eps, d5": {
+     "Z": "> 8",
+     "X ci95": [
+      1.6785515989219177,
+      2.376452516810269
+     ]
+    },
+    "Z against X, detection, d3": {
+     "Z / X": 2.4910486549244095,
+     "z": 5.300993279412804,
+     "p": 1.1517432911764844e-07
+    },
+    "Z against X, detection, d5": {
+     "Z / X": 3.005419706620483,
+     "z": 11.966032912243799,
+     "p": 5.35273074686136e-33
+    }
+   },
+   "t1": {
+    "X: eps and detection, d3 and d5": {
+     "k": 2.0448456478149057,
+     "ci95": [
+      1.8948471182178264,
+      2.2067182535128835
+     ],
+     "chi2": 8.292534306350746,
+     "dof": 3,
+     "p": 0.040337396943990925
+    },
+    "Z: eps and detection, d3 and d5": {
+     "k": 2.9447276352268763,
+     "ci95": [
+      2.7734601346809153,
+      3.126571295269947
+     ],
+     "chi2": 40.28673147708183,
+     "dof": 3,
+     "p": 9.26345858113196e-09
+    },
+    "X and Z eps, d3 and d5": {
+     "k": 2.3560725091148638,
+     "ci95": [
+      2.222081663759188,
+      2.498142961503864
+     ],
+     "chi2": 29.187921371488397,
+     "dof": 3,
+     "p": 2.0447751740007825e-06
+    },
+    "all eight": {
+     "k": 2.5616051247792613,
+     "ci95": [
+      2.443755243727213,
+      2.685138305948877
+     ],
+     "chi2": 102.96630084087069,
+     "dof": 7,
+     "p": 2.629800350928456e-19
+    },
+    "Z against X, eps, d3": {
+     "Z / X": 1.2127800115158718,
+     "z": 1.8203642826605158,
+     "p": 0.06870354793022193
+    },
+    "Z against X, eps, d5": {
+     "Z / X": 1.4703441099060528,
+     "z": 4.924070713346195,
+     "p": 8.476218377622484e-07
+    },
+    "Z against X, detection, d3": {
+     "Z / X": 1.6183795225977395,
+     "z": 3.174207034775707,
+     "p": 0.0015024647975430002
+    },
+    "Z against X, detection, d5": {
+     "Z / X": 1.690317950681096,
+     "z": 5.449371507638751,
+     "p": 5.0548126994844026e-08
+    }
+   },
+   "dephasing": {
+    "X: eps and detection, d3 and d5": {
+     "k": 1.523632426187875,
+     "ci95": [
+      1.433344498062779,
+      1.6196076890577864
+     ],
+     "chi2": 3.4253995803395436,
+     "dof": 3,
+     "p": 0.33056721083598906
+    },
+    "Z: eps and detection, d3 and d5": {
+     "beyond the grid": [
+      "Z d3 eps",
+      "Z d3 detection",
+      "Z d5 eps",
+      "Z d5 detection"
+     ],
+     "verdict": "undecided"
+    },
+    "X and Z eps, d3 and d5": {
+     "beyond the grid": [
+      "Z d3 eps",
+      "Z d5 eps"
+     ],
+     "verdict": "incompatible: Z d3 eps, Z d5 eps need more than 8, the others' 95% intervals end at 2.02"
+    },
+    "all eight": {
+     "beyond the grid": [
+      "Z d3 eps",
+      "Z d3 detection",
+      "Z d5 eps",
+      "Z d5 detection"
+     ],
+     "verdict": "incompatible: Z d3 eps, Z d3 detection, Z d5 eps, Z d5 detection need more than 8, the others' 95% intervals end at 2.02"
+    },
+    "Z against X, eps, d3": {
+     "Z": "> 8",
+     "X ci95": [
+      1.3470100206463937,
+      2.02133430637007
+     ]
+    },
+    "Z against X, eps, d5": {
+     "Z": "> 8",
+     "X ci95": [
+      1.353673157425419,
+      1.6694631916848754
+     ]
+    },
+    "Z against X, detection, d3": {
+     "Z": "> 8",
+     "X ci95": [
+      1.057046311516074,
+      1.646267488100238
+     ]
+    },
+    "Z against X, detection, d5": {
+     "Z": "> 8",
+     "X ci95": [
+      1.3930456169971681,
+      1.7834506281009275
+     ]
+    }
+   }
+  },
+  "two channels": {
+   "cz + dephasing": {
+    "eps, d3 and d5": {
+     "targets": 4,
+     "first channel factor": 3.62532359274556,
+     "dephasing factor": 0.0,
+     "chi2": 24.082935032920172,
+     "dof": 2,
+     "p": 5.894637512945296e-06,
+     "at the edge of the simulated box": [
+      "dephasing"
+     ],
+     "first channel factor ci95 (within the box)": [
+      3.0000000000000004,
+      4.23515354951056
+     ],
+     "dephasing factor ci95 (within the box)": [
+      0.0,
+      0.425
+     ]
+    },
+    "eps, d3 only": {
+     "targets": 2,
+     "first channel factor": 3.948397238611938,
+     "dephasing factor": 0.0,
+     "chi2": 0.34918197515731725,
+     "dof": 0,
+     "p": null,
+     "at the edge of the simulated box": [
+      "dephasing"
+     ]
+    },
+    "eps, d5 only": {
+     "targets": 2,
+     "first channel factor": 3.4881094282757132,
+     "dephasing factor": 0.0,
+     "chi2": 17.14933876740524,
+     "dof": 0,
+     "p": null,
+     "at the edge of the simulated box": [
+      "dephasing"
+     ]
+    },
+    "eps and detection, d3 and d5": {
+     "targets": 8,
+     "first channel factor": 4.045252098231528,
+     "dephasing factor": 0.0,
+     "chi2": 67.45871659371086,
+     "dof": 6,
+     "p": 1.3559674346991148e-12,
+     "at the edge of the simulated box": [
+      "dephasing"
+     ],
+     "first channel factor ci95 (within the box)": [
+      3.3311964759307977,
+      4.434406969665631
+     ],
+     "dephasing factor ci95 (within the box)": [
+      0.0,
+      0.37
+     ]
+    },
+    "X eps with the factor Z eps needs": {
+     "d3": {
+      "Z's factor": 4.131796322840755,
+      "X model / device at dephasing x0": 1.0365802115729552,
+      "X model / device at dephasing x1": 1.3865184218801072
+     },
+     "d5": {
+      "Z's factor": 4.310797945418722,
+      "X model / device at dephasing x0": 1.21395688604065,
+      "X model / device at dephasing x1": 1.5297047002383404
+     }
+    },
+    "surfaces": {
+     "largest residual in ln eps": 0.04286911056940679,
+     "largest residual in ln eps over its shot-noise error": 1.40046320853127,
+     "largest residual in ln rate": 0.00012580371688497571,
+     "fewest grid points under the eps cap": 15
+    }
+   },
+   "t1 + dephasing": {
+    "eps, d3 and d5": {
+     "targets": 4,
+     "first channel factor": 2.6297363381404746,
+     "dephasing factor": 0.6004439336142743,
+     "chi2": 4.021447423836812,
+     "dof": 2,
+     "p": 0.13389174054843567,
+     "at the edge of the simulated box": [],
+     "first channel factor ci95 (within the box)": [
+      2.386671486063444,
+      2.907945034640621
+     ],
+     "dephasing factor ci95 (within the box)": [
+      0.4,
+      0.8
+     ]
+    },
+    "eps, d3 only": {
+     "targets": 2,
+     "first channel factor": 2.385056317060804,
+     "dephasing factor": 0.7215532099033668,
+     "chi2": 5.510796035533068e-15,
+     "dof": 0,
+     "p": null,
+     "at the edge of the simulated box": []
+    },
+    "eps, d5 only": {
+     "targets": 2,
+     "first channel factor": 2.774362772055313,
+     "dephasing factor": 0.5352091952772365,
+     "chi2": 4.5447826897274115e-15,
+     "dof": 0,
+     "p": null,
+     "at the edge of the simulated box": []
+    },
+    "eps and detection, d3 and d5": {
+     "targets": 8,
+     "first channel factor": 2.919313190698975,
+     "dephasing factor": 0.6356878634660568,
+     "chi2": 69.74977902666525,
+     "dof": 6,
+     "p": 4.601679741654658e-13,
+     "at the edge of the simulated box": [],
+     "first channel factor ci95 (within the box)": [
+      2.4368205273503825,
+      3.5308119851626194
+     ],
+     "dephasing factor ci95 (within the box)": [
+      0.325,
+      0.96
+     ]
+    },
+    "X eps with the factor Z eps needs": {
+     "d3": {
+      "Z's factor": 2.3914225365801824,
+      "X model / device at dephasing x0": 0.7311505861960971,
+      "X model / device at dephasing x1": 1.08094232163405
+     },
+     "d5": {
+      "Z's factor": 2.7626411856376176,
+      "X model / device at dephasing x0": 0.782939510878482,
+      "X model / device at dephasing x1": 1.1706844452297251
+     }
+    },
+    "surfaces": {
+     "largest residual in ln eps": 0.03631252026820264,
+     "largest residual in ln eps over its shot-noise error": 1.9098554482774444,
+     "largest residual in ln rate": 0.00022470529314344567,
+     "fewest grid points under the eps cap": 15
+    }
+   }
+  },
+  "spread": {
+   "IBM's reported values": {
+    "CZ error": {
+     "components": 108,
+     "patches' geometric mean, largest day-to-day ratio": 1.0947106764072798,
+     "one component, 95th percentile of its day / its five-day mean": 1.7652471236539773,
+     "chip 90th percentile / median, range over the days": [
+      2.399377629502537,
+      3.1600231883851437
+     ]
+    },
+    "single-qubit error": {
+     "components": 97,
+     "patches' geometric mean, largest day-to-day ratio": 1.0592244515738054,
+     "one component, 95th percentile of its day / its five-day mean": 1.630861771937903,
+     "chip 90th percentile / median, range over the days": [
+      2.0190335867314877,
+      2.347504253095904
+     ]
+    },
+    "readout error": {
+     "components": 97,
+     "patches' geometric mean, largest day-to-day ratio": 1.0967725538376303,
+     "one component, 95th percentile of its day / its five-day mean": 2.0054120959910797,
+     "chip 90th percentile / median, range over the days": [
+      3.6726190476190474,
+      4.8
+     ]
+    },
+    "1/T1": {
+     "components": 97,
+     "patches' geometric mean, largest day-to-day ratio": 1.1180082708459462,
+     "one component, 95th percentile of its day / its five-day mean": 1.6618301634885337,
+     "chip 90th percentile / median, range over the days": [
+      1.5862393079430601,
+      1.8113055181933788
+     ]
+    },
+    "1/T2": {
+     "components": 97,
+     "patches' geometric mean, largest day-to-day ratio": 1.1335536301548366,
+     "one component, 95th percentile of its day / its five-day mean": 1.765516312280764,
+     "chip 90th percentile / median, range over the days": [
+      2.7205490739266125,
+      3.628193862990803
+     ]
+    }
+   },
+   "idle test f": {
+    "f median over the jobs": 0.9907930952407054,
+    "f range": [
+     0.7209195209657838,
+     1.5228084888934883
+    ],
+    "relative error of a job's f (bootstrap), range": [
+     0.06608876558683568,
+     0.13894183970318424
+    ],
+    "relative error of a factor common to the 15 jobs": 0.02117971700978834
+   }
+  },
+  "plausible": {
+   "definition": "factor <= chip 90th percentile / median of the reported quantity (largest over the five days): every qubit or coupler of the patches as bad as the chip's worst tenth",
+   "bound": {
+    "cz": 3.1600231883851437,
+    "sq": 2.347504253095904,
+    "readout": 4.8,
+    "t1": 1.8113055181933788,
+    "dephasing": 3.628193862990803
+   },
+   "X d3": {
+    "cz": {
+     "eps": "within",
+     "detection": "within"
+    },
+    "sq": {
+     "eps": "beyond",
+     "detection": "undecided"
+    },
+    "readout": {
+     "eps": "within",
+     "detection": "within"
+    },
+    "t1": {
+     "eps": "undecided",
+     "detection": "undecided"
+    },
+    "dephasing": {
+     "eps": "within",
+     "detection": "within"
+    }
+   },
+   "X d5": {
+    "cz": {
+     "eps": "within",
+     "detection": "within"
+    },
+    "sq": {
+     "eps": "beyond",
+     "detection": "beyond"
+    },
+    "readout": {
+     "eps": "within",
+     "detection": "within"
+    },
+    "t1": {
+     "eps": "undecided",
+     "detection": "beyond"
+    },
+    "dephasing": {
+     "eps": "within",
+     "detection": "within"
+    }
+   },
+   "Z d3": {
+    "cz": {
+     "eps": "beyond",
+     "detection": "undecided"
+    },
+    "sq": {
+     "eps": "beyond",
+     "detection": "beyond"
+    },
+    "readout": {
+     "eps": "beyond",
+     "detection": "within"
+    },
+    "t1": {
+     "eps": "beyond",
+     "detection": "beyond"
+    },
+    "dephasing": {
+     "eps": "beyond",
+     "detection": "beyond"
+    }
+   },
+   "Z d5": {
+    "cz": {
+     "eps": "beyond",
+     "detection": "beyond"
+    },
+    "sq": {
+     "eps": "beyond",
+     "detection": "beyond"
+    },
+    "readout": {
+     "eps": "beyond",
+     "detection": "undecided"
+    },
+    "t1": {
+     "eps": "beyond",
+     "detection": "beyond"
+    },
+    "dephasing": {
+     "eps": "beyond",
+     "detection": "beyond"
+    }
+   }
+  },
+  "grid": {
+   "shots": 20000,
+   "pairs": {
+    "cz": [
+     3.0,
+     4.0,
+     5.0
+    ],
+    "t1": [
+     2.0,
+     3.0,
+     4.0
+    ]
+   },
+   "dephasing": [
+    0.0,
+    0.25,
+    0.5,
+    0.75,
+    1.0
+   ]
+  }
+ },
+ "f_treatments": {
+  "what": "observed over predicted (binomial fit) under each treatment of f: geometric mean over the ten pair-days, Student t 95% interval (9 dof); each pair's means; every curve",
+  "table": {
+   "f = 1, stored before the job": {
+    "X eps3": {
+     "ratio": 1.2586084099253374,
+     "ci95": [
+      1.1490947517129908,
+      1.3785591894605098
+     ],
+     "n": 10,
+     "above": 9,
+     "of": 10
+    },
+    "X eps5": {
+     "ratio": 1.1904787672990849,
+     "ci95": [
+      1.1424427178547019,
+      1.2405345784436923
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    },
+    "X lambda": {
+     "ratio": 1.0572287759325796,
+     "ci95": [
+      0.957087610079769,
+      1.1678478259338687
+     ],
+     "n": 10,
+     "above": 9,
+     "of": 10
+    },
+    "Z eps3": {
+     "ratio": 2.0601004340791738,
+     "ci95": [
+      1.7918807480319499,
+      2.368468885641227
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    },
+    "Z eps5": {
+     "ratio": 1.8416460386575748,
+     "ci95": [
+      1.717985409390592,
+      1.9742077628623376
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    }
+   },
+   "f = 0, stored before the job": {
+    "X eps3": {
+     "ratio": 2.410930249537861,
+     "ci95": [
+      2.194668289782646,
+      2.6485025984096917
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    },
+    "X eps5": {
+     "ratio": 2.382644791014863,
+     "ci95": [
+      2.319098045541897,
+      2.4479328120962363
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    },
+    "X lambda": {
+     "ratio": 1.0118714542048672,
+     "ci95": [
+      0.9086885579320728,
+      1.1267709171608289
+     ],
+     "n": 10,
+     "above": 5,
+     "of": 10
+    },
+    "Z eps3": {
+     "ratio": 2.064863651405953,
+     "ci95": [
+      1.7975366071117882,
+      2.3719471870718736
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    },
+    "Z eps5": {
+     "ratio": 1.8392453743047892,
+     "ci95": [
+      1.7159794890572433,
+      1.9713659565710093
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    }
+   },
+   "the job's median f (planned)": {
+    "X eps3": {
+     "ratio": 1.280809292400308,
+     "ci95": [
+      1.1688570077787643,
+      1.4034842864281982
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    },
+    "X eps5": {
+     "ratio": 1.1941037721871155,
+     "ci95": [
+      1.1350124839400437,
+      1.2562714850516306
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    },
+    "X lambda": {
+     "ratio": 1.0726113778657471,
+     "ci95": [
+      0.958205396693056,
+      1.2006769862679003
+     ],
+     "n": 10,
+     "above": 8,
+     "of": 10
+    },
+    "Z eps3": {
+     "ratio": 2.057519941346862,
+     "ci95": [
+      1.7891291566715948,
+      2.366172555655834
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    },
+    "Z eps5": {
+     "ratio": 1.8370076386372411,
+     "ci95": [
+      1.714440539803182,
+      1.9683371840932888
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    }
+   },
+   "each data qubit at its own f": {
+    "X eps3": {
+     "ratio": 1.2481546199181455,
+     "ci95": [
+      1.1321678812652165,
+      1.3760238044220456
+     ],
+     "n": 10,
+     "above": 9,
+     "of": 10
+    },
+    "X eps5": {
+     "ratio": 1.3445837027020613,
+     "ci95": [
+      1.2802375498867378,
+      1.4121639642048693
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    },
+    "X lambda": {
+     "ratio": 0.9282833172898549,
+     "ci95": [
+      0.8246481134269524,
+      1.0449425677792301
+     ],
+     "n": 10,
+     "above": 3,
+     "of": 10
+    },
+    "Z eps3": {
+     "ratio": 2.0684685647246295,
+     "ci95": [
+      1.7915384651908712,
+      2.3882056045043543
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    },
+    "Z eps5": {
+     "ratio": 1.843615225343133,
+     "ci95": [
+      1.721596711428465,
+      1.9742818260246437
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    }
+   },
+   "inverse-variance mean of the per-qubit f": {
+    "X eps3": {
+     "ratio": 1.8386710193220763,
+     "ci95": [
+      1.6820100312338875,
+      2.009923279003791
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    },
+    "X eps5": {
+     "ratio": 1.7062615933791696,
+     "ci95": [
+      1.5013747746933812,
+      1.9391085251418254
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    },
+    "X lambda": {
+     "ratio": 1.0776020666799848,
+     "ci95": [
+      0.9329902876291843,
+      1.2446284055793964
+     ],
+     "n": 10,
+     "above": 7,
+     "of": 10
+    },
+    "Z eps3": {
+     "ratio": 2.0626030168359897,
+     "ci95": [
+      1.8040484848367737,
+      2.3582133411707322
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    },
+    "Z eps5": {
+     "ratio": 1.8384932655591164,
+     "ci95": [
+      1.7215987898780891,
+      1.9633247347633034
+     ],
+     "n": 10,
+     "above": 10,
+     "of": 10
+    }
+   }
+  },
+  "f_range": {
+   "f = 1, stored before the job": [
+    1.0,
+    1.0
+   ],
+   "f = 0, stored before the job": [
+    0.0,
+    0.0
+   ],
+   "the job's median f (planned)": [
+    0.7209195209657838,
+    1.5228084888934883
+   ],
+   "inverse-variance mean of the per-qubit f": [
+    0.01844835221591786,
+    0.5930004023779559
+   ]
+  },
+  "pairs": {
+   "pair 1": {
+    "X eps3": {
+     "observed": 0.12881390078031066,
+     "at f = 1": 0.10398428551717345,
+     "at the job's f": 0.10246293780773108
+    },
+    "X eps5": {
+     "observed": 0.19328453550065267,
+     "at f = 1": 0.1621405988067146,
+     "at the job's f": 0.1610989410165964
+    },
+    "X lambda": {
+     "observed": 0.667345723048857,
+     "at f = 1": 0.6436612766455495,
+     "at the job's f": 0.6421403278530585
+    },
+    "Z eps3": {
+     "observed": 0.13868684040004622,
+     "at f = 1": 0.07082230211986536,
+     "at the job's f": 0.0709206097878501
+    },
+    "Z eps5": {
+     "observed": 0.3110265599700722,
+     "at f = 1": 0.16540115118081627,
+     "at the job's f": 0.16634001510143573
+    }
+   },
+   "pair 2": {
+    "X eps3": {
+     "observed": 0.11178005785018046,
+     "at f = 1": 0.08784036863101341,
+     "at the job's f": 0.08600652946837069
+    },
+    "X eps5": {
+     "observed": 0.22819208913622235,
+     "at f = 1": 0.19198614051863025,
+     "at the job's f": 0.19233359370992995
+    },
+    "X lambda": {
+     "observed": 0.489813774673023,
+     "at f = 1": 0.4582771902132977,
+     "at the job's f": 0.44758609692083756
+    },
+    "Z eps3": {
+     "observed": 0.18445073316469512,
+     "at f = 1": 0.08354951873650818,
+     "at the job's f": 0.08365576910457671
+    },
+    "Z eps5": {
+     "observed": 0.2987419771326609,
+     "at f = 1": 0.16498357788482537,
+     "at the job's f": 0.1648307217316675
+    }
+   }
+  },
+  "lambda_without_day2_pair1": {
+   "at f = 1": {
+    "ratio": 1.096753177333584,
+    "ci95": [
+     1.0302872742140834,
+     1.1675069294715643
+    ],
+    "n": 9
+   },
+   "at the job's f": {
+    "ratio": 1.1125926553814025,
+    "ci95": [
+     1.0195803622765542,
+     1.2140900929522596
+    ],
+    "n": 9
+   }
+  },
+  "windows": {
+   "windows": [
+    "1-4",
+    "1-6",
+    "1-8",
+    "2-6",
+    "2-8",
+    "3-8"
+   ],
+   "X eps3": [
+    1.247866127153892,
+    1.286010978091601
+   ],
+   "X eps5": [
+    1.1107648752652945,
+    1.2051410693674238
+   ],
+   "Z eps3": [
+    2.0105168941152836,
+    2.098414564886433
+   ],
+   "Z eps5": [
+    1.6248740522244018,
+    1.8451736601860806
+   ]
+  },
+  "curves": [
+   {
+    "day": 1,
+    "pair": 1,
+    "f": {
+     "3": 1.0572945121021786,
+     "5": 1.0572945121021786
+    },
+    "X eps3": {
+     "observed": [
+      0.13316110953571542,
+      0.006793371368353424
+     ],
+     "at f = 1": 0.09411055441798932,
+     "at the job's f": 0.09737247344373917
+    },
+    "X eps5": {
+     "observed": [
+      0.185528767847486,
+      0.014582577035107278
+     ],
+     "at f = 1": 0.17440168396644656,
+     "at the job's f": 0.179395107932165
+    },
+    "X lambda": {
+     "observed": [
+      0.7177383382677373,
+      0.06744307249811426
+     ],
+     "at f = 1": 0.5396195281927175,
+     "at the job's f": 0.5427822116562888
+    },
+    "Z eps3": {
+     "observed": [
+      0.130148045808116,
+      0.00479617943926669
+     ],
+     "at f = 1": 0.06498092964733204,
+     "at the job's f": 0.06513640105795887
+    },
+    "Z eps5": {
+     "observed": [
+      0.28362150710381573,
+      0.022435091839573096
+     ],
+     "at f = 1": 0.16698585538906352,
+     "at the job's f": 0.1672746280624241
+    }
+   },
+   {
+    "day": 1,
+    "pair": 2,
+    "f": {
+     "3": 0.8833140337009852,
+     "5": 0.9471254591763452
+    },
+    "X eps3": {
+     "observed": [
+      0.10096937010858734,
+      0.0043084840585063885
+     ],
+     "at f = 1": 0.08554219950383024,
+     "at the job's f": 0.08067065176332333
+    },
+    "X eps5": {
+     "observed": [
+      0.2304513263143117,
+      0.01396847493226304
+     ],
+     "at f = 1": 0.2065889192747017,
+     "at the job's f": 0.20142440792826954
+    },
+    "X lambda": {
+     "observed": [
+      0.4381375092234253,
+      0.03253001163594724
+     ],
+     "at f = 1": 0.41406964034738286,
+     "at the job's f": 0.4005008757034621
+    },
+    "Z eps3": {
+     "observed": [
+      0.138598015599894,
+      0.004705461879398298
+     ],
+     "at f = 1": 0.08797827039906353,
+     "at the job's f": 0.08791486541601995
+    },
+    "Z eps5": {
+     "observed": [
+      0.3141377784392419,
+      0.02179266178894043
+     ],
+     "at f = 1": 0.15387886309415438,
+     "at the job's f": 0.15422534385641012
+    }
+   },
+   {
+    "day": 2,
+    "pair": 1,
+    "f": {
+     "3": 0.7766487485966175,
+     "5": 0.7766487485966175
+    },
+    "X eps3": {
+     "observed": [
+      0.1194702563556212,
+      0.005473417113278922
+     ],
+     "at f = 1": 0.13145415129881793,
+     "at the job's f": 0.11768939666204412
+    },
+    "X eps5": {
+     "observed": [
+      0.18844344145747888,
+      0.01280440176564708
+     ],
+     "at f = 1": 0.15754520127812316,
+     "at the job's f": 0.14323754356883595
+    },
+    "X lambda": {
+     "observed": [
+      0.6339846875624957,
+      0.05205738172917429
+     ],
+     "at f = 1": 0.8343900685794595,
+     "at the job's f": 0.8216379151007005
+    },
+    "Z eps3": {
+     "observed": [
+      0.13890123204495503,
+      0.008826043209781656
+     ],
+     "at f = 1": 0.07029384562498289,
+     "at the job's f": 0.07008958122383124
+    },
+    "Z eps5": {
+     "observed": [
+      0.328089633279757,
+      0.02150953112925158
+     ],
+     "at f = 1": 0.16943438058706484,
+     "at the job's f": 0.17019955529103203
+    }
+   },
+   {
+    "day": 2,
+    "pair": 2,
+    "f": {
+     "3": 0.7209195209657838,
+     "5": 0.9444411324612529
+    },
+    "X eps3": {
+     "observed": [
+      0.12024495366170984,
+      0.005269388881515645
+     ],
+     "at f = 1": 0.0866769310544597,
+     "at the job's f": 0.0770036780271113
+    },
+    "X eps5": {
+     "observed": [
+      0.22801807702288085,
+      0.013831962956203023
+     ],
+     "at f = 1": 0.18767789358491177,
+     "at the job's f": 0.18355424213983024
+    },
+    "X lambda": {
+     "observed": [
+      0.5273483367270204,
+      0.039525540422340105
+     ],
+     "at f = 1": 0.4618387887822502,
+     "at the job's f": 0.41951456490147737
+    },
+    "Z eps3": {
+     "observed": [
+      0.20458652307922198,
+      0.009697046862162176
+     ],
+     "at f = 1": 0.08483714185633592,
+     "at the job's f": 0.08512039547129405
+    },
+    "Z eps5": {
+     "observed": [
+      0.33582236695998346,
+      0.032990255775168786
+     ],
+     "at f = 1": 0.1615731874304051,
+     "at the job's f": 0.1612113010986142
+    }
+   },
+   {
+    "day": 3,
+    "pair": 1,
+    "f": {
+     "3": 1.050757878545906,
+     "5": 1.050757878545906
+    },
+    "X eps3": {
+     "observed": [
+      0.14119595979902388,
+      0.009235225458454926
+     ],
+     "at f = 1": 0.1019715833707063,
+     "at the job's f": 0.1042170707276267
+    },
+    "X eps5": {
+     "observed": [
+      0.2033607884110898,
+      0.011785054400212963
+     ],
+     "at f = 1": 0.1625070942263364,
+     "at the job's f": 0.16633491917717946
+    },
+    "X lambda": {
+     "observed": [
+      0.6943126101261914,
+      0.060746387867795515
+     ],
+     "at f = 1": 0.6274900419343076,
+     "at the job's f": 0.6265495618308203
+    },
+    "Z eps3": {
+     "observed": [
+      0.1491629346476025,
+      0.005382439172664663
+     ],
+     "at f = 1": 0.08159259308253117,
+     "at the job's f": 0.08187995418950117
+    },
+    "Z eps5": {
+     "observed": [
+      0.29779668016282973,
+      0.018180794429071445
+     ],
+     "at f = 1": 0.1655561033604992,
+     "at the job's f": 0.16648899147402213
+    }
+   },
+   {
+    "day": 3,
+    "pair": 2,
+    "f": {
+     "3": 1.5228084888934883,
+     "5": 1.1282786023847438
+    },
+    "X eps3": {
+     "observed": [
+      0.11147257200701838,
+      0.0053505195457560495
+     ],
+     "at f = 1": 0.08636364843605057,
+     "at the job's f": 0.10219935797708435
+    },
+    "X eps5": {
+     "observed": [
+      0.22843996171097652,
+      0.013695830576195417
+     ],
+     "at f = 1": 0.1826663590449663,
+     "at the job's f": 0.1900565140608092
+    },
+    "X lambda": {
+     "observed": [
+      0.487973168845362,
+      0.037534626092133816
+     ],
+     "at f = 1": 0.4727944920322781,
+     "at the job's f": 0.5377314136382894
+    },
+    "Z eps3": {
+     "observed": [
+      0.15374336877211242,
+      0.009706095032648812
+     ],
+     "at f = 1": 0.08713024947494438,
+     "at the job's f": 0.08733260530276002
+    },
+    "Z eps5": {
+     "observed": [
+      0.26893464838293,
+      0.01371271857265674
+     ],
+     "at f = 1": 0.16317504526726162,
+     "at the job's f": 0.1630402192565003
+    }
+   },
+   {
+    "day": 4,
+    "pair": 1,
+    "f": {
+     "3": 1.0109156834362347,
+     "5": 1.0109156834362347
+    },
+    "X eps3": {
+     "observed": [
+      0.12539458569865009,
+      0.009724243044135009
+     ],
+     "at f = 1": 0.09710224183976329,
+     "at the job's f": 0.09732687894682263
+    },
+    "X eps5": {
+     "observed": [
+      0.18339933378973294,
+      0.010783033342748341
+     ],
+     "at f = 1": 0.15702940783254987,
+     "at the job's f": 0.15798946414978443
+    },
+    "X lambda": {
+     "observed": [
+      0.6837243249880874,
+      0.06661697535374861
+     ],
+     "at f = 1": 0.618369789328311,
+     "at the job's f": 0.6160339834721531
+    },
+    "Z eps3": {
+     "observed": [
+      0.13727077038013563,
+      0.005092548389661333
+     ],
+     "at f = 1": 0.0755067995252483,
+     "at the job's f": 0.07582315562345918
+    },
+    "Z eps5": {
+     "observed": [
+      0.28944290054422417,
+      0.02053114920253893
+     ],
+     "at f = 1": 0.15036678735506392,
+     "at the job's f": 0.15341993831235662
+    }
+   },
+   {
+    "day": 4,
+    "pair": 2,
+    "f": {
+     "3": 1.03343690279773,
+     "5": 1.095717140360736
+    },
+    "X eps3": {
+     "observed": [
+      0.10640610577490736,
+      0.005548228725443964
+     ],
+     "at f = 1": 0.08612893441396033,
+     "at the job's f": 0.08789003352913016
+    },
+    "X eps5": {
+     "observed": [
+      0.2185016382212091,
+      0.01602217933633797
+     ],
+     "at f = 1": 0.18734462500123522,
+     "at the job's f": 0.1934942339213756
+    },
+    "X lambda": {
+     "observed": [
+      0.48698081461148024,
+      0.043916129198711656
+     ],
+     "at f = 1": 0.45973528417691434,
+     "at the job's f": 0.45422559498513726
+    },
+    "Z eps3": {
+     "observed": [
+      0.17071748407711018,
+      0.006989774107000107
+     ],
+     "at f = 1": 0.07657460746512848,
+     "at the job's f": 0.07672472808540354
+    },
+    "Z eps5": {
+     "observed": [
+      0.2897487830899269,
+      0.023504359389880686
+     ],
+     "at f = 1": 0.1827317582106318,
+     "at the job's f": 0.18299018199812933
+    }
+   },
+   {
+    "day": 5,
+    "pair": 1,
+    "f": {
+     "3": 0.9907930952407054,
+     "5": 0.9907930952407054
+    },
+    "X eps3": {
+     "observed": [
+      0.12484759251254263,
+      0.005963132058408718
+     ],
+     "at f = 1": 0.09528289665859041,
+     "at the job's f": 0.0957088692584227
+    },
+    "X eps5": {
+     "observed": [
+      0.20569034599747577,
+      0.012923076864835764
+     ],
+     "at f = 1": 0.15921960673011698,
+     "at the job's f": 0.15853767025501714
+    },
+    "X lambda": {
+     "observed": [
+      0.6069686542997733,
+      0.0479867029507412
+     ],
+     "at f = 1": 0.5984369551929517,
+     "at the job's f": 0.6036979672053296
+    },
+    "Z eps3": {
+     "observed": [
+      0.13795121911942182,
+      0.004896036885144936
+     ],
+     "at f = 1": 0.061737342719232396,
+     "at the job's f": 0.061673956844500014
+    },
+    "Z eps5": {
+     "observed": [
+      0.35618207875973446,
+      0.02657658256833545
+     ],
+     "at f = 1": 0.17466262921238984,
+     "at the job's f": 0.1743169623673438
+    }
+   },
+   {
+    "day": 5,
+    "pair": 2,
+    "f": {
+     "3": 0.791187681715852,
+     "5": 0.9805896625605671
+    },
+    "X eps3": {
+     "observed": [
+      0.11980728769867927,
+      0.005612858783772684
+     ],
+     "at f = 1": 0.09449012974676621,
+     "at the job's f": 0.0822689260452043
+    },
+    "X eps5": {
+     "observed": [
+      0.2355494424117337,
+      0.014229149617458164
+     ],
+     "at f = 1": 0.1956529056873363,
+     "at the job's f": 0.19313857049936523
+    },
+    "X lambda": {
+     "observed": [
+      0.5086290439578267,
+      0.03894334512156525
+     ],
+     "at f = 1": 0.48294774572766347,
+     "at the job's f": 0.425958035375822
+    },
+    "Z eps3": {
+     "observed": [
+      0.2546082742951371,
+      0.02085028384481341
+     ],
+     "at f = 1": 0.08122732448706857,
+     "at the job's f": 0.08118625124740603
+    },
+    "Z eps5": {
+     "observed": [
+      0.2850663087912219,
+      0.020340550077183106
+     ],
+     "at f = 1": 0.16355903542167405,
+     "at the job's f": 0.16268656244868346
+    }
+   }
+  ]
  },
  "readout": {
   "flags_against_quotes": {

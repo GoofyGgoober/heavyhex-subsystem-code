@@ -38,8 +38,6 @@ D3, D5 = "#eb6834", "#2a78d6"
 # Qubit roles in Fig. 1's colours (docs/figures/draw_blueprint.py): X ancillas and flags, Z
 # ancillas, relays. Detector classes take the colour of the qubits that measure them.
 X_ROLE, Z_ROLE, RELAY_ROLE = "#E4574C", "#1F4E99", "#8C8C8C"
-# Fig. 1 rings the qubits of placement 1 that were weak on every day (Sec. III).
-WEAK_QUBITS = (83, 102, 149, 150)
 INK, MUTED, GRID = "#0b0b0b", "#52514e", "#d9d8d4"
 COLUMN, PAGE = 3.375, 7.0  # revtex column and page widths, inches
 
@@ -142,7 +140,7 @@ def binomial_curve(rep: int, distance: int, basis: str, n: np.ndarray) -> np.nda
 def fig_pn() -> None:
     """P(n) of each pair, X and Z memory, mean over the five days: device, its binomial fit and
     the prediction."""
-    fig, axes = plt.subplots(2, 2, figsize=(PAGE, 3.0), sharex=True, sharey=True)
+    fig, axes = plt.subplots(2, 2, figsize=(PAGE, 2.6), sharex=True, sharey=True)
     n = np.array(ROUNDS)
     smooth = np.linspace(1, 8, 57)
     for col, rep in enumerate((1, 2)):
@@ -200,6 +198,21 @@ def fig_pn() -> None:
     plt.close(fig)
 
 
+def weak_qubits(calibration: Path) -> list[int]:
+    """Every qubit that the placement rule calls weak (heavyhex.patches.placement.weak): readout
+    error above WEAK_READOUT, T1 below WEAK_T1_US or T2 below WEAK_T2_US. Fig. 1 rings those its
+    patches use."""
+    from heavyhex.patches.placement import BROKEN, WEAK_READOUT, WEAK_T1_US, WEAK_T2_US
+
+    cal = load(calibration)
+    found = []
+    for q, readout in cal["readout"].items():
+        t1, t2 = cal["t1_us"].get(q), cal["t2_us"].get(q)
+        if WEAK_READOUT < readout < BROKEN or (t1 and t1 < WEAK_T1_US) or (t2 and t2 < WEAK_T2_US):
+            found.append(int(q))
+    return sorted(found)
+
+
 def fig_layout() -> None:
     """The chip figure, drawn by the repository's own script from day 1's calibration."""
     calibration = RUNS / "ibm_fez-2026-10-04-r1" / "calibration.json"
@@ -224,7 +237,7 @@ def fig_layout() -> None:
             str(calibration),
             str(OUT / "layout.pdf"),
             str(OUT),
-            ",".join(map(str, WEAK_QUBITS)),
+            ",".join(map(str, weak_qubits(calibration))),
         ],
         cwd=ROOT / "docs" / "figures",
         check=True,
@@ -235,9 +248,11 @@ def fig_layout() -> None:
 def fig_analyses() -> None:
     """The figures of the analyses after the run, each drawn by its own script."""
     import fig_C_idle_dephasing
+    import fig_obs_pred
     import fig_timing
 
     fig_timing.make(DIAG, OUT / "timing.pdf")
+    fig_obs_pred.make(DIAG, OUT / "obs_pred.pdf")
     fig_C_idle_dephasing.make(DIAG, OUT / "C_idle_dephasing.pdf")
 
 
