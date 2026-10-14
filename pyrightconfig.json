@@ -5,10 +5,10 @@
   // stim's union return types, qiskit's options, GzipFile for BinaryIO) are not shown.
   // docs/analysis/ is treated the same way: its reports are mostly the same stubs (stim's
   // flattened() and its samplers' optional tuples) on research scripts that run as they are.
-  "include": ["src", "tests", "scripts", "docs", "paper/figures"],
+  "include": ["src", "followup", "tests", "scripts", "docs", "paper/figures"],
   "exclude": ["runs", "build", ".venv", "**/__pycache__"],
   "ignore": ["src", "docs/analysis"],
-  "extraPaths": ["src", "docs/analysis", "docs/figures"],
+  "extraPaths": ["src", ".", "docs/analysis", "docs/figures"],
   "pythonVersion": "3.10",
   "typeCheckingMode": "basic",
   "reportMissingTypeStubs": false,

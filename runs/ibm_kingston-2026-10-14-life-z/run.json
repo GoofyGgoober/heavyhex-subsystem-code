@@ -1,0 +1,369 @@
+{
+ "job": "life-z",
+ "backend": "ibm_kingston",
+ "dt": 4e-09,
+ "calibrated": "2026-10-14 21:55:57+03:00",
+ "placements": {
+  "3": {
+   "spot": [
+    [
+     11,
+     9
+    ],
+    [
+     1,
+     -1
+    ]
+   ],
+   "qubits": [
+    90,
+    70,
+    50,
+    92,
+    72,
+    52,
+    94,
+    74,
+    54,
+    91,
+    71,
+    51,
+    93,
+    73,
+    53,
+    78,
+    58,
+    79,
+    59,
+    89,
+    69,
+    75,
+    55
+   ],
+   "shortfalls": [
+    "flag 51: readout 3.1%",
+    "data 52: T2 60 us",
+    "data 54: readout 3.3%",
+    "data 72: readout 5.1%",
+    "Z ancilla 78: T2 33 us",
+    "Z ancilla 78: readout 3.6%",
+    "data 92: readout 7.5%"
+   ]
+  },
+  "5": {
+   "spot": [
+    [
+     7,
+     9
+    ],
+    [
+     1,
+     -1
+    ]
+   ],
+   "qubits": [
+    86,
+    66,
+    46,
+    26,
+    6,
+    88,
+    68,
+    48,
+    28,
+    8,
+    90,
+    70,
+    50,
+    30,
+    10,
+    92,
+    72,
+    52,
+    32,
+    12,
+    94,
+    74,
+    54,
+    34,
+    14,
+    87,
+    67,
+    47,
+    27,
+    7,
+    89,
+    69,
+    49,
+    29,
+    9,
+    91,
+    71,
+    51,
+    31,
+    11,
+    93,
+    73,
+    53,
+    33,
+    13,
+    77,
+    57,
+    37,
+    17,
+    78,
+    38,
+    58,
+    18,
+    79,
+    39,
+    59,
+    19,
+    85,
+    65,
+    45,
+    25,
+    75,
+    55,
+    35,
+    15
+   ],
+   "shortfalls": [
+    "X ancilla 9: T2 42 us",
+    "data 10: T2 24 us",
+    "data 12: readout 4.4%",
+    "data 14: readout 3.2%",
+    "relay 25: T2 26 us",
+    "flag 27: readout 3.3%",
+    "data 30: T2 76 us",
+    "relay 35: readout 3.0%",
+    "Z ancilla 37: T2 31 us",
+    "data 46: T2 79 us",
+    "data 46: readout 7.1%",
+    "data 48: T2 20 us",
+    "flag 51: readout 3.1%",
+    "data 52: T2 60 us",
+    "data 54: readout 3.3%",
+    "data 72: readout 5.1%",
+    "Z ancilla 78: T2 33 us",
+    "Z ancilla 78: readout 3.6%",
+    "data 86: T2 19 us",
+    "X ancilla 87: T2 48 us",
+    "data 88: T2 16 us",
+    "data 92: readout 7.5%",
+    "coupler 85-86: CZ 6.4%",
+    "coupler 86-87: CZ 7.1%"
+   ]
+  }
+ },
+ "meas_type": "classified",
+ "rep_delay_us": 250,
+ "twirling": "active",
+ "decoupling": "XY4",
+ "items": [
+  {
+   "label": "d=5 idle, 1 round, read in Z, from |0>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 1,
+    "readout": "Z",
+    "start": "0"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 92,
+    "d5": 25
+   },
+   "seconds": 1.1612000000000007e-05,
+   "duration_dt": 2903
+  },
+  {
+   "label": "d=5 idle, 2 rounds, read in Z, from |0>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 2,
+    "readout": "Z",
+    "start": "0"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 148,
+    "d5": 25
+   },
+   "seconds": 1.7576000000000033e-05,
+   "duration_dt": 4394
+  },
+  {
+   "label": "d=5 idle, 4 rounds, read in Z, from |0>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 4,
+    "readout": "Z",
+    "start": "0"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 260,
+    "d5": 25
+   },
+   "seconds": 2.9504000000000024e-05,
+   "duration_dt": 7376
+  },
+  {
+   "label": "d=5 idle, 8 rounds, read in Z, from |0>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 8,
+    "readout": "Z",
+    "start": "0"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 484,
+    "d5": 25
+   },
+   "seconds": 5.336000000000045e-05,
+   "duration_dt": 13340
+  },
+  {
+   "label": "d=5 idle, 16 rounds, read in Z, from |0>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 16,
+    "readout": "Z",
+    "start": "0"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 932,
+    "d5": 25
+   },
+   "seconds": 0.00010107200000000127,
+   "duration_dt": 25268
+  },
+  {
+   "label": "d=5 idle, 1 round, read in Z, from |1>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 1,
+    "readout": "Z",
+    "start": "1"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 92,
+    "d5": 25
+   },
+   "seconds": 1.1612000000000007e-05,
+   "duration_dt": 2903
+  },
+  {
+   "label": "d=5 idle, 2 rounds, read in Z, from |1>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 2,
+    "readout": "Z",
+    "start": "1"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 148,
+    "d5": 25
+   },
+   "seconds": 1.7576000000000033e-05,
+   "duration_dt": 4394
+  },
+  {
+   "label": "d=5 idle, 4 rounds, read in Z, from |1>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 4,
+    "readout": "Z",
+    "start": "1"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 260,
+    "d5": 25
+   },
+   "seconds": 2.9504000000000024e-05,
+   "duration_dt": 7376
+  },
+  {
+   "label": "d=5 idle, 8 rounds, read in Z, from |1>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 8,
+    "readout": "Z",
+    "start": "1"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 484,
+    "d5": 25
+   },
+   "seconds": 5.336000000000045e-05,
+   "duration_dt": 13340
+  },
+  {
+   "label": "d=5 idle, 16 rounds, read in Z, from |1>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 16,
+    "readout": "Z",
+    "start": "1"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 932,
+    "d5": 25
+   },
+   "seconds": 0.00010107200000000127,
+   "duration_dt": 25268
+  }
+ ],
+ "instances": 40,
+ "qpu_seconds_estimate": 5.127197952000003,
+ "qpu_seconds_billed_estimate": 6,
+ "qpu_seconds_bound": 5.127197952000003
+}

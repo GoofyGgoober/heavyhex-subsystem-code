@@ -1,0 +1,389 @@
+{
+ "job": "db7sur6r6oqs73888qug",
+ "tag": "heavyhex:ibm_kingston-2026-10-14-exp1-2",
+ "tags": [
+  "heavyhex-followup",
+  "heavyhex:ibm_kingston-2026-10-14-exp1-2"
+ ],
+ "backend": "ibm_kingston",
+ "plan_job": "exp1-2",
+ "flags": {
+  "twirl": true,
+  "kerneled": true,
+  "sampler": "executor"
+ },
+ "submitted": "2026-10-14T21:52:14+03:00",
+ "submitted_utc": "2026-10-14T18:52:14+00:00",
+ "code": {
+  "commit": "134a0726269058aea6b6ab1e2c3d5c37e6f35338",
+  "code": [
+   "a233d4069719d0cc396c71f29f6429bffd40f113",
+   "f8e44350df9165b40fb5a3259f75ba9c9f697fee"
+  ],
+  "followup": "dff6e7deebfc267f4988541a017449f828867b61",
+  "changed": false
+ },
+ "local": false,
+ "qpu_seconds_limit": 30,
+ "qpu_seconds_estimate": 26.039301376000008,
+ "qpu_seconds_bound": 28.13930137600001,
+ "created_utc": "2026-10-14T18:52:29.627118Z",
+ "running_utc": "2026-10-14T19:13:26.982707Z",
+ "finished_utc": "2026-10-14T19:16:02.416129Z",
+ "usage": {
+  "qpu_charge_time_seconds": 27,
+  "value": 0.4471,
+  "unit": "resource_units",
+  "status": "complete",
+  "details": [
+   {
+    "value": 0.4471,
+    "unit": "resource_units",
+    "metric": {
+     "id": "caffe3ca-729c-5750-8777-df63bbf8bfd9",
+     "value": 27
+    }
+   }
+  ]
+ },
+ "status": "DONE",
+ "reason": null,
+ "checks": {
+  "circuits": {
+   "d=3 X memory, 1 round": {
+    "m3": {
+     "shots": 4096,
+     "bits": 30
+    },
+    "d3": {
+     "shots": 4096,
+     "bits": 9
+    }
+   },
+   "d=3 X memory, 2 rounds": {
+    "m3": {
+     "shots": 4096,
+     "bits": 48
+    },
+    "d3": {
+     "shots": 4096,
+     "bits": 9
+    }
+   },
+   "d=3 X memory, 3 rounds": {
+    "m3": {
+     "shots": 4096,
+     "bits": 66
+    },
+    "d3": {
+     "shots": 4096,
+     "bits": 9
+    }
+   },
+   "d=3 X memory, 4 rounds": {
+    "m3": {
+     "shots": 4096,
+     "bits": 84
+    },
+    "d3": {
+     "shots": 4096,
+     "bits": 9
+    }
+   },
+   "d=3 Z memory, 1 round": {
+    "m3": {
+     "shots": 4096,
+     "bits": 24
+    },
+    "d3": {
+     "shots": 4096,
+     "bits": 9
+    }
+   },
+   "d=3 Z memory, 2 rounds": {
+    "m3": {
+     "shots": 4096,
+     "bits": 42
+    },
+    "d3": {
+     "shots": 4096,
+     "bits": 9
+    }
+   },
+   "d=3 Z memory, 3 rounds": {
+    "m3": {
+     "shots": 4096,
+     "bits": 60
+    },
+    "d3": {
+     "shots": 4096,
+     "bits": 9
+    }
+   },
+   "d=3 Z memory, 4 rounds": {
+    "m3": {
+     "shots": 4096,
+     "bits": 78
+    },
+    "d3": {
+     "shots": 4096,
+     "bits": 9
+    }
+   },
+   "d=5 X memory, 1 round": {
+    "m5": {
+     "shots": 4096,
+     "bits": 92
+    },
+    "d5": {
+     "shots": 4096,
+     "bits": 25
+    }
+   },
+   "d=5 X memory, 2 rounds": {
+    "m5": {
+     "shots": 4096,
+     "bits": 148
+    },
+    "d5": {
+     "shots": 4096,
+     "bits": 25
+    }
+   },
+   "d=5 X memory, 3 rounds": {
+    "m5": {
+     "shots": 4096,
+     "bits": 204
+    },
+    "d5": {
+     "shots": 4096,
+     "bits": 25
+    }
+   },
+   "d=5 X memory, 4 rounds": {
+    "m5": {
+     "shots": 4096,
+     "bits": 260
+    },
+    "d5": {
+     "shots": 4096,
+     "bits": 25
+    }
+   },
+   "d=5 Z memory, 1 round": {
+    "m5": {
+     "shots": 4096,
+     "bits": 76
+    },
+    "d5": {
+     "shots": 4096,
+     "bits": 25
+    }
+   },
+   "d=5 Z memory, 2 rounds": {
+    "m5": {
+     "shots": 4096,
+     "bits": 132
+    },
+    "d5": {
+     "shots": 4096,
+     "bits": 25
+    }
+   },
+   "d=5 Z memory, 3 rounds": {
+    "m5": {
+     "shots": 4096,
+     "bits": 188
+    },
+    "d5": {
+     "shots": 4096,
+     "bits": 25
+    }
+   },
+   "d=5 Z memory, 4 rounds": {
+    "m5": {
+     "shots": 4096,
+     "bits": 244
+    },
+    "d5": {
+     "shots": 4096,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 1 round, read in X": {
+    "m5": {
+     "shots": 2048,
+     "bits": 92
+    },
+    "d5": {
+     "shots": 2048,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 2 rounds, read in X": {
+    "m5": {
+     "shots": 2048,
+     "bits": 148
+    },
+    "d5": {
+     "shots": 2048,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 4 rounds, read in X": {
+    "m5": {
+     "shots": 2048,
+     "bits": 260
+    },
+    "d5": {
+     "shots": 2048,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 8 rounds, read in X": {
+    "m5": {
+     "shots": 2048,
+     "bits": 484
+    },
+    "d5": {
+     "shots": 2048,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 16 rounds, read in X": {
+    "m5": {
+     "shots": 2048,
+     "bits": 932
+    },
+    "d5": {
+     "shots": 2048,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 1 round, read in Y": {
+    "m5": {
+     "shots": 2048,
+     "bits": 92
+    },
+    "d5": {
+     "shots": 2048,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 2 rounds, read in Y": {
+    "m5": {
+     "shots": 2048,
+     "bits": 148
+    },
+    "d5": {
+     "shots": 2048,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 4 rounds, read in Y": {
+    "m5": {
+     "shots": 2048,
+     "bits": 260
+    },
+    "d5": {
+     "shots": 2048,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 8 rounds, read in Y": {
+    "m5": {
+     "shots": 2048,
+     "bits": 484
+    },
+    "d5": {
+     "shots": 2048,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 16 rounds, read in Y": {
+    "m5": {
+     "shots": 2048,
+     "bits": 932
+    },
+    "d5": {
+     "shots": 2048,
+     "bits": 25
+    }
+   }
+  },
+  "schedule_returned": 26,
+  "schedule_gap_dt": [
+   4,
+   34
+  ],
+  "detection": {
+   "d=3 X memory, 1 round": {
+    "chip": 0.150665283203125,
+    "model": 0.153472900390625
+   },
+   "d=3 X memory, 2 rounds": {
+    "chip": 0.15767415364583334,
+    "model": 0.14967854817708334
+   },
+   "d=3 X memory, 3 rounds": {
+    "chip": 0.160308837890625,
+    "model": 0.14630126953125
+   },
+   "d=3 X memory, 4 rounds": {
+    "chip": 0.1639892578125,
+    "model": 0.1470703125
+   },
+   "d=3 Z memory, 1 round": {
+    "chip": 0.1131591796875,
+    "model": 0.09903971354166667
+   },
+   "d=3 Z memory, 2 rounds": {
+    "chip": 0.10643421519886363,
+    "model": 0.09369451349431818
+   },
+   "d=3 Z memory, 3 rounds": {
+    "chip": 0.10736846923828125,
+    "model": 0.09278106689453125
+   },
+   "d=3 Z memory, 4 rounds": {
+    "chip": 0.10654994419642858,
+    "model": 0.09172130766369048
+   },
+   "d=5 X memory, 1 round": {
+    "chip": 0.18682861328125,
+    "model": 0.1956787109375
+   },
+   "d=5 X memory, 2 rounds": {
+    "chip": 0.20231797960069445,
+    "model": 0.1976657443576389
+   },
+   "d=5 X memory, 3 rounds": {
+    "chip": 0.20714823404947916,
+    "model": 0.19835917154947916
+   },
+   "d=5 X memory, 4 rounds": {
+    "chip": 0.2126708984375,
+    "model": 0.1990966796875
+   },
+   "d=5 Z memory, 1 round": {
+    "chip": 0.13056182861328125,
+    "model": 0.11325836181640625
+   },
+   "d=5 Z memory, 2 rounds": {
+    "chip": 0.12617594401041668,
+    "model": 0.10640055338541667
+   },
+   "d=5 Z memory, 3 rounds": {
+    "chip": 0.12336314808238637,
+    "model": 0.10314109108664772
+   },
+   "d=5 Z memory, 4 rounds": {
+    "chip": 0.12395398370150862,
+    "model": 0.10184241985452586
+   }
+  },
+  "prepared": {},
+  "failed": [],
+  "passed": true
+ }
+}

@@ -1,0 +1,226 @@
+{
+ "job": "exp3-1",
+ "backend": "ibm_kingston",
+ "dt": 4e-09,
+ "calibrated": "2026-10-14 20:27:28+03:00",
+ "placements": {
+  "3": {
+   "spot": [
+    [
+     11,
+     9
+    ],
+    [
+     1,
+     -1
+    ]
+   ],
+   "qubits": [
+    90,
+    70,
+    50,
+    92,
+    72,
+    52,
+    94,
+    74,
+    54,
+    91,
+    71,
+    51,
+    93,
+    73,
+    53,
+    78,
+    58,
+    79,
+    59,
+    89,
+    69,
+    75,
+    55
+   ],
+   "shortfalls": [
+    "data 52: T2 60 us",
+    "data 54: readout 3.6%",
+    "data 72: readout 20.2%",
+    "Z ancilla 78: T2 33 us",
+    "Z ancilla 78: readout 3.2%",
+    "data 92: readout 6.4%"
+   ]
+  },
+  "5": {
+   "spot": [
+    [
+     7,
+     9
+    ],
+    [
+     1,
+     -1
+    ]
+   ],
+   "qubits": [
+    86,
+    66,
+    46,
+    26,
+    6,
+    88,
+    68,
+    48,
+    28,
+    8,
+    90,
+    70,
+    50,
+    30,
+    10,
+    92,
+    72,
+    52,
+    32,
+    12,
+    94,
+    74,
+    54,
+    34,
+    14,
+    87,
+    67,
+    47,
+    27,
+    7,
+    89,
+    69,
+    49,
+    29,
+    9,
+    91,
+    71,
+    51,
+    31,
+    11,
+    93,
+    73,
+    53,
+    33,
+    13,
+    77,
+    57,
+    37,
+    17,
+    78,
+    38,
+    58,
+    18,
+    79,
+    39,
+    59,
+    19,
+    85,
+    65,
+    45,
+    25,
+    75,
+    55,
+    35,
+    15
+   ],
+   "shortfalls": [
+    "X ancilla 9: T2 42 us",
+    "data 10: T2 24 us",
+    "data 12: readout 18.5%",
+    "relay 25: T2 26 us",
+    "data 30: T2 76 us",
+    "flag 31: readout 4.2%",
+    "data 32: readout 4.8%",
+    "Z ancilla 37: T2 31 us",
+    "data 46: T2 79 us",
+    "data 48: T2 20 us",
+    "data 52: T2 60 us",
+    "data 54: readout 3.6%",
+    "relay 65: readout 3.4%",
+    "data 72: readout 20.2%",
+    "Z ancilla 78: T2 33 us",
+    "Z ancilla 78: readout 3.2%",
+    "data 86: T2 19 us",
+    "X ancilla 87: T2 48 us",
+    "data 88: T2 16 us",
+    "data 92: readout 6.4%",
+    "coupler 85-86: CZ 6.4%",
+    "coupler 86-87: CZ 7.1%"
+   ]
+  }
+ },
+ "meas_type": "kerneled",
+ "rep_delay_us": 250,
+ "twirling": null,
+ "decoupling": null,
+ "items": [
+  {
+   "label": "R0",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 1000,
+   "executions": 1000,
+   "bits": {
+    "m": 10
+   },
+   "seconds": 2.18e-06,
+   "duration_dt": 545
+  },
+  {
+   "label": "R1",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 1000,
+   "executions": 1000,
+   "bits": {
+    "m": 10
+   },
+   "seconds": 2.2119999999999997e-06,
+   "duration_dt": 553
+  },
+  {
+   "label": "A",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 1000,
+   "executions": 1000,
+   "bits": {
+    "m": 300
+   },
+   "seconds": 0.00014591999999999999,
+   "duration_dt": 36480
+  },
+  {
+   "label": "A",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 1000,
+   "executions": 1000,
+   "bits": {
+    "m": 300
+   },
+   "seconds": 0.00014591999999999999,
+   "duration_dt": 36480
+  },
+  {
+   "label": "A",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 1000,
+   "executions": 1000,
+   "bits": {
+    "m": 300
+   },
+   "seconds": 0.00014591999999999999,
+   "duration_dt": 36480
+  }
+ ],
+ "instances": 5,
+ "qpu_seconds_estimate": 3.8071520000000003,
+ "qpu_seconds_billed_estimate": 4,
+ "qpu_seconds_bound": 3.8071520000000003
+}
