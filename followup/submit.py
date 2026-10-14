@@ -119,15 +119,16 @@ TWIRLING = "active"  # each CZ layer twirls its own qubits; the rest keep their 
 # with T2 below MIN_D3_DATA_T2_US waits for a new approval.
 APPROVED_SPOTS = {5: Spot((7, 9), (1, -1)), 3: Spot((11, 9), (1, -1))}
 APPROVED_WEAK: dict[tuple[int | tuple[int, int], str], float] = {
-    (8, "T2"): 74, (9, "T2"): 41, (10, "T2"): 25, (12, "readout"): 0.053, (18, "T1"): 76,
+    (8, "T2"): 74, (9, "T2"): 41, (10, "T2"): 25, (12, "readout"): 0.185, (18, "T1"): 76,
     (25, "T2"): 26, (32, "T1"): 61, (32, "readout"): 0.042, (35, "readout"): 0.030,
     (37, "T2"): 28, (48, "T2"): 21, (52, "T2"): 56, (52, "readout"): 0.033,
-    (54, "readout"): 0.045, (72, "readout"): 0.052, (78, "T2"): 32, (78, "readout"): 0.044,
+    (54, "readout"): 0.045, (72, "readout"): 0.202, (78, "T2"): 32, (78, "readout"): 0.044,
     (85, "readout"): 0.033, (86, "T2"): 24, (87, "T1"): 54, (87, "T2"): 36, (88, "T2"): 19,
     ((85, 86), "CZ"): 0.047, ((86, 87), "CZ"): 0.057,
     # Calibration of 14 October 2026, 20:27 (+03:00), approved to run as it stands.
-    (12, "readout"): 0.185, (30, "T2"): 76, (31, "readout"): 0.042, (46, "T2"): 79,
-    (65, "readout"): 0.034, (72, "readout"): 0.202, (92, "readout"): 0.064,
+    # (12 and 72 readout were raised to their values in it, above.)
+    (30, "T2"): 76, (31, "readout"): 0.042, (46, "T2"): 79, (65, "readout"): 0.034,
+    (92, "readout"): 0.064,
 }  # fmt: skip
 WORSE = 1.5
 MIN_D3_DATA_T2_US = 50
@@ -1252,7 +1253,7 @@ def load(folder: Path) -> dict[str, dict[str, np.ndarray]]:
 def inspect(folder: Path) -> dict:
     """The checks a job's data must pass before the next job goes: every circuit's shots and
     bits as planned; IQ points where kerneled, each shot's all distinct in IQ_DISTINCT of the
-    shots; IBM's schedule of every circuit within SCHEDULE_GAP of ours; each memory
+    shots; IBM's schedule of every circuit, less the resets it adds before and after, within SCHEDULE_GAP of ours; each memory
     circuit's detectors firing no more than the model's would with MAX_EXCESS times its
     errors: a readout that doesn't leave its qubit in |m>, or bits read in the wrong order,
     make them fire about half the time; and life-1's circuits that should read as prepared
@@ -1285,10 +1286,10 @@ def inspect(folder: Path) -> dict:
         schedules = json.load(f)["circuits"]
     gaps = []
     for item, s in zip(run["items"], schedules, strict=True):
-        if not s or "circuit_duration" not in s:
+        if not s or "timing" not in s:
             failed.append(f"{item['label']}: IBM returned no schedule")
             continue
-        gaps.append(s["circuit_duration"] - item["duration_dt"])
+        gaps.append(_body(s) - item["duration_dt"])
         if abs(gaps[-1]) > SCHEDULE_GAP * item["duration_dt"]:
             failed.append(f"{item['label']}: IBM's schedule is {gaps[-1]} dt off ours")
     found["schedule_returned"] = len(gaps)
@@ -1333,6 +1334,14 @@ def detection(
 
 
 # The command
+
+
+def _body(schedule: Mapping[str, Any]) -> int:
+    """IBM's length of a circuit less the resets it adds before (INIT_*) and after (FINI_*) it."""
+    rows = [line.split(",") for line in schedule["timing"].splitlines()]
+    init = [int(r[3]) + int(r[4]) for r in rows if r[1].startswith("INIT_")]
+    fini = [int(r[3]) for r in rows if r[1].startswith("FINI_")]
+    return min(fini, default=schedule["circuit_duration"]) - max(init, default=0)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
