@@ -1,0 +1,51 @@
+{
+ "job": "db7sq8mr6oqs73888jtg",
+ "tag": "heavyhex:ibm_kingston-2026-10-14-life-1",
+ "tags": [
+  "heavyhex-followup",
+  "heavyhex:ibm_kingston-2026-10-14-life-1"
+ ],
+ "backend": "ibm_kingston",
+ "plan_job": "life-1",
+ "flags": {
+  "twirl": true,
+  "kerneled": true,
+  "sampler": "executor"
+ },
+ "submitted": "2026-10-14T21:42:33+03:00",
+ "submitted_utc": "2026-10-14T18:42:33+00:00",
+ "code": {
+  "commit": "134a0726269058aea6b6ab1e2c3d5c37e6f35338",
+  "code": [
+   "a233d4069719d0cc396c71f29f6429bffd40f113",
+   "f8e44350df9165b40fb5a3259f75ba9c9f697fee"
+  ],
+  "followup": "dff6e7deebfc267f4988541a017449f828867b61",
+  "changed": false
+ },
+ "local": false,
+ "qpu_seconds_limit": 14,
+ "qpu_seconds_estimate": 9.782228224000002,
+ "qpu_seconds_bound": 9.782228224000002,
+ "created_utc": "2026-10-14T18:42:43.320798Z",
+ "running_utc": "2026-10-14T18:42:45.08152Z",
+ "finished_utc": "2026-10-14T18:47:20.1684Z",
+ "usage": {
+  "qpu_charge_time_seconds": 2,
+  "value": 0.0313,
+  "unit": "resource_units",
+  "status": "pending",
+  "details": [
+   {
+    "value": 0.0313,
+    "unit": "resource_units",
+    "metric": {
+     "id": "caffe3ca-729c-5750-8777-df63bbf8bfd9",
+     "value": 2
+    }
+   }
+  ]
+ },
+ "status": "ERROR",
+ "reason": "Job db7sq8mr6oqs73888jtg ran longer than maximum execution time. Job was cancelled:\n"
+}

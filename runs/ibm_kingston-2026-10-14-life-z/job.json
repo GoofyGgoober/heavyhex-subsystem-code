@@ -1,0 +1,167 @@
+{
+ "job": "db7te86r6oqs73889m0g",
+ "tag": "heavyhex:ibm_kingston-2026-10-14-life-z",
+ "tags": [
+  "heavyhex-followup",
+  "heavyhex:ibm_kingston-2026-10-14-life-z"
+ ],
+ "backend": "ibm_kingston",
+ "plan_job": "life-z",
+ "flags": {
+  "twirl": true,
+  "kerneled": true,
+  "sampler": "executor"
+ },
+ "submitted": "2026-10-14T22:25:11+03:00",
+ "submitted_utc": "2026-10-14T19:25:11+00:00",
+ "code": {
+  "commit": "7f1eeecf0a1b78c5e2da8bcba0121175582db881",
+  "code": [
+   "a233d4069719d0cc396c71f29f6429bffd40f113",
+   "f8e44350df9165b40fb5a3259f75ba9c9f697fee"
+  ],
+  "followup": "69254c52d7adbef6ba86c82268dd11904d53c4a9",
+  "changed": false
+ },
+ "local": false,
+ "qpu_seconds_limit": 7,
+ "qpu_seconds_estimate": 5.127197952000003,
+ "qpu_seconds_bound": 5.127197952000003,
+ "created_utc": "2026-10-14T19:25:21.056448Z",
+ "running_utc": "2026-10-14T19:36:49.571919Z",
+ "finished_utc": "2026-10-14T19:40:51.425475Z",
+ "usage": {
+  "qpu_charge_time_seconds": 5,
+  "value": 0.0811,
+  "unit": "resource_units",
+  "status": "complete",
+  "details": [
+   {
+    "value": 0.0811,
+    "unit": "resource_units",
+    "metric": {
+     "id": "caffe3ca-729c-5750-8777-df63bbf8bfd9",
+     "value": 5
+    }
+   }
+  ]
+ },
+ "status": "DONE",
+ "reason": null,
+ "checks": {
+  "circuits": {
+   "d=5 idle, 1 round, read in Z, from |0>": {
+    "m5": {
+     "shots": 1024,
+     "bits": 92
+    },
+    "d5": {
+     "shots": 1024,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 2 rounds, read in Z, from |0>": {
+    "m5": {
+     "shots": 1024,
+     "bits": 148
+    },
+    "d5": {
+     "shots": 1024,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 4 rounds, read in Z, from |0>": {
+    "m5": {
+     "shots": 1024,
+     "bits": 260
+    },
+    "d5": {
+     "shots": 1024,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 8 rounds, read in Z, from |0>": {
+    "m5": {
+     "shots": 1024,
+     "bits": 484
+    },
+    "d5": {
+     "shots": 1024,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 16 rounds, read in Z, from |0>": {
+    "m5": {
+     "shots": 1024,
+     "bits": 932
+    },
+    "d5": {
+     "shots": 1024,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 1 round, read in Z, from |1>": {
+    "m5": {
+     "shots": 1024,
+     "bits": 92
+    },
+    "d5": {
+     "shots": 1024,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 2 rounds, read in Z, from |1>": {
+    "m5": {
+     "shots": 1024,
+     "bits": 148
+    },
+    "d5": {
+     "shots": 1024,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 4 rounds, read in Z, from |1>": {
+    "m5": {
+     "shots": 1024,
+     "bits": 260
+    },
+    "d5": {
+     "shots": 1024,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 8 rounds, read in Z, from |1>": {
+    "m5": {
+     "shots": 1024,
+     "bits": 484
+    },
+    "d5": {
+     "shots": 1024,
+     "bits": 25
+    }
+   },
+   "d=5 idle, 16 rounds, read in Z, from |1>": {
+    "m5": {
+     "shots": 1024,
+     "bits": 932
+    },
+    "d5": {
+     "shots": 1024,
+     "bits": 25
+    }
+   }
+  },
+  "schedule_returned": 10,
+  "schedule_gap_dt": [
+   4,
+   34
+  ],
+  "detection": {},
+  "prepared": {
+   "d=5 idle, 1 round, read in Z, from |0>": 0.9287890625,
+   "d=5 idle, 1 round, read in Z, from |1>": 0.9294921875
+  },
+  "failed": [],
+  "passed": true
+ }
+}

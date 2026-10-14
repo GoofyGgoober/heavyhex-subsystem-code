@@ -1,0 +1,942 @@
+{
+ "job": "life-1",
+ "backend": "ibm_kingston",
+ "dt": 4e-09,
+ "calibrated": "2026-10-14 21:29:29+03:00",
+ "placements": {
+  "3": {
+   "spot": [
+    [
+     11,
+     9
+    ],
+    [
+     1,
+     -1
+    ]
+   ],
+   "qubits": [
+    90,
+    70,
+    50,
+    92,
+    72,
+    52,
+    94,
+    74,
+    54,
+    91,
+    71,
+    51,
+    93,
+    73,
+    53,
+    78,
+    58,
+    79,
+    59,
+    89,
+    69,
+    75,
+    55
+   ],
+   "shortfalls": [
+    "data 52: T2 60 us",
+    "data 54: readout 3.6%",
+    "data 72: readout 20.2%",
+    "Z ancilla 78: T2 33 us",
+    "Z ancilla 78: readout 3.2%",
+    "data 92: readout 6.4%"
+   ]
+  },
+  "5": {
+   "spot": [
+    [
+     7,
+     9
+    ],
+    [
+     1,
+     -1
+    ]
+   ],
+   "qubits": [
+    86,
+    66,
+    46,
+    26,
+    6,
+    88,
+    68,
+    48,
+    28,
+    8,
+    90,
+    70,
+    50,
+    30,
+    10,
+    92,
+    72,
+    52,
+    32,
+    12,
+    94,
+    74,
+    54,
+    34,
+    14,
+    87,
+    67,
+    47,
+    27,
+    7,
+    89,
+    69,
+    49,
+    29,
+    9,
+    91,
+    71,
+    51,
+    31,
+    11,
+    93,
+    73,
+    53,
+    33,
+    13,
+    77,
+    57,
+    37,
+    17,
+    78,
+    38,
+    58,
+    18,
+    79,
+    39,
+    59,
+    19,
+    85,
+    65,
+    45,
+    25,
+    75,
+    55,
+    35,
+    15
+   ],
+   "shortfalls": [
+    "X ancilla 9: T2 42 us",
+    "data 10: T2 24 us",
+    "data 12: readout 18.5%",
+    "relay 25: T2 26 us",
+    "data 30: T2 76 us",
+    "flag 31: readout 4.2%",
+    "data 32: readout 4.8%",
+    "Z ancilla 37: T2 31 us",
+    "data 46: T2 79 us",
+    "data 48: T2 20 us",
+    "data 52: T2 60 us",
+    "data 54: readout 3.6%",
+    "relay 65: readout 3.4%",
+    "data 72: readout 20.2%",
+    "Z ancilla 78: T2 33 us",
+    "Z ancilla 78: readout 3.2%",
+    "data 86: T2 19 us",
+    "X ancilla 87: T2 48 us",
+    "data 88: T2 16 us",
+    "data 92: readout 6.4%",
+    "coupler 85-86: CZ 6.4%",
+    "coupler 86-87: CZ 7.1%"
+   ]
+  }
+ },
+ "meas_type": "classified",
+ "rep_delay_us": 250,
+ "twirling": "active",
+ "decoupling": "XY4 in the idle test; T1 and T2 none, but the echo",
+ "items": [
+  {
+   "label": "d=5 idle, 1 round, read in Z, from |0>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 1,
+    "readout": "Z",
+    "start": "0"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 92,
+    "d5": 25
+   },
+   "seconds": 1.1612000000000007e-05,
+   "duration_dt": 2903
+  },
+  {
+   "label": "d=5 idle, 2 rounds, read in Z, from |0>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 2,
+    "readout": "Z",
+    "start": "0"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 148,
+    "d5": 25
+   },
+   "seconds": 1.7576000000000033e-05,
+   "duration_dt": 4394
+  },
+  {
+   "label": "d=5 idle, 4 rounds, read in Z, from |0>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 4,
+    "readout": "Z",
+    "start": "0"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 260,
+    "d5": 25
+   },
+   "seconds": 2.9504000000000024e-05,
+   "duration_dt": 7376
+  },
+  {
+   "label": "d=5 idle, 8 rounds, read in Z, from |0>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 8,
+    "readout": "Z",
+    "start": "0"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 484,
+    "d5": 25
+   },
+   "seconds": 5.336000000000045e-05,
+   "duration_dt": 13340
+  },
+  {
+   "label": "d=5 idle, 16 rounds, read in Z, from |0>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 16,
+    "readout": "Z",
+    "start": "0"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 932,
+    "d5": 25
+   },
+   "seconds": 0.00010107200000000127,
+   "duration_dt": 25268
+  },
+  {
+   "label": "d=5 idle, 1 round, read in Z, from |1>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 1,
+    "readout": "Z",
+    "start": "1"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 92,
+    "d5": 25
+   },
+   "seconds": 1.1612000000000007e-05,
+   "duration_dt": 2903
+  },
+  {
+   "label": "d=5 idle, 2 rounds, read in Z, from |1>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 2,
+    "readout": "Z",
+    "start": "1"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 148,
+    "d5": 25
+   },
+   "seconds": 1.7576000000000033e-05,
+   "duration_dt": 4394
+  },
+  {
+   "label": "d=5 idle, 4 rounds, read in Z, from |1>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 4,
+    "readout": "Z",
+    "start": "1"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 260,
+    "d5": 25
+   },
+   "seconds": 2.9504000000000024e-05,
+   "duration_dt": 7376
+  },
+  {
+   "label": "d=5 idle, 8 rounds, read in Z, from |1>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 8,
+    "readout": "Z",
+    "start": "1"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 484,
+    "d5": 25
+   },
+   "seconds": 5.336000000000045e-05,
+   "duration_dt": 13340
+  },
+  {
+   "label": "d=5 idle, 16 rounds, read in Z, from |1>",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 16,
+    "readout": "Z",
+    "start": "1"
+   },
+   "randomizations": 4,
+   "shots": 256,
+   "executions": 1024,
+   "bits": {
+    "m5": 932,
+    "d5": 25
+   },
+   "seconds": 0.00010107200000000127,
+   "duration_dt": 25268
+  },
+  {
+   "label": "T1, 20 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 2.2212e-05,
+   "duration_dt": 5553
+  },
+  {
+   "label": "T1, 20 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 2.2212e-05,
+   "duration_dt": 5553
+  },
+  {
+   "label": "T1, 20 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 2.2212e-05,
+   "duration_dt": 5553
+  },
+  {
+   "label": "T1, 20 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 2.2212e-05,
+   "duration_dt": 5553
+  },
+  {
+   "label": "T1, 40 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 4.221200000000001e-05,
+   "duration_dt": 10553
+  },
+  {
+   "label": "T1, 40 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 4.221200000000001e-05,
+   "duration_dt": 10553
+  },
+  {
+   "label": "T1, 40 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 4.221200000000001e-05,
+   "duration_dt": 10553
+  },
+  {
+   "label": "T1, 40 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 4.221200000000001e-05,
+   "duration_dt": 10553
+  },
+  {
+   "label": "T1, 75 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 7.7212e-05,
+   "duration_dt": 19303
+  },
+  {
+   "label": "T1, 75 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 7.7212e-05,
+   "duration_dt": 19303
+  },
+  {
+   "label": "T1, 75 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 7.7212e-05,
+   "duration_dt": 19303
+  },
+  {
+   "label": "T1, 75 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 7.7212e-05,
+   "duration_dt": 19303
+  },
+  {
+   "label": "T1, 135 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000137212,
+   "duration_dt": 34303
+  },
+  {
+   "label": "T1, 135 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000137212,
+   "duration_dt": 34303
+  },
+  {
+   "label": "T1, 135 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000137212,
+   "duration_dt": 34303
+  },
+  {
+   "label": "T1, 135 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000137212,
+   "duration_dt": 34303
+  },
+  {
+   "label": "T1, 245 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000247212,
+   "duration_dt": 61803
+  },
+  {
+   "label": "T1, 245 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000247212,
+   "duration_dt": 61803
+  },
+  {
+   "label": "T1, 245 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000247212,
+   "duration_dt": 61803
+  },
+  {
+   "label": "T1, 245 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000247212,
+   "duration_dt": 61803
+  },
+  {
+   "label": "T1, 450 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.00045221200000000007,
+   "duration_dt": 113053
+  },
+  {
+   "label": "T1, 450 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.00045221200000000007,
+   "duration_dt": 113053
+  },
+  {
+   "label": "T1, 450 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.00045221200000000007,
+   "duration_dt": 113053
+  },
+  {
+   "label": "T1, 450 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.00045221200000000007,
+   "duration_dt": 113053
+  },
+  {
+   "label": "T2, 12 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 1.4276e-05,
+   "duration_dt": 3569
+  },
+  {
+   "label": "T2, 12 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 1.4276e-05,
+   "duration_dt": 3569
+  },
+  {
+   "label": "T2, 12 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 1.4276e-05,
+   "duration_dt": 3569
+  },
+  {
+   "label": "T2, 12 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 1.4276e-05,
+   "duration_dt": 3569
+  },
+  {
+   "label": "T2, 22 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 2.4276000000000003e-05,
+   "duration_dt": 6069
+  },
+  {
+   "label": "T2, 22 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 2.4276000000000003e-05,
+   "duration_dt": 6069
+  },
+  {
+   "label": "T2, 22 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 2.4276000000000003e-05,
+   "duration_dt": 6069
+  },
+  {
+   "label": "T2, 22 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 2.4276000000000003e-05,
+   "duration_dt": 6069
+  },
+  {
+   "label": "T2, 40 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 4.2276000000000007e-05,
+   "duration_dt": 10569
+  },
+  {
+   "label": "T2, 40 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 4.2276000000000007e-05,
+   "duration_dt": 10569
+  },
+  {
+   "label": "T2, 40 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 4.2276000000000007e-05,
+   "duration_dt": 10569
+  },
+  {
+   "label": "T2, 40 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 4.2276000000000007e-05,
+   "duration_dt": 10569
+  },
+  {
+   "label": "T2, 72 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 7.4276e-05,
+   "duration_dt": 18569
+  },
+  {
+   "label": "T2, 72 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 7.4276e-05,
+   "duration_dt": 18569
+  },
+  {
+   "label": "T2, 72 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 7.4276e-05,
+   "duration_dt": 18569
+  },
+  {
+   "label": "T2, 72 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 7.4276e-05,
+   "duration_dt": 18569
+  },
+  {
+   "label": "T2, 132 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000134276,
+   "duration_dt": 33569
+  },
+  {
+   "label": "T2, 132 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000134276,
+   "duration_dt": 33569
+  },
+  {
+   "label": "T2, 132 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000134276,
+   "duration_dt": 33569
+  },
+  {
+   "label": "T2, 132 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000134276,
+   "duration_dt": 33569
+  },
+  {
+   "label": "T2, 240 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000242276,
+   "duration_dt": 60569
+  },
+  {
+   "label": "T2, 240 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000242276,
+   "duration_dt": 60569
+  },
+  {
+   "label": "T2, 240 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000242276,
+   "duration_dt": 60569
+  },
+  {
+   "label": "T2, 240 us",
+   "setting": null,
+   "randomizations": 0,
+   "shots": 256,
+   "executions": 256,
+   "bits": {
+    "m": 65
+   },
+   "seconds": 0.000242276,
+   "duration_dt": 60569
+  }
+ ],
+ "instances": 88,
+ "qpu_seconds_estimate": 9.782228224000002,
+ "qpu_seconds_billed_estimate": 10,
+ "qpu_seconds_bound": 9.782228224000002
+}
