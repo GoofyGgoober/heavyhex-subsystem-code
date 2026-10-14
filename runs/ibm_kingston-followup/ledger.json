@@ -1,0 +1,1284 @@
+{
+ "approved_s": 90,
+ "attempts": [
+  {
+   "job": "exp3-1",
+   "folder": "ibm_kingston-2026-10-14-exp3-1",
+   "tags": [
+    "heavyhex-followup",
+    "heavyhex:ibm_kingston-2026-10-14-exp3-1"
+   ],
+   "flags": {
+    "twirl": true,
+    "kerneled": true,
+    "sampler": "executor"
+   },
+   "claimed_utc": "2026-10-14T18:08:45+00:00",
+   "calibrated": "2026-10-14 20:27:28+03:00",
+   "estimate_s": 3.8071520000000003,
+   "billed_s": 4,
+   "bound_s": 3.8071520000000003,
+   "limit_s": 8,
+   "id": "db7sabmil99s73fopc00",
+   "status": "done",
+   "usage": {
+    "qpu_charge_time_seconds": 4,
+    "value": 0.0575,
+    "unit": "resource_units",
+    "status": "complete",
+    "details": [
+     {
+      "value": 0.0575,
+      "unit": "resource_units",
+      "metric": {
+       "id": "caffe3ca-729c-5750-8777-df63bbf8bfd9",
+       "value": 4
+      }
+     }
+    ]
+   },
+   "checks": {
+    "circuits": {
+     "R0": {
+      "m": {
+       "shots": 1000,
+       "bits": 10,
+       "iq_distinct_per_shot": 1.0
+      }
+     },
+     "R1": {
+      "m": {
+       "shots": 1000,
+       "bits": 10,
+       "iq_distinct_per_shot": 1.0
+      }
+     },
+     "A": {
+      "m": {
+       "shots": 3000,
+       "bits": 300,
+       "iq_distinct_per_shot": 1.0
+      }
+     }
+    },
+    "schedule_returned": 5,
+    "schedule_gap_dt": [
+     0,
+     30
+    ],
+    "detection": {},
+    "prepared": {},
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "job": "exp3-2",
+   "folder": "ibm_kingston-2026-10-14-exp3-2",
+   "tags": [
+    "heavyhex-followup",
+    "heavyhex:ibm_kingston-2026-10-14-exp3-2"
+   ],
+   "flags": {
+    "twirl": true,
+    "kerneled": true,
+    "sampler": "executor"
+   },
+   "claimed_utc": "2026-10-14T18:30:19+00:00",
+   "calibrated": "2026-10-14 20:27:28+03:00",
+   "estimate_s": 3.8071519999999994,
+   "billed_s": 4,
+   "bound_s": 3.8071519999999994,
+   "limit_s": 8,
+   "id": "db7skfeil99s73foq1sg",
+   "status": "done",
+   "usage": {
+    "qpu_charge_time_seconds": 4,
+    "value": 0.0575,
+    "unit": "resource_units",
+    "status": "complete",
+    "details": [
+     {
+      "value": 0.0575,
+      "unit": "resource_units",
+      "metric": {
+       "id": "caffe3ca-729c-5750-8777-df63bbf8bfd9",
+       "value": 4
+      }
+     }
+    ]
+   },
+   "checks": {
+    "circuits": {
+     "R0": {
+      "m": {
+       "shots": 1000,
+       "bits": 10,
+       "iq_distinct_per_shot": 1.0
+      }
+     },
+     "R1": {
+      "m": {
+       "shots": 1000,
+       "bits": 10,
+       "iq_distinct_per_shot": 1.0
+      }
+     },
+     "B": {
+      "m": {
+       "shots": 3000,
+       "bits": 300,
+       "iq_distinct_per_shot": 1.0
+      }
+     }
+    },
+    "schedule_returned": 5,
+    "schedule_gap_dt": [
+     0,
+     30
+    ],
+    "detection": {},
+    "prepared": {},
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "job": "exp3-3",
+   "folder": "ibm_kingston-2026-10-14-exp3-3",
+   "tags": [
+    "heavyhex-followup",
+    "heavyhex:ibm_kingston-2026-10-14-exp3-3"
+   ],
+   "flags": {
+    "twirl": true,
+    "kerneled": true,
+    "sampler": "executor"
+   },
+   "claimed_utc": "2026-10-14T18:31:16+00:00",
+   "calibrated": "2026-10-14 20:27:28+03:00",
+   "estimate_s": 3.8071520000000003,
+   "billed_s": 4,
+   "bound_s": 3.8071520000000003,
+   "limit_s": 8,
+   "id": "db7skter6oqs73888830",
+   "status": "done",
+   "usage": {
+    "qpu_charge_time_seconds": 4,
+    "value": 0.0575,
+    "unit": "resource_units",
+    "status": "complete",
+    "details": [
+     {
+      "value": 0.0575,
+      "unit": "resource_units",
+      "metric": {
+       "id": "caffe3ca-729c-5750-8777-df63bbf8bfd9",
+       "value": 4
+      }
+     }
+    ]
+   },
+   "checks": {
+    "circuits": {
+     "R0": {
+      "m": {
+       "shots": 1000,
+       "bits": 10,
+       "iq_distinct_per_shot": 1.0
+      }
+     },
+     "R1": {
+      "m": {
+       "shots": 1000,
+       "bits": 10,
+       "iq_distinct_per_shot": 1.0
+      }
+     },
+     "C": {
+      "m": {
+       "shots": 3000,
+       "bits": 300,
+       "iq_distinct_per_shot": 1.0
+      }
+     }
+    },
+    "schedule_returned": 5,
+    "schedule_gap_dt": [
+     0,
+     30
+    ],
+    "detection": {},
+    "prepared": {},
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "job": "exp1-1",
+   "folder": "ibm_kingston-2026-10-14-exp1-1",
+   "tags": [
+    "heavyhex-followup",
+    "heavyhex:ibm_kingston-2026-10-14-exp1-1"
+   ],
+   "flags": {
+    "twirl": true,
+    "kerneled": true,
+    "sampler": "executor"
+   },
+   "claimed_utc": "2026-10-14T18:37:33+00:00",
+   "calibrated": "2026-10-14 20:27:28+03:00",
+   "estimate_s": 26.039301376000008,
+   "billed_s": 27,
+   "bound_s": 28.13930137600001,
+   "limit_s": 30,
+   "id": "db7snuiraffc73fb7irg",
+   "status": "done",
+   "usage": {
+    "qpu_charge_time_seconds": 27,
+    "value": 0.4471,
+    "unit": "resource_units",
+    "status": "complete",
+    "details": [
+     {
+      "value": 0.4471,
+      "unit": "resource_units",
+      "metric": {
+       "id": "caffe3ca-729c-5750-8777-df63bbf8bfd9",
+       "value": 27
+      }
+     }
+    ]
+   },
+   "checks": {
+    "circuits": {
+     "d=3 X memory, 1 round": {
+      "m3": {
+       "shots": 4096,
+       "bits": 30
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=3 X memory, 2 rounds": {
+      "m3": {
+       "shots": 4096,
+       "bits": 48
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=3 X memory, 3 rounds": {
+      "m3": {
+       "shots": 4096,
+       "bits": 66
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=3 X memory, 4 rounds": {
+      "m3": {
+       "shots": 4096,
+       "bits": 84
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=3 Z memory, 1 round": {
+      "m3": {
+       "shots": 4096,
+       "bits": 24
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=3 Z memory, 2 rounds": {
+      "m3": {
+       "shots": 4096,
+       "bits": 42
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=3 Z memory, 3 rounds": {
+      "m3": {
+       "shots": 4096,
+       "bits": 60
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=3 Z memory, 4 rounds": {
+      "m3": {
+       "shots": 4096,
+       "bits": 78
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=5 X memory, 1 round": {
+      "m5": {
+       "shots": 4096,
+       "bits": 92
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 X memory, 2 rounds": {
+      "m5": {
+       "shots": 4096,
+       "bits": 148
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 X memory, 3 rounds": {
+      "m5": {
+       "shots": 4096,
+       "bits": 204
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 X memory, 4 rounds": {
+      "m5": {
+       "shots": 4096,
+       "bits": 260
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 Z memory, 1 round": {
+      "m5": {
+       "shots": 4096,
+       "bits": 76
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 Z memory, 2 rounds": {
+      "m5": {
+       "shots": 4096,
+       "bits": 132
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 Z memory, 3 rounds": {
+      "m5": {
+       "shots": 4096,
+       "bits": 188
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 Z memory, 4 rounds": {
+      "m5": {
+       "shots": 4096,
+       "bits": 244
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 1 round, read in X": {
+      "m5": {
+       "shots": 2048,
+       "bits": 92
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 2 rounds, read in X": {
+      "m5": {
+       "shots": 2048,
+       "bits": 148
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 4 rounds, read in X": {
+      "m5": {
+       "shots": 2048,
+       "bits": 260
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 8 rounds, read in X": {
+      "m5": {
+       "shots": 2048,
+       "bits": 484
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 16 rounds, read in X": {
+      "m5": {
+       "shots": 2048,
+       "bits": 932
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 1 round, read in Y": {
+      "m5": {
+       "shots": 2048,
+       "bits": 92
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 2 rounds, read in Y": {
+      "m5": {
+       "shots": 2048,
+       "bits": 148
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 4 rounds, read in Y": {
+      "m5": {
+       "shots": 2048,
+       "bits": 260
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 8 rounds, read in Y": {
+      "m5": {
+       "shots": 2048,
+       "bits": 484
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 16 rounds, read in Y": {
+      "m5": {
+       "shots": 2048,
+       "bits": 932
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     }
+    },
+    "schedule_returned": 26,
+    "schedule_gap_dt": [
+     4,
+     34
+    ],
+    "detection": {
+     "d=3 X memory, 1 round": {
+      "chip": 0.197906494140625,
+      "model": 0.153472900390625
+     },
+     "d=3 X memory, 2 rounds": {
+      "chip": 0.20450846354166666,
+      "model": 0.14967854817708334
+     },
+     "d=3 X memory, 3 rounds": {
+      "chip": 0.2142791748046875,
+      "model": 0.14630126953125
+     },
+     "d=3 X memory, 4 rounds": {
+      "chip": 0.21734619140625,
+      "model": 0.1470703125
+     },
+     "d=3 Z memory, 1 round": {
+      "chip": 0.12394205729166667,
+      "model": 0.09903971354166667
+     },
+     "d=3 Z memory, 2 rounds": {
+      "chip": 0.11827503551136363,
+      "model": 0.09369451349431818
+     },
+     "d=3 Z memory, 3 rounds": {
+      "chip": 0.12020111083984375,
+      "model": 0.09278106689453125
+     },
+     "d=3 Z memory, 4 rounds": {
+      "chip": 0.11927432105654762,
+      "model": 0.09172130766369048
+     },
+     "d=5 X memory, 1 round": {
+      "chip": 0.19861857096354166,
+      "model": 0.1956787109375
+     },
+     "d=5 X memory, 2 rounds": {
+      "chip": 0.20810953776041666,
+      "model": 0.1976657443576389
+     },
+     "d=5 X memory, 3 rounds": {
+      "chip": 0.2158355712890625,
+      "model": 0.19835917154947916
+     },
+     "d=5 X memory, 4 rounds": {
+      "chip": 0.22169596354166668,
+      "model": 0.1990966796875
+     },
+     "d=5 Z memory, 1 round": {
+      "chip": 0.123291015625,
+      "model": 0.11325836181640625
+     },
+     "d=5 Z memory, 2 rounds": {
+      "chip": 0.117333984375,
+      "model": 0.10640055338541667
+     },
+     "d=5 Z memory, 3 rounds": {
+      "chip": 0.11604725230823863,
+      "model": 0.10314109108664772
+     },
+     "d=5 Z memory, 4 rounds": {
+      "chip": 0.11336964574353449,
+      "model": 0.10184241985452586
+     }
+    },
+    "prepared": {},
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "job": "life-1",
+   "folder": "ibm_kingston-2026-10-14-life-1",
+   "tags": [
+    "heavyhex-followup",
+    "heavyhex:ibm_kingston-2026-10-14-life-1"
+   ],
+   "flags": {
+    "twirl": true,
+    "kerneled": true,
+    "sampler": "executor"
+   },
+   "claimed_utc": "2026-10-14T18:42:33+00:00",
+   "calibrated": "2026-10-14 21:29:29+03:00",
+   "estimate_s": 9.782228224000002,
+   "billed_s": 10,
+   "bound_s": 9.782228224000002,
+   "limit_s": 14,
+   "id": "db7sq8mr6oqs73888jtg",
+   "status": "failed",
+   "usage": {
+    "qpu_charge_time_seconds": 10,
+    "value": 0.1616,
+    "unit": "resource_units",
+    "status": "pending",
+    "details": [
+     {
+      "value": 0.1616,
+      "unit": "resource_units",
+      "metric": {
+       "id": "caffe3ca-729c-5750-8777-df63bbf8bfd9",
+       "value": 10
+      }
+     }
+    ]
+   },
+   "reason": "Job db7sq8mr6oqs73888jtg ran longer than maximum execution time. Job was cancelled:\n"
+  },
+  {
+   "job": "exp1-2",
+   "folder": "ibm_kingston-2026-10-14-exp1-2",
+   "tags": [
+    "heavyhex-followup",
+    "heavyhex:ibm_kingston-2026-10-14-exp1-2"
+   ],
+   "flags": {
+    "twirl": true,
+    "kerneled": true,
+    "sampler": "executor"
+   },
+   "claimed_utc": "2026-10-14T18:52:14+00:00",
+   "calibrated": "2026-10-14 21:29:29+03:00",
+   "estimate_s": 26.039301376000008,
+   "billed_s": 27,
+   "bound_s": 28.13930137600001,
+   "limit_s": 30,
+   "id": "db7sur6r6oqs73888qug",
+   "status": "done",
+   "usage": {
+    "qpu_charge_time_seconds": 27,
+    "value": 0.4471,
+    "unit": "resource_units",
+    "status": "complete",
+    "details": [
+     {
+      "value": 0.4471,
+      "unit": "resource_units",
+      "metric": {
+       "id": "caffe3ca-729c-5750-8777-df63bbf8bfd9",
+       "value": 27
+      }
+     }
+    ]
+   },
+   "checks": {
+    "circuits": {
+     "d=3 X memory, 1 round": {
+      "m3": {
+       "shots": 4096,
+       "bits": 30
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=3 X memory, 2 rounds": {
+      "m3": {
+       "shots": 4096,
+       "bits": 48
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=3 X memory, 3 rounds": {
+      "m3": {
+       "shots": 4096,
+       "bits": 66
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=3 X memory, 4 rounds": {
+      "m3": {
+       "shots": 4096,
+       "bits": 84
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=3 Z memory, 1 round": {
+      "m3": {
+       "shots": 4096,
+       "bits": 24
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=3 Z memory, 2 rounds": {
+      "m3": {
+       "shots": 4096,
+       "bits": 42
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=3 Z memory, 3 rounds": {
+      "m3": {
+       "shots": 4096,
+       "bits": 60
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=3 Z memory, 4 rounds": {
+      "m3": {
+       "shots": 4096,
+       "bits": 78
+      },
+      "d3": {
+       "shots": 4096,
+       "bits": 9
+      }
+     },
+     "d=5 X memory, 1 round": {
+      "m5": {
+       "shots": 4096,
+       "bits": 92
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 X memory, 2 rounds": {
+      "m5": {
+       "shots": 4096,
+       "bits": 148
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 X memory, 3 rounds": {
+      "m5": {
+       "shots": 4096,
+       "bits": 204
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 X memory, 4 rounds": {
+      "m5": {
+       "shots": 4096,
+       "bits": 260
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 Z memory, 1 round": {
+      "m5": {
+       "shots": 4096,
+       "bits": 76
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 Z memory, 2 rounds": {
+      "m5": {
+       "shots": 4096,
+       "bits": 132
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 Z memory, 3 rounds": {
+      "m5": {
+       "shots": 4096,
+       "bits": 188
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 Z memory, 4 rounds": {
+      "m5": {
+       "shots": 4096,
+       "bits": 244
+      },
+      "d5": {
+       "shots": 4096,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 1 round, read in X": {
+      "m5": {
+       "shots": 2048,
+       "bits": 92
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 2 rounds, read in X": {
+      "m5": {
+       "shots": 2048,
+       "bits": 148
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 4 rounds, read in X": {
+      "m5": {
+       "shots": 2048,
+       "bits": 260
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 8 rounds, read in X": {
+      "m5": {
+       "shots": 2048,
+       "bits": 484
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 16 rounds, read in X": {
+      "m5": {
+       "shots": 2048,
+       "bits": 932
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 1 round, read in Y": {
+      "m5": {
+       "shots": 2048,
+       "bits": 92
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 2 rounds, read in Y": {
+      "m5": {
+       "shots": 2048,
+       "bits": 148
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 4 rounds, read in Y": {
+      "m5": {
+       "shots": 2048,
+       "bits": 260
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 8 rounds, read in Y": {
+      "m5": {
+       "shots": 2048,
+       "bits": 484
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 16 rounds, read in Y": {
+      "m5": {
+       "shots": 2048,
+       "bits": 932
+      },
+      "d5": {
+       "shots": 2048,
+       "bits": 25
+      }
+     }
+    },
+    "schedule_returned": 26,
+    "schedule_gap_dt": [
+     4,
+     34
+    ],
+    "detection": {
+     "d=3 X memory, 1 round": {
+      "chip": 0.150665283203125,
+      "model": 0.153472900390625
+     },
+     "d=3 X memory, 2 rounds": {
+      "chip": 0.15767415364583334,
+      "model": 0.14967854817708334
+     },
+     "d=3 X memory, 3 rounds": {
+      "chip": 0.160308837890625,
+      "model": 0.14630126953125
+     },
+     "d=3 X memory, 4 rounds": {
+      "chip": 0.1639892578125,
+      "model": 0.1470703125
+     },
+     "d=3 Z memory, 1 round": {
+      "chip": 0.1131591796875,
+      "model": 0.09903971354166667
+     },
+     "d=3 Z memory, 2 rounds": {
+      "chip": 0.10643421519886363,
+      "model": 0.09369451349431818
+     },
+     "d=3 Z memory, 3 rounds": {
+      "chip": 0.10736846923828125,
+      "model": 0.09278106689453125
+     },
+     "d=3 Z memory, 4 rounds": {
+      "chip": 0.10654994419642858,
+      "model": 0.09172130766369048
+     },
+     "d=5 X memory, 1 round": {
+      "chip": 0.18682861328125,
+      "model": 0.1956787109375
+     },
+     "d=5 X memory, 2 rounds": {
+      "chip": 0.20231797960069445,
+      "model": 0.1976657443576389
+     },
+     "d=5 X memory, 3 rounds": {
+      "chip": 0.20714823404947916,
+      "model": 0.19835917154947916
+     },
+     "d=5 X memory, 4 rounds": {
+      "chip": 0.2126708984375,
+      "model": 0.1990966796875
+     },
+     "d=5 Z memory, 1 round": {
+      "chip": 0.13056182861328125,
+      "model": 0.11325836181640625
+     },
+     "d=5 Z memory, 2 rounds": {
+      "chip": 0.12617594401041668,
+      "model": 0.10640055338541667
+     },
+     "d=5 Z memory, 3 rounds": {
+      "chip": 0.12336314808238637,
+      "model": 0.10314109108664772
+     },
+     "d=5 Z memory, 4 rounds": {
+      "chip": 0.12395398370150862,
+      "model": 0.10184241985452586
+     }
+    },
+    "prepared": {},
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "job": "life-z",
+   "folder": "ibm_kingston-2026-10-14-life-z",
+   "tags": [
+    "heavyhex-followup",
+    "heavyhex:ibm_kingston-2026-10-14-life-z"
+   ],
+   "flags": {
+    "twirl": true,
+    "kerneled": true,
+    "sampler": "executor"
+   },
+   "claimed_utc": "2026-10-14T19:25:11+00:00",
+   "calibrated": "2026-10-14 21:55:57+03:00",
+   "estimate_s": 5.127197952000003,
+   "billed_s": 6,
+   "bound_s": 5.127197952000003,
+   "limit_s": 7,
+   "id": "db7te86r6oqs73889m0g",
+   "status": "done",
+   "usage": {
+    "qpu_charge_time_seconds": 5,
+    "value": 0.0811,
+    "unit": "resource_units",
+    "status": "complete",
+    "details": [
+     {
+      "value": 0.0811,
+      "unit": "resource_units",
+      "metric": {
+       "id": "caffe3ca-729c-5750-8777-df63bbf8bfd9",
+       "value": 5
+      }
+     }
+    ]
+   },
+   "checks": {
+    "circuits": {
+     "d=5 idle, 1 round, read in Z, from |0>": {
+      "m5": {
+       "shots": 1024,
+       "bits": 92
+      },
+      "d5": {
+       "shots": 1024,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 2 rounds, read in Z, from |0>": {
+      "m5": {
+       "shots": 1024,
+       "bits": 148
+      },
+      "d5": {
+       "shots": 1024,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 4 rounds, read in Z, from |0>": {
+      "m5": {
+       "shots": 1024,
+       "bits": 260
+      },
+      "d5": {
+       "shots": 1024,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 8 rounds, read in Z, from |0>": {
+      "m5": {
+       "shots": 1024,
+       "bits": 484
+      },
+      "d5": {
+       "shots": 1024,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 16 rounds, read in Z, from |0>": {
+      "m5": {
+       "shots": 1024,
+       "bits": 932
+      },
+      "d5": {
+       "shots": 1024,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 1 round, read in Z, from |1>": {
+      "m5": {
+       "shots": 1024,
+       "bits": 92
+      },
+      "d5": {
+       "shots": 1024,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 2 rounds, read in Z, from |1>": {
+      "m5": {
+       "shots": 1024,
+       "bits": 148
+      },
+      "d5": {
+       "shots": 1024,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 4 rounds, read in Z, from |1>": {
+      "m5": {
+       "shots": 1024,
+       "bits": 260
+      },
+      "d5": {
+       "shots": 1024,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 8 rounds, read in Z, from |1>": {
+      "m5": {
+       "shots": 1024,
+       "bits": 484
+      },
+      "d5": {
+       "shots": 1024,
+       "bits": 25
+      }
+     },
+     "d=5 idle, 16 rounds, read in Z, from |1>": {
+      "m5": {
+       "shots": 1024,
+       "bits": 932
+      },
+      "d5": {
+       "shots": 1024,
+       "bits": 25
+      }
+     }
+    },
+    "schedule_returned": 10,
+    "schedule_gap_dt": [
+     4,
+     34
+    ],
+    "detection": {},
+    "prepared": {
+     "d=5 idle, 1 round, read in Z, from |0>": 0.9287890625,
+     "d=5 idle, 1 round, read in Z, from |1>": 0.9294921875
+    },
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "job": "life-t",
+   "folder": "ibm_kingston-2026-10-14-life-t-legacy",
+   "tags": [
+    "heavyhex-followup",
+    "heavyhex:ibm_kingston-2026-10-14-life-t-legacy"
+   ],
+   "flags": {
+    "twirl": true,
+    "kerneled": true,
+    "sampler": "legacy"
+   },
+   "claimed_utc": "2026-10-14T19:41:13+00:00",
+   "calibrated": "2026-10-14 22:23:17+03:00",
+   "estimate_s": 4.427515136,
+   "billed_s": 5,
+   "bound_s": 4.427515136,
+   "limit_s": 5,
+   "id": "db7tlmuil99s73fortl0",
+   "status": "done",
+   "usage": {
+    "qpu_charge_time_seconds": 5,
+    "value": 0.0685,
+    "unit": "resource_units",
+    "status": "complete",
+    "details": [
+     {
+      "value": 0.0685,
+      "unit": "resource_units",
+      "metric": {
+       "id": "caffe3ca-729c-5750-8777-df63bbf8bfd9",
+       "value": 5
+      }
+     }
+    ]
+   },
+   "checks": {
+    "circuits": {
+     "T1, 20 us": {
+      "m": {
+       "shots": 512,
+       "bits": 65
+      }
+     },
+     "T1, 40 us": {
+      "m": {
+       "shots": 512,
+       "bits": 65
+      }
+     },
+     "T1, 75 us": {
+      "m": {
+       "shots": 512,
+       "bits": 65
+      }
+     },
+     "T1, 135 us": {
+      "m": {
+       "shots": 512,
+       "bits": 65
+      }
+     },
+     "T1, 245 us": {
+      "m": {
+       "shots": 512,
+       "bits": 65
+      }
+     },
+     "T1, 450 us": {
+      "m": {
+       "shots": 512,
+       "bits": 65
+      }
+     },
+     "T2, 12 us": {
+      "m": {
+       "shots": 512,
+       "bits": 65
+      }
+     },
+     "T2, 22 us": {
+      "m": {
+       "shots": 512,
+       "bits": 65
+      }
+     },
+     "T2, 40 us": {
+      "m": {
+       "shots": 512,
+       "bits": 65
+      }
+     },
+     "T2, 72 us": {
+      "m": {
+       "shots": 512,
+       "bits": 65
+      }
+     },
+     "T2, 132 us": {
+      "m": {
+       "shots": 512,
+       "bits": 65
+      }
+     },
+     "T2, 240 us": {
+      "m": {
+       "shots": 512,
+       "bits": 65
+      }
+     }
+    },
+    "schedule_returned": 24,
+    "schedule_gap_dt": [
+     0,
+     1
+    ],
+    "detection": {},
+    "prepared": {
+     "T1, 20 us": 0.8600360576923077,
+     "T2, 12 us": 0.8927283653846154
+    },
+    "failed": [],
+    "passed": true
+   }
+  }
+ ]
+}

@@ -1,0 +1,686 @@
+{
+ "job": "exp1-1",
+ "backend": "ibm_kingston",
+ "dt": 4e-09,
+ "calibrated": "2026-10-14 20:27:28+03:00",
+ "placements": {
+  "3": {
+   "spot": [
+    [
+     11,
+     9
+    ],
+    [
+     1,
+     -1
+    ]
+   ],
+   "qubits": [
+    90,
+    70,
+    50,
+    92,
+    72,
+    52,
+    94,
+    74,
+    54,
+    91,
+    71,
+    51,
+    93,
+    73,
+    53,
+    78,
+    58,
+    79,
+    59,
+    89,
+    69,
+    75,
+    55
+   ],
+   "shortfalls": [
+    "data 52: T2 60 us",
+    "data 54: readout 3.6%",
+    "data 72: readout 20.2%",
+    "Z ancilla 78: T2 33 us",
+    "Z ancilla 78: readout 3.2%",
+    "data 92: readout 6.4%"
+   ]
+  },
+  "5": {
+   "spot": [
+    [
+     7,
+     9
+    ],
+    [
+     1,
+     -1
+    ]
+   ],
+   "qubits": [
+    86,
+    66,
+    46,
+    26,
+    6,
+    88,
+    68,
+    48,
+    28,
+    8,
+    90,
+    70,
+    50,
+    30,
+    10,
+    92,
+    72,
+    52,
+    32,
+    12,
+    94,
+    74,
+    54,
+    34,
+    14,
+    87,
+    67,
+    47,
+    27,
+    7,
+    89,
+    69,
+    49,
+    29,
+    9,
+    91,
+    71,
+    51,
+    31,
+    11,
+    93,
+    73,
+    53,
+    33,
+    13,
+    77,
+    57,
+    37,
+    17,
+    78,
+    38,
+    58,
+    18,
+    79,
+    39,
+    59,
+    19,
+    85,
+    65,
+    45,
+    25,
+    75,
+    55,
+    35,
+    15
+   ],
+   "shortfalls": [
+    "X ancilla 9: T2 42 us",
+    "data 10: T2 24 us",
+    "data 12: readout 18.5%",
+    "relay 25: T2 26 us",
+    "data 30: T2 76 us",
+    "flag 31: readout 4.2%",
+    "data 32: readout 4.8%",
+    "Z ancilla 37: T2 31 us",
+    "data 46: T2 79 us",
+    "data 48: T2 20 us",
+    "data 52: T2 60 us",
+    "data 54: readout 3.6%",
+    "relay 65: readout 3.4%",
+    "data 72: readout 20.2%",
+    "Z ancilla 78: T2 33 us",
+    "Z ancilla 78: readout 3.2%",
+    "data 86: T2 19 us",
+    "X ancilla 87: T2 48 us",
+    "data 88: T2 16 us",
+    "data 92: readout 6.4%",
+    "coupler 85-86: CZ 6.4%",
+    "coupler 86-87: CZ 7.1%"
+   ]
+  }
+ },
+ "meas_type": "classified",
+ "rep_delay_us": 250,
+ "twirling": "active",
+ "decoupling": "XY4",
+ "items": [
+  {
+   "label": "d=3 X memory, 1 round",
+   "setting": {
+    "kind": "memory",
+    "basis": "X",
+    "distance": 3,
+    "rounds": 1,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m3": 30,
+    "d3": 9
+   },
+   "seconds": 1.1352000000000008e-05,
+   "duration_dt": 2838
+  },
+  {
+   "label": "d=3 X memory, 2 rounds",
+   "setting": {
+    "kind": "memory",
+    "basis": "X",
+    "distance": 3,
+    "rounds": 2,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m3": 48,
+    "d3": 9
+   },
+   "seconds": 1.7160000000000036e-05,
+   "duration_dt": 4290
+  },
+  {
+   "label": "d=3 X memory, 3 rounds",
+   "setting": {
+    "kind": "memory",
+    "basis": "X",
+    "distance": 3,
+    "rounds": 3,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m3": 66,
+    "d3": 9
+   },
+   "seconds": 2.296800000000003e-05,
+   "duration_dt": 5742
+  },
+  {
+   "label": "d=3 X memory, 4 rounds",
+   "setting": {
+    "kind": "memory",
+    "basis": "X",
+    "distance": 3,
+    "rounds": 4,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m3": 84,
+    "d3": 9
+   },
+   "seconds": 2.877600000000002e-05,
+   "duration_dt": 7194
+  },
+  {
+   "label": "d=3 Z memory, 1 round",
+   "setting": {
+    "kind": "memory",
+    "basis": "Z",
+    "distance": 3,
+    "rounds": 1,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m3": 24,
+    "d3": 9
+   },
+   "seconds": 1.0560000000000006e-05,
+   "duration_dt": 2640
+  },
+  {
+   "label": "d=3 Z memory, 2 rounds",
+   "setting": {
+    "kind": "memory",
+    "basis": "Z",
+    "distance": 3,
+    "rounds": 2,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m3": 42,
+    "d3": 9
+   },
+   "seconds": 1.6368000000000034e-05,
+   "duration_dt": 4092
+  },
+  {
+   "label": "d=3 Z memory, 3 rounds",
+   "setting": {
+    "kind": "memory",
+    "basis": "Z",
+    "distance": 3,
+    "rounds": 3,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m3": 60,
+    "d3": 9
+   },
+   "seconds": 2.2176000000000043e-05,
+   "duration_dt": 5544
+  },
+  {
+   "label": "d=3 Z memory, 4 rounds",
+   "setting": {
+    "kind": "memory",
+    "basis": "Z",
+    "distance": 3,
+    "rounds": 4,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m3": 78,
+    "d3": 9
+   },
+   "seconds": 2.7984000000000032e-05,
+   "duration_dt": 6996
+  },
+  {
+   "label": "d=5 X memory, 1 round",
+   "setting": {
+    "kind": "memory",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 1,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m5": 92,
+    "d5": 25
+   },
+   "seconds": 1.1612000000000008e-05,
+   "duration_dt": 2903
+  },
+  {
+   "label": "d=5 X memory, 2 rounds",
+   "setting": {
+    "kind": "memory",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 2,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m5": 148,
+    "d5": 25
+   },
+   "seconds": 1.7576000000000033e-05,
+   "duration_dt": 4394
+  },
+  {
+   "label": "d=5 X memory, 3 rounds",
+   "setting": {
+    "kind": "memory",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 3,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m5": 204,
+    "d5": 25
+   },
+   "seconds": 2.354000000000003e-05,
+   "duration_dt": 5885
+  },
+  {
+   "label": "d=5 X memory, 4 rounds",
+   "setting": {
+    "kind": "memory",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 4,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m5": 260,
+    "d5": 25
+   },
+   "seconds": 2.9504000000000024e-05,
+   "duration_dt": 7376
+  },
+  {
+   "label": "d=5 Z memory, 1 round",
+   "setting": {
+    "kind": "memory",
+    "basis": "Z",
+    "distance": 5,
+    "rounds": 1,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m5": 76,
+    "d5": 25
+   },
+   "seconds": 1.0768000000000008e-05,
+   "duration_dt": 2692
+  },
+  {
+   "label": "d=5 Z memory, 2 rounds",
+   "setting": {
+    "kind": "memory",
+    "basis": "Z",
+    "distance": 5,
+    "rounds": 2,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m5": 132,
+    "d5": 25
+   },
+   "seconds": 1.6732000000000036e-05,
+   "duration_dt": 4183
+  },
+  {
+   "label": "d=5 Z memory, 3 rounds",
+   "setting": {
+    "kind": "memory",
+    "basis": "Z",
+    "distance": 5,
+    "rounds": 3,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m5": 188,
+    "d5": 25
+   },
+   "seconds": 2.269600000000004e-05,
+   "duration_dt": 5674
+  },
+  {
+   "label": "d=5 Z memory, 4 rounds",
+   "setting": {
+    "kind": "memory",
+    "basis": "Z",
+    "distance": 5,
+    "rounds": 4,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 16,
+   "shots": 256,
+   "executions": 4096,
+   "bits": {
+    "m5": 244,
+    "d5": 25
+   },
+   "seconds": 2.8660000000000037e-05,
+   "duration_dt": 7165
+  },
+  {
+   "label": "d=5 idle, 1 round, read in X",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 1,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 8,
+   "shots": 256,
+   "executions": 2048,
+   "bits": {
+    "m5": 92,
+    "d5": 25
+   },
+   "seconds": 1.1612000000000007e-05,
+   "duration_dt": 2903
+  },
+  {
+   "label": "d=5 idle, 2 rounds, read in X",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 2,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 8,
+   "shots": 256,
+   "executions": 2048,
+   "bits": {
+    "m5": 148,
+    "d5": 25
+   },
+   "seconds": 1.7576000000000033e-05,
+   "duration_dt": 4394
+  },
+  {
+   "label": "d=5 idle, 4 rounds, read in X",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 4,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 8,
+   "shots": 256,
+   "executions": 2048,
+   "bits": {
+    "m5": 260,
+    "d5": 25
+   },
+   "seconds": 2.9504000000000024e-05,
+   "duration_dt": 7376
+  },
+  {
+   "label": "d=5 idle, 8 rounds, read in X",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 8,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 8,
+   "shots": 256,
+   "executions": 2048,
+   "bits": {
+    "m5": 484,
+    "d5": 25
+   },
+   "seconds": 5.336000000000045e-05,
+   "duration_dt": 13340
+  },
+  {
+   "label": "d=5 idle, 16 rounds, read in X",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 16,
+    "readout": "X",
+    "start": "+"
+   },
+   "randomizations": 8,
+   "shots": 256,
+   "executions": 2048,
+   "bits": {
+    "m5": 932,
+    "d5": 25
+   },
+   "seconds": 0.00010107200000000127,
+   "duration_dt": 25268
+  },
+  {
+   "label": "d=5 idle, 1 round, read in Y",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 1,
+    "readout": "Y",
+    "start": "+"
+   },
+   "randomizations": 8,
+   "shots": 256,
+   "executions": 2048,
+   "bits": {
+    "m5": 92,
+    "d5": 25
+   },
+   "seconds": 1.1612000000000007e-05,
+   "duration_dt": 2903
+  },
+  {
+   "label": "d=5 idle, 2 rounds, read in Y",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 2,
+    "readout": "Y",
+    "start": "+"
+   },
+   "randomizations": 8,
+   "shots": 256,
+   "executions": 2048,
+   "bits": {
+    "m5": 148,
+    "d5": 25
+   },
+   "seconds": 1.7576000000000033e-05,
+   "duration_dt": 4394
+  },
+  {
+   "label": "d=5 idle, 4 rounds, read in Y",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 4,
+    "readout": "Y",
+    "start": "+"
+   },
+   "randomizations": 8,
+   "shots": 256,
+   "executions": 2048,
+   "bits": {
+    "m5": 260,
+    "d5": 25
+   },
+   "seconds": 2.9504000000000024e-05,
+   "duration_dt": 7376
+  },
+  {
+   "label": "d=5 idle, 8 rounds, read in Y",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 8,
+    "readout": "Y",
+    "start": "+"
+   },
+   "randomizations": 8,
+   "shots": 256,
+   "executions": 2048,
+   "bits": {
+    "m5": 484,
+    "d5": 25
+   },
+   "seconds": 5.336000000000045e-05,
+   "duration_dt": 13340
+  },
+  {
+   "label": "d=5 idle, 16 rounds, read in Y",
+   "setting": {
+    "kind": "idle",
+    "basis": "X",
+    "distance": 5,
+    "rounds": 16,
+    "readout": "Y",
+    "start": "+"
+   },
+   "randomizations": 8,
+   "shots": 256,
+   "executions": 2048,
+   "bits": {
+    "m5": 932,
+    "d5": 25
+   },
+   "seconds": 0.00010107200000000127,
+   "duration_dt": 25268
+  }
+ ],
+ "instances": 336,
+ "qpu_seconds_estimate": 26.039301376000008,
+ "qpu_seconds_billed_estimate": 27,
+ "qpu_seconds_bound": 28.13930137600001
+}
