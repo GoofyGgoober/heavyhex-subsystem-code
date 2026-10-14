@@ -21,7 +21,7 @@ series come from 38 physical qubits, over qubits (each qubit's mean over its ser
 normalization, the qubits that served in both roles (onset and exit rate as a flag against
 as a relay), and the line through onset rate against CZs per round, which with two CZ
 counts only joins the two roles' means.
-Paper: Sec. VI (onset rate by role, the normalizations, the correlations) and Fig. leak (b).
+Paper: Sec. VII and App. E (onset rate by role, the normalizations, the correlations).
 Under a minute.
 
     python docs/analysis/hmm_causes.py   # writes results/hmm_causes.json (per series) and hmm_causes_summary.json

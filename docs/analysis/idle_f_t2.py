@@ -6,7 +6,8 @@ Reads only committed inputs: runs/*/analysis.json and calibration.json, results/
   decay    v(n) of three data qubits of one job (day 1, repetition 1, d = 3 patch), with the
            shot noise taken out [Eq. (r2)] and the error bar of Eq. (varlnr), against the
            model's exact <X> at f = 0 and f = 1. The qubits: the patch's shortest reported T2,
-           the f closest to the job's median, and the patch's largest f. Every model curve
+           the f closest to the job's median, and of the rest the fit whose reduced chi2 is
+           closest to the patch's median (a typical fit). Every model curve
            carries the qubit's fitted offset alpha,
 
              v_f(n) = exp(alpha) x0(n)^(1 - f) x1(n)^f,
@@ -66,6 +67,17 @@ def model_curve(alpha: float, log_x0, log_x1, f: float) -> list[float]:
     return np.exp(alpha + log_x0 - f * (log_x0 - log_x1)).tolist()
 
 
+def reduced_chi2(q: dict) -> float:
+    """chi2 per degree of freedom of a qubit's fit, with the prespecified weights."""
+    with np.errstate(divide="ignore", invalid="ignore"):
+        v, old, _ = variances(q)
+    l0, l1 = np.array(q["log_x0"]), np.array(q["log_x1"])
+    f, _ = fit(v, l0, l1, old)
+    keep = v > 0.05
+    gap = np.log(v[keep]) - np.log(model_curve(offset(v, l0, l1, old, f), l0, l1, f))[keep]
+    return float((gap**2 / old[keep]).sum() / (keep.sum() - 2))
+
+
 def decay(inputs: dict) -> dict:
     """Panel (a): three qubits of one job's d = 3 patch."""
     job = inputs[EXAMPLE_JOB]
@@ -82,8 +94,13 @@ def decay(inputs: dict) -> dict:
     picks = {
         "shortest reported T2 in the patch": min(measured, key=t2),
         "f closest to the job median": min(measured, key=lambda k: abs(shares[k] - median)),
-        "largest f in the patch": max(measured, key=lambda k: shares[k]),
     }
+    chi2 = {k: reduced_chi2(job["qubits"][f"{EXAMPLE_PATCH}/{k}"]) for k in measured}
+    typical = float(np.median(list(chi2.values())))
+    rest = [k for k in measured if k not in picks.values()]
+    picks["fit closest to the patch's median reduced chi2"] = min(
+        rest, key=lambda k: abs(chi2[k] - typical)
+    )
     assert len(set(picks.values())) == 3, picks
     qubits = []
     for role, k in picks.items():
@@ -107,6 +124,7 @@ def decay(inputs: dict) -> dict:
                 "f": f,
                 "sigma_f": sigma,
                 "alpha": alpha,
+                "chi2_red": chi2[k],
                 "v": v.tolist(),
                 "sigma_v": sigma_v.tolist(),
                 "in_fit": (v > 0.05).tolist(),
@@ -126,6 +144,7 @@ def decay(inputs: dict) -> dict:
         "rounds": job["rounds"],
         "job_median_f": median,
         "job_median_f_uncertainty": a["idle_test"]["median_uncertainty"],
+        "patch_median_chi2_red": typical,
         "qubits": qubits,
     }
 

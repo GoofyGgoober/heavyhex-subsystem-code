@@ -1028,6 +1028,138 @@ def input_noise_digest(n: dict) -> list[str]:
     return L
 
 
+def f_treatments() -> dict:
+    """Observed over predicted under each treatment of f, each pair's means, Lambda_X without
+    day 2 of pair 1, the range over the windows of rounds and every curve (f_treatments.py)."""
+    return take("f_treatments.json")
+
+
+def f_treatments_digest(f: dict) -> list[str]:
+    def cell(v: dict) -> str:
+        return (
+            f"{v['ratio']:.2f} ({v['ci95'][0]:.2f}-{v['ci95'][1]:.2f}) above {v['above']}/{v['of']}"
+        )
+
+    L = ["26. O/M under each treatment of f (f_treatments.py; binomial; geometric mean, t 95%)"]
+    for row, blk in f["table"].items():
+        L.append(f"   {row}: " + "; ".join(f"{q} {cell(v)}" for q, v in blk.items()))
+    L.append(
+        "   f range: " + "; ".join(f"{k} {lo:.2f}-{hi:.2f}" for k, (lo, hi) in f["f_range"].items())
+    )
+    for pair, blk in f["pairs"].items():
+        L.append(
+            f"   {pair} mean, device / at f = 1 / at the job's f: "
+            + "; ".join(
+                f"{q} "
+                + " / ".join(
+                    f"{v[k]:.3f}" if "lambda" in q else f"{100 * v[k]:.2f}"
+                    for k in ("observed", "at f = 1", "at the job's f")
+                )
+                for q, v in blk.items()
+            )
+        )
+    L.append(
+        "   Lambda_X O/M without day 2 of pair 1: "
+        + "; ".join(
+            f"{k} {v['ratio']:.2f} ({v['ci95'][0]:.2f}-{v['ci95'][1]:.2f})"
+            for k, v in f["lambda_without_day2_pair1"].items()
+        )
+    )
+    w = f["windows"]
+    L.append(
+        f"   O/M range over windows {', '.join(w['windows'])} (at the job's f): "
+        + "; ".join(f"{q} {r[0]:.2f}-{r[1]:.2f}" for q, r in w.items() if q != "windows")
+    )
+    return L
+
+
+def channels() -> dict:
+    """Each channel's factor with Birge-widened 95% intervals, one factor across targets, two
+    channels fitted together, and the spreads 'plausible' is measured against (channels.py)."""
+    return take("channels.json")
+
+
+def channels_digest(c: dict) -> list[str]:
+    def k_of(e: dict) -> str:
+        if "k" not in e:
+            return f"{e['bound']} ({e['beyond_the_grid']}/{e['curves']})"
+        return f"{e['k']:.2f} ({e['ci95'][0]:.2f}-{e['ci95'][1]:.2f})"
+
+    L = ["25. One channel, one factor; two channels (channels.py; binomial; 95%, Birge-widened)"]
+    for bd, blk in c["factors"].items():
+        L.append(
+            f"   {bd}, eps / detection: "
+            + "; ".join(
+                f"{ch} {k_of(v['eps'])} / {k_of(v['detection'])}"
+                for ch, v in blk.items()
+                if not ch.startswith("all")
+            )
+        )
+    for ch, blk in c["one factor"].items():
+        parts = []
+        for name, v in blk.items():
+            if "chi2" in v:
+                parts.append(
+                    f"{name}: k {v['k']:.2f}, chi2 {v['chi2']:.1f}/{v['dof']}, p {v['p']:.2g}"
+                )
+            elif "z" in v:
+                parts.append(f"{name}: Z/X {v['Z / X']:.2f}, z {v['z']:.1f}")
+            elif "verdict" in v:
+                parts.append(f"{name}: {v['verdict'].split(':')[0]}")
+        L.append(f"   one factor on {ch}: " + "; ".join(parts))
+    zk, x0, x1 = (
+        "Z's factor",
+        "X model / device at dephasing x0",
+        "X model / device at dephasing x1",
+    )
+    for pair, blk in c["two channels"].items():
+        at = blk["X eps with the factor Z eps needs"]
+        L.append(
+            f"   {pair}: X eps model/device at Z's factor, no pure dephasing / at f: "
+            + "; ".join(f"{d} (x{v[zk]:.2f}) {v[x0]:.2f} / {v[x1]:.2f}" for d, v in at.items())
+        )
+        for name in ("eps, d3 and d5", "eps and detection, d3 and d5"):
+            v = blk[name]
+            ca = v["first channel factor ci95 (within the box)"]
+            cb = v["dephasing factor ci95 (within the box)"]
+            edge = v["at the edge of the simulated box"]
+            L.append(
+                f"     {name}: {v['first channel factor']:.2f} ({ca[0]:.2f}-{ca[1]:.2f}), "
+                f"dephasing {v['dephasing factor']:.2f} ({cb[0]:.2f}-{cb[1]:.2f}), "
+                f"chi2 {v['chi2']:.1f}/{v['dof']}, p {v['p']:.2g}"
+                + (f", at the edge: {', '.join(edge)}" if edge else "")
+            )
+    day, chip = (
+        "patches' geometric mean, largest day-to-day ratio",
+        "chip 90th percentile / median, range over the days",
+    )
+    L.append(
+        "   IBM's spread (patches' mean, largest day-to-day ratio; chip p90/median): "
+        + "; ".join(
+            f"{q} {v[day]:.2f}; {v[chip][0]:.1f}-{v[chip][1]:.1f}"
+            for q, v in c["spread"]["IBM's reported values"].items()
+        )
+    )
+    f = c["spread"]["idle test f"]
+    rel = f["relative error of a job's f (bootstrap), range"]
+    L.append(
+        f"   idle test f: median {f['f median over the jobs']:.2f}, a job's relative error "
+        f"{100 * rel[0]:.0f}-{100 * rel[1]:.0f}%, of a common factor "
+        f"{100 * f['relative error of a factor common to the 15 jobs']:.1f}%"
+    )
+    p = c["plausible"]
+    L.append(
+        "   plausible: factor <= chip p90/median ("
+        + ", ".join(f"{ch} {b:.2f}" for ch, b in p["bound"].items())
+        + "); eps/detection: "
+        + "; ".join(
+            f"{bd} " + ", ".join(f"{ch} {v['eps']}/{v['detection']}" for ch, v in p[bd].items())
+            for bd in c["factors"]
+        )
+    )
+    return L
+
+
 def stored_pl8() -> dict:
     """P_L(8) of each patch as stored before its job at f = 0 and f = 1 (Sec. discussion)."""
     out = {}
@@ -1063,6 +1195,22 @@ def timing() -> dict:
             }
             for p, body in t["patches"].items()
         }
+    }
+
+
+def decoder_graph() -> dict:
+    """Stim's observable-only pieces, single faults on a uniform chip and the shortest logical
+    in edges (decoder_graph.py)."""
+    g = take("decoder_graph.json")
+    s = g["summary"]
+    return {
+        "pymatching_behaviour": g["pymatching_behaviour"],
+        "pieces": {k: v for k, v in s["pieces"].items() if k != "per_round_8_rounds"},
+        "uniform_chip": {
+            day: {k: v for k, v in row.items() if "examples" not in k}
+            for day, row in s["uniform_chip"].items()
+        },
+        "path": {k: v for k, v in s["path"].items() if "example" not in k},
     }
 
 
@@ -1494,6 +1642,38 @@ def digest(res: dict) -> str:
         f"probability matching miscorrects at n = 4 ({n4[0]:.3f}), ML also misassigns {n4[1]:.3f} "
         f"({100 * n4[2]:.0f}%)"
     )
+    gr = res["decoder_graph"]
+    pc = gr["pieces"]
+    sh, alone = pc["shots_decoded_differently"], pc["faults_decoded_alone"]
+    scan = pc["z_d3_single_scan (decoder_faults.py's, repeated)"]
+    lo, hi = pc["fault_probability_range"]
+    L.append(
+        f"   observable-only pieces: {pc['count_by_basis_and_patch']} (one per round, p "
+        f"{lo:.4f}-{hi:.4f}); graph unchanged without them "
+        f"{pc['graph_unchanged_without_pieces_every_circuit']} and folded into any piece "
+        f"{pc['graph_unchanged_folded_into_any_piece_every_circuit']}; shots decoded differently "
+        f"{sh['device matching_folded_vs_paper'] + sh['device correlated_folded_vs_dropped']} of "
+        f"{sh['device shots']} device, {sh['model matching_folded_vs_paper'] + sh['model correlated_folded_vs_dropped']}"
+        f" of {sh['model shots']} model; alone, calibrated wrong on {alone['calibrated_wrong']} "
+        f"({scan['calibrated_wrong_with_observable_only_piece']} of the {scan['calibrated_wrong']} Z d3 "
+        f"single miscorrections), uniform on {alone['uniform_wrong']}; up to "
+        f"{100 * pc['share_of_predicted_Z_eps3_range'][1]:.1f}% of predicted Z eps3"
+    )
+    for day, u in gr["uniform_chip"].items():
+        x3 = u["X d3 per-job model"]
+        L.append(
+            f"   uniform chip {day} (f = 1): X d3 single faults miscorrected {x3['n=2'][0]} of "
+            f"{x3['n=2'][1]} at n = 2 ({x3['n=2 by symptom'][0]} of {x3['n=2 by symptom'][1]} "
+            f"symptoms), {x3['n=8'][0]} of {x3['n=8'][1]} at n = 8 (f = 0: "
+            f"{u['X d3 pre-run simulator f=0']['n=8'][0]}, no idle decay: "
+            f"{u['X d3 pre-run simulator f=1 no idle']['n=8'][0]}), "
+            f"{100 * x3['share_of_eps3']:.0f}% of eps3; boundary p up to {x3['boundary_p'][1]:.3f}; "
+            f"d = 5: {u['X d5 per-job model']['n=8'][0]}"
+        )
+    L.append(
+        "   shortest logical in edges: "
+        + ", ".join(f"{k} {v}" for k, v in gr["path"]["shortest_logical_edges_seen"].items())
+    )
     scope = res["idle_test_scope"]
     ones, left = scope["ancilla_reads_1"], scope["f_left_out_of_the_median"]
     L.append(
@@ -1514,6 +1694,8 @@ def digest(res: dict) -> str:
     L += error_budget_digest(res["error_budget"])
     L += stat_checks_digest(res["stat_checks"])
     L += input_noise_digest(res["input_noise"])
+    L += channels_digest(res["channels"])
+    L += f_treatments_digest(res["f_treatments"])
     return "\n".join(L) + "\n"
 
 
@@ -1861,6 +2043,7 @@ def main() -> None:
         "heating_exploratory": heating(),
         "decoder_audit": take("decoder.json")["paper"],
         "decoder_ml": take("decoder_ml.json")["summary"],
+        "decoder_graph": decoder_graph(),
         "idle_test_scope": {
             "ancilla_reads_1": {
                 k: v
@@ -1878,6 +2061,8 @@ def main() -> None:
         "error_budget": error_budget(),
         "stat_checks": stat_checks(),
         "input_noise": input_noise(),
+        "channels": channels(),
+        "f_treatments": f_treatments(),
         **other(),
     }
     res["about"]["inputs"] = sorted(INPUTS | {"docs/analysis/results/placements.json"})
