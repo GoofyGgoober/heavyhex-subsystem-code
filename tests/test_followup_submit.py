@@ -74,14 +74,16 @@ def chip(distance):
 
 
 def test_the_jobs_go_in_the_plans_order():
-    assert list(JOBS) == ["exp3-1", "exp3-2", "exp3-3", "exp1-1", "life-1", "exp1-2", "exp3-d"]
-    order, name = [], "exp1-2"
+    plan = ["exp3-1", "exp3-2", "exp3-3", "exp1-1", "life-1", "exp1-2", "life-z", "life-t"]
+    assert list(JOBS) == [*plan, "exp3-d"]
+    order, name = [], "life-t"
     while name:
         order.append(name)
         name = JOBS[name][1]
-    assert order[::-1] == ["exp3-1", "exp3-2", "exp3-3", "exp1-1", "life-1", "exp1-2"]
-    assert JOBS["exp3-d"][1:] == ("exp1-2", "exp3-3")  # last, as exp3-3 went
-    assert JOBS["life-1"][2] == JOBS["exp1-2"][2] == "exp1-1"  # both go as exp1-1 went
+    assert order[::-1] == plan
+    assert JOBS["exp3-d"][1:] == ("life-t", "exp3-3")  # last, as exp3-3 went
+    assert JOBS["life-1"][2] == JOBS["exp1-2"][2] == JOBS["life-z"][2] == "exp1-1"
+    assert JOBS["life-t"][2] is None and JOBS["life-t"][0] not in submit.TWIRLED
 
 
 def test_the_placement_is_the_one_approved():
@@ -244,10 +246,18 @@ def test_the_cost_is_ibms_billing_rule_and_its_bound_loads_in_parts(target, jobs
     life = jobs["life-1"]
     assert life.instances == 10 * 4 + 12 * 4 and life.bound == life.seconds
     assert life.billed == 10 <= submit.SECONDS["life-1"] == 14
+    life_z, life_t = jobs["life-z"], jobs["life-t"]
+    assert [(i.label, i.executions) for i in life_z.items] == [
+        (i.label, i.executions) for i in life.items[:10]
+    ]  # life-1's idle test read in Z, as it went
+    assert life_z.twirled and life_z.instances == 10 * 4 and life_z.billed == 6
+    assert not life_t.twirled and life_t.instances == 12 * 2 and life_t.billed == 5
+    for job in (life_z, life_t):  # IBM cancels each at its own cap
+        assert job.bound == job.seconds
+        assert ceil(1.5 * job.bound) + 2 > submit.SECONDS[job.name] == 7
     planned = sum(job.billed for name, job in jobs.items() if name not in submit.OPTIONAL)
-    assert planned == 76 <= submit.PLAN_SECONDS == 80  # within the 90 s approved, with a margin
-    assert sum(ceil(job.bound) for name, job in jobs.items() if name not in submit.OPTIONAL) == 80
-    assert planned + jobs["exp3-d"].billed == 81  # so exp3-d waits for an approval
+    assert planned == 87 <= TOTAL_SECONDS  # life-1 as IBM charged it
+    assert planned + jobs["exp3-d"].billed > submit.PLAN_SECONDS  # so exp3-d can't go
 
 
 def stub(name="exp1-1", billed=27):
@@ -265,6 +275,9 @@ def test_the_caps_refuse_a_dear_job_an_overspent_total_and_a_short_counter():
     assert job_limit(stub("life-1", billed=10), [], 375) == 14  # its own cap, not 17
     with pytest.raises(Refused, match="over its 14 s"):
         job_limit(stub("life-1", billed=15), [], 375)
+    assert job_limit(stub("life-z", billed=6), [], 375) == 7  # not 11
+    with pytest.raises(Refused, match="over its 7 s"):
+        job_limit(stub("life-t", billed=8), [], 375)
     spent = [{"job": "exp3-1", "status": "sent", "limit_s": 30, "usage": None}] * 2
     assert committed(spent) == 60
     assert job_limit(stub(billed=27), spent[:1], 375) == 30
@@ -277,6 +290,30 @@ def test_the_caps_refuse_a_dear_job_an_overspent_total_and_a_short_counter():
     with pytest.raises(Refused, match="below 285 s"):  # used elsewhere, so the floor holds it
         job_limit(stub(billed=27), [], 300)
     assert job_limit(stub(billed=4), [*spent, {**spent[0], "limit_s": 25}], 375) == 5
+
+
+def test_life_z_and_life_t_fit_the_90_s_once_ibm_has_counted_life_1(jobs):
+    """The ledger as it stands after exp1-2: life-1 counts at its 14 s limit until IBM has
+    counted its 10 s, and only then does life-t fit after life-z."""
+
+    def spent(job, charged=None, limit=30):
+        usage = {"status": "pending"}
+        if charged is not None:
+            usage = {"status": "complete", "qpu_charge_time_seconds": charged}
+        return {"job": job, "status": "done", "limit_s": limit, "usage": usage}
+
+    before = [spent("exp3-1", 4), spent("exp3-2", 4), spent("exp3-3", 4), spent("exp1-1", 27),
+              spent("exp1-2", 27)]  # fmt: skip
+    pending, counted = [*before, spent("life-1", limit=14)], [*before, spent("life-1", 10, 14)]
+    life_z, life_t = jobs["life-z"], jobs["life-t"]
+    assert committed(pending) == 80 and committed(counted) == 76
+    assert job_limit(life_z, pending, 375) == job_limit(life_z, counted, 299) == 7
+    with pytest.raises(Refused, match="90 s approved"):
+        job_limit(life_t, [*pending, spent("life-z", 6, 7)], 375)  # 86 + 5
+    assert job_limit(life_t, [*counted, spent("life-z", limit=7)], 375) == 7  # 83 + 5
+    assert job_limit(life_t, [*counted, spent("life-z", 6, 7)], 293) == 7
+    with pytest.raises(Refused, match="below 285 s"):
+        job_limit(life_t, [*counted, spent("life-z", 6, 7)], 291)
 
 
 def test_an_optional_job_stays_within_the_plans_80_s_and_no_cap_passes_30_s(monkeypatch):
@@ -367,6 +404,23 @@ def test_life_1_ended_by_ibm_after_a_twirled_exp1_1_holds_exp1_2_only_till_passe
         check_order("exp1-2", went, {**PLAIN, "twirl": False}, despite=True)
     with pytest.raises(Refused, match="after life-1"):  # while a life-1 is out, never
         check_order("exp1-2", [*went, attempt("life-1", "sent")], PLAIN, despite=True)
+
+
+def test_life_z_goes_after_exp1_2_as_exp1_1_went_and_life_t_after_it():
+    went = [attempt("exp1-1"), {**attempt("life-1", "failed"), "reason": "CANCELLED"}]
+    with pytest.raises(Refused, match="after exp1-2"):
+        check_order("life-z", went, PLAIN)
+    went.append(attempt("exp1-2"))
+    with pytest.raises(Refused, match="goes as exp1-1 went, without --untwirled"):
+        check_order("life-z", went, {**PLAIN, "twirl": False})
+    check_order("life-z", went, PLAIN)
+    legacy = {**PLAIN, "sampler": "legacy"}
+    with pytest.raises(Refused, match="after life-z"):
+        check_order("life-t", [*went, attempt("life-z", "sent")], legacy)
+    went.append(attempt("life-z"))
+    check_order("life-t", went, legacy)
+    with pytest.raises(Refused, match="after life-t"):
+        check_order("exp3-d", [*went, attempt("exp3-3")], PLAIN)
 
 
 def test_failed_checks_or_an_overcharge_hold_the_next_job():
@@ -536,7 +590,7 @@ def test_a_submission_end_to_end_against_a_stand_in(tmp_path, ibm, target):
 def test_life_1_and_exp1_2_go_with_their_own_limits_against_a_stand_in(ibm, jobs, monkeypatch):
     """After exp1-1, through submit() with IBM replaced, which refuses each job it gets: life-1
     goes with its own 14 s, the counter's floor holds it, exp1-2 goes with 30 s after it, and
-    after a life-1 IBM ended only by hand."""
+    after a life-1 IBM ended only by hand; then life-z and life-t with 7 s each."""
     monkeypatch.setattr(submit, "build", lambda names, *_, **__: {n: jobs[n] for n in names})
     monkeypatch.setattr(submit, "check", lambda item: None)  # each circuit is checked above
     monkeypatch.setattr(submit, "payload", lambda job: {})
@@ -576,6 +630,14 @@ def test_life_1_and_exp1_2_go_with_their_own_limits_against_a_stand_in(ibm, jobs
     assert "goes as exp1-1 went" in go("life-1", [*before, ended], twirl=False)
     go("exp1-2", [*before, ended], despite=True)
     assert tried[-1] == ("exp1-2", 30) and len(tried) == 4
+    # Then life-z, twirled, and life-t through run 1's sampler, each with its own 7 s.
+    before += [done("life-1", 10, status="failed", reason="CANCELLED"), done("exp1-2", 27)]
+    go("life-z", before)
+    assert tried[-1] == ("life-z", 7)
+    assert "untwirled" in go("life-z", before, sampler="legacy")
+    assert "after life-z" in go("life-t", before, sampler="legacy") and len(tried) == 5
+    go("life-t", [*before, done("life-z", 6)], sampler="legacy")
+    assert tried[-1] == ("life-t", 7)
 
 
 def test_malformed_iq_data_hold_the_next_job_until_it_goes_classified(ibm):

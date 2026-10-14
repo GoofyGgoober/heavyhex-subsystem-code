@@ -1,6 +1,6 @@
-"""life-1: the idle test read in Z, T1 and T2 on the footprint, their fits, both idle tests
-fitted together, the job read back through the analysis, and the model run again at the
-data's in-situ lifetimes. Nothing here contacts IBM."""
+"""life-z and life-t: the idle test read in Z, T1 and T2 on the footprint, their fits, both
+idle tests fitted together, the jobs read back through the analysis, and the model run again
+at the data's in-situ lifetimes. Nothing here contacts IBM."""
 
 from collections import Counter
 from dataclasses import replace
@@ -127,6 +127,22 @@ def test_life_1_is_the_z_test_then_t1_and_t2_each_1024_shots(target):
     ]
     assert list(shots) == labels and set(shots.values()) == {lifetimes.SHOTS}
     assert len(lifetimes.Z_IDLE) == 2 * len(IDLE_ROUNDS)
+
+
+def test_life_z_is_the_z_test_alone_and_life_t_t1_and_t2_at_512_shots(target):
+    z = submit.life(PLACEMENTS, target, twirl=False, part="Z")
+    t = submit.life(PLACEMENTS, target, part="T")
+    expected = (
+        (z, [str(s) for s in lifetimes.Z_IDLE], lifetimes.SHOTS),
+        (t, [lifetimes.label(k, w) for k, ws in lifetimes.WAITS_US.items() for w in ws], 512),
+    )
+    for items, labels, each in expected:
+        shots = Counter()
+        for item in items:
+            assert item.shots == 256 and item.samplex is None
+            shots[item.label] += item.executions
+        assert list(shots) == labels and set(shots.values()) == {each}
+    assert lifetimes.T_SHOTS == 512
 
 
 # Fits
@@ -341,17 +357,21 @@ def planted():
 
 
 @pytest.fixture(scope="module")
-def life_1(tmp_path_factory, target, planted):
-    """A smaller life-1 from the model at the planted lifetimes, saved as submit saves a job."""
+def life_z_t(tmp_path_factory, target, planted):
+    """A smaller life-z and life-t from the model at the planted lifetimes, saved as submit
+    saves a job."""
     with pytest.MonkeyPatch.context() as patch:
         patch.setattr(lifetimes, "WAITS_US", {"T1": (20, 75, 245, 450), "T2": (12, 40, 132, 240)})
         patch.setattr(
             lifetimes, "Z_IDLE", tuple(s for s in lifetimes.Z_IDLE if s.rounds in (1, 16))
         )
-        job = submit.Job("life-1", submit.life(PLACEMENTS, target))
+        jobs = submit.build(["life-z", "life-t"], PLACEMENTS, target)
     p = planted
-    readouts = results(job.items, p.standard, p.situ, p.t_q, target.dt)
-    return saved(tmp_path_factory.mktemp("runs") / "life-1", job, target, readouts)
+    runs = tmp_path_factory.mktemp("runs")
+    return tuple(
+        saved(runs / name, job, target, results(job.items, p.standard, p.situ, p.t_q, target.dt))
+        for name, job in jobs.items()
+    )
 
 
 @pytest.fixture(scope="module")
@@ -369,15 +389,20 @@ def exp1_1(tmp_path_factory, target, planted):
     return saved(tmp_path_factory.mktemp("runs") / "exp1-1", job, target, readouts)
 
 
-def test_life_1_read_back_through_the_analysis(life_1, planted):
-    """It passes the checks, and the fits return what was planted."""
-    checks = submit.inspect(life_1)
-    assert checks["passed"], checks["failed"]
-    assert set(checks["prepared"]) == {"T1, 20 us", "T2, 12 us"} | {
-        str(s) for s in lifetimes.Z_IDLE if s.rounds == 1
-    }
+def test_life_z_and_life_t_read_back_through_the_analysis(life_z_t, planted):
+    """Each passes the checks, and the fits return what was planted."""
+    life_z, life_t = life_z_t
+    for folder, prepared in (
+        (life_z, {str(s) for s in lifetimes.Z_IDLE if s.rounds == 1}),
+        (life_t, {"T1, 20 us", "T2, 12 us"}),
+    ):
+        checks = submit.inspect(folder)
+        assert checks["passed"], checks["failed"]
+        assert set(checks["prepared"]) == prepared
+    assert {row["shots"] for row in submit._read(life_t / "run.json")["items"]} == {256}
 
-    found = analysis.life(life_1)
+    found = analysis.life(life_z_t)
+    assert found["folders"] == ["life-z", "life-t"]
     assert [row["qubit"] for row in found["qubits"]] == FOOTPRINT
     for kind, true in (("T1", planted.t1), ("T2", planted.t2)):
         pulls = []
@@ -401,7 +426,7 @@ def test_life_1_read_back_through_the_analysis(life_1, planted):
     assert "T1 ours/IBM" in lifetimes.table(found["qubits"])
 
 
-def test_both_idle_tests_and_the_model_at_the_data_in_situ(life_1, exp1_1, planted, monkeypatch):
+def test_both_idle_tests_and_the_model_at_the_data_in_situ(life_z_t, exp1_1, planted, monkeypatch):
     """exp1(..., life=) fits both idle tests together (in_situ), which give the decay a round
     each memory's data see, as planted, and runs the model again at the data's in-situ T1 and
     T_q alone."""
@@ -413,10 +438,11 @@ def test_both_idle_tests_and_the_model_at_the_data_in_situ(life_1, exp1_1, plant
         return {"rule": None, "detection": {key: {} for key in circuits},
                 "decoders": {str(d): {"logical_error": p} for d in decoders}}  # fmt: skip
 
+    life_z, _ = life_z_t
     monkeypatch.setattr(analysis.model, "predict", predict)
-    found = analysis.exp1([exp1_1], caps=(None,), life=life_1)
+    found = analysis.exp1([exp1_1], caps=(None,), life=life_z)
     again = found["in_situ"]
-    assert again["folder"] == life_1.name and len(calls) == 2
+    assert again["folder"] == life_z.name and len(calls) == 2
     (ibm, _), (calibration, decay_us) = calls
     assert decay_us == again["t_q_us"] and sorted(decay_us) == sorted(DATA)
     for q in FOOTPRINT:
@@ -426,7 +452,7 @@ def test_both_idle_tests_and_the_model_at_the_data_in_situ(life_1, exp1_1, plant
     o_m = again["observed_over_model"]["0.1"]["Z"]["log"]["eps3"]
     assert np.isfinite(o_m).all()
 
-    job = analysis.record([life_1])
+    job = analysis.record([life_z])
     read_z = analysis.z_idle(job.found, job.shots, job.calibration, job.dt)
     z_rows = {row["qubit"]: row for row in read_z["qubits"]}
     pulls = []
