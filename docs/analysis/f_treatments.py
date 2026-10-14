@@ -6,9 +6,11 @@ predictions exist under five treatments of it: f = 1 and f = 0, stored before ea
 job's median f (the planned tests); each data qubit at its own f; and the inverse-variance mean
 of the per-qubit f, whose priors also decode the device's shots again (f_weighted_mean.py).
 For each treatment and each quantity, O/M is the geometric mean over the ten pair-days with a
-Student t 95% interval (9 dof) from the spread of ln(O/M), the paper's one estimator for a
-ratio over pair-days; the binomial fit throughout. Also how many of the ten curves lie above
-the prediction.
+Student t 95% interval (4 dof) from the five daily means of ln(O/M). The two placements
+within a day form one block. This treats days as independent, conditional on the sampled
+patches and model inputs, not as a sample of hardware placements. The earlier ten-pair-day
+interval and separate placement intervals remain available as sensitivity results.
+The binomial fit is used throughout. Also how many curves lie above the prediction.
 
   table      O/M of X eps3, eps5, Lambda_X, Z eps3, eps5 under each treatment, and the range of f
   pairs      each pair's mean over the five days: the device, the prediction at f = 1 and at the
@@ -57,25 +59,49 @@ def predicted(pred: dict, rep: dict, source: str, q: str) -> float:
     return eps["3"] / eps["5"] if name == "lambda" else eps[name[-1]]
 
 
-def summary(y: np.ndarray, above: int) -> dict:
-    return {**t_interval(y), "above": above, "of": len(y)}
+def summary(y: np.ndarray, above: int, days: np.ndarray, placements: np.ndarray) -> dict:
+    """Day-block interval, with earlier and placement-specific intervals beside it."""
+    y, days, placements = np.asarray(y, float), np.asarray(days), np.asarray(placements)
+    if y.ndim != 1 or days.shape != y.shape or placements.shape != y.shape:
+        raise ValueError("Ratios, days and placements must be aligned one-dimensional arrays")
+    if not np.isfinite(y).all() or len(np.unique(days)) < 2:
+        raise ValueError("Finite ratios from at least two days are required")
+    for d in np.unique(days):
+        if sorted(placements[days == d].tolist()) != [1, 2]:
+            raise ValueError("Each day must contain exactly one result from each placement")
+    by_day = np.array([y[days == d].mean() for d in np.unique(days)])
+    return {
+        **t_interval(by_day),
+        "day_log_means": by_day.tolist(),
+        "pair_day_interval": t_interval(y),
+        "placement_intervals": {
+            str(p): t_interval(y[placements == p]) for p in np.unique(placements)
+        },
+        "above": above,
+        "of": len(y),
+    }
 
 
 def main() -> None:
     fits, weighted = result("fits.json"), result("f_weighted_mean.json")
     per_rep, pred = fits["per_rep"], fits["predictions"]
     keys = sorted(per_rep, key=lambda k: (per_rep[k]["day"], per_rep[k]["rep"]))
+    days = np.array([day_number(per_rep[k]["day"]) for k in keys])
+    placements = np.array([per_rep[k]["placement"] for k in keys])
     table: dict = {}
     for row, source in STORED.items():
         table[row] = {}
         for q in QUANTITIES:
             o = np.array([observed(per_rep[k], q)[0] for k in keys])
             m = np.array([predicted(pred, per_rep[k], source, q) for k in keys])
-            table[row][q] = summary(np.log(o / m), int((o > m).sum()))
+            table[row][q] = summary(np.log(o / m), int((o > m).sum()), days, placements)
     w = weighted["binomial"]["O_over_M"]["weighted-mean f"]
     table[WEIGHTED] = {
         q: summary(
-            np.log(w[q]["per_repetition"]), int((np.array(w[q]["per_repetition"]) > 1).sum())
+            np.log(w[q]["per_repetition"]),
+            int((np.array(w[q]["per_repetition"]) > 1).sum()),
+            days,
+            placements,
         )
         for q in QUANTITIES
     }
@@ -151,7 +177,9 @@ def main() -> None:
 
     out = {
         "what": "observed over predicted (binomial fit) under each treatment of f: geometric mean "
-        "over the ten pair-days, Student t 95% interval (9 dof); each pair's means; every curve",
+        "over the ten pair-days, Student t 95% interval on five daily log means (4 dof), "
+        "conditional on sampled patches and fixed model inputs; earlier pair-day and "
+        "placement-specific intervals retained; each pair's means; every curve",
         "table": table,
         "f_range": f_range,
         "pairs": pairs,

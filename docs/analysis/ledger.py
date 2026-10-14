@@ -1040,7 +1040,10 @@ def f_treatments_digest(f: dict) -> list[str]:
             f"{v['ratio']:.2f} ({v['ci95'][0]:.2f}-{v['ci95'][1]:.2f}) above {v['above']}/{v['of']}"
         )
 
-    L = ["26. O/M under each treatment of f (f_treatments.py; binomial; geometric mean, t 95%)"]
+    L = [
+        "26. O/M under each treatment of f (f_treatments.py; binomial; geometric mean, "
+        "day-block t 95%, 4 dof)"
+    ]
     for row, blk in f["table"].items():
         L.append(f"   {row}: " + "; ".join(f"{q} {cell(v)}" for q, v in blk.items()))
     L.append(
