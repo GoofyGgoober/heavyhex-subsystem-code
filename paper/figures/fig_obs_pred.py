@@ -3,8 +3,9 @@ the four Kingston ones.
 
 One point per curve: the device's eps from the binomial fit, with its 68% interval, against the
 prediction stored before the job (filled; at f = 1 on Fez, at IBM's T2 on Kingston), and
-against the prediction at the measured dephasing (open, joined to it; the job's f on Fez, each
-data qubit's T_q on Kingston). The predictions' own shot noise is smaller than the markers.
+against the in-job prediction on Fez (open, the job's f) or the measured-decay model on
+Kingston (open diamonds, each data qubit's T_q). The predictions' own shot noise is smaller
+than the markers; uncertainty in fitted inputs is not drawn.
 Fez: one point per basis, distance and pair-day, from docs/analysis/results/fits.json and
 effect_sizes.json ("prejob"). Kingston: rounds 1-4, weights capped at p = 0.1, from
 runs/ibm_kingston-followup/analysis/exp1.json. In the style of make_figures.py, whose fonts and
@@ -137,7 +138,7 @@ def panel(ax, fez: list[dict], king: list[dict], basis: str) -> None:
 
 def make(results_dir: Path, out_pdf: Path) -> None:
     fez, king = curves(Path(results_dir)), kingston()
-    fig, axes = plt.subplots(1, 2, figsize=(COLUMN, 2.1), sharey=True, layout="constrained")
+    fig, axes = plt.subplots(1, 2, figsize=(COLUMN, 2.25), sharey=True, layout="constrained")
     for ax, basis in zip(axes, "XZ"):
         panel(ax, fez, king, basis)
     axes[0].set_yticklabels([str(t) for t in TICKS])
@@ -150,9 +151,8 @@ def make(results_dir: Path, out_pdf: Path) -> None:
     fig.legend(
         handles=[
             Line2D([], [], marker="s", ms=3.0, color=D3, ls="none", label="$d=3$"),
-            Line2D([], [], marker="o", ms=3.4, color=D5, ls="none", label="$d=5$"),
-            Line2D([], [], marker=K_MARKER, ms=K_SIZE, color=MUTED, ls="none", label="Kingston"),
             Line2D([], [], marker="o", ms=3.4, color=MUTED, ls="none", label="stored"),
+            Line2D([], [], marker="o", ms=3.4, color=D5, ls="none", label="$d=5$"),
             Line2D(
                 [],
                 [],
@@ -162,11 +162,23 @@ def make(results_dir: Path, out_pdf: Path) -> None:
                 mec=MUTED,
                 mew=0.6,
                 ls="none",
-                label="measured",
+                label="in-job $f$",
+            ),
+            Line2D([], [], marker=K_MARKER, ms=K_SIZE, color=MUTED, ls="none", label="Kingston"),
+            Line2D(
+                [],
+                [],
+                marker=K_MARKER,
+                ms=K_SIZE * 0.85,
+                mfc="white",
+                mec=MUTED,
+                mew=0.6,
+                ls="none",
+                label="measured $T_q$",
             ),
         ],
         loc="outside upper center",
-        ncol=5,
+        ncol=3,
         handletextpad=0.1,
         columnspacing=0.8,
     )
