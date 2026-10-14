@@ -1,0 +1,85 @@
+{
+ "job": "db7sabmil99s73fopc00",
+ "tag": "heavyhex:ibm_kingston-2026-10-14-exp3-1",
+ "tags": [
+  "heavyhex-followup",
+  "heavyhex:ibm_kingston-2026-10-14-exp3-1"
+ ],
+ "backend": "ibm_kingston",
+ "plan_job": "exp3-1",
+ "flags": {
+  "twirl": true,
+  "kerneled": true,
+  "sampler": "executor"
+ },
+ "submitted": "2026-10-14T21:08:45+03:00",
+ "submitted_utc": "2026-10-14T18:08:45+00:00",
+ "code": {
+  "commit": "84b20a98c814662258f46d18b9b0c50f74aed6c6",
+  "code": [
+   "a233d4069719d0cc396c71f29f6429bffd40f113",
+   "f8e44350df9165b40fb5a3259f75ba9c9f697fee"
+  ],
+  "followup": "fc56822a9e7888d0e011130e30077526792afd4b",
+  "changed": false
+ },
+ "local": false,
+ "qpu_seconds_limit": 8,
+ "qpu_seconds_estimate": 3.8071520000000003,
+ "qpu_seconds_bound": 3.8071520000000003,
+ "created_utc": "2026-10-14T18:08:46.763394Z",
+ "running_utc": "2026-10-14T18:22:12.055293Z",
+ "finished_utc": "2026-10-14T18:22:24.42927Z",
+ "usage": {
+  "qpu_charge_time_seconds": 4,
+  "value": 0.0575,
+  "unit": "resource_units",
+  "status": "complete",
+  "details": [
+   {
+    "value": 0.0575,
+    "unit": "resource_units",
+    "metric": {
+     "id": "caffe3ca-729c-5750-8777-df63bbf8bfd9",
+     "value": 4
+    }
+   }
+  ]
+ },
+ "status": "DONE",
+ "reason": null,
+ "checks": {
+  "circuits": {
+   "R0": {
+    "m": {
+     "shots": 1000,
+     "bits": 10,
+     "iq_distinct_per_shot": 1.0
+    }
+   },
+   "R1": {
+    "m": {
+     "shots": 1000,
+     "bits": 10,
+     "iq_distinct_per_shot": 1.0
+    }
+   },
+   "A": {
+    "m": {
+     "shots": 3000,
+     "bits": 300,
+     "iq_distinct_per_shot": 1.0
+    }
+   }
+  },
+  "schedule_returned": 5,
+  "schedule_gap_dt": [
+   0,
+   30
+  ],
+  "detection": {},
+  "prepared": {},
+  "failed": [],
+  "passed": true
+ }
+}

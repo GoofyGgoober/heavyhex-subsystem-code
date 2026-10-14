@@ -1,0 +1,139 @@
+{
+ "job": "db7tlmuil99s73fortl0",
+ "tag": "heavyhex:ibm_kingston-2026-10-14-life-t-legacy",
+ "tags": [
+  "heavyhex-followup",
+  "heavyhex:ibm_kingston-2026-10-14-life-t-legacy"
+ ],
+ "backend": "ibm_kingston",
+ "plan_job": "life-t",
+ "flags": {
+  "twirl": true,
+  "kerneled": true,
+  "sampler": "legacy"
+ },
+ "submitted": "2026-10-14T22:41:13+03:00",
+ "submitted_utc": "2026-10-14T19:41:13+00:00",
+ "code": {
+  "commit": "7f1eeecf0a1b78c5e2da8bcba0121175582db881",
+  "code": [
+   "a233d4069719d0cc396c71f29f6429bffd40f113",
+   "f8e44350df9165b40fb5a3259f75ba9c9f697fee"
+  ],
+  "followup": "69254c52d7adbef6ba86c82268dd11904d53c4a9",
+  "changed": false
+ },
+ "local": false,
+ "qpu_seconds_limit": 5,
+ "qpu_seconds_estimate": 4.427515136,
+ "qpu_seconds_bound": 4.427515136,
+ "created_utc": "2026-10-14T19:41:15.36718Z",
+ "running_utc": "2026-10-14T19:41:39.576337Z",
+ "finished_utc": "2026-10-14T19:54:59.033976Z",
+ "usage": {
+  "qpu_charge_time_seconds": 5,
+  "value": 0.0685,
+  "unit": "resource_units",
+  "status": "complete",
+  "details": [
+   {
+    "value": 0.0685,
+    "unit": "resource_units",
+    "metric": {
+     "id": "caffe3ca-729c-5750-8777-df63bbf8bfd9",
+     "value": 5
+    }
+   }
+  ]
+ },
+ "status": "DONE",
+ "reason": null,
+ "checks": {
+  "circuits": {
+   "T1, 20 us": {
+    "m": {
+     "shots": 512,
+     "bits": 65
+    }
+   },
+   "T1, 40 us": {
+    "m": {
+     "shots": 512,
+     "bits": 65
+    }
+   },
+   "T1, 75 us": {
+    "m": {
+     "shots": 512,
+     "bits": 65
+    }
+   },
+   "T1, 135 us": {
+    "m": {
+     "shots": 512,
+     "bits": 65
+    }
+   },
+   "T1, 245 us": {
+    "m": {
+     "shots": 512,
+     "bits": 65
+    }
+   },
+   "T1, 450 us": {
+    "m": {
+     "shots": 512,
+     "bits": 65
+    }
+   },
+   "T2, 12 us": {
+    "m": {
+     "shots": 512,
+     "bits": 65
+    }
+   },
+   "T2, 22 us": {
+    "m": {
+     "shots": 512,
+     "bits": 65
+    }
+   },
+   "T2, 40 us": {
+    "m": {
+     "shots": 512,
+     "bits": 65
+    }
+   },
+   "T2, 72 us": {
+    "m": {
+     "shots": 512,
+     "bits": 65
+    }
+   },
+   "T2, 132 us": {
+    "m": {
+     "shots": 512,
+     "bits": 65
+    }
+   },
+   "T2, 240 us": {
+    "m": {
+     "shots": 512,
+     "bits": 65
+    }
+   }
+  },
+  "schedule_returned": 24,
+  "schedule_gap_dt": [
+   0,
+   1
+  ],
+  "detection": {},
+  "prepared": {
+   "T1, 20 us": 0.8600360576923077,
+   "T2, 12 us": 0.8927283653846154
+  },
+  "failed": [],
+  "passed": true
+ }
+}
