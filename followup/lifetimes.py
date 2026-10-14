@@ -1,4 +1,5 @@
-"""Lifetimes on the d=5 footprint, against the ones IBM reports: job life-1, after exp1-1.
+"""Lifetimes on the d=5 footprint, against the ones IBM reports: jobs life-z (the idle test read
+in Z) and life-t (T1 and T2), after exp1-2. life-1 ran both at once, and IBM cancelled it.
 
     Z idle   Exp 1's idle test, each CZ a wait as long, with the same pulses, XY4 and twirl,
              its data starting in |0> or |1> instead of |+> and read in Z; rounds 1, 2, 4, 8,
@@ -9,7 +10,8 @@
              in |0> (SX last): P(1) = (1 + e^(-t/T2))/2, the same T2
 
 T1 and T2 wait six times, from 0.1 to 2 times the footprint's median on 13 October (223 and
-121 us), with no decoupling but the echo's X. Every circuit runs SHOTS shots.
+121 us), with no decoupling but the echo's X. The Z idle test runs SHOTS shots a circuit,
+T1 and T2 T_SHOTS (SHOTS in life-1).
 
 The fits, each with its standard error:
 
@@ -49,7 +51,8 @@ WAITS_US = {"T1": (20, 40, 75, 135, 245, 450), "T2": (12, 22, 40, 72, 132, 240)}
 Z_IDLE = tuple(
     Setting("idle", "X", IDLE_DISTANCE, n, "Z", start) for start in "01" for n in IDLE_ROUNDS
 )
-SHOTS = 1024  # each circuit
+SHOTS = 1024  # each circuit of the Z idle test
+T_SHOTS = 512  # each T1 and T2 circuit
 MAX_T_US = 1e5  # the fits' bounds on T
 SHOWN_US = 1e4  # a T beyond this, 20 times the longest wait, shows as ∞
 

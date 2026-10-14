@@ -13,8 +13,11 @@ its checks:
     exp3-3  Exp 3: references and arm C
     exp1-1  Exp 1: 16 memory circuits x 4096 shots (16 randomizations x 256), 10 idle x 2048
     life-1  lifetimes: the idle test read in Z, 10 circuits x 1024 shots (4 x 256), as Exp 1's
-            goes; T1 and T2 on the d=5 footprint, 12 circuits x 1024 (4 pieces of 256)
+            goes; T1 and T2 on the d=5 footprint, 12 circuits x 1024 (4 pieces of 256).
+            IBM cancelled it at its limit, having charged 10 s; life-z and life-t split it
     exp1-2  Exp 1 again
+    life-z  life-1's idle test read in Z alone
+    life-t  T1 and T2 alone, 12 circuits x 512 (2 pieces of 256), untwirled, for run 1's sampler
     exp3-d  Exp 3: references and arm D, optional, after the plan's jobs and within PLAN_SECONDS
 
 Exp 1's circuits are circuits.py's on the placed qubits, in the device's gates as run 1 wrote
@@ -25,14 +28,14 @@ scheduled ALAP and XY4 fills every idle period of the patch's qubits after their
 (Y = rz(pi/2) X rz(-pi/2), so it takes X's time). The idle test is boxed as its X memory is,
 each CZ then replaced by a delay as long: the delays sit between the barriers that close each
 layer, so its data wait as in memory, through the same pulses, and the Paulis pass them
-unchanged. life-1's idle test read in Z goes as Exp 1's does; its T1 and T2 circuits and
-Exp 3's are lifetimes.py's and leakage_control.py's, sent as they are. IBM adds no
+unchanged. The idle test read in Z goes as Exp 1's does; the T1 and T2 circuits and Exp
+3's are lifetimes.py's and leakage_control.py's, sent as they are. IBM adds no
 decoupling and twirls no readout, rep_delay is 250 us, and IBM returns each circuit's schedule.
 
 A job's QPU time is IBM's billing rule, as run 1 was billed: LOAD_S, then N (t + 253 us) for
 each circuit run N times and t long once scheduled. IBM may load a job of more than
 MAX_EXPERIMENTS circuits (each twirl one) in parts, LOAD_S each, so the caps take that bound.
-A job is refused above JOB_SECONDS (life-1 above its own cap, in SECONDS), if the
+A job is refused above JOB_SECONDS (the lifetimes' above their own caps, in SECONDS), if the
 follow-up's jobs so far and it would pass TOTAL_SECONDS (an optional job PLAN_SECONDS), or if
 IBM's usage counter would fall below COUNTER_FLOOR_S; IBM cancels it at its limit, 1.5 times the bound and 2 s, at most its
 cap, and while it is queued it is cancelled if IBM's own estimate is over that. The ledger
@@ -45,9 +48,10 @@ If IBM refuses the client-side route, or fails the job, --untwirled sends Exp 1 
 twirling (memory in two pieces of the idle's shots); if kerneled data are refused or
 malformed, --classified sends Exp 3 with IBM's 0/1 readout. --sampler legacy sends through
 run 1's SamplerV2 instead of the executor, untwirled only. A job goes again only with a
-fallback it hasn't failed with, and the next job of its experiment goes as it went; life-1
+fallback it hasn't failed with, and the next job of its experiment goes as it went; life-z
 goes as exp1-1 went, since its idle test is Exp 1's, so after a twirled exp1-1 it has no
-fallback. The job after one IBM ended goes only with --despite-checks.
+fallback. life-t, untwirled, goes with --sampler legacy. The job after one IBM ended goes
+only with --despite-checks.
 """
 
 from __future__ import annotations
@@ -98,7 +102,7 @@ TAG = "heavyhex-followup"  # on every job, so IBM's own list of them needs no le
 TOTAL_SECONDS = 90  # QPU time approved for the whole follow-up
 PLAN_SECONDS = 80  # the plan's jobs within it, leaving room to send one again; optional jobs too
 JOB_SECONDS = 30  # and for any one job
-SECONDS = {"life-1": 14}  # and for these, approved with them, at most JOB_SECONDS
+SECONDS = {"life-1": 14, "life-z": 7, "life-t": 7}  # and for these, approved, at most JOB_SECONDS
 MARGIN_SECONDS = 10  # IBM's counter must leave this much beyond a job's bound
 # IBM's counter when the 90 s were approved (375 s), less them. IBM gives run 1's time back
 # from 31 October, after which the floor only loosens; the ledger still holds the total.
@@ -140,13 +144,21 @@ JOBS = {
     "exp3-2": ("B", "exp3-1", "exp3-1"),
     "exp3-3": ("C", "exp3-2", "exp3-2"),
     "exp1-1": ("memory", "exp3-3", None),
-    "life-1": ("lifetimes", "exp1-1", "exp1-1"),
+    "life-1": ("lifetimes", "exp1-1", "exp1-1"),  # cancelled by IBM, kept for the record
     "exp1-2": ("memory", "life-1", "exp1-1"),
-    "exp3-d": ("D", "exp1-2", "exp3-3"),  # last, so that it can't take the plan's room
+    "life-z": ("z-idle", "exp1-2", "exp1-1"),
+    "life-t": ("t1t2", "life-z", None),
+    "exp3-d": ("D", "life-t", "exp3-3"),  # last, so that it can't take the plan's room
 }
 OPTIONAL = ("exp3-d",)
-TWIRLED = ("memory", "lifetimes")  # what goes twirled or --untwirled; Exp 3's arms are kerneled
-DECOUPLING = {"memory": "XY4", "lifetimes": "XY4 in the idle test; T1 and T2 none, but the echo"}
+LIFETIMES = {"lifetimes": "ZT", "z-idle": "Z", "t1t2": "T"}  # the parts of life() each runs
+TWIRLED = ("memory", "lifetimes", "z-idle")  # twirled or --untwirled; Exp 3's arms are kerneled
+DECOUPLING = {
+    "memory": "XY4",
+    "lifetimes": "XY4 in the idle test; T1 and T2 none, but the echo",
+    "z-idle": "XY4",
+    "t1t2": "none, but the echo",
+}
 FLIPS = "measurement_flips."  # the executor's prefix for readout flips a twirl leaves
 
 # The checks a job's data must pass before the next job goes.
@@ -155,8 +167,8 @@ SCHEDULE_GAP = 0.01  # IBM's length of a circuit against ours, at most this apar
 # A memory circuit's detectors may fire as the model's would with its errors this many times
 # larger, 1 - 2 r >= (1 - 2 r_model)^MAX_EXCESS; run 1 was 1.2-1.75 times the model.
 MAX_EXCESS = 3
-# life-1's circuits that should read as prepared (lifetimes.prepared) do so this often, at
-# least: 0.92-0.94 in the model, about 0 with a pulse missing.
+# The lifetimes' circuits that should read as prepared (lifetimes.prepared) do so this often,
+# at least: 0.92-0.94 in the model, about 0 with a pulse missing.
 READ_AS_PREPARED = 0.75
 
 
@@ -411,21 +423,26 @@ def exp1(
 
 
 def life(
-    placements: Mapping[int, Placement], target: Target, *, twirl: bool = True
+    placements: Mapping[int, Placement], target: Target, *, twirl: bool = True, part: str = "ZT"
 ) -> tuple[Item, ...]:
-    """life-1's circuits: the idle test read in Z on the d=5 footprint, built as Exp 1's idle
-    test is, then T1 and T2 on every qubit of the footprint; each lifetimes.SHOTS shots, in
-    randomizations or pieces of SHOTS_PER_RANDOMIZATION."""
+    """The lifetimes' circuits on the d=5 footprint. With Z in `part`, the idle test read in
+    Z, built as Exp 1's idle test is, lifetimes.SHOTS shots each in randomizations or pieces
+    of SHOTS_PER_RANDOMIZATION; with T, T1 and T2 on every qubit of the footprint, in pieces
+    of that, lifetimes.T_SHOTS shots each, or SHOTS beside the idle test, as life-1 sent them."""
     chip = placements[5].qubits
     pieces = lifetimes.SHOTS // SHOTS_PER_RANDOMIZATION
     items: list[Item] = []
-    for setting in lifetimes.Z_IDLE:
-        if twirl:
-            items.append(twirled(setting, chip, target, pieces))
-        else:
-            items += untwirled(setting, chip, target, pieces, piece=1)
-    for label, circuit in lifetimes.circuits(sorted(chip), target):
-        items += [_item(label, circuit, target, SHOTS_PER_RANDOMIZATION)] * pieces
+    if "Z" in part:
+        for setting in lifetimes.Z_IDLE:
+            if twirl:
+                items.append(twirled(setting, chip, target, pieces))
+            else:
+                items += untwirled(setting, chip, target, pieces, piece=1)
+    if "T" in part:
+        shots = lifetimes.SHOTS if "Z" in part else lifetimes.T_SHOTS
+        for label, circuit in lifetimes.circuits(sorted(chip), target):
+            item = _item(label, circuit, target, SHOTS_PER_RANDOMIZATION)
+            items += [item] * (shots // SHOTS_PER_RANDOMIZATION)
     return tuple(items)
 
 
@@ -458,8 +475,8 @@ def build(
         if runs == "memory":
             memory = memory or exp1(placements, target, twirl=twirl)
             jobs[name] = Job(name, memory)
-        elif runs == "lifetimes":
-            jobs[name] = Job(name, life(placements, target, twirl=twirl))
+        elif runs in LIFETIMES:
+            jobs[name] = Job(name, life(placements, target, twirl=twirl, part=LIFETIMES[runs]))
         else:
             meas_type = exp3.MEAS_TYPE if kerneled else "classified"
             jobs[name] = Job(name, exp3_items(runs, selection, target), meas_type)
@@ -991,7 +1008,7 @@ def check_order(
     whose predecessor hasn't gone or is out, or last ended by IBM, failed its checks or cost
     over its estimate (unless `despite`, so that a job with no fallback left holds up no
     other). A job goes as the job JOBS names went: an experiment's next job as the one before
-    it, life-1 and exp1-2 as exp1-1."""
+    it, life-1, exp1-2 and life-z as exp1-1."""
     runs, after, like = JOBS[name]
     twirled = runs in TWIRLED
     keys = ("twirl" if twirled else "kerneled", "sampler")
@@ -1256,8 +1273,8 @@ def inspect(folder: Path) -> dict:
     shots; IBM's schedule of every circuit, less the resets it adds before and after, within SCHEDULE_GAP of ours; each memory
     circuit's detectors firing no more than the model's would with MAX_EXCESS times its
     errors: a readout that doesn't leave its qubit in |m>, or bits read in the wrong order,
-    make them fire about half the time; and life-1's circuits that should read as prepared
-    doing so READ_AS_PREPARED of the time."""
+    make them fire about half the time; and the lifetimes' circuits that should read as
+    prepared doing so READ_AS_PREPARED of the time."""
     run = _read(folder / "run.json")
     data = load(folder)
     failed: list[str] = []
@@ -1365,7 +1382,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--untwirled",
         action="store_true",
-        help="Exp 1 and life-1 untwirled, if IBM refuses the twirling",
+        help="Exp 1 and life-z untwirled, if IBM refuses the twirling",
     )
     parser.add_argument(
         "--classified", action="store_true", help="Exp 3 read as 0/1, if IQ data fail"
@@ -1526,7 +1543,7 @@ def dry(calibration_path: Path | None = None, *, twirl: bool = True, kerneled: b
     planned = bound = 0
     for job in jobs.values():
         circuits_run = ", ".join(dict.fromkeys(item.label for item in job.items))
-        if JOBS[job.name][0] in TWIRLED:
+        if JOBS[job.name][0] in (*TWIRLED, *LIFETIMES):
             circuits_run = f"{len(dict.fromkeys(job.items))} circuits, " + (
                 "twirled" if job.twirled else "untwirled"
             )
@@ -1547,7 +1564,7 @@ def dry(calibration_path: Path | None = None, *, twirl: bool = True, kerneled: b
         f"{JOB_SECONDS} s a job ({own}), {TOTAL_SECONDS} s in all, IBM's counter "
         f"{MARGIN_SECONDS} s over"
     )
-    shown = ("exp3-1", "exp1-1", "life-1")
+    shown = ("exp3-1", "exp1-1", "life-z", "life-t")
     for name in shown:
         job = jobs[name]
         lines += ["", f"{name}: {'circuit':40} {'randomizations x shots':>23} {'length us':>10}"]

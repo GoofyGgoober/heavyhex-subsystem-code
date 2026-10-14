@@ -20,7 +20,7 @@ Exp 1, both jobs together:
              analysis modelled it; per placement, ε the mean over the days and Λ the
              inverse-variance mean of the days', widened by √(χ²/dof) above 1
 
-life-1:
+life-z and life-t:
 
     T1, T2   every qubit of the footprint, P(1) = A e^(-t/T) + B (lifetimes.decay), compared
              in the rate 1/T; T1's B gives the excited share at rest, π
@@ -524,7 +524,7 @@ def together(xy: Mapping, z: Mapping) -> dict:
     1/Var(ln), over the points above MIN_R, of
 
         ln(r/G) = k_X - t_eq/T_q - t_Z/T1     read in X and Y (a row of idle(), Exp 1)
-        ln(c/G) = k_Z - t_Z/T1 - t_eq/T_q     read in Z (a row of z_idle(), life-1)
+        ln(c/G) = k_Z - t_Z/T1 - t_eq/T_q     read in Z (a row of z_idle(), life-z)
 
     with G what the model's pulses and readout leave, in the rates the model can take:
     1/T1 >= 0 and 1/T_q = 1/(2 T1) + 1/T_phi with 1/T_phi >= 0. The data sit on the equator
@@ -623,7 +623,7 @@ def record(folders: Sequence[Path]) -> Record:
 
 
 def in_situ(xy: Record, z: Record) -> dict:
-    """The data qubits' T1 and T_q in situ, Exp 1's idle test (xy) and life-1's (z) fitted
+    """The data qubits' T1 and T_q in situ, Exp 1's idle test (xy) and life-z's (z) fitted
     together, with the decay a round each memory's data see, t_Z/T1 + t_eq/T_q with the
     times a round of the test that mimics it (Z memory's read in Z), at those rates and at
     IBM's T1 and T2 as Exp 1's model took them; and the values the model takes: the fit's,
@@ -675,17 +675,23 @@ def _per_round(row: Mapping, rounds: Sequence[int]) -> np.ndarray:
     return np.array([np.polyfit(n, row[side], 1)[0] for side in ("along_z_us", "equator_us")])
 
 
-def life(folder: Path, exp1_folders: Sequence[Path] = ()) -> dict:
-    """life-1 from its record: T1 and T2 of every qubit of the d=5 footprint, the flips per
-    round of each data qubit, and each qubit's T1 and T2 three ways, the rows lifetimes.table
-    prints, as rates in 1/us: IBM's (the calibration in force when life-1 ended), ours, with
-    the excited share at rest π from T1's B, and in situ. In situ, each data qubit's flips a
-    round read in Z, π of them |0> -> |1>; with Exp 1's jobs, both idle tests fitted together
-    (in_situ); without them, the T1 of the test read in Z alone, its G holding IBM's T2 on the
-    equator."""
-    job = record([folder])
-    after = folder / "calibration_after.json"
-    claimed = Calibration.load(after) if after.exists() else job.calibration
+def life(folders: Sequence[Path], exp1_folders: Sequence[Path] = ()) -> dict:
+    """life-z and life-t from their records, in that order: T1 and T2 of every qubit of the
+    d=5 footprint, the flips per round of each data qubit, and each qubit's T1 and T2 three
+    ways, the rows lifetimes.table prints, as rates in 1/us: IBM's (the calibration in force
+    when the last job ended), ours, with the excited share at rest π from T1's B, and in situ.
+    In situ, each data qubit's flips a round read in Z, π of them |0> -> |1>; with Exp 1's
+    jobs, both idle tests fitted together (in_situ); without them, the T1 of the test read in
+    Z alone, its G holding IBM's T2 on the equator."""
+    jobs = [record([folder]) for folder in folders]
+    job = Record(
+        {label: row for each in jobs for label, row in each.found.items()},
+        {label: row for each in jobs for label, row in each.shots.items()},
+        jobs[0].calibration,
+        jobs[0].dt,
+    )
+    after = folders[-1] / "calibration_after.json"
+    claimed = Calibration.load(after) if after.exists() else jobs[-1].calibration
     standard = relaxation(job.found, job.shots, claimed, job.dt)
     read_z = z_idle(job.found, job.shots, job.calibration, job.dt)
     situ = in_situ(record(exp1_folders), job) if exp1_folders else None
@@ -723,7 +729,7 @@ def life(folder: Path, exp1_folders: Sequence[Path] = ()) -> dict:
             }
         )
     return {
-        "folder": folder.name,
+        "folders": [folder.name for folder in folders],
         "calibration": claimed.calibrated,
         "standard": standard,
         "z_idle": read_z,
@@ -808,7 +814,7 @@ def exp1(
     """Exp 1 from its jobs: the idle test's T_q, every memory circuit decoded by each decoder,
     both fits, and the model at the measured T_q by each decoder. `cap` leads, decided before
     the run: decoder.PRIMARY, with the rule's cap (prediction.json in exp1-1's folder) and
-    uniform weights beside it. With life-1's folder, also the model at the data's in-situ T1
+    uniform weights beside it. With life-z's folder, also the model at the data's in-situ T1
     and T_q (in_situ), and O/M against it."""
     run = json.loads((folders[0] / "run.json").read_text())
     dt = run["dt"]
