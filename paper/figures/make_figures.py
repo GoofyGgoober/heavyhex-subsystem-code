@@ -112,13 +112,16 @@ def folders(rep: int, distance: int, day: str) -> tuple[str, int]:
 
 
 def p_of_n(rep: int, distance: int, basis: str, which: str) -> np.ndarray:
-    """P(n) for each day, shape (days, rounds). which = observed | predicted."""
-    key = "observed" if which == "observed" else "predicted_at_measured_dephasing"
+    """P(n) for each day, shape (days, rounds). which = observed | stored, the prediction
+    stored before the job at f = 1 (prediction.json)."""
     offset = 0 if basis == "X" else len(ROUNDS)
     rows = []
     for day in DAYS:
         folder, k = folders(rep, distance, day)
-        settings = load(RUNS / folder / "analysis.json")[key]["settings"]
+        if which == "observed":
+            settings = load(RUNS / folder / "analysis.json")["observed"]["settings"]
+        else:
+            settings = load(RUNS / folder / "prediction.json")["1.0"]["settings"]
         rows.append([settings[offset + j]["logical_error"][k] for j in range(len(ROUNDS))])
     return np.array(rows)
 
@@ -139,8 +142,8 @@ def binomial_curve(rep: int, distance: int, basis: str, n: np.ndarray) -> np.nda
 
 def fig_pn() -> None:
     """P(n) of each pair, X and Z memory, mean over the five days: device, its binomial fit and
-    the prediction."""
-    fig, axes = plt.subplots(2, 2, figsize=(PAGE, 2.6), sharex=True, sharey=True)
+    the prediction stored before each job at f = 1."""
+    fig, axes = plt.subplots(2, 2, figsize=(PAGE, 2.35), sharex=True, sharey=True)
     n = np.array(ROUNDS)
     smooth = np.linspace(1, 8, 57)
     for col, rep in enumerate((1, 2)):
@@ -152,7 +155,7 @@ def fig_pn() -> None:
                 (5, D5, "o", (0, (4, 2))),
             ):
                 o = p_of_n(rep, distance, basis, "observed")
-                p = p_of_n(rep, distance, basis, "predicted")
+                p = p_of_n(rep, distance, basis, "stored")
                 ax.plot(n, p.mean(0), color=colour, lw=1.0, ls=dash, alpha=0.9)
                 ax.plot(smooth, binomial_curve(rep, distance, basis, smooth), color=colour, lw=0.6)
                 ax.errorbar(

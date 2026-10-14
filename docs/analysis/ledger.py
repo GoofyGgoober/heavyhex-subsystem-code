@@ -289,7 +289,7 @@ def f_models() -> dict:
 
 def f_models_digest(f: dict) -> list[str]:
     pl = f["placement_difference"]
-    o = pl["observed (WL, inverse-variance over the days; placements.py)"]
+    o = pl["observed (binomial, inverse-variance over the days; placements.py)"]
     p1 = f["pair_1_predicted (eps3, eps5, Lambda_X)"]
     q = list(f["q150"].values())
     steep = f["slope"]["by_job"]["ibm_fez-2026-10-06-r2-d3"]["eps3"]
