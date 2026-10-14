@@ -27,9 +27,9 @@ little shot noise. The reruns of median and per_qubit are checked against the st
                the qubits the median f over-dephases most
   pair_days    eps3, eps5 and Lambda_X per pair-day under each variant; per pair, plain means
   placement    pair 1 minus pair 2 predicted Lambda_X under each variant, against the observed
-               difference (placements.py: WL, inverse-variance over the days); also the observed
-               plain-mean difference with the device decoded with per-qubit priors
-               (perqubit_f_decode.json)
+               difference (placements.py: binomial, inverse-variance over the days; the WL one
+               beside it); also the observed plain-mean difference (WL) with the device decoded
+               with per-qubit priors (perqubit_f_decode.json)
   tests        the X agreement tests over the ten pair-days under each variant, with the f term
                and the calibration gap carried over from the prespecified test (as perqubit_f.py),
                with sigma_f as prespecified and from the idle test's noise alone
@@ -323,14 +323,22 @@ def per_pair(rows: list[dict], models: list[str]) -> dict:
 def placement(pairs: dict, models: list[str]) -> dict:
     """Predicted pair 1 minus pair 2 Lambda_X against the observed difference."""
     pl = result("placements.json")
-    obs = pl["placements_compared"]["Lambda_X wls"]
+    obs = pl["placements_compared"]["Lambda_X binomial"]
     o, so = obs["placement_1_minus_placement_2"], obs["se"]
+    wl = pl["placements_compared"]["Lambda_X wls"]
     plain = {
         p: pl["per_placement"]["X"][f"placement {p}"]["wls"]["lambda"]["observed_plain"]["value"]
         for p in (1, 2)
     }
     out: dict = {
-        "observed (WL, inverse-variance over the days; placements.py)": {"value": o, "se": so},
+        "observed (binomial, inverse-variance over the days; placements.py)": {
+            "value": o,
+            "se": so,
+        },
+        "observed (WL, inverse-variance over the days; placements.py)": {
+            "value": wl["placement_1_minus_placement_2"],
+            "se": wl["se"],
+        },
         "observed plain means": {
             "pair 1": plain[1],
             "pair 2": plain[2],
@@ -688,7 +696,7 @@ def report(s: dict) -> None:
     for m, v in s["per_pair"]["pair 2"].items():
         print(f"  {m:17s} {v['lambda']['mean']:.3f}+-{v['lambda']['sim_se_of_mean']:.3f}")
     p = s["placement"]
-    o = p["observed (WL, inverse-variance over the days; placements.py)"]
+    o = p["observed (binomial, inverse-variance over the days; placements.py)"]
     print(f"\nPlacement difference, observed {o['value']:.3f} +- {o['se']:.3f}; predicted:")
     for m in s["per_pair"]["pair 1"]:
         v = p[m]

@@ -20380,6 +20380,10 @@
    "shrunk_scaled": 0.4721042426578981
   },
   "placement_difference": {
+   "observed (binomial, inverse-variance over the days; placements.py)": {
+    "value": 0.171074111702549,
+    "se": 0.030758494778269575
+   },
    "observed (WL, inverse-variance over the days; placements.py)": {
     "value": 0.18157750888994517,
     "se": 0.03270529930482157
@@ -20394,9 +20398,9 @@
     "pair 2": 0.44780179466187153,
     "predicted_difference": 0.1945003344012154,
     "sim_se": 0.003003277488943193,
-    "observed_minus_predicted": -0.01292282551127022,
-    "z (observed se only)": -0.3951294067308864,
-    "z (with sim se)": -0.3934739114359471,
+    "observed_minus_predicted": -0.0234262226986664,
+    "z (observed se only)": -0.7616179812289345,
+    "z (with sim se)": -0.7580132231405512,
     "pair 1 observed plain mean minus predicted": 0.04395443488293904
    },
    "stored per_qubit": {
@@ -20404,9 +20408,9 @@
     "pair 2": 0.4769416402339666,
     "predicted_difference": 0.322543950863916,
     "sim_se": 0.00623757661262001,
-    "observed_minus_predicted": -0.14096644197397085,
-    "z (observed se only)": -4.3102018623993725,
-    "z (with sim se)": -4.233887141439719,
+    "observed_minus_predicted": -0.15146983916136703,
+    "z (observed se only)": -4.92448802365902,
+    "z (with sim se)": -4.826249088599623,
     "pair 1 observed plain mean minus predicted": -0.11322902715185668
    },
    "median": {
@@ -20414,9 +20418,9 @@
     "pair 2": 0.449337035325199,
     "predicted_difference": 0.18713456566272113,
     "sim_se": 0.005149387713331562,
-    "observed_minus_predicted": -0.005557056772775959,
-    "z (observed se only)": -0.1699130382811299,
-    "z (with sim se)": -0.16784533902874163,
+    "observed_minus_predicted": -0.01606045396017214,
+    "z (observed se only)": -0.5221469410628836,
+    "z (with sim se)": -0.5149800645866683,
     "pair 1 observed plain mean minus predicted": 0.04978496295810586
    },
    "per_qubit": {
@@ -20424,9 +20428,9 @@
     "pair 2": 0.4769416402339666,
     "predicted_difference": 0.322543950863916,
     "sim_se": 0.00623757661262001,
-    "observed_minus_predicted": -0.14096644197397085,
-    "z (observed se only)": -4.3102018623993725,
-    "z (with sim se)": -4.233887141439719,
+    "observed_minus_predicted": -0.15146983916136703,
+    "z (observed se only)": -4.92448802365902,
+    "z (with sim se)": -4.826249088599623,
     "pair 1 observed plain mean minus predicted": -0.11322902715185668
    },
    "q150": {
@@ -20434,9 +20438,9 @@
     "pair 2": 0.449337035325199,
     "predicted_difference": 0.20179164784204973,
     "sim_se": 0.005642624977198692,
-    "observed_minus_predicted": -0.020214138952104554,
-    "z (observed se only)": -0.6180692236968609,
-    "z (with sim se)": -0.6090707773636299,
+    "observed_minus_predicted": -0.030717536139500734,
+    "z (observed se only)": -0.9986683796114179,
+    "z (with sim se)": -0.9822765523704927,
     "pair 1 observed plain mean minus predicted": 0.035127880778777265
    },
    "shrunk": {
@@ -20444,9 +20448,9 @@
     "pair 2": 0.47487682976348733,
     "predicted_difference": 0.3063488480733556,
     "sim_se": 0.006428788793053385,
-    "observed_minus_predicted": -0.12477133918341043,
-    "z (observed se only)": -3.8150190285834213,
-    "z (with sim se)": -3.7433847478627578,
+    "observed_minus_predicted": -0.13527473637080661,
+    "z (observed se only)": -4.397963468172579,
+    "z (with sim se)": -4.304938823609393,
     "pair 1 observed plain mean minus predicted": -0.09496911389081697
    },
    "shrunk_scaled": {
@@ -20454,9 +20458,9 @@
     "pair 2": 0.4721042426578981,
     "predicted_difference": 0.2927065659334893,
     "sim_se": 0.006026450473104351,
-    "observed_minus_predicted": -0.11112905704354414,
-    "z (observed se only)": -3.3978914550756296,
-    "z (with sim se)": -3.341634595081709,
+    "observed_minus_predicted": -0.12163245423094032,
+    "z (observed se only)": -3.954434542644521,
+    "z (with sim se)": -3.880651172760717,
     "pair 1 observed plain mean minus predicted": -0.07855424464536143
    },
    "observed plain means, device decoded with per-qubit priors": {
