@@ -133,6 +133,9 @@ APPROVED_WEAK: dict[tuple[int | tuple[int, int], str], float] = {
     # (12 and 72 readout were raised to their values in it, above.)
     (30, "T2"): 76, (31, "readout"): 0.042, (46, "T2"): 79, (65, "readout"): 0.034,
     (92, "readout"): 0.064,
+    # Calibration of 14 October 2026, 21:55 (+03:00), approved for the lifetime jobs.
+    (14, "readout"): 0.032, (27, "readout"): 0.033, (46, "readout"): 0.071,
+    (51, "readout"): 0.031,
 }  # fmt: skip
 WORSE = 1.5
 MIN_D3_DATA_T2_US = 50
