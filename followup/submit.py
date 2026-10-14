@@ -125,6 +125,9 @@ APPROVED_WEAK: dict[tuple[int | tuple[int, int], str], float] = {
     (54, "readout"): 0.045, (72, "readout"): 0.052, (78, "T2"): 32, (78, "readout"): 0.044,
     (85, "readout"): 0.033, (86, "T2"): 24, (87, "T1"): 54, (87, "T2"): 36, (88, "T2"): 19,
     ((85, 86), "CZ"): 0.047, ((86, 87), "CZ"): 0.057,
+    # Calibration of 14 October 2026, 20:27 (+03:00), approved to run as it stands.
+    (12, "readout"): 0.185, (30, "T2"): 76, (31, "readout"): 0.042, (46, "T2"): 79,
+    (65, "readout"): 0.034, (72, "readout"): 0.202, (92, "readout"): 0.064,
 }  # fmt: skip
 WORSE = 1.5
 MIN_D3_DATA_T2_US = 50
