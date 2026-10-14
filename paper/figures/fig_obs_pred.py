@@ -1,10 +1,13 @@
-"""Fig. observed against predicted: the logical error per round of all 40 curves.
+"""Fig. observed against predicted: the logical error per round of all 40 Fez curves and of
+the four Kingston ones.
 
-One point per curve (two bases, two distances, ten pair-days): the device's eps from the
-binomial fit, with its 68% profile interval, against the prediction stored before the job at
-f = 1 (filled), and against the prediction at the job's measured f (open, joined to it). The
-predictions' own shot noise is smaller than the markers. Draws from docs/analysis/results/
-fits.json and effect_sizes.json ("prejob") in the style of make_figures.py, whose fonts and
+One point per curve: the device's eps from the binomial fit, with its 68% interval, against the
+prediction stored before the job (filled; at f = 1 on Fez, at IBM's T2 on Kingston), and
+against the prediction at the measured dephasing (open, joined to it; the job's f on Fez, each
+data qubit's T_q on Kingston). The predictions' own shot noise is smaller than the markers.
+Fez: one point per basis, distance and pair-day, from docs/analysis/results/fits.json and
+effect_sizes.json ("prejob"). Kingston: rounds 1-4, weights capped at p = 0.1, from
+runs/ibm_kingston-followup/analysis/exp1.json. In the style of make_figures.py, whose fonts and
 rcParams it imports. Run from the repository root:
 
     python paper/figures/fig_obs_pred.py      # writes paper/figures/obs_pred.pdf
@@ -20,15 +23,17 @@ import numpy as np
 from matplotlib.lines import Line2D
 from matplotlib.ticker import FixedLocator, NullFormatter
 
-from make_figures import COLUMN, D3, D5, DAYS, DIAG, GRID, INK, MUTED, OUT, label
+from make_figures import COLUMN, D3, D5, DAYS, DIAG, GRID, INK, MUTED, OUT, RUNS, label
 
-LIMITS = (5.0, 42.0)  # both axes, eps in percent
-TICKS = [5, 10, 20, 40]
+LIMITS = (3.0, 42.0)  # both axes, eps in percent
+TICKS = [3, 5, 10, 20, 40]
 STYLE = {"3": (D3, "s", 3.0), "5": (D5, "o", 3.4)}  # colour, marker, size; as in Fig. pn
+KINGSTON = RUNS / "ibm_kingston-followup" / "analysis" / "exp1.json"
+K_MARKER, K_SIZE = "D", 3.2
 
 
 def curves(results_dir: Path) -> list[dict]:
-    """The 40 curves: observed eps and its 68% interval, the frozen f = 1 and measured-f
+    """The 40 Fez curves: observed eps and its 68% interval, the frozen f = 1 and measured-f
     predictions, all from the binomial fit."""
     fits = json.loads((results_dir / "fits.json").read_text())
     rows = json.loads((results_dir / "effect_sizes.json").read_text())["prejob"]["binomial"]
@@ -50,8 +55,8 @@ def curves(results_dir: Path) -> list[dict]:
                         "obs": obs["binomial"],
                         "lo": obs["binomial_lo68_quasi"],
                         "hi": obs["binomial_hi68_quasi"],
-                        "at_f1": at1,
-                        "at_fhat": pred["predicted_at_measured_dephasing"][basis][d]["binomial"][
+                        "stored": at1,
+                        "measured": pred["predicted_at_measured_dephasing"][basis][d]["binomial"][
                             "eps"
                         ],
                     }
@@ -60,30 +65,59 @@ def curves(results_dir: Path) -> list[dict]:
     return out
 
 
-def panel(ax, rows: list[dict], basis: str) -> None:
+def kingston(path: Path = KINGSTON) -> list[dict]:
+    """The four Kingston curves: observed eps (both jobs pooled) and its 68% interval, the
+    prediction stored before the jobs (IBM's T2) and the one at each data qubit's T_q."""
+    s = json.loads(path.read_text())["summary"]
+    out = []
+    for basis in "XZ":
+        for d in "35":
+            eps, sigma = s["observed_cap0.1"][basis][f"eps{d}"]
+            out.append(
+                {
+                    "basis": basis,
+                    "d": d,
+                    "obs": eps,
+                    "lo": eps - sigma,
+                    "hi": eps + sigma,
+                    "stored": s["prerun_model_cap0.1"][basis][f"eps{d}"][0],
+                    "measured": s["model_measured_tq_cap0.1"][basis][f"eps{d}"][0],
+                }
+            )
+    return out
+
+
+def points(ax, sel: list[dict], colour: str, marker: str, ms: float) -> None:
+    """Observed against stored (filled, with the 68% interval) and against measured (open),
+    joined at the same height."""
+    y = 100 * np.array([r["obs"] for r in sel])
+    lo = 100 * np.array([r["lo"] for r in sel])
+    hi = 100 * np.array([r["hi"] for r in sel])
+    xs = 100 * np.array([r["stored"] for r in sel])
+    xm = 100 * np.array([r["measured"] for r in sel])
+    ax.hlines(y, np.minimum(xs, xm), np.maximum(xs, xm), color=colour, lw=0.5, alpha=0.6)
+    ax.plot(xm, y, marker, ms=ms * 0.85, mfc="white", mec=colour, mew=0.6, ls="none", alpha=0.8)
+    ax.errorbar(
+        xs,
+        y,
+        yerr=[y - lo, hi - y],
+        fmt=marker,
+        ms=ms,
+        color=colour,
+        mec="white",
+        mew=0.3,
+        elinewidth=0.7,
+        capsize=0,
+        zorder=3,
+    )
+
+
+def panel(ax, fez: list[dict], king: list[dict], basis: str) -> None:
     ax.plot(LIMITS, LIMITS, color=MUTED, lw=0.7, ls=(0, (3, 2)), zorder=0)
     for d, (colour, marker, ms) in STYLE.items():
-        sel = [r for r in rows if r["basis"] == basis and r["d"] == d]
-        y = 100 * np.array([r["obs"] for r in sel])
-        lo = 100 * np.array([r["lo"] for r in sel])
-        hi = 100 * np.array([r["hi"] for r in sel])
-        x1 = 100 * np.array([r["at_f1"] for r in sel])
-        xf = 100 * np.array([r["at_fhat"] for r in sel])
-        # the measured-f prediction: open, light, joined to the frozen one at the same height
-        ax.hlines(y, np.minimum(x1, xf), np.maximum(x1, xf), color=colour, lw=0.5, alpha=0.6)
-        ax.plot(xf, y, marker, ms=ms * 0.85, mfc="white", mec=colour, mew=0.6, ls="none", alpha=0.8)
-        ax.errorbar(
-            x1,
-            y,
-            yerr=[y - lo, hi - y],
-            fmt=marker,
-            ms=ms,
-            color=colour,
-            mec="white",
-            mew=0.3,
-            elinewidth=0.7,
-            capsize=0,
-            zorder=3,
+        points(ax, [r for r in fez if r["basis"] == basis and r["d"] == d], colour, marker, ms)
+        points(
+            ax, [r for r in king if r["basis"] == basis and r["d"] == d], colour, K_MARKER, K_SIZE
         )
     ax.set_xscale("log")
     ax.set_yscale("log")
@@ -92,7 +126,7 @@ def panel(ax, rows: list[dict], basis: str) -> None:
     ax.set_aspect("equal")
     for axis in (ax.xaxis, ax.yaxis):
         axis.set_major_locator(FixedLocator(TICKS))
-        axis.set_minor_locator(FixedLocator([6, 7, 8, 9, 30]))
+        axis.set_minor_locator(FixedLocator([4, 6, 7, 8, 9, 30]))
         axis.set_minor_formatter(NullFormatter())
     ax.set_xticklabels([str(t) for t in TICKS])
     ax.tick_params(which="minor", length=1.5, width=0.5)
@@ -102,14 +136,14 @@ def panel(ax, rows: list[dict], basis: str) -> None:
 
 
 def make(results_dir: Path, out_pdf: Path) -> None:
-    rows = curves(Path(results_dir))
-    fig, axes = plt.subplots(1, 2, figsize=(COLUMN, 2.05), sharey=True, layout="constrained")
+    fez, king = curves(Path(results_dir)), kingston()
+    fig, axes = plt.subplots(1, 2, figsize=(COLUMN, 2.1), sharey=True, layout="constrained")
     for ax, basis in zip(axes, "XZ"):
-        panel(ax, rows, basis)
+        panel(ax, fez, king, basis)
     axes[0].set_yticklabels([str(t) for t in TICKS])
     axes[0].set_ylabel(r"observed $\varepsilon$ (%)")
     axes[0].text(
-        33, 26, "$y = x$", rotation=45, ha="center", va="center", fontsize=6.5, color=MUTED
+        30, 23, "$y = x$", rotation=45, ha="center", va="center", fontsize=6.5, color=MUTED
     )
     for ax, tag in zip(axes, "ab"):
         label(ax, f"({tag})")
@@ -117,7 +151,8 @@ def make(results_dir: Path, out_pdf: Path) -> None:
         handles=[
             Line2D([], [], marker="s", ms=3.0, color=D3, ls="none", label="$d=3$"),
             Line2D([], [], marker="o", ms=3.4, color=D5, ls="none", label="$d=5$"),
-            Line2D([], [], marker="o", ms=3.4, color=MUTED, ls="none", label="at $f=1$"),
+            Line2D([], [], marker=K_MARKER, ms=K_SIZE, color=MUTED, ls="none", label="Kingston"),
+            Line2D([], [], marker="o", ms=3.4, color=MUTED, ls="none", label="stored"),
             Line2D(
                 [],
                 [],
@@ -127,13 +162,13 @@ def make(results_dir: Path, out_pdf: Path) -> None:
                 mec=MUTED,
                 mew=0.6,
                 ls="none",
-                label=r"at $\hat f$",
+                label="measured",
             ),
         ],
         loc="outside upper center",
-        ncol=4,
-        handletextpad=0.2,
-        columnspacing=1.0,
+        ncol=5,
+        handletextpad=0.1,
+        columnspacing=0.8,
     )
     fig.savefig(out_pdf)
     plt.close(fig)
