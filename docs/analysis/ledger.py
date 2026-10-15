@@ -1624,7 +1624,8 @@ def digest(res: dict) -> str:
     ms = dg["miscorrected_single_faults_X_d3"]["share_of_predicted_eps3_range"]
     q44 = dg["miscorrected_single_faults_X_d3"]["largest_by_patch"]["2026-10-04-r1"]
     L.append(
-        f"   miscorrected single faults: {100 * ms[0]:.0f}-{100 * ms[1]:.0f}% of predicted eps3; "
+        f"   historical isolated-fault mass/(rounds*legacy eps3): {100 * ms[0]:.0f}-{100 * ms[1]:.0f}% "
+        "(not a rate contribution or bound; not used in the paper); "
         f"day 1 pair 1: {q44['fault']} {100 * q44['p_per_round']:.1f}% per round over "
         f"{q44['mechanisms']} mechanisms, largest single {q44['largest_single_mechanism_p']:.4f}, "
         f"{100 * q44['share_of_miscorrected']:.0f}% of the miscorrected; its own edge "
@@ -1640,7 +1641,8 @@ def digest(res: dict) -> str:
         ml["n4_miscorrected_single_fault_p"],
     )
     L.append(
-        f"   exact maximum likelihood (d = 3 X memory, n = 1-4): model eps3 {100 * drop[0]:.1f}-"
+        "   archived exact-ML rate diagnostic (legacy unweighted log slope, not used in the paper; "
+        f"d = 3 X memory, n = 1-4): model eps3 {100 * drop[0]:.1f}-"
         f"{100 * drop[1]:.1f}% lower than with matching; device eps3 {shift[0]:+.2f} to "
         f"{shift[1]:+.2f} pp (mean {ml['device_eps3_change_pp_mean']:+.2f}); of the single-fault "
         f"probability matching miscorrects at n = 4 ({n4[0]:.3f}), ML also misassigns {n4[1]:.3f} "
@@ -1660,8 +1662,9 @@ def digest(res: dict) -> str:
         f"{sh['device shots']} device, {sh['model matching_folded_vs_paper'] + sh['model correlated_folded_vs_dropped']}"
         f" of {sh['model shots']} model; alone, calibrated wrong on {alone['calibrated_wrong']} "
         f"({scan['calibrated_wrong_with_observable_only_piece']} of the {scan['calibrated_wrong']} Z d3 "
-        f"single miscorrections), uniform on {alone['uniform_wrong']}; up to "
-        f"{100 * pc['share_of_predicted_Z_eps3_range'][1]:.1f}% of predicted Z eps3"
+        f"single miscorrections), uniform on {alone['uniform_wrong']}; historical isolated-fault "
+        f"mass/(8*legacy eps3), maximum {100 * pc['share_of_predicted_Z_eps3_range'][1]:.1f}% "
+        "(not a rate contribution or bound; not used in the paper)"
     )
     for day, u in gr["uniform_chip"].items():
         x3 = u["X d3 per-job model"]
@@ -1671,7 +1674,8 @@ def digest(res: dict) -> str:
             f"symptoms), {x3['n=8'][0]} of {x3['n=8'][1]} at n = 8 (f = 0: "
             f"{u['X d3 pre-run simulator f=0']['n=8'][0]}, no idle decay: "
             f"{u['X d3 pre-run simulator f=1 no idle']['n=8'][0]}), "
-            f"{100 * x3['share_of_eps3']:.0f}% of eps3; boundary p up to {x3['boundary_p'][1]:.3f}; "
+            f"isolated-mass/(rounds*legacy eps3) {100 * x3['share_of_eps3']:.0f}% "
+            f"(not a rate contribution or bound); boundary p up to {x3['boundary_p'][1]:.3f}; "
             f"d = 5: {u['X d5 per-job model']['n=8'][0]}"
         )
     L.append(
