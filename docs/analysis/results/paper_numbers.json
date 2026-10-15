@@ -12,6 +12,7 @@
    "docs/analysis/results/corr_matching.json",
    "docs/analysis/results/costreak.json",
    "docs/analysis/results/cz_scaled.json",
+   "docs/analysis/results/day_sensitivity.json",
    "docs/analysis/results/day_swing.json",
    "docs/analysis/results/decoder.json",
    "docs/analysis/results/decoder_dominant.json",
@@ -38,6 +39,7 @@
    "docs/analysis/results/idle_test_scope.json",
    "docs/analysis/results/input_noise.json",
    "docs/analysis/results/input_resolution.json",
+   "docs/analysis/results/kingston_checks.json",
    "docs/analysis/results/leakage_checks.json",
    "docs/analysis/results/leakage_fit.json",
    "docs/analysis/results/leakage_lifetime.json",
@@ -52900,6 +52902,3112 @@
    "min": -0.004357247315924129,
    "max": 0.005939015079737153,
    "mean": 0.00038319592290904993
+  }
+ },
+ "stored_priors_day_sensitivity": {
+  "what": "Matched stored-prior comparison, omit each day in turn; four remaining daily log means, t with three degrees of freedom, Bonferroni family of five. Selected-subset sensitivity only, not confirmatory tests.",
+  "by_quantity": {
+   "X eps3": {
+    "1": {
+     "ratio": 1.260834117976443,
+     "ci95_family_of_five": [
+      1.0052280874787425,
+      1.5814347936105124
+     ]
+    },
+    "2": {
+     "ratio": 1.3026548373500757,
+     "ci95_family_of_five": [
+      1.19431433543607,
+      1.4208232915934762
+     ]
+    },
+    "3": {
+     "ratio": 1.2451595743595127,
+     "ci95_family_of_five": [
+      1.0299469466397775,
+      1.5053419699698583
+     ]
+    },
+    "4": {
+     "ratio": 1.2674040916091627,
+     "ci95_family_of_five": [
+      1.0079572455897063,
+      1.5936322085644334
+     ]
+    },
+    "5": {
+     "ratio": 1.2573798494878745,
+     "ci95_family_of_five": [
+      1.0065826898610604,
+      1.5706648860774441
+     ]
+    }
+   },
+   "X eps5": {
+    "1": {
+     "ratio": 1.221384474324348,
+     "ci95_family_of_five": [
+      1.1307917791214412,
+      1.319234948170201
+     ]
+    },
+    "2": {
+     "ratio": 1.189059096789741,
+     "ci95_family_of_five": [
+      0.9909343211583237,
+      1.4267964137176543
+     ]
+    },
+    "3": {
+     "ratio": 1.183341335241506,
+     "ci95_family_of_five": [
+      0.996730675356637,
+      1.4048897563929341
+     ]
+    },
+    "4": {
+     "ratio": 1.1982024201815358,
+     "ci95_family_of_five": [
+      0.9970416311274938,
+      1.4399489398505416
+     ]
+    },
+    "5": {
+     "ratio": 1.180378295295658,
+     "ci95_family_of_five": [
+      1.0032147396726645,
+      1.388828198895579
+     ]
+    }
+   },
+   "X lambda": {
+    "1": {
+     "ratio": 1.0322991199588631,
+     "ci95_family_of_five": [
+      0.8369098018540543,
+      1.2733050451877448
+     ]
+    },
+    "2": {
+     "ratio": 1.095534141967396,
+     "ci95_family_of_five": [
+      0.9361552695243565,
+      1.2820470014830296
+     ]
+    },
+    "3": {
+     "ratio": 1.0522404121929794,
+     "ci95_family_of_five": [
+      0.7906715290345097,
+      1.4003411586149648
+     ]
+    },
+    "4": {
+     "ratio": 1.0577545749049166,
+     "ci95_family_of_five": [
+      0.7906296051975069,
+      1.4151313502266116
+     ]
+    },
+    "5": {
+     "ratio": 1.06523464087666,
+     "ci95_family_of_five": [
+      0.7973339658956259,
+      1.4231487540468917
+     ]
+    }
+   },
+   "Z eps3": {
+    "1": {
+     "ratio": 2.1378701577954002,
+     "ci95_family_of_five": [
+      1.3271743879177995,
+      3.443774121321582
+     ]
+    },
+    "2": {
+     "ratio": 2.030488420482995,
+     "ci95_family_of_five": [
+      1.1812375219375462,
+      3.49030838349335
+     ]
+    },
+    "3": {
+     "ratio": 2.1319685220812774,
+     "ci95_family_of_five": [
+      1.308221266112477,
+      3.4744044427990786
+     ]
+    },
+    "4": {
+     "ratio": 2.071988487879381,
+     "ci95_family_of_five": [
+      1.1943583734433447,
+      3.594512659987922
+     ]
+    },
+    "5": {
+     "ratio": 1.935049119467041,
+     "ci95_family_of_five": [
+      1.4522136379315451,
+      2.5784189026647026
+     ]
+    }
+   },
+   "Z eps5": {
+    "1": {
+     "ratio": 1.836570555346932,
+     "ci95_family_of_five": [
+      1.492411187454557,
+      2.2600952291977134
+     ]
+    },
+    "2": {
+     "ratio": 1.802670242591922,
+     "ci95_family_of_five": [
+      1.5794489148983428,
+      2.057439131379297
+     ]
+    },
+    "3": {
+     "ratio": 1.872887721382326,
+     "ci95_family_of_five": [
+      1.5871576712113205,
+      2.210056682161637
+     ]
+    },
+    "4": {
+     "ratio": 1.8660805355115022,
+     "ci95_family_of_five": [
+      1.5534819446469268,
+      2.2415816141373544
+     ]
+    },
+    "5": {
+     "ratio": 1.8309006282193807,
+     "ci95_family_of_five": [
+      1.4932900871899113,
+      2.244839860098664
+     ]
+    }
+   }
+  },
+  "window_boundaries": {
+   "device": {
+    "1-8": {
+     "active_at_mle": [],
+     "minimum_fitted_P1": 0.10934665062651733
+    },
+    "2-8": {
+     "active_at_mle": [],
+     "minimum_fitted_P1": 0.10324402479574857
+    },
+    "1-6": {
+     "active_at_mle": [],
+     "minimum_fitted_P1": 0.10798266271398549
+    },
+    "2-6": {
+     "active_at_mle": [],
+     "minimum_fitted_P1": 0.09872351598490758
+    },
+    "1-4": {
+     "active_at_mle": [],
+     "minimum_fitted_P1": 0.10826680063535449
+    },
+    "3-8": {
+     "active_at_mle": [
+      [
+       "ibm_fez-2026-10-04-r2-d5",
+       "Z",
+       "5"
+      ],
+      [
+       "ibm_fez-2026-10-05-r2-d5",
+       "Z",
+       "5"
+      ],
+      [
+       "ibm_fez-2026-10-08-r1",
+       "Z",
+       "5"
+      ]
+     ],
+     "minimum_fitted_P1": 4.999889391399392e-13
+    }
+   },
+   "model": {
+    "1-8": {
+     "active_at_mle": [],
+     "minimum_fitted_P1": 0.04685012328081062
+    },
+    "2-8": {
+     "active_at_mle": [],
+     "minimum_fitted_P1": 0.042898294325156294
+    },
+    "1-6": {
+     "active_at_mle": [],
+     "minimum_fitted_P1": 0.04687519704478571
+    },
+    "2-6": {
+     "active_at_mle": [],
+     "minimum_fitted_P1": 0.0418959812326844
+    },
+    "1-4": {
+     "active_at_mle": [],
+     "minimum_fitted_P1": 0.04737801110385942
+    },
+    "3-8": {
+     "active_at_mle": [],
+     "minimum_fitted_P1": 0.04115002321866623
+    }
+   }
+  }
+ },
+ "kingston_fixed_decoder": {
+  "what": "All device and simulated samples use the same capped measured-Tq decoder. New simulations use 200000 shots per depth and seed0; the measured-Tq baseline and device counts come from the archive. Fixed inputs, not held-out validation. Residuals quantify the exponential compression, not physical stationary rates.",
+  "variants": {
+   "ibm": {
+    "input_sha256": {
+     "followup/reproduce.py": "ab8110422b8bb69ba695c9aaa84dad3b3afc08e261db68e5874995b3a1ef9081",
+     "runs/ibm_kingston-2026-10-14-exp1-1/run.json": "6b89d7cd77cdf2aa24a7b4277b0bafb67b71d731aa2a21701c8691934805912d",
+     "runs/ibm_kingston-2026-10-14-exp1-1/calibration.json": "4c6463eacc5a7e886e042fe3812b87bdac157b38bc0301a694d7574fb8184793",
+     "runs/ibm_kingston-2026-10-14-exp1-1/program.json.gz": "48e180d9c41e2e6c5f296fc692ad766f9cf0925ec90d92d7f98aa0d266b0c648",
+     "runs/ibm_kingston-2026-10-14-exp1-1/results.npz": "766118c5302cdc1667be8b8d9ee87d4e27be439882689f28a9dd4fb1a0ffd42e",
+     "runs/ibm_kingston-2026-10-14-exp1-2/run.json": "87b9679bc198ac471f30bc31ac9345b2a3733578ff6ffc59188e0f4be07d653a",
+     "runs/ibm_kingston-2026-10-14-exp1-2/calibration.json": "4c6ce0f9a15f1eac0ab5e172e58b3dbf3a8d19d978b3155bca18323b9b3ff090",
+     "runs/ibm_kingston-2026-10-14-exp1-2/program.json.gz": "6e7dbcc8d49edba1007b5e3140d73b17d8c38d0bbe320d8acdd87e913196692e",
+     "runs/ibm_kingston-2026-10-14-exp1-2/results.npz": "5d9178fcf18a691f9cca28abee05fad6e267c53d06488bd98f57be10078c56aa",
+     "runs/ibm_kingston-2026-10-14-life-z/run.json": "f9e9c1878d03a7e26c38740200d931f26ef149d80cbd50aa286f59441d878dd4",
+     "runs/ibm_kingston-2026-10-14-life-z/calibration.json": "1ccc2b7b13f9b5a2d9b6a5b14f4b63c0d826d5b6acff34acdceea3c4ad1adf03",
+     "runs/ibm_kingston-2026-10-14-life-z/program.json.gz": "5b82d4d9c70c63f79c6d7002b8652c73922428b8a90ee8e0d7d615eb3e499c18",
+     "runs/ibm_kingston-2026-10-14-life-z/results.npz": "333fe231cba2faff58400f1042e378a4da642d074e18b3525cab8964246acab0"
+    },
+    "hardware_priors": "measured",
+    "simulation_priors": "hardware",
+    "shots": 200000,
+    "seed": 0,
+    "memory": {
+     "observed": {
+      "X": {
+       "eps": {
+        "3": {
+         "failures": [
+          968,
+          1365,
+          1713,
+          2046
+         ],
+         "log": [
+          0.06493780509524844,
+          0.002673788751349963
+         ],
+         "binomial": [
+          0.06494949402300902,
+          0.00265722529804514
+         ],
+         "binomial_interval": [
+          0.062289778886346604,
+          0.06760422948243688
+         ],
+         "dispersion": 1.0
+        },
+        "5": {
+         "failures": [
+          1170,
+          1679,
+          2181,
+          2540
+         ],
+         "log": [
+          0.0946597066738612,
+          0.0032428747254805595
+         ],
+         "binomial": [
+          0.09467704393191209,
+          0.0032019818227223135
+         ],
+         "binomial_interval": [
+          0.09147389727227315,
+          0.09787786091771777
+         ],
+         "dispersion": 1.0
+        }
+       },
+       "lambda": {
+        "log": [
+         0.686013166288207,
+         0.036744797230085204
+        ],
+        "binomial": [
+         0.6860110046287258,
+         0.03641420954404263
+        ]
+       }
+      },
+      "Z": {
+       "eps": {
+        "3": {
+         "failures": [
+          903,
+          1334,
+          1759,
+          2014
+         ],
+         "log": [
+          0.06831417966028297,
+          0.002593248172479624
+         ],
+         "binomial": [
+          0.06840746391781169,
+          0.002613325855085856
+         ],
+         "binomial_interval": [
+          0.06579193473981976,
+          0.07101858644999147
+         ],
+         "dispersion": 1.0
+        },
+        "5": {
+         "failures": [
+          1159,
+          1799,
+          2422,
+          2795
+         ],
+         "log": [
+          0.1191453964544133,
+          0.004079678460361451
+         ],
+         "binomial": [
+          0.11924268927879547,
+          0.003988004409424463
+         ],
+         "binomial_interval": [
+          0.1152567947374839,
+          0.12323280355633283
+         ],
+         "dispersion": 1.3768733372351476
+        }
+       },
+       "lambda": {
+        "log": [
+         0.5733681845309142,
+         0.029311769897079135
+        ],
+        "binomial": [
+         0.5736826662628478,
+         0.029127885162804703
+        ]
+       }
+      }
+     },
+     "predicted": {
+      "X": {
+       "eps": {
+        "3": {
+         "failures": [
+          16073,
+          22461,
+          27630,
+          32057
+         ],
+         "log": [
+          0.03443934814474919,
+          0.0011961332601110515
+         ],
+         "binomial": [
+          0.03444349874738162,
+          0.0012140990423805606
+         ],
+         "binomial_interval": [
+          0.033228428584696906,
+          0.03565662666945803
+         ],
+         "dispersion": 9.11125236625404
+        },
+        "5": {
+         "failures": [
+          20582,
+          30340,
+          39016,
+          46601
+         ],
+         "log": [
+          0.06191737098344241,
+          0.0004980876207426108
+         ],
+         "binomial": [
+          0.061917398422198344,
+          0.0004975024582509063
+         ],
+         "binomial_interval": [
+          0.06141981161785992,
+          0.06241481653436173
+         ],
+         "dispersion": 1.0
+        }
+       },
+       "lambda": {
+        "log": [
+         0.5562146389251373,
+         0.01982962111915808
+        ],
+        "binomial": [
+         0.5562814269507985,
+         0.020111343506115955
+        ]
+       }
+      },
+      "Z": {
+       "eps": {
+        "3": {
+         "failures": [
+          18929,
+          28279,
+          34441,
+          40620
+         ],
+         "log": [
+          0.04966634987586316,
+          0.0023208261728533256
+         ],
+         "binomial": [
+          0.049660143596713335,
+          0.0023953594580528766
+         ],
+         "binomial_interval": [
+          0.04726189331463546,
+          0.052052612230741216
+         ],
+         "dispersion": 26.381633940613312
+        },
+        "5": {
+         "failures": [
+          29983,
+          45349,
+          56645,
+          65881
+         ],
+         "log": [
+          0.10677190782933516,
+          0.0010028460116494038
+         ],
+         "binomial": [
+          0.10677531365623072,
+          0.0010116690995541702
+         ],
+         "binomial_interval": [
+          0.10576360748161698,
+          0.10778694568072532
+         ],
+         "dispersion": 2.090385762733238
+        }
+       },
+       "lambda": {
+        "log": [
+         0.4651630834886845,
+         0.02217103783158796
+        ],
+        "binomial": [
+         0.46509012145444995,
+         0.022862341118313027
+        ]
+       }
+      }
+     },
+     "observed_over_model": {
+      "X": {
+       "log": {
+        "eps3": [
+         1.8855700991294517,
+         0.1015696191862306
+        ],
+        "eps5": [
+         1.5288069433564058,
+         0.05379878134582573
+        ],
+        "lambda": [
+         1.2333605020067435,
+         0.0793576270914789
+        ]
+       },
+       "binomial": {
+        "eps3": [
+         1.8856822444016799,
+         0.10183205592450816
+        ],
+        "eps5": [
+         1.529086272106176,
+         0.053153194876358965
+        ],
+        "lambda": [
+         1.233208536889371,
+         0.07920093341974171
+        ]
+       }
+      },
+      "Z": {
+       "log": {
+        "eps3": [
+         1.375462054913004,
+         0.08280859731700604
+        ],
+        "eps5": [
+         1.1158871174696625,
+         0.03962068061614822
+        ],
+        "lambda": [
+         1.232617559051979,
+         0.08615301641341748
+        ]
+       },
+       "binomial": {
+        "eps3": [
+         1.3775124065960034,
+         0.08475944171662687
+        ],
+        "eps5": [
+         1.116762715984185,
+         0.03881937058569203
+        ],
+        "lambda": [
+         1.2334871023895382,
+         0.0871713334053566
+        ]
+       }
+      }
+     },
+     "detection": {
+      "d=3 X memory, 1 round": {
+       "stabilizer": 0.0890875,
+       "final": 0.21801
+      },
+      "d=3 X memory, 2 rounds": {
+       "stabilizer": 0.11267125000000001,
+       "final": 0.22006625
+      },
+      "d=3 X memory, 3 rounds": {
+       "stabilizer": 0.12322958333333334,
+       "final": 0.220645
+      },
+      "d=3 X memory, 4 rounds": {
+       "stabilizer": 0.1274965625,
+       "final": 0.22080375
+      },
+      "d=5 X memory, 1 round": {
+       "stabilizer": 0.150195,
+       "final": 0.24036375000000007
+      },
+      "d=5 X memory, 2 rounds": {
+       "stabilizer": 0.1748875,
+       "final": 0.24353541666666664
+      },
+      "d=5 X memory, 3 rounds": {
+       "stabilizer": 0.18419694444444443,
+       "final": 0.24390416666666667
+      },
+      "d=5 X memory, 4 rounds": {
+       "stabilizer": 0.18856052083333333,
+       "final": 0.24359625
+      },
+      "d=3 Z memory, 1 round": {
+       "stabilizer": 0.1252975,
+       "final": 0.334345,
+       "relay": 0.0270325,
+       "z_flag": 0.04134125
+      },
+      "d=3 Z memory, 2 rounds": {
+       "stabilizer": 0.173955,
+       "final": 0.360525,
+       "relay": 0.037969375,
+       "z_flag": 0.041109375000000004
+      },
+      "d=3 Z memory, 3 rounds": {
+       "stabilizer": 0.20586666666666664,
+       "final": 0.36150499999999997,
+       "relay": 0.04158666666666667,
+       "z_flag": 0.04157541666666667
+      },
+      "d=3 Z memory, 4 rounds": {
+       "stabilizer": 0.22136250000000002,
+       "final": 0.36204749999999997,
+       "relay": 0.0432890625,
+       "z_flag": 0.0415446875
+      },
+      "d=5 Z memory, 1 round": {
+       "stabilizer": 0.2500875,
+       "final": 0.389945,
+       "relay": 0.0384075,
+       "z_flag": 0.047615000000000005
+      },
+      "d=5 Z memory, 2 rounds": {
+       "stabilizer": 0.3008175,
+       "final": 0.41088624999999995,
+       "relay": 0.048458749999999995,
+       "z_flag": 0.04749484375
+      },
+      "d=5 Z memory, 3 rounds": {
+       "stabilizer": 0.32669791666666664,
+       "final": 0.41060375,
+       "relay": 0.05185375,
+       "z_flag": 0.04748104166666666
+      },
+      "d=5 Z memory, 4 rounds": {
+       "stabilizer": 0.3389671875,
+       "final": 0.41057375,
+       "relay": 0.0533765625,
+       "z_flag": 0.047403125000000004
+      }
+     }
+    }
+   },
+   "joint": {
+    "input_sha256": {
+     "followup/reproduce.py": "ab8110422b8bb69ba695c9aaa84dad3b3afc08e261db68e5874995b3a1ef9081",
+     "runs/ibm_kingston-2026-10-14-exp1-1/run.json": "6b89d7cd77cdf2aa24a7b4277b0bafb67b71d731aa2a21701c8691934805912d",
+     "runs/ibm_kingston-2026-10-14-exp1-1/calibration.json": "4c6463eacc5a7e886e042fe3812b87bdac157b38bc0301a694d7574fb8184793",
+     "runs/ibm_kingston-2026-10-14-exp1-1/program.json.gz": "48e180d9c41e2e6c5f296fc692ad766f9cf0925ec90d92d7f98aa0d266b0c648",
+     "runs/ibm_kingston-2026-10-14-exp1-1/results.npz": "766118c5302cdc1667be8b8d9ee87d4e27be439882689f28a9dd4fb1a0ffd42e",
+     "runs/ibm_kingston-2026-10-14-exp1-2/run.json": "87b9679bc198ac471f30bc31ac9345b2a3733578ff6ffc59188e0f4be07d653a",
+     "runs/ibm_kingston-2026-10-14-exp1-2/calibration.json": "4c6ce0f9a15f1eac0ab5e172e58b3dbf3a8d19d978b3155bca18323b9b3ff090",
+     "runs/ibm_kingston-2026-10-14-exp1-2/program.json.gz": "6e7dbcc8d49edba1007b5e3140d73b17d8c38d0bbe320d8acdd87e913196692e",
+     "runs/ibm_kingston-2026-10-14-exp1-2/results.npz": "5d9178fcf18a691f9cca28abee05fad6e267c53d06488bd98f57be10078c56aa",
+     "runs/ibm_kingston-2026-10-14-life-z/run.json": "f9e9c1878d03a7e26c38740200d931f26ef149d80cbd50aa286f59441d878dd4",
+     "runs/ibm_kingston-2026-10-14-life-z/calibration.json": "1ccc2b7b13f9b5a2d9b6a5b14f4b63c0d826d5b6acff34acdceea3c4ad1adf03",
+     "runs/ibm_kingston-2026-10-14-life-z/program.json.gz": "5b82d4d9c70c63f79c6d7002b8652c73922428b8a90ee8e0d7d615eb3e499c18",
+     "runs/ibm_kingston-2026-10-14-life-z/results.npz": "333fe231cba2faff58400f1042e378a4da642d074e18b3525cab8964246acab0"
+    },
+    "hardware_priors": "measured",
+    "simulation_priors": "hardware",
+    "shots": 200000,
+    "seed": 0,
+    "memory": {
+     "observed": {
+      "X": {
+       "eps": {
+        "3": {
+         "failures": [
+          968,
+          1365,
+          1713,
+          2046
+         ],
+         "log": [
+          0.06493780509524844,
+          0.002673788751349963
+         ],
+         "binomial": [
+          0.06494949402300902,
+          0.00265722529804514
+         ],
+         "binomial_interval": [
+          0.062289778886346604,
+          0.06760422948243688
+         ],
+         "dispersion": 1.0
+        },
+        "5": {
+         "failures": [
+          1170,
+          1679,
+          2181,
+          2540
+         ],
+         "log": [
+          0.0946597066738612,
+          0.0032428747254805595
+         ],
+         "binomial": [
+          0.09467704393191209,
+          0.0032019818227223135
+         ],
+         "binomial_interval": [
+          0.09147389727227315,
+          0.09787786091771777
+         ],
+         "dispersion": 1.0
+        }
+       },
+       "lambda": {
+        "log": [
+         0.686013166288207,
+         0.036744797230085204
+        ],
+        "binomial": [
+         0.6860110046287258,
+         0.03641420954404263
+        ]
+       }
+      },
+      "Z": {
+       "eps": {
+        "3": {
+         "failures": [
+          903,
+          1334,
+          1759,
+          2014
+         ],
+         "log": [
+          0.06831417966028297,
+          0.002593248172479624
+         ],
+         "binomial": [
+          0.06840746391781169,
+          0.002613325855085856
+         ],
+         "binomial_interval": [
+          0.06579193473981976,
+          0.07101858644999147
+         ],
+         "dispersion": 1.0
+        },
+        "5": {
+         "failures": [
+          1159,
+          1799,
+          2422,
+          2795
+         ],
+         "log": [
+          0.1191453964544133,
+          0.004079678460361451
+         ],
+         "binomial": [
+          0.11924268927879547,
+          0.003988004409424463
+         ],
+         "binomial_interval": [
+          0.1152567947374839,
+          0.12323280355633283
+         ],
+         "dispersion": 1.3768733372351476
+        }
+       },
+       "lambda": {
+        "log": [
+         0.5733681845309142,
+         0.029311769897079135
+        ],
+        "binomial": [
+         0.5736826662628478,
+         0.029127885162804703
+        ]
+       }
+      }
+     },
+     "predicted": {
+      "X": {
+       "eps": {
+        "3": {
+         "failures": [
+          18184,
+          25103,
+          30842,
+          36016
+         ],
+         "log": [
+          0.03959444207596846,
+          0.000833919556149423
+         ],
+         "binomial": [
+          0.03959492695645356,
+          0.0008425721068338506
+         ],
+         "binomial_interval": [
+          0.03875192836540686,
+          0.040437072579074564
+         ],
+         "dispersion": 3.754239135328142
+        },
+        "5": {
+         "failures": [
+          16851,
+          26830,
+          35020,
+          42528
+         ],
+         "log": [
+          0.05799801035283647,
+          0.0006120898158044678
+         ],
+         "binomial": [
+          0.05799818775331817,
+          0.000617285220034184
+         ],
+         "binomial_interval": [
+          0.057380772542542105,
+          0.05861534298261047
+         ],
+         "dispersion": 1.887335614587182
+        }
+       },
+       "lambda": {
+        "log": [
+         0.6826862134595975,
+         0.016082546724758447
+        ],
+        "binomial": [
+         0.6826924855800907,
+         0.016243306946902132
+        ]
+       }
+      },
+      "Z": {
+       "eps": {
+        "3": {
+         "failures": [
+          22187,
+          32204,
+          39943,
+          46734
+         ],
+         "log": [
+          0.05985503083684929,
+          0.0014194975106555368
+         ],
+         "binomial": [
+          0.05985861929022224,
+          0.001441199686802782
+         ],
+         "binomial_interval": [
+          0.0584165569502729,
+          0.06129895632387847
+         ],
+         "dispersion": 7.702465417224006
+        },
+        "5": {
+         "failures": [
+          28235,
+          42550,
+          54727,
+          64462
+         ],
+         "log": [
+          0.10350656564237481,
+          0.0013928640578152718
+         ],
+         "binomial": [
+          0.10351823427438561,
+          0.0013778631979608838
+         ],
+         "binomial_interval": [
+          0.10214033222449015,
+          0.10489605862041192
+         ],
+         "dispersion": 4.332150105947334
+        }
+       },
+       "lambda": {
+        "log": [
+         0.5782727932801307,
+         0.015768026088438063
+        ],
+        "binomial": [
+         0.5782422749943829,
+         0.015908012008565692
+        ]
+       }
+      }
+     },
+     "observed_over_model": {
+      "X": {
+       "log": {
+        "eps3": [
+         1.640073750014069,
+         0.07585117725473409
+        ],
+        "eps5": [
+         1.6321198968376636,
+         0.058506571038910965
+        ],
+        "lambda": [
+         1.0048733265195877,
+         0.0587996247473111
+        ]
+       },
+       "binomial": {
+        "eps3": [
+         1.6403488783914257,
+         0.07564545325639976
+        ],
+        "eps5": [
+         1.6324138322148776,
+         0.05787759336346558
+        ],
+        "lambda": [
+         1.0048609280440743,
+         0.05845241492278977
+        ]
+       }
+      },
+      "Z": {
+       "log": {
+        "eps3": [
+         1.141327282020643,
+         0.05108555286960414
+        ],
+        "eps5": [
+         1.1510902300253314,
+         0.04234921464915552
+        ],
+        "lambda": [
+         0.9915185206597804,
+         0.05744804127326008
+        ]
+       },
+       "binomial": {
+        "eps3": [
+         1.1428172705778712,
+         0.05160561353748175
+        ],
+        "eps5": [
+         1.1519003402118566,
+         0.041463540112693494
+        ],
+        "lambda": [
+         0.9921147087843425,
+         0.05729240244915988
+        ]
+       }
+      }
+     },
+     "detection": {
+      "d=3 X memory, 1 round": {
+       "stabilizer": 0.08881125000000001,
+       "final": 0.22201374999999998
+      },
+      "d=3 X memory, 2 rounds": {
+       "stabilizer": 0.11719437499999999,
+       "final": 0.22483375
+      },
+      "d=3 X memory, 3 rounds": {
+       "stabilizer": 0.12823625000000002,
+       "final": 0.22485375000000002
+      },
+      "d=3 X memory, 4 rounds": {
+       "stabilizer": 0.1334303125,
+       "final": 0.2254625
+      },
+      "d=5 X memory, 1 round": {
+       "stabilizer": 0.12885500000000003,
+       "final": 0.2284445833333333
+      },
+      "d=5 X memory, 2 rounds": {
+       "stabilizer": 0.15888875,
+       "final": 0.23145708333333334
+      },
+      "d=5 X memory, 3 rounds": {
+       "stabilizer": 0.1703175,
+       "final": 0.23134875
+      },
+      "d=5 X memory, 4 rounds": {
+       "stabilizer": 0.17576197916666667,
+       "final": 0.23123000000000002
+      },
+      "d=3 Z memory, 1 round": {
+       "stabilizer": 0.12958,
+       "final": 0.3430825,
+       "relay": 0.027485000000000002,
+       "z_flag": 0.041607500000000006
+      },
+      "d=3 Z memory, 2 rounds": {
+       "stabilizer": 0.18424875,
+       "final": 0.37072499999999997,
+       "relay": 0.037983750000000004,
+       "z_flag": 0.041533125000000004
+      },
+      "d=3 Z memory, 3 rounds": {
+       "stabilizer": 0.21690833333333334,
+       "final": 0.3700725,
+       "relay": 0.04144333333333334,
+       "z_flag": 0.04161666666666666
+      },
+      "d=3 Z memory, 4 rounds": {
+       "stabilizer": 0.23282875,
+       "final": 0.370155,
+       "relay": 0.0430540625,
+       "z_flag": 0.041736875
+      },
+      "d=5 Z memory, 1 round": {
+       "stabilizer": 0.22322625000000001,
+       "final": 0.3892875,
+       "relay": 0.038913125,
+       "z_flag": 0.0476715625
+      },
+      "d=5 Z memory, 2 rounds": {
+       "stabilizer": 0.28569187500000004,
+       "final": 0.4089675,
+       "relay": 0.048554062499999995,
+       "z_flag": 0.04774140625
+      },
+      "d=5 Z memory, 3 rounds": {
+       "stabilizer": 0.3155708333333333,
+       "final": 0.408555,
+       "relay": 0.051793541666666665,
+       "z_flag": 0.04762104166666667
+      },
+      "d=5 Z memory, 4 rounds": {
+       "stabilizer": 0.3307265625,
+       "final": 0.40864625,
+       "relay": 0.0534853125,
+       "z_flag": 0.047642265625
+      }
+     }
+    }
+   },
+   "own_test": {
+    "input_sha256": {
+     "followup/reproduce.py": "ab8110422b8bb69ba695c9aaa84dad3b3afc08e261db68e5874995b3a1ef9081",
+     "runs/ibm_kingston-2026-10-14-exp1-1/run.json": "6b89d7cd77cdf2aa24a7b4277b0bafb67b71d731aa2a21701c8691934805912d",
+     "runs/ibm_kingston-2026-10-14-exp1-1/calibration.json": "4c6463eacc5a7e886e042fe3812b87bdac157b38bc0301a694d7574fb8184793",
+     "runs/ibm_kingston-2026-10-14-exp1-1/program.json.gz": "48e180d9c41e2e6c5f296fc692ad766f9cf0925ec90d92d7f98aa0d266b0c648",
+     "runs/ibm_kingston-2026-10-14-exp1-1/results.npz": "766118c5302cdc1667be8b8d9ee87d4e27be439882689f28a9dd4fb1a0ffd42e",
+     "runs/ibm_kingston-2026-10-14-exp1-2/run.json": "87b9679bc198ac471f30bc31ac9345b2a3733578ff6ffc59188e0f4be07d653a",
+     "runs/ibm_kingston-2026-10-14-exp1-2/calibration.json": "4c6ce0f9a15f1eac0ab5e172e58b3dbf3a8d19d978b3155bca18323b9b3ff090",
+     "runs/ibm_kingston-2026-10-14-exp1-2/program.json.gz": "6e7dbcc8d49edba1007b5e3140d73b17d8c38d0bbe320d8acdd87e913196692e",
+     "runs/ibm_kingston-2026-10-14-exp1-2/results.npz": "5d9178fcf18a691f9cca28abee05fad6e267c53d06488bd98f57be10078c56aa",
+     "runs/ibm_kingston-2026-10-14-life-z/run.json": "f9e9c1878d03a7e26c38740200d931f26ef149d80cbd50aa286f59441d878dd4",
+     "runs/ibm_kingston-2026-10-14-life-z/calibration.json": "1ccc2b7b13f9b5a2d9b6a5b14f4b63c0d826d5b6acff34acdceea3c4ad1adf03",
+     "runs/ibm_kingston-2026-10-14-life-z/program.json.gz": "5b82d4d9c70c63f79c6d7002b8652c73922428b8a90ee8e0d7d615eb3e499c18",
+     "runs/ibm_kingston-2026-10-14-life-z/results.npz": "333fe231cba2faff58400f1042e378a4da642d074e18b3525cab8964246acab0"
+    },
+    "hardware_priors": "measured",
+    "simulation_priors": "hardware",
+    "shots": 200000,
+    "seed": 0,
+    "memory": {
+     "observed": {
+      "X": {
+       "eps": {
+        "3": {
+         "failures": [
+          968,
+          1365,
+          1713,
+          2046
+         ],
+         "log": [
+          0.06493780509524844,
+          0.002673788751349963
+         ],
+         "binomial": [
+          0.06494949402300902,
+          0.00265722529804514
+         ],
+         "binomial_interval": [
+          0.062289778886346604,
+          0.06760422948243688
+         ],
+         "dispersion": 1.0
+        },
+        "5": {
+         "failures": [
+          1170,
+          1679,
+          2181,
+          2540
+         ],
+         "log": [
+          0.0946597066738612,
+          0.0032428747254805595
+         ],
+         "binomial": [
+          0.09467704393191209,
+          0.0032019818227223135
+         ],
+         "binomial_interval": [
+          0.09147389727227315,
+          0.09787786091771777
+         ],
+         "dispersion": 1.0
+        }
+       },
+       "lambda": {
+        "log": [
+         0.686013166288207,
+         0.036744797230085204
+        ],
+        "binomial": [
+         0.6860110046287258,
+         0.03641420954404263
+        ]
+       }
+      },
+      "Z": {
+       "eps": {
+        "3": {
+         "failures": [
+          903,
+          1334,
+          1759,
+          2014
+         ],
+         "log": [
+          0.06831417966028297,
+          0.002593248172479624
+         ],
+         "binomial": [
+          0.06840746391781169,
+          0.002613325855085856
+         ],
+         "binomial_interval": [
+          0.06579193473981976,
+          0.07101858644999147
+         ],
+         "dispersion": 1.0
+        },
+        "5": {
+         "failures": [
+          1159,
+          1799,
+          2422,
+          2795
+         ],
+         "log": [
+          0.1191453964544133,
+          0.004079678460361451
+         ],
+         "binomial": [
+          0.11924268927879547,
+          0.003988004409424463
+         ],
+         "binomial_interval": [
+          0.1152567947374839,
+          0.12323280355633283
+         ],
+         "dispersion": 1.3768733372351476
+        }
+       },
+       "lambda": {
+        "log": [
+         0.5733681845309142,
+         0.029311769897079135
+        ],
+        "binomial": [
+         0.5736826662628478,
+         0.029127885162804703
+        ]
+       }
+      }
+     },
+     "predicted": {
+      "X": {
+       "eps": {
+        "3": {
+         "failures": [
+          18218,
+          25471,
+          30509,
+          35602
+         ],
+         "log": [
+          0.03844195391906424,
+          0.0016601100327651567
+         ],
+         "binomial": [
+          0.038433438470260955,
+          0.001700789338822603
+         ],
+         "binomial_interval": [
+          0.03673084932165247,
+          0.04013242799929768
+         ],
+         "dispersion": 15.187120651146198
+        },
+        "5": {
+         "failures": [
+          17169,
+          26429,
+          34805,
+          42004
+         ],
+         "log": [
+          0.05614052825826221,
+          0.0004478342494244535
+         ],
+         "binomial": [
+          0.05614104911929814,
+          0.00044791863162242304
+         ],
+         "binomial_interval": [
+          0.055693058177334887,
+          0.05658889544057973
+         ],
+         "dispersion": 1.0
+        }
+       },
+       "lambda": {
+        "log": [
+         0.6847451406623829,
+         0.030070871102892263
+        ],
+        "binomial": [
+         0.6845871082421525,
+         0.030783369323026846
+        ]
+       }
+      },
+      "Z": {
+       "eps": {
+        "3": {
+         "failures": [
+          24283,
+          35367,
+          43487,
+          50688
+         ],
+         "log": [
+          0.06719891543825396,
+          0.0018586196706942082
+         ],
+         "binomial": [
+          0.06720382783717213,
+          0.0018952227095172872
+         ],
+         "binomial_interval": [
+          0.065307288134618,
+          0.06909773355365258
+         ],
+         "dispersion": 11.495104848329651
+        },
+        "5": {
+         "failures": [
+          30004,
+          45759,
+          57341,
+          66851
+         ],
+         "log": [
+          0.11021827282239571,
+          0.0008499118646927259
+         ],
+         "binomial": [
+          0.11022149081816635,
+          0.00085467604617636
+         ],
+         "binomial_interval": [
+          0.10936681791830252,
+          0.11107617001065524
+         ],
+         "dispersion": 1.467833678053116
+        }
+       },
+       "lambda": {
+        "log": [
+         0.6096894255142014,
+         0.01750619443319169
+        ],
+        "binomial": [
+         0.6097161936236106,
+         0.01783281638190812
+        ]
+       }
+      }
+     },
+     "observed_over_model": {
+      "X": {
+       "log": {
+        "eps3": [
+         1.6892430918565848,
+         0.10079389179749745
+        ],
+        "eps5": [
+         1.6861206976606977,
+         0.05930879477087633
+        ],
+        "lambda": [
+         1.0018518212843357,
+         0.06939253789433884
+        ]
+       },
+       "binomial": {
+        "eps3": [
+         1.689921500863517,
+         0.10184664137555323
+        ],
+        "eps5": [
+         1.6864138703700755,
+         0.05860017845556563
+        ],
+        "lambda": [
+         1.002079934561183,
+         0.06971173105980075
+        ]
+       }
+      },
+      "Z": {
+       "log": {
+        "eps3": [
+         1.016596461635661,
+         0.047747573133047214
+        ],
+        "eps5": [
+         1.0809949512310235,
+         0.03794154092892493
+        ],
+        "lambda": [
+         0.9404266509089371,
+         0.05514076652353448
+        ]
+       },
+       "binomial": {
+        "eps3": [
+         1.0179102309998747,
+         0.04833436375794012
+        ],
+        "eps5": [
+         1.0818460936580099,
+         0.03714148575545198
+        ],
+        "lambda": [
+         0.9409011475542226,
+         0.055132147927973316
+        ]
+       }
+      }
+     },
+     "detection": {
+      "d=3 X memory, 1 round": {
+       "stabilizer": 0.09620375,
+       "final": 0.22089
+      },
+      "d=3 X memory, 2 rounds": {
+       "stabilizer": 0.11961062500000001,
+       "final": 0.2238525
+      },
+      "d=3 X memory, 3 rounds": {
+       "stabilizer": 0.12923625,
+       "final": 0.2236925
+      },
+      "d=3 X memory, 4 rounds": {
+       "stabilizer": 0.1333225,
+       "final": 0.22350125
+      },
+      "d=5 X memory, 1 round": {
+       "stabilizer": 0.13518125,
+       "final": 0.2268983333333333
+      },
+      "d=5 X memory, 2 rounds": {
+       "stabilizer": 0.16149979166666667,
+       "final": 0.23009499999999997
+      },
+      "d=5 X memory, 3 rounds": {
+       "stabilizer": 0.17143541666666667,
+       "final": 0.23056041666666663
+      },
+      "d=5 X memory, 4 rounds": {
+       "stabilizer": 0.17640124999999998,
+       "final": 0.2309341666666667
+      },
+      "d=3 Z memory, 1 round": {
+       "stabilizer": 0.13809,
+       "final": 0.35184000000000004,
+       "relay": 0.027298749999999997,
+       "z_flag": 0.041275
+      },
+      "d=3 Z memory, 2 rounds": {
+       "stabilizer": 0.19511375000000003,
+       "final": 0.37429,
+       "relay": 0.03793125,
+       "z_flag": 0.0416075
+      },
+      "d=3 Z memory, 3 rounds": {
+       "stabilizer": 0.22754166666666667,
+       "final": 0.37541,
+       "relay": 0.04164125,
+       "z_flag": 0.041672916666666664
+      },
+      "d=3 Z memory, 4 rounds": {
+       "stabilizer": 0.24358875,
+       "final": 0.37500500000000003,
+       "relay": 0.0433859375,
+       "z_flag": 0.0416640625
+      },
+      "d=5 Z memory, 1 round": {
+       "stabilizer": 0.2354725,
+       "final": 0.3954475,
+       "relay": 0.038619375,
+       "z_flag": 0.047712500000000005
+      },
+      "d=5 Z memory, 2 rounds": {
+       "stabilizer": 0.296608125,
+       "final": 0.4136975,
+       "relay": 0.049011562499999994,
+       "z_flag": 0.04770578125
+      },
+      "d=5 Z memory, 3 rounds": {
+       "stabilizer": 0.32415916666666666,
+       "final": 0.412805,
+       "relay": 0.05199937500000001,
+       "z_flag": 0.04752625
+      },
+      "d=5 Z memory, 4 rounds": {
+       "stabilizer": 0.33881375,
+       "final": 0.414755,
+       "relay": 0.05363125,
+       "z_flag": 0.047649687499999996
+      }
+     }
+    }
+   },
+   "measured_tq_readout": {
+    "input_sha256": {
+     "followup/reproduce.py": "ab8110422b8bb69ba695c9aaa84dad3b3afc08e261db68e5874995b3a1ef9081",
+     "runs/ibm_kingston-2026-10-14-exp1-1/run.json": "6b89d7cd77cdf2aa24a7b4277b0bafb67b71d731aa2a21701c8691934805912d",
+     "runs/ibm_kingston-2026-10-14-exp1-1/calibration.json": "4c6463eacc5a7e886e042fe3812b87bdac157b38bc0301a694d7574fb8184793",
+     "runs/ibm_kingston-2026-10-14-exp1-1/program.json.gz": "48e180d9c41e2e6c5f296fc692ad766f9cf0925ec90d92d7f98aa0d266b0c648",
+     "runs/ibm_kingston-2026-10-14-exp1-1/results.npz": "766118c5302cdc1667be8b8d9ee87d4e27be439882689f28a9dd4fb1a0ffd42e",
+     "runs/ibm_kingston-2026-10-14-exp1-2/run.json": "87b9679bc198ac471f30bc31ac9345b2a3733578ff6ffc59188e0f4be07d653a",
+     "runs/ibm_kingston-2026-10-14-exp1-2/calibration.json": "4c6ce0f9a15f1eac0ab5e172e58b3dbf3a8d19d978b3155bca18323b9b3ff090",
+     "runs/ibm_kingston-2026-10-14-exp1-2/program.json.gz": "6e7dbcc8d49edba1007b5e3140d73b17d8c38d0bbe320d8acdd87e913196692e",
+     "runs/ibm_kingston-2026-10-14-exp1-2/results.npz": "5d9178fcf18a691f9cca28abee05fad6e267c53d06488bd98f57be10078c56aa",
+     "runs/ibm_kingston-2026-10-14-life-z/run.json": "f9e9c1878d03a7e26c38740200d931f26ef149d80cbd50aa286f59441d878dd4",
+     "runs/ibm_kingston-2026-10-14-life-z/calibration.json": "1ccc2b7b13f9b5a2d9b6a5b14f4b63c0d826d5b6acff34acdceea3c4ad1adf03",
+     "runs/ibm_kingston-2026-10-14-life-z/program.json.gz": "5b82d4d9c70c63f79c6d7002b8652c73922428b8a90ee8e0d7d615eb3e499c18",
+     "runs/ibm_kingston-2026-10-14-life-z/results.npz": "333fe231cba2faff58400f1042e378a4da642d074e18b3525cab8964246acab0"
+    },
+    "hardware_priors": "measured",
+    "simulation_priors": "hardware",
+    "shots": 200000,
+    "seed": 0,
+    "memory": {
+     "observed": {
+      "X": {
+       "eps": {
+        "3": {
+         "failures": [
+          968,
+          1365,
+          1713,
+          2046
+         ],
+         "log": [
+          0.06493780509524844,
+          0.002673788751349963
+         ],
+         "binomial": [
+          0.06494949402300902,
+          0.00265722529804514
+         ],
+         "binomial_interval": [
+          0.062289778886346604,
+          0.06760422948243688
+         ],
+         "dispersion": 1.0
+        },
+        "5": {
+         "failures": [
+          1170,
+          1679,
+          2181,
+          2540
+         ],
+         "log": [
+          0.0946597066738612,
+          0.0032428747254805595
+         ],
+         "binomial": [
+          0.09467704393191209,
+          0.0032019818227223135
+         ],
+         "binomial_interval": [
+          0.09147389727227315,
+          0.09787786091771777
+         ],
+         "dispersion": 1.0
+        }
+       },
+       "lambda": {
+        "log": [
+         0.686013166288207,
+         0.036744797230085204
+        ],
+        "binomial": [
+         0.6860110046287258,
+         0.03641420954404263
+        ]
+       }
+      },
+      "Z": {
+       "eps": {
+        "3": {
+         "failures": [
+          903,
+          1334,
+          1759,
+          2014
+         ],
+         "log": [
+          0.06831417966028297,
+          0.002593248172479624
+         ],
+         "binomial": [
+          0.06840746391781169,
+          0.002613325855085856
+         ],
+         "binomial_interval": [
+          0.06579193473981976,
+          0.07101858644999147
+         ],
+         "dispersion": 1.0
+        },
+        "5": {
+         "failures": [
+          1159,
+          1799,
+          2422,
+          2795
+         ],
+         "log": [
+          0.1191453964544133,
+          0.004079678460361451
+         ],
+         "binomial": [
+          0.11924268927879547,
+          0.003988004409424463
+         ],
+         "binomial_interval": [
+          0.1152567947374839,
+          0.12323280355633283
+         ],
+         "dispersion": 1.3768733372351476
+        }
+       },
+       "lambda": {
+        "log": [
+         0.5733681845309142,
+         0.029311769897079135
+        ],
+        "binomial": [
+         0.5736826662628478,
+         0.029127885162804703
+        ]
+       }
+      }
+     },
+     "predicted": {
+      "X": {
+       "eps": {
+        "3": {
+         "failures": [
+          14531,
+          21947,
+          27768,
+          33228
+         ],
+         "log": [
+          0.03976353795304621,
+          0.001072940472890449
+         ],
+         "binomial": [
+          0.0397625017295559,
+          0.0010915058722721985
+         ],
+         "binomial_interval": [
+          0.0386703217281342,
+          0.040853333472678596
+         ],
+         "dispersion": 7.7151680561414615
+        },
+        "5": {
+         "failures": [
+          14995,
+          23692,
+          31739,
+          38873
+         ],
+         "log": [
+          0.05199106231228201,
+          0.0004155977650835229
+         ],
+         "binomial": [
+          0.05199108134736387,
+          0.000414647401807796
+         ],
+         "binomial_interval": [
+          0.05157637342967337,
+          0.05240566823328896
+         ],
+         "dispersion": 1.0
+        }
+       },
+       "lambda": {
+        "log": [
+         0.7648148774919867,
+         0.021523551325543688
+        ],
+        "binomial": [
+         0.7647946666831926,
+         0.02186220907560915
+        ]
+       }
+      },
+      "Z": {
+       "eps": {
+        "3": {
+         "failures": [
+          15765,
+          24881,
+          32584,
+          39266
+         ],
+         "log": [
+          0.052038229382901036,
+          0.0007298831392156349
+         ],
+         "binomial": [
+          0.05204117018921682,
+          0.0007358310750964631
+         ],
+         "binomial_interval": [
+          0.05130511930945766,
+          0.05277678145965058
+         ],
+         "dispersion": 2.9667569262474522
+        },
+        "5": {
+         "failures": [
+          21609,
+          36190,
+          48099,
+          57924
+         ],
+         "log": [
+          0.09342882506351047,
+          0.0005635327371661555
+         ],
+         "binomial": [
+          0.09342954935354778,
+          0.0005626866050850651
+         ],
+         "binomial_interval": [
+          0.09286686421523255,
+          0.09399223742540268
+         ],
+         "dispersion": 1.0
+        }
+       },
+       "lambda": {
+        "log": [
+         0.5569825944779548,
+         0.008503924153070583
+        ],
+        "binomial": [
+         0.5570097527955237,
+         0.008560465106392317
+        ]
+       }
+      }
+     },
+     "observed_over_model": {
+      "X": {
+       "log": {
+        "eps3": [
+         1.6330992773311226,
+         0.08039480857384178
+        ],
+        "eps5": [
+         1.820691912492418,
+         0.06404916495794402
+        ],
+        "lambda": [
+         0.8969662940368136,
+         0.0542717022408894
+        ]
+       },
+       "binomial": {
+        "eps3": [
+         1.6334358050396853,
+         0.08047624497015916
+        ],
+        "eps5": [
+         1.821024711899218,
+         0.06327639555011351
+        ],
+        "lambda": [
+         0.8969871712153269,
+         0.05407832444497212
+        ]
+       }
+      },
+      "Z": {
+       "log": {
+        "eps3": [
+         1.312769102069602,
+         0.053126358124729336
+        ],
+        "eps5": [
+         1.2752530749843143,
+         0.044338465679738315
+        ],
+        "lambda": [
+         1.029418495686238,
+         0.05492286204873461
+        ]
+       },
+       "binomial": {
+        "eps3": [
+         1.3144874273404799,
+         0.053545677771401984
+        ],
+        "eps5": [
+         1.276284538498285,
+         0.04337117736714719
+        ],
+        "lambda": [
+         1.0299328932458471,
+         0.054636400556747865
+        ]
+       }
+      }
+     },
+     "detection": {
+      "d=3 X memory, 1 round": {
+       "stabilizer": 0.0993375,
+       "final": 0.18466875
+      },
+      "d=3 X memory, 2 rounds": {
+       "stabilizer": 0.124238125,
+       "final": 0.18826125
+      },
+      "d=3 X memory, 3 rounds": {
+       "stabilizer": 0.13414749999999998,
+       "final": 0.18719375000000002
+      },
+      "d=3 X memory, 4 rounds": {
+       "stabilizer": 0.139026875,
+       "final": 0.18808624999999998
+      },
+      "d=5 X memory, 1 round": {
+       "stabilizer": 0.13074791666666666,
+       "final": 0.1961275
+      },
+      "d=5 X memory, 2 rounds": {
+       "stabilizer": 0.15564,
+       "final": 0.19897166666666666
+      },
+      "d=5 X memory, 3 rounds": {
+       "stabilizer": 0.16516416666666667,
+       "final": 0.19889708333333334
+      },
+      "d=5 X memory, 4 rounds": {
+       "stabilizer": 0.16993114583333332,
+       "final": 0.19942041666666666
+      },
+      "d=3 Z memory, 1 round": {
+       "stabilizer": 0.13622250000000002,
+       "final": 0.26626,
+       "relay": 0.02450625,
+       "z_flag": 0.046509999999999996
+      },
+      "d=3 Z memory, 2 rounds": {
+       "stabilizer": 0.18157875,
+       "final": 0.3018825,
+       "relay": 0.034190625,
+       "z_flag": 0.045703749999999994
+      },
+      "d=3 Z memory, 3 rounds": {
+       "stabilizer": 0.21175666666666668,
+       "final": 0.30159749999999996,
+       "relay": 0.037186250000000004,
+       "z_flag": 0.04611333333333333
+      },
+      "d=3 Z memory, 4 rounds": {
+       "stabilizer": 0.226906875,
+       "final": 0.30264,
+       "relay": 0.038985,
+       "z_flag": 0.045895937500000004
+      },
+      "d=5 Z memory, 1 round": {
+       "stabilizer": 0.23394875,
+       "final": 0.3577025,
+       "relay": 0.03615125,
+       "z_flag": 0.042935
+      },
+      "d=5 Z memory, 2 rounds": {
+       "stabilizer": 0.28718375,
+       "final": 0.38205625,
+       "relay": 0.045089375,
+       "z_flag": 0.04308859375
+      },
+      "d=5 Z memory, 3 rounds": {
+       "stabilizer": 0.3136845833333333,
+       "final": 0.3812325,
+       "relay": 0.047843541666666656,
+       "z_flag": 0.042913020833333336
+      },
+      "d=5 Z memory, 4 rounds": {
+       "stabilizer": 0.327141875,
+       "final": 0.38125749999999997,
+       "relay": 0.049555,
+       "z_flag": 0.043051015625
+      }
+     }
+    }
+   },
+   "measured_tq": {
+    "shots": 200000,
+    "memory": {
+     "observed": {
+      "X": {
+       "eps": {
+        "3": {
+         "failures": [
+          968,
+          1365,
+          1713,
+          2046
+         ],
+         "log": [
+          0.06493780509524844,
+          0.002673788751349963
+         ],
+         "binomial": [
+          0.06494949402300902,
+          0.00265722529804514
+         ],
+         "binomial_interval": [
+          0.062289778886346604,
+          0.06760422948243688
+         ],
+         "dispersion": 1.0
+        },
+        "5": {
+         "failures": [
+          1170,
+          1679,
+          2181,
+          2540
+         ],
+         "log": [
+          0.0946597066738612,
+          0.0032428747254805595
+         ],
+         "binomial": [
+          0.09467704393191209,
+          0.0032019818227223135
+         ],
+         "binomial_interval": [
+          0.09147389727227315,
+          0.09787786091771777
+         ],
+         "dispersion": 1.0
+        }
+       },
+       "lambda": {
+        "log": [
+         0.686013166288207,
+         0.036744797230085204
+        ],
+        "binomial": [
+         0.6860110046287258,
+         0.03641420954404263
+        ]
+       }
+      },
+      "Z": {
+       "eps": {
+        "3": {
+         "failures": [
+          903,
+          1334,
+          1759,
+          2014
+         ],
+         "log": [
+          0.06831417966028297,
+          0.002593248172479624
+         ],
+         "binomial": [
+          0.06840746391781169,
+          0.002613325855085856
+         ],
+         "binomial_interval": [
+          0.06579193473981976,
+          0.07101858644999147
+         ],
+         "dispersion": 1.0
+        },
+        "5": {
+         "failures": [
+          1159,
+          1799,
+          2422,
+          2795
+         ],
+         "log": [
+          0.1191453964544133,
+          0.004079678460361451
+         ],
+         "binomial": [
+          0.11924268927879547,
+          0.003988004409424463
+         ],
+         "binomial_interval": [
+          0.1152567947374839,
+          0.12323280355633283
+         ],
+         "dispersion": 1.3768733372351476
+        }
+       },
+       "lambda": {
+        "log": [
+         0.5733681845309142,
+         0.029311769897079135
+        ],
+        "binomial": [
+         0.5736826662628478,
+         0.029127885162804703
+        ]
+       }
+      }
+     },
+     "predicted": {
+      "X": {
+       "eps": {
+        "3": {
+         "failures": [
+          18218,
+          25471,
+          30509,
+          35602
+         ],
+         "log": [
+          0.03844195391906424,
+          0.0016601100327651567
+         ],
+         "binomial": [
+          0.038433438470260955,
+          0.001700789338822603
+         ],
+         "binomial_interval": [
+          0.03673084932165247,
+          0.04013242799929768
+         ],
+         "dispersion": 15.187120651146198
+        },
+        "5": {
+         "failures": [
+          17169,
+          26429,
+          34805,
+          42004
+         ],
+         "log": [
+          0.05614052825826221,
+          0.0004478342494244535
+         ],
+         "binomial": [
+          0.05614104911929814,
+          0.00044791863162242304
+         ],
+         "binomial_interval": [
+          0.055693058177334887,
+          0.05658889544057973
+         ],
+         "dispersion": 1.0
+        }
+       },
+       "lambda": {
+        "log": [
+         0.6847451406623829,
+         0.030070871102892263
+        ],
+        "binomial": [
+         0.6845871082421525,
+         0.030783369323026846
+        ]
+       }
+      },
+      "Z": {
+       "eps": {
+        "3": {
+         "failures": [
+          21130,
+          30707,
+          37749,
+          44117
+         ],
+         "log": [
+          0.054782077418260855,
+          0.0018032511038558422
+         ],
+         "binomial": [
+          0.054784162197793224,
+          0.001841529840449132
+         ],
+         "binomial_interval": [
+          0.052941049336757404,
+          0.05662410901765567
+         ],
+         "dispersion": 13.59192126543846
+        },
+        "5": {
+         "failures": [
+          27899,
+          42121,
+          53375,
+          62418
+         ],
+         "log": [
+          0.09778452063302984,
+          0.0006513353620985042
+         ],
+         "binomial": [
+          0.09778498957803983,
+          0.0006525892708974662
+         ],
+         "binomial_interval": [
+          0.09713236326508465,
+          0.09843754180687958
+         ],
+         "dispersion": 1.0
+        }
+       },
+       "lambda": {
+        "log": [
+         0.560232612110965,
+         0.01881484446203828
+        ],
+        "binomial": [
+         0.5602512454538977,
+         0.019200014585855917
+        ]
+       }
+      }
+     },
+     "observed_over_model": {
+      "X": {
+       "binomial": {
+        "eps3": [
+         1.689921500863517,
+         0.10184664137555323
+        ],
+        "eps5": [
+         1.6864138703700755,
+         0.05860017845556563
+        ],
+        "lambda": [
+         1.002079934561183,
+         0.06971173105980075
+        ]
+       }
+      },
+      "Z": {
+       "binomial": {
+        "eps3": [
+         1.2486722653680964,
+         0.06353937178012667
+        ],
+        "eps5": [
+         1.219437561872733,
+         0.04158744699662732
+        ],
+        "lambda": [
+         1.023973924052714,
+         0.06272546727896916
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "curves": {
+   "X3": {
+    "observed": {
+     "failures": [
+      968,
+      1365,
+      1713,
+      2046
+     ],
+     "shots": 8192,
+     "P": [
+      0.1181640625,
+      0.1666259765625,
+      0.2091064453125,
+      0.249755859375
+     ],
+     "eps": 0.06494949402300902,
+     "A": 0.8788776734266758,
+     "dispersion": 1.0,
+     "fit_P": [
+      0.11764382348384406,
+      0.1673115038864374,
+      0.2105274028661408,
+      0.24812960030088177
+     ],
+     "residual_P": [
+      0.0005202390161559434,
+      -0.000685527323937396,
+      -0.0014209575536408003,
+      0.0016262590741182303
+     ],
+     "max_abs_residual_P": 0.0016262590741182303
+    },
+    "ibm": {
+     "failures": [
+      16073,
+      22461,
+      27630,
+      32057
+     ],
+     "shots": 200000,
+     "P": [
+      0.080365,
+      0.112305,
+      0.13815,
+      0.160285
+     ],
+     "eps": 0.03444349874738162,
+     "A": 0.8989524535431266,
+     "dispersion": 9.11125236625404,
+     "fit_P": [
+      0.081486840936005,
+      0.1103169558759719,
+      0.1371610507602955,
+      0.1621559365475736
+     ],
+     "residual_P": [
+      -0.0011218409360049947,
+      0.0019880441240281016,
+      0.0009889492397044952,
+      -0.0018709365475735873
+     ],
+     "max_abs_residual_P": 0.0019880441240281016,
+     "observed_minus_model_P": [
+      0.037799062499999994,
+      0.0543209765625,
+      0.0709564453125,
+      0.08947085937499999
+     ],
+     "observed_over_model_P": [
+      1.4703423443041124,
+      1.4836915236409776,
+      1.5136188585776331,
+      1.5581985798733504
+     ]
+    },
+    "joint": {
+     "failures": [
+      18184,
+      25103,
+      30842,
+      36016
+     ],
+     "shots": 200000,
+     "P": [
+      0.09092,
+      0.125515,
+      0.15421,
+      0.18008
+     ],
+     "eps": 0.03959492695645356,
+     "A": 0.8868409167030408,
+     "dispersion": 3.754239135328142,
+     "fit_P": [
+      0.09169394296733085,
+      0.12402763997550303,
+      0.1538008362411339,
+      0.18121629744396905
+     ],
+     "residual_P": [
+      -0.000773942967330854,
+      0.0014873600244969531,
+      0.00040916375886612677,
+      -0.0011362974439690643
+     ],
+     "max_abs_residual_P": 0.0014873600244969531,
+     "observed_minus_model_P": [
+      0.0272440625,
+      0.04111097656250001,
+      0.054896445312499986,
+      0.06967585937500001
+     ],
+     "observed_over_model_P": [
+      1.2996487296524417,
+      1.3275383544795445,
+      1.3559849900298293,
+      1.386916144907819
+     ]
+    },
+    "own_test": {
+     "failures": [
+      18218,
+      25471,
+      30509,
+      35602
+     ],
+     "shots": 200000,
+     "P": [
+      0.09109,
+      0.127355,
+      0.152545,
+      0.17801
+     ],
+     "eps": 0.038433438470260955,
+     "A": 0.882541617954604,
+     "dispersion": 15.187120651146198,
+     "fit_P": [
+      0.09264829999380081,
+      0.12396015298968971,
+      0.15286516163456393,
+      0.17954833253696784
+     ],
+     "residual_P": [
+      -0.0015582999938008046,
+      0.003394847010310287,
+      -0.0003201616345639424,
+      -0.0015383325369678347
+     ],
+     "max_abs_residual_P": 0.003394847010310287,
+     "observed_minus_model_P": [
+      0.027074062499999996,
+      0.039270976562500004,
+      0.056561445312500014,
+      0.071745859375
+     ],
+     "observed_over_model_P": [
+      1.297223213305522,
+      1.3083583413489852,
+      1.3707853113015833,
+      1.4030439827818662
+     ]
+    },
+    "measured_tq_readout": {
+     "failures": [
+      14531,
+      21947,
+      27768,
+      33228
+     ],
+     "shots": 200000,
+     "P": [
+      0.072655,
+      0.109735,
+      0.13884,
+      0.16614
+     ],
+     "eps": 0.0397625017295559,
+     "A": 0.9264151906565591,
+     "dispersion": 7.7151680561414615,
+     "fit_P": [
+      0.07362899029248876,
+      0.1075361463143436,
+      0.13874683563627177,
+      0.16747549478191237
+     ],
+     "residual_P": [
+      -0.0009739902924887633,
+      0.0021988536856563934,
+      9.31643637282209e-05,
+      -0.0013354947819123608
+     ],
+     "max_abs_residual_P": 0.0021988536856563934,
+     "observed_minus_model_P": [
+      0.0455090625,
+      0.0568909765625,
+      0.07026644531250001,
+      0.08361585937499999
+     ],
+     "observed_over_model_P": [
+      1.6263720666161998,
+      1.5184396643049165,
+      1.5060965522363874,
+      1.5032855385518236
+     ]
+    },
+    "measured_tq": {
+     "failures": [
+      18218,
+      25471,
+      30509,
+      35602
+     ],
+     "shots": 200000,
+     "P": [
+      0.09109,
+      0.127355,
+      0.152545,
+      0.17801
+     ],
+     "eps": 0.038433438470260955,
+     "A": 0.882541617954604,
+     "dispersion": 15.187120651146198,
+     "fit_P": [
+      0.09264829999380081,
+      0.12396015298968971,
+      0.15286516163456393,
+      0.17954833253696784
+     ],
+     "residual_P": [
+      -0.0015582999938008046,
+      0.003394847010310287,
+      -0.0003201616345639424,
+      -0.0015383325369678347
+     ],
+     "max_abs_residual_P": 0.003394847010310287,
+     "observed_minus_model_P": [
+      0.027074062499999996,
+      0.039270976562500004,
+      0.056561445312500014,
+      0.071745859375
+     ],
+     "observed_over_model_P": [
+      1.297223213305522,
+      1.3083583413489852,
+      1.3707853113015833,
+      1.4030439827818662
+     ]
+    }
+   },
+   "X5": {
+    "observed": {
+     "failures": [
+      1170,
+      1679,
+      2181,
+      2540
+     ],
+     "shots": 8192,
+     "P": [
+      0.142822265625,
+      0.2049560546875,
+      0.2662353515625,
+      0.31005859375
+     ],
+     "eps": 0.09467704393191209,
+     "A": 0.8848009331248188,
+     "dispersion": 1.0,
+     "fit_P": [
+      0.1413698702540459,
+      0.20927795135257599,
+      0.2643273596961113,
+      0.3089529375353133
+     ],
+     "residual_P": [
+      0.001452395370954096,
+      -0.004321896665075986,
+      0.0019079918663886808,
+      0.0011056562146867233
+     ],
+     "max_abs_residual_P": 0.004321896665075986
+    },
+    "ibm": {
+     "failures": [
+      20582,
+      30340,
+      39016,
+      46601
+     ],
+     "shots": 200000,
+     "P": [
+      0.10291,
+      0.1517,
+      0.19508,
+      0.233005
+     ],
+     "eps": 0.061917398422198344,
+     "A": 0.9066945470600069,
+     "dispersion": 1.0,
+     "fit_P": [
+      0.10279289398754571,
+      0.15198095526574873,
+      0.1950778229683957,
+      0.2328377988144556
+     ],
+     "residual_P": [
+      0.0001171060124542933,
+      -0.000280955265748728,
+      2.1770316042946103e-06,
+      0.00016720118554439112
+     ],
+     "max_abs_residual_P": 0.000280955265748728,
+     "observed_minus_model_P": [
+      0.039912265625,
+      0.0532560546875,
+      0.0711553515625,
+      0.07705359375000001
+     ],
+     "observed_over_model_P": [
+      1.387836610873579,
+      1.3510616657053394,
+      1.3647495979213655,
+      1.3306950226389993
+     ]
+    },
+    "joint": {
+     "failures": [
+      16851,
+      26830,
+      35020,
+      42528
+     ],
+     "shots": 200000,
+     "P": [
+      0.084255,
+      0.13415,
+      0.1751,
+      0.21264
+     ],
+     "eps": 0.05799818775331817,
+     "A": 0.9395715145222775,
+     "dispersion": 1.887335614587182,
+     "fit_P": [
+      0.0847076878457938,
+      0.1328800908314523,
+      0.17546466967132945,
+      0.21310959171330418
+     ],
+     "residual_P": [
+      -0.0004526878457938033,
+      0.0012699091685476893,
+      -0.0003646696713294484,
+      -0.0004695917133041849
+     ],
+     "max_abs_residual_P": 0.0012699091685476893,
+     "observed_minus_model_P": [
+      0.058567265625,
+      0.07080605468750001,
+      0.0911353515625,
+      0.09741859375
+     ],
+     "observed_over_model_P": [
+      1.6951191694854906,
+      1.527812558237048,
+      1.5204760226299256,
+      1.4581386086813395
+     ]
+    },
+    "own_test": {
+     "failures": [
+      17169,
+      26429,
+      34805,
+      42004
+     ],
+     "shots": 200000,
+     "P": [
+      0.085845,
+      0.132145,
+      0.174025,
+      0.21002
+     ],
+     "eps": 0.05614104911929814,
+     "A": 0.9331158094182463,
+     "dispersion": 1.0,
+     "fit_P": [
+      0.0858281957814202,
+      0.13233227499034744,
+      0.17361477860904245,
+      0.21026199610088792
+     ],
+     "residual_P": [
+      1.68042185798023e-05,
+      -0.00018727499034743023,
+      0.00041022139095756027,
+      -0.00024199610088790346
+     ],
+     "max_abs_residual_P": 0.00041022139095756027,
+     "observed_minus_model_P": [
+      0.056977265624999995,
+      0.07281105468749999,
+      0.09221035156249999,
+      0.10003859374999999
+     ],
+     "observed_over_model_P": [
+      1.663722588677267,
+      1.5509936409814975,
+      1.5298684186898432,
+      1.476328891296067
+     ]
+    },
+    "measured_tq_readout": {
+     "failures": [
+      14995,
+      23692,
+      31739,
+      38873
+     ],
+     "shots": 200000,
+     "P": [
+      0.074975,
+      0.11846,
+      0.158695,
+      0.194365
+     ],
+     "eps": 0.05199108134736387,
+     "A": 0.9491399695761997,
+     "dispersion": 1.0,
+     "fit_P": [
+      0.07477682858017082,
+      0.11899245357231558,
+      0.15861044225287807,
+      0.19410886678882044
+     ],
+     "residual_P": [
+      0.0001981714198291823,
+      -0.000532453572315586,
+      8.455774712193276e-05,
+      0.00025613321117956556
+     ],
+     "max_abs_residual_P": 0.000532453572315586,
+     "observed_minus_model_P": [
+      0.067847265625,
+      0.0864960546875,
+      0.1075403515625,
+      0.11569359374999999
+     ],
+     "observed_over_model_P": [
+      1.9049318522840948,
+      1.7301709833488097,
+      1.6776543152745833,
+      1.595238822576081
+     ]
+    },
+    "measured_tq": {
+     "failures": [
+      17169,
+      26429,
+      34805,
+      42004
+     ],
+     "shots": 200000,
+     "P": [
+      0.085845,
+      0.132145,
+      0.174025,
+      0.21002
+     ],
+     "eps": 0.05614104911929814,
+     "A": 0.9331158094182463,
+     "dispersion": 1.0,
+     "fit_P": [
+      0.0858281957814202,
+      0.13233227499034744,
+      0.17361477860904245,
+      0.21026199610088792
+     ],
+     "residual_P": [
+      1.68042185798023e-05,
+      -0.00018727499034743023,
+      0.00041022139095756027,
+      -0.00024199610088790346
+     ],
+     "max_abs_residual_P": 0.00041022139095756027,
+     "observed_minus_model_P": [
+      0.056977265624999995,
+      0.07281105468749999,
+      0.09221035156249999,
+      0.10003859374999999
+     ],
+     "observed_over_model_P": [
+      1.663722588677267,
+      1.5509936409814975,
+      1.5298684186898432,
+      1.476328891296067
+     ]
+    }
+   },
+   "Z3": {
+    "observed": {
+     "failures": [
+      903,
+      1334,
+      1759,
+      2014
+     ],
+     "shots": 8192,
+     "P": [
+      0.1102294921875,
+      0.162841796875,
+      0.2147216796875,
+      0.245849609375
+     ],
+     "eps": 0.06840746391781169,
+     "A": 0.9023692400813328,
+     "dispersion": 1.0,
+     "fit_P": [
+      0.11054417119074056,
+      0.1638275423044423,
+      0.20982095284438423,
+      0.24952177824038974
+     ],
+     "residual_P": [
+      -0.00031467900324055886,
+      -0.0009857454294422974,
+      0.004900726843115766,
+      -0.0036721688653897355
+     ],
+     "max_abs_residual_P": 0.004900726843115766
+    },
+    "ibm": {
+     "failures": [
+      18929,
+      28279,
+      34441,
+      40620
+     ],
+     "shots": 200000,
+     "P": [
+      0.094645,
+      0.141395,
+      0.172205,
+      0.2031
+     ],
+     "eps": 0.049660143596713335,
+     "A": 0.8956880041429975,
+     "dispersion": 26.381633940613312,
+     "fit_P": [
+      0.09663599283209606,
+      0.1366982218675037,
+      0.17278145880950585,
+      0.2052808982955598
+     ],
+     "residual_P": [
+      -0.0019909928320960557,
+      0.004696778132496304,
+      -0.0005764588095058532,
+      -0.0021808982955597855
+     ],
+     "max_abs_residual_P": 0.004696778132496304,
+     "observed_minus_model_P": [
+      0.015584492187499993,
+      0.021446796875000007,
+      0.0425166796875,
+      0.042749609375
+     ],
+     "observed_over_model_P": [
+      1.16466260433726,
+      1.1516800231620639,
+      1.2468957329200663,
+      1.2104855212949286
+     ]
+    },
+    "joint": {
+     "failures": [
+      22187,
+      32204,
+      39943,
+      46734
+     ],
+     "shots": 200000,
+     "P": [
+      0.110935,
+      0.16102,
+      0.199715,
+      0.23367
+     ],
+     "eps": 0.05985861929022224,
+     "A": 0.8813535972695262,
+     "dispersion": 7.702465417224006,
+     "fit_P": [
+      0.11207981080426133,
+      0.1585205446443787,
+      0.1994015220715079,
+      0.23538834177059165
+     ],
+     "residual_P": [
+      -0.0011448108042613203,
+      0.002499455355621294,
+      0.0003134779284920952,
+      -0.0017183417705916582
+     ],
+     "max_abs_residual_P": 0.002499455355621294,
+     "observed_minus_model_P": [
+      -0.0007055078125000058,
+      0.0018217968750000035,
+      0.015006679687499996,
+      0.012179609375000011
+     ],
+     "observed_over_model_P": [
+      0.993640349641682,
+      1.0113141030617314,
+      1.0751404736123977,
+      1.0521231196773229
+     ]
+    },
+    "own_test": {
+     "failures": [
+      24283,
+      35367,
+      43487,
+      50688
+     ],
+     "shots": 200000,
+     "P": [
+      0.121415,
+      0.176835,
+      0.217435,
+      0.25344
+     ],
+     "eps": 0.06720382783717213,
+     "A": 0.8714339883905963,
+     "dispersion": 11.495104848329651,
+     "fit_P": [
+      0.12284670553196375,
+      0.17353899567126818,
+      0.217417853932185,
+      0.25539905772058513
+     ],
+     "residual_P": [
+      -0.0014317055319637562,
+      0.003296004328731811,
+      1.7146067814999277e-05,
+      -0.0019590577205851334
+     ],
+     "max_abs_residual_P": 0.003296004328731811,
+     "observed_minus_model_P": [
+      -0.011185507812499995,
+      -0.013993203124999992,
+      -0.0027133203124999894,
+      -0.007590390624999999
+     ],
+     "observed_over_model_P": [
+      0.9078737568463534,
+      0.9208685886560919,
+      0.9875212347943064,
+      0.9700505420415089
+     ]
+    },
+    "measured_tq_readout": {
+     "failures": [
+      15765,
+      24881,
+      32584,
+      39266
+     ],
+     "shots": 200000,
+     "P": [
+      0.078825,
+      0.124405,
+      0.16292,
+      0.19633
+     ],
+     "eps": 0.05204117018921682,
+     "A": 0.938930898787797,
+     "dispersion": 2.9667569262474522,
+     "fit_P": [
+      0.07939761330583156,
+      0.12317489408171561,
+      0.1623957330190418,
+      0.19753437524816547
+     ],
+     "residual_P": [
+      -0.0005726133058315541,
+      0.0012301059182843882,
+      0.000524266980958199,
+      -0.001204375248165468
+     ],
+     "max_abs_residual_P": 0.0012301059182843882,
+     "observed_minus_model_P": [
+      0.031404492187499994,
+      0.038436796875,
+      0.05180167968749999,
+      0.049519609374999995
+     ],
+     "observed_over_model_P": [
+      1.39840776641294,
+      1.3089650486314859,
+      1.3179577687668793,
+      1.2522264013395812
+     ]
+    },
+    "measured_tq": {
+     "failures": [
+      21130,
+      30707,
+      37749,
+      44117
+     ],
+     "shots": 200000,
+     "P": [
+      0.10565,
+      0.153535,
+      0.188745,
+      0.220585
+     ],
+     "eps": 0.054784162197793224,
+     "A": 0.8823462901387604,
+     "dispersion": 13.59192126543846,
+     "fit_P": [
+      0.10716545720420279,
+      0.15020767982304462,
+      0.18853383823127812,
+      0.22266066368220166
+     ],
+     "residual_P": [
+      -0.0015154572042027914,
+      0.0033273201769553895,
+      0.0002111617687218792,
+      -0.0020756636822016616
+     ],
+     "max_abs_residual_P": 0.0033273201769553895,
+     "observed_minus_model_P": [
+      0.004579492187500006,
+      0.009306796874999995,
+      0.025976679687500004,
+      0.025264609374999997
+     ],
+     "observed_over_model_P": [
+      1.04334587967345,
+      1.0606167771192236,
+      1.1376284388328168,
+      1.1145345756737766
+     ]
+    }
+   },
+   "Z5": {
+    "observed": {
+     "failures": [
+      1159,
+      1799,
+      2422,
+      2795
+     ],
+     "shots": 8192,
+     "P": [
+      0.1414794921875,
+      0.2196044921875,
+      0.295654296875,
+      0.3411865234375
+     ],
+     "eps": 0.11924268927879547,
+     "A": 0.9458912059207493,
+     "dispersion": 1.3768733372351476,
+     "fit_P": [
+      0.13984500819877838,
+      0.22573670775789878,
+      0.2911444928327075,
+      0.3409534775233368
+     ],
+     "residual_P": [
+      0.0016344839887216245,
+      -0.00613221557039878,
+      0.004509804042292509,
+      0.00023304591416317688
+     ],
+     "max_abs_residual_P": 0.00613221557039878
+    },
+    "ibm": {
+     "failures": [
+      29983,
+      45349,
+      56645,
+      65881
+     ],
+     "shots": 200000,
+     "P": [
+      0.149915,
+      0.226745,
+      0.283225,
+      0.329405
+     ],
+     "eps": 0.10677531365623072,
+     "A": 0.8888888289834835,
+     "dispersion": 2.090385762733238,
+     "fit_P": [
+      0.15046696902848933,
+      0.22510996705888142,
+      0.2838129060354005,
+      0.32997979556839874
+     ],
+     "residual_P": [
+      -0.0005519690284893353,
+      0.0016350329411185804,
+      -0.0005879060354004872,
+      -0.0005747955683987338
+     ],
+     "max_abs_residual_P": 0.0016350329411185804,
+     "observed_minus_model_P": [
+      -0.008435507812499993,
+      -0.007140507812500002,
+      0.012429296874999995,
+      0.011781523437499997
+     ],
+     "observed_over_model_P": [
+      0.9437313957075677,
+      0.9685086426933339,
+      1.043884886132933,
+      1.0357660734885628
+     ]
+    },
+    "joint": {
+     "failures": [
+      28235,
+      42550,
+      54727,
+      64462
+     ],
+     "shots": 200000,
+     "P": [
+      0.141175,
+      0.21275,
+      0.273635,
+      0.32231
+     ],
+     "eps": 0.10351823427438561,
+     "A": 0.9070711224312994,
+     "dispersion": 4.332150105947334,
+     "fit_P": [
+      0.14036283973972347,
+      0.2148208473589196,
+      0.27386333202545987,
+      0.3206818691722947
+     ],
+     "residual_P": [
+      0.0008121602602765288,
+      -0.002070847358919603,
+      -0.0002283320254598542,
+      0.0016281308277052986
+     ],
+     "max_abs_residual_P": 0.002070847358919603,
+     "observed_minus_model_P": [
+      0.00030449218750000506,
+      0.006854492187500005,
+      0.022019296874999983,
+      0.018876523437500015
+     ],
+     "observed_over_model_P": [
+      1.0021568421285638,
+      1.0322185296709754,
+      1.0804695922487986,
+      1.0585663598321493
+     ]
+    },
+    "own_test": {
+     "failures": [
+      30004,
+      45759,
+      57341,
+      66851
+     ],
+     "shots": 200000,
+     "P": [
+      0.15002,
+      0.228795,
+      0.286705,
+      0.334255
+     ],
+     "eps": 0.11022149081816635,
+     "A": 0.896890070739567,
+     "dispersion": 1.467833678053116,
+     "fit_P": [
+      0.15041152532714225,
+      0.22747585102972462,
+      0.2875518869966362,
+      0.33438458247011027
+     ],
+     "residual_P": [
+      -0.0003915253271422614,
+      0.00131914897027538,
+      -0.0008468869966362091,
+      -0.00012958247011024548
+     ],
+     "max_abs_residual_P": 0.00131914897027538,
+     "observed_minus_model_P": [
+      -0.008540507812499987,
+      -0.009190507812499998,
+      0.008949296875000012,
+      0.006931523437499976
+     ],
+     "observed_over_model_P": [
+      0.9430708718004267,
+      0.9598308188006731,
+      1.0312143034652343,
+      1.0207372318663894
+     ]
+    },
+    "measured_tq_readout": {
+     "failures": [
+      21609,
+      36190,
+      48099,
+      57924
+     ],
+     "shots": 200000,
+     "P": [
+      0.108045,
+      0.18095,
+      0.240495,
+      0.28962
+     ],
+     "eps": 0.09342954935354778,
+     "A": 0.9643370840707501,
+     "dispersion": 1.0,
+     "fit_P": [
+      0.10792903715426938,
+      0.18119106390084572,
+      0.24076341436010174,
+      0.28920412910467785
+     ],
+     "residual_P": [
+      0.00011596284573062166,
+      -0.00024106390084571716,
+      -0.00026841436010174857,
+      0.0004158708953221346
+     ],
+     "max_abs_residual_P": 0.0004158708953221346,
+     "observed_minus_model_P": [
+      0.0334344921875,
+      0.0386544921875,
+      0.05515929687500001,
+      0.05156652343750001
+     ],
+     "observed_over_model_P": [
+      1.3094496939932436,
+      1.2136197412959382,
+      1.229357354102996,
+      1.1780489035201298
+     ]
+    },
+    "measured_tq": {
+     "failures": [
+      27899,
+      42121,
+      53375,
+      62418
+     ],
+     "shots": 200000,
+     "P": [
+      0.139495,
+      0.210605,
+      0.266875,
+      0.31209
+     ],
+     "eps": 0.09778498957803983,
+     "A": 0.8958429449932023,
+     "dispersion": 1.0,
+     "fit_P": [
+      0.13967852054311963,
+      0.21014658476998954,
+      0.26683321114484115,
+      0.31243363518113465
+     ],
+     "residual_P": [
+      -0.00018352054311962518,
+      0.00045841523001044493,
+      4.178885515881969e-05,
+      -0.0003436351811346716
+     ],
+     "max_abs_residual_P": 0.00045841523001044493,
+     "observed_minus_model_P": [
+      0.001984492187499992,
+      0.008999492187500013,
+      0.028779296875000027,
+      0.02909652343750002
+     ],
+     "observed_over_model_P": [
+      1.0142262603498333,
+      1.0427316169487904,
+      1.1078381147540985,
+      1.093231194326957
+     ]
+    }
+   }
   }
  },
  "readout": {

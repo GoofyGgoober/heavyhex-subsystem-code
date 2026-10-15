@@ -2079,6 +2079,8 @@ def main() -> None:
         "stored_priors_matched": {
             k: v for k, v in take("stored_priors.json").items() if k not in ("curves", "inputs")
         },
+        "stored_priors_day_sensitivity": take("day_sensitivity.json"),
+        "kingston_fixed_decoder": take("kingston_checks.json"),
         **other(),
     }
     res["about"]["inputs"] = sorted(INPUTS | {"docs/analysis/results/placements.json"})

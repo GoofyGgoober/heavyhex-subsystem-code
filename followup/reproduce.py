@@ -150,6 +150,7 @@ def evaluate(
     *,
     cap: float | None = decoder.PRIMARY,
     hardware_priors: str = "measured",
+    simulation_priors: str = "variant",
 ) -> dict:
     calibration, dt = record.calibration, record.dt
     decay = fitted["xy"]["decay_us"]
@@ -187,7 +188,17 @@ def evaluate(
             sent[key] = circuit, circuits.logical_circuit(setting)[1]
         for i, key in enumerate(sorted(sent)):
             noisy, labels = model.memory(*sent[key], used, dt, decay_us=tq)
-            dem = noisy.detector_error_model(decompose_errors=True)
+            prior_model = noisy
+            if simulation_priors == "hardware":
+                prior_model, prior_labels = model.memory(
+                    *sent[key],
+                    calibration,
+                    dt,
+                    decay_us=decay if hardware_priors == "measured" else None,
+                )
+                if prior_labels != labels or prior_model.num_detectors != noisy.num_detectors:
+                    raise ValueError("Fixed decoder and sample detector layouts differ")
+            dem = prior_model.detector_error_model(decompose_errors=True)
             probabilities, rates = model.sample(
                 noisy,
                 decoder.decoders(dem, [cap]),
@@ -222,6 +233,12 @@ def main() -> None:
     parser.add_argument(
         "--hardware-priors", choices=("measured", "calibration"), default="measured"
     )
+    parser.add_argument(
+        "--simulation-priors",
+        choices=("variant", "hardware"),
+        default="variant",
+        help="Use each simulated noise variant's priors, or hold the hardware decoder fixed",
+    )
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     if args.shots < 100:
@@ -243,7 +260,7 @@ def main() -> None:
         "seed": args.seed,
         "decoder_cap": cap,
         "hardware_priors": args.hardware_priors,
-        "simulation_priors": "each variant's model; same cap or uniform policy as hardware",
+        "simulation_priors": args.simulation_priors,
         "input_sha256": {str(p.relative_to(REPO)): fingerprint(p) for p in source_files},
         "inputs": fitted,
     }
@@ -256,6 +273,7 @@ def main() -> None:
             args.seed,
             cap=cap,
             hardware_priors=args.hardware_priors,
+            simulation_priors=args.simulation_priors,
         )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(clean(result), indent=2, allow_nan=False) + "\n")
