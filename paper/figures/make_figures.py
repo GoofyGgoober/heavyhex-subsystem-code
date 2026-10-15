@@ -253,6 +253,9 @@ def fig_layout() -> None:
 
 def fig_analyses() -> None:
     """The figures of the analyses after the run, each drawn by its own script."""
+    import fig_diagnostics
+    import fig_kingston_curves
+
     import fig_C_idle_dephasing
     import fig_obs_pred
     import fig_timing
@@ -260,6 +263,8 @@ def fig_analyses() -> None:
     fig_timing.make(DIAG, OUT / "timing.pdf")
     fig_obs_pred.make(DIAG, OUT / "obs_pred.pdf")
     fig_C_idle_dephasing.make(DIAG, OUT / "C_idle_dephasing.pdf")
+    fig_diagnostics.make(DIAG, OUT / "diagnostics.pdf")
+    fig_kingston_curves.make(DIAG, OUT / "F_kingston_curves.pdf")
 
 
 if __name__ == "__main__":

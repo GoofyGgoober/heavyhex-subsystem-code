@@ -43,6 +43,7 @@ LIGHT = [
     ["dephasing_floor.py"],
     ["f_weighted_mean.py"],
     ["f_treatments.py"],
+    ["day_sensitivity.py"],
     ["input_resolution.py"],
     ["input_noise.py"],
     ["stat_checks.py"],
