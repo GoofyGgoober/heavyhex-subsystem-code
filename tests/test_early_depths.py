@@ -27,12 +27,25 @@ def test_interval_rejects_invalid_daily_panel(early, values):
         early.interval(values)
 
 
+def test_primary_omissions_use_four_days_and_three_degrees_of_freedom(early):
+    daily = np.array([0.01, 0.02, 0.03, 0.04, 0.05])
+    rows = early.interval(daily)["leave_one_day_out"]
+    for day in range(5):
+        subset = np.delete(daily, day)
+        half = t.ppf(1 - 0.05 / 32, 3) * subset.std(ddof=1) / 2
+        assert rows[str(day + 1)]["mean"] == pytest.approx(subset.mean())
+        assert rows[str(day + 1)]["ci95_family16"] == pytest.approx(
+            [subset.mean() - half, subset.mean() + half]
+        )
+
+
 def test_saved_depth_cells_reconstruct_from_forecast_and_device_counts(early):
     saved = early.result("early_depths.json")["cells"]
     device = early.result("stored_priors.json")["curves"]
     forecast = early.result("fits_counts.json")["jobs"]
     reps = early.result("fits.json")["per_rep"]
     positive = 0
+    fragile = 0
     for key, depths in saved.items():
         basis, d = key
         for depth, row in depths.items():
@@ -45,8 +58,12 @@ def test_saved_depth_cells_reconstruct_from_forecast_and_device_counts(early):
             expected = early.interval(np.array([np.mean(daily[d]) for d in sorted(daily)]))
             assert row == expected
             positive += row["ci95_family16"][0] > 0
+            fragile += row["ci95_family16"][0] > 0 and any(
+                r["ci95_family16"][0] <= 0 for r in row["leave_one_day_out"].values()
+            )
     assert positive == 15
     assert saved["Z3"]["1"]["ci95_family16"][0] < 0
+    assert fragile == 7
 
 
 def test_exact_ml_summary_uses_probabilities_not_legacy_rate_estimator(early):
