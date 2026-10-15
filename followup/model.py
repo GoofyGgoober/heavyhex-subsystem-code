@@ -4,7 +4,8 @@ Stim, with Pauli channels from the day's calibration, instruction by instruction
 scheduled native circuit (submit.py's, as sent or with a fix undone), so that every pulse, CZ,
 readout and delay sits where the device runs it:
 
-    CZ        twirled, so a Pauli channel: depolarizing, with 5/4 of IBM's error
+    CZ        twirling motivates Pauli noise; isotropic depolarizing is the chosen model,
+              with 5/4 of IBM's error
     sx, x     depolarizing, with 3/2 of the qubit's error: H gates, the twirl's layers, XY4
     readout   the record is wrong with the qubit's readout error; the qubit is not flipped
     delay     T1 decay and dephasing, Pauli-twirled: px = py = (1 - e^(-t/T1))/4 and

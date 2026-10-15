@@ -1037,12 +1037,13 @@ def f_treatments() -> dict:
 def f_treatments_digest(f: dict) -> list[str]:
     def cell(v: dict) -> str:
         return (
-            f"{v['ratio']:.2f} ({v['ci95'][0]:.2f}-{v['ci95'][1]:.2f}) above {v['above']}/{v['of']}"
+            f"{v['ratio']:.2f} ({v['ci95_family_of_five'][0]:.2f}-"
+            f"{v['ci95_family_of_five'][1]:.2f}) above {v['above']}/{v['of']}"
         )
 
     L = [
         "26. O/M under each treatment of f (f_treatments.py; binomial; geometric mean, "
-        "day-block t 95%, 4 dof)"
+        "day-block t, simultaneous 95% over five columns, 4 dof)"
     ]
     for row, blk in f["table"].items():
         L.append(f"   {row}: " + "; ".join(f"{q} {cell(v)}" for q, v in blk.items()))

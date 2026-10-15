@@ -24,6 +24,13 @@ def test_interval_uses_daily_log_means(analysis):
     assert result["of"] == 10
     assert result["ratio"] == pytest.approx(np.exp(y.mean()))
     assert result["ci95"] == pytest.approx(expected["ci95"])
+    assert result["ci95_family_of_five"][0] < result["ci95"][0]
+    assert result["ci95_family_of_five"][1] > result["ci95"][1]
+    daily = y.reshape(5, 2).mean(axis=1)
+    half = 4.604094871349992 * daily.std(ddof=1) / np.sqrt(5)
+    assert result["ci95_family_of_five"] == pytest.approx(
+        np.exp([daily.mean() - half, daily.mean() + half])
+    )
     assert result["pair_day_interval"]["n"] == 10
     assert result["placement_intervals"]["1"]["n"] == 5
     reverse = analysis.summary(y[::-1], 10, days[::-1], placements[::-1])
