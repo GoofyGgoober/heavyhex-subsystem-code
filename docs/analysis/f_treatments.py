@@ -6,7 +6,9 @@ predictions exist under five treatments of it: f = 1 and f = 0, stored before ea
 job's median f (the planned tests); each data qubit at its own f; and the inverse-variance mean
 of the per-qubit f, whose priors also decode the device's shots again (f_weighted_mean.py).
 For each treatment and each quantity, O/M is the geometric mean over the ten pair-days with a
-Student t 95% interval (4 dof) from the five daily means of ln(O/M). The two placements
+Student t intervals (4 dof) from the five daily means of ln(O/M). The primary table uses
+Bonferroni simultaneous 95% intervals over its five quantities within each input treatment;
+pointwise 95% intervals remain recorded. The two placements
 within a day form one block. This treats days as independent, conditional on the sampled
 patches and model inputs, not as a sample of hardware placements. The earlier ten-pair-day
 interval and separate placement intervals remain available as sensitivity results.
@@ -31,6 +33,7 @@ job's f from runs/; no simulation; a second.
 from __future__ import annotations
 
 import numpy as np
+from scipy import stats
 
 from common import day_number, jobs, result, write_json
 from effect_sizes import t_interval
@@ -70,8 +73,11 @@ def summary(y: np.ndarray, above: int, days: np.ndarray, placements: np.ndarray)
         if sorted(placements[days == d].tolist()) != [1, 2]:
             raise ValueError("Each day must contain exactly one result from each placement")
     by_day = np.array([y[days == d].mean() for d in np.unique(days)])
+    family_critical = stats.t.ppf(1 - 0.05 / (2 * len(QUANTITIES)), len(by_day) - 1)
+    half = family_critical * by_day.std(ddof=1) / np.sqrt(len(by_day))
     return {
         **t_interval(by_day),
+        "ci95_family_of_five": np.exp([by_day.mean() - half, by_day.mean() + half]).tolist(),
         "day_log_means": by_day.tolist(),
         "pair_day_interval": t_interval(y),
         "placement_intervals": {
@@ -178,7 +184,8 @@ def main() -> None:
     out = {
         "what": "observed over predicted (binomial fit) under each treatment of f: geometric mean "
         "over the ten pair-days, Student t 95% interval on five daily log means (4 dof), "
-        "conditional on sampled patches and fixed model inputs; earlier pair-day and "
+        "pointwise and Bonferroni simultaneous intervals over the five quantities within "
+        "each fixed input treatment; conditional on sampled patches and fixed model inputs; earlier pair-day and "
         "placement-specific intervals retained; each pair's means; every curve",
         "table": table,
         "f_range": f_range,
@@ -190,7 +197,8 @@ def main() -> None:
     write_json("f_treatments.json", out)
     for row, blk in table.items():
         cells = "  ".join(
-            f"{q} {v['ratio']:.2f} ({v['ci95'][0]:.2f}, {v['ci95'][1]:.2f}) {v['above']}/{v['of']}"
+            f"{q} {v['ratio']:.2f} ({v['ci95_family_of_five'][0]:.2f}, "
+            f"{v['ci95_family_of_five'][1]:.2f}) {v['above']}/{v['of']}"
             for q, v in blk.items()
         )
         print(f"{row}: {cells}")
