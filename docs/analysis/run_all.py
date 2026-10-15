@@ -44,6 +44,7 @@ LIGHT = [
     ["f_weighted_mean.py"],
     ["f_treatments.py"],
     ["day_sensitivity.py"],
+    ["early_depths.py"],
     ["input_resolution.py"],
     ["input_noise.py"],
     ["stat_checks.py"],
