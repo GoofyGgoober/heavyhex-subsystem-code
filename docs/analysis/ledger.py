@@ -2082,6 +2082,7 @@ def main() -> None:
         "stored_priors_day_sensitivity": take("day_sensitivity.json"),
         "primary_early_depths": take("early_depths.json"),
         "kingston_fixed_decoder": take("kingston_checks.json"),
+        "kingston_idle_diagnostics": take("idle_checks.json"),
         **other(),
     }
     res["about"]["inputs"] = sorted(INPUTS | {"docs/analysis/results/placements.json"})

@@ -24,7 +24,21 @@ def interval(daily: np.ndarray) -> dict:
     se = daily.std(ddof=1) / np.sqrt(5)
     mean = float(daily.mean())
     half = t.ppf(1 - 0.05 / (2 * 16), 4) * se
-    return {"mean": mean, "daily": daily.tolist(), "ci95_family16": [mean - half, mean + half]}
+    omissions = {}
+    for day in range(5):
+        subset = np.delete(daily, day)
+        center = float(subset.mean())
+        width = t.ppf(1 - 0.05 / (2 * 16), 3) * subset.std(ddof=1) / np.sqrt(4)
+        omissions[str(day + 1)] = {
+            "mean": center,
+            "ci95_family16": [center - width, center + width],
+        }
+    return {
+        "mean": mean,
+        "daily": daily.tolist(),
+        "ci95_family16": [mean - half, mean + half],
+        "leave_one_day_out": omissions,
+    }
 
 
 def main() -> None:
@@ -56,7 +70,9 @@ def main() -> None:
     out = {
         "what": "Primary fixed-depth comparison; paired placements averaged within each day; "
         "five-day mean probability differences and approximate simultaneous 95% t4 intervals "
-        "over 16 cells. Fixed archived forecast, inputs and placements; no future prediction coverage.",
+        "over 16 cells. Leave-one-day-out uses t3 on four days, a precision sensitivity "
+        "diagnostic, not independent tests. Fixed archived forecast, inputs and placements; "
+        "no future prediction coverage.",
         "cells": cells,
         "exact_ml_depth_diagnostic": {
             "window": [1, 2, 3, 4],

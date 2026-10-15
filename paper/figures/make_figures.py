@@ -255,6 +255,7 @@ def fig_analyses() -> None:
     """The figures of the analyses after the run, each drawn by its own script."""
     import fig_depth_errors
     import fig_diagnostics
+    import fig_idle_checks
     import fig_kingston_curves
 
     import fig_C_idle_dephasing
@@ -267,6 +268,8 @@ def fig_analyses() -> None:
     fig_diagnostics.make(DIAG, OUT / "diagnostics.pdf")
     fig_depth_errors.make(DIAG, OUT / "depth_errors.pdf")
     fig_kingston_curves.make(DIAG, OUT / "F_kingston_curves.pdf")
+    fig_kingston_curves.make_main(DIAG, OUT / "kingston.pdf")
+    fig_idle_checks.make(DIAG, OUT / "F_idle_checks.pdf")
 
 
 if __name__ == "__main__":
