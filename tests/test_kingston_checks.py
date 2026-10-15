@@ -54,3 +54,20 @@ def test_residuals_and_fixed_depth_differences_are_direct_arithmetic(checks):
                 assert curve["observed_minus_model_P"] == pytest.approx(observed - curve["P"])
             if variant in ("ibm", "measured_tq"):
                 assert curve["max_abs_residual_P"] < 0.0055  # plotted residual limits
+
+
+def test_stored_and_job_gaps_use_their_own_device_counts(checks):
+    saved = checks.read(checks.REPO / "docs/analysis/results/kingston_checks.json")
+    groups = [saved["stored_curves"]["curves"], *saved["by_job_curves"]["jobs"].values()]
+    for curves in groups:
+        for curve in curves.values():
+            observed = curve["observed"]
+            assert curve["observed_minus_model_P"] == pytest.approx(
+                np.array(observed["failures"]) / observed["shots"] - curve["model_P"]
+            )
+    first, second = saved["by_job_curves"]["jobs"].values()
+    for key, pooled in saved["curves"].items():
+        np.testing.assert_array_equal(
+            np.array(first[key]["observed"]["failures"]) + second[key]["observed"]["failures"],
+            pooled["observed"]["failures"],
+        )
