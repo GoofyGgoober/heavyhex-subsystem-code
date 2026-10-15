@@ -256,3 +256,10 @@
    pair 2 mean, device / at f = 1 / at the job's f: X eps3 11.18 / 8.78 / 8.60; X eps5 22.82 / 19.20 / 19.23; X lambda 0.490 / 0.458 / 0.448; Z eps3 18.45 / 8.35 / 8.37; Z eps5 29.87 / 16.50 / 16.48
    Lambda_X O/M without day 2 of pair 1: at f = 1 1.10 (1.03-1.17); at the job's f 1.11 (1.02-1.21)
    O/M range over windows 1-4, 1-6, 1-8, 2-6, 2-8, 3-8 (at the job's f): X eps3 1.25-1.29; X eps5 1.11-1.21; Z eps3 2.01-2.10; Z eps5 1.62-1.85
+Matched stored-prior comparison (f=1 noise and decoder on both sides):
+   X eps3: 1.2665 (1.1012-1.4567)
+   X eps5: 1.1944 (1.0666-1.3375)
+   X lambda: 1.0604 (0.8874-1.2671)
+   Z eps3: 2.0601 (1.4701-2.8868)
+   Z eps5: 1.8416 (1.6215-2.0917)
+   Early points above: 160/160; fitted curves above: 39/40
