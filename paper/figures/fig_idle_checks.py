@@ -13,7 +13,7 @@ def make(results, output):
     ordered = sorted(checks, key=lambda q: checks[q]["chi2_red"])
     axes[0].plot(range(1, 26), [checks[q]["chi2_red"] for q in ordered], "o", color=INK, ms=2.5)
     axes[0].axhline(1, color=MUTED, ls="--", lw=0.7)
-    axes[0].set(xlabel="qubits, sorted by fit error", ylabel=r"nominal $\chi^2/\nu$")
+    axes[0].set(xlabel=r"qubits, ordered by $\chi^2/\nu$", ylabel=r"nominal $\chi^2/\nu$")
     axes[0].set_title("(a) Common idle fit", loc="left", fontsize=8)
     for q, color in ((ordered[12], D5), (ordered[-1], D3)):
         for basis, marker, ls in (("XY", "o", "-"), ("Z", "s", "--")):
@@ -30,7 +30,7 @@ def make(results, output):
             )
     axes[1].axhline(0, color=MUTED, lw=0.6)
     axes[1].set(xlabel="rounds", ylabel="standardized log residual", xticks=[1, 4, 8, 16])
-    axes[1].set_title("(b) Median / largest error", loc="left", fontsize=8)
+    axes[1].set_title("(b) Median / worst-fitting qubits", loc="left", fontsize=8)
     axes[1].margins(y=0.15)
     references = {"R0": [], "R1": []}
     for arm, color in (("A", D5), ("B", D3)):
