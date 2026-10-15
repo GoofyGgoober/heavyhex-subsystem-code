@@ -1203,7 +1203,7 @@ def timing() -> dict:
 
 
 def decoder_graph() -> dict:
-    """Stim's observable-only pieces, single faults on a uniform chip and the shortest logical
+    """Stim's observable-only pieces, legacy partially homogenized faults and the shortest logical
     in edges (decoder_graph.py)."""
     g = take("decoder_graph.json")
     s = g["summary"]
@@ -1666,7 +1666,7 @@ def digest(res: dict) -> str:
     for day, u in gr["uniform_chip"].items():
         x3 = u["X d3 per-job model"]
         L.append(
-            f"   uniform chip {day} (f = 1): X d3 single faults miscorrected {x3['n=2'][0]} of "
+            f"   legacy partially homogenized chip {day} (f = 1): X d3 single faults miscorrected {x3['n=2'][0]} of "
             f"{x3['n=2'][1]} at n = 2 ({x3['n=2 by symptom'][0]} of {x3['n=2 by symptom'][1]} "
             f"symptoms), {x3['n=8'][0]} of {x3['n=8'][1]} at n = 8 (f = 0: "
             f"{u['X d3 pre-run simulator f=0']['n=8'][0]}, no idle decay: "

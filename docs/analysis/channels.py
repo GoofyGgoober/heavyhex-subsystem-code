@@ -13,7 +13,9 @@ detection rate (one k per curve). Here:
   one factor  whether one k on a channel fits several targets (basis, distance, eps or detection
               rate) at once: the inverse-variance mean of the targets' ln k and chi2 about it
               (T - 1 dof), and z of ln k_Z - ln k_X. The eps and detection-rate targets of one
-              basis and distance come from the same shots, so chi2 over both is approximate.
+              basis and distance come from the same shots; placements also share days/qubits.
+              No joint covariance is estimated, so these p values are nominal diagnostic
+              scores, not calibrated channel-selection tests in the current paper.
   two         two channels fitted together to both bases at both distances (four eps targets,
               two factors): dephasing while idle with CZ, and with T1 decay while idle.
               Dephasing cannot flip Z memory's logical value (switching it off moves Z eps by
@@ -260,7 +262,7 @@ def targets(eb: dict, ebr: dict) -> dict:
 
 
 def common_k(entries: dict) -> dict:
-    """One k for several targets: inverse-variance mean of ln k, chi2 about it, p."""
+    """Diagonal-weight diagnostic; returned p is nominal, not covariance-calibrated."""
     bounds = [t for t, e in entries.items() if "k" not in e]
     if bounds:
         fitted = {t: e for t, e in entries.items() if "k" in e}
