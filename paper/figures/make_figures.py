@@ -119,7 +119,9 @@ def p_of_n(rep: int, distance: int, basis: str, which: str) -> np.ndarray:
     for day in DAYS:
         folder, k = folders(rep, distance, day)
         if which == "observed":
-            settings = load(RUNS / folder / "analysis.json")["observed"]["settings"]
+            curve = load(DIAG / "stored_priors.json")["curves"][folder][basis][str(distance)]
+            rows.append(curve["P"])
+            continue
         else:
             settings = load(RUNS / folder / "prediction.json")["1.0"]["settings"]
         rows.append([settings[offset + j]["logical_error"][k] for j in range(len(ROUNDS))])
@@ -132,10 +134,11 @@ def label(ax, text: str) -> None:
 
 def binomial_curve(rep: int, distance: int, basis: str, n: np.ndarray) -> np.ndarray:
     """The binomial fit (1 - A (1 - 2 eps)^n) / 2 of each day, averaged over the days."""
-    curves = load(DIAG / "fits.json")["curves"]
+    curves = load(DIAG / "stored_priors.json")["curves"]
     days = []
     for day in DAYS:
-        fit = curves[f"{day} r{rep} {basis} d{distance}"]["binomial"]
+        folder, _ = folders(rep, distance, day)
+        fit = curves[folder][basis][str(distance)]["binomial"]
         days.append((1 - fit["A"] * (1 - 2 * fit["eps"]) ** n) / 2)
     return np.mean(days, axis=0)
 

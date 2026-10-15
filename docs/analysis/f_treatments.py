@@ -1,18 +1,21 @@
 """Observed over predicted under each treatment of f, by pair, and the value of every curve
-(Sec. VI A, Table III, Fig. 3, Table A2).
+(Original adaptive-decoder diagnostics; the matched primary comparison is stored_priors.py.)
 
 The model needs one number the calibration does not give, the dephasing multiplier f. The
 predictions exist under five treatments of it: f = 1 and f = 0, stored before each job; the
 job's median f (the planned tests); each data qubit at its own f; and the inverse-variance mean
 of the per-qubit f, whose priors also decode the device's shots again (f_weighted_mean.py).
 For each treatment and each quantity, O/M is the geometric mean over the ten pair-days with a
-Student t intervals (4 dof) from the five daily means of ln(O/M). The primary table uses
+Student t intervals (4 dof) from the five daily means of ln(O/M). The sensitivity table uses
 Bonferroni simultaneous 95% intervals over its five quantities within each input treatment;
 pointwise 95% intervals remain recorded. The two placements
 within a day form one block. This treats days as independent, conditional on the sampled
 patches and model inputs, not as a sample of hardware placements. The earlier ten-pair-day
 interval and separate placement intervals remain available as sensitivity results.
 The binomial fit is used throughout. Also how many curves lie above the prediction.
+The device uses the original measured-f priors except in the weighted-mean treatment;
+the simulated samples use each variant's priors. These are input/decoder diagnostics,
+not matched-decoder validation of every noise treatment.
 
   table      O/M of X eps3, eps5, Lambda_X, Z eps3, eps5 under each treatment, and the range of f
   pairs      each pair's mean over the five days: the device, the prediction at f = 1 and at the

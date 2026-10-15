@@ -1700,6 +1700,15 @@ def digest(res: dict) -> str:
     L += input_noise_digest(res["input_noise"])
     L += channels_digest(res["channels"])
     L += f_treatments_digest(res["f_treatments"])
+    matched = res["stored_priors_matched"]
+    L.append("Matched stored-prior comparison (f=1 noise and decoder on both sides):")
+    for q, row in matched["primary"].items():
+        lo, hi = row["ci95_family_of_five"]
+        L.append(f"   {q}: {row['ratio']:.4f} ({lo:.4f}-{hi:.4f})")
+    L.append(
+        f"   Early points above: {matched['early_points_above']}/{matched['early_points_total']}; "
+        f"fitted curves above: {matched['fitted_curves_above']}/40"
+    )
     return "\n".join(L) + "\n"
 
 
@@ -2067,6 +2076,9 @@ def main() -> None:
         "input_noise": input_noise(),
         "channels": channels(),
         "f_treatments": f_treatments(),
+        "stored_priors_matched": {
+            k: v for k, v in take("stored_priors.json").items() if k not in ("curves", "inputs")
+        },
         **other(),
     }
     res["about"]["inputs"] = sorted(INPUTS | {"docs/analysis/results/placements.json"})

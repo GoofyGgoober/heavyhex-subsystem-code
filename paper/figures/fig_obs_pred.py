@@ -39,6 +39,7 @@ def curves(results_dir: Path) -> list[dict]:
     fits = json.loads((results_dir / "fits.json").read_text())
     rows = json.loads((results_dir / "effect_sizes.json").read_text())["prejob"]["binomial"]
     prejob = {(r["day"], r["placement"]): r for r in rows["per_repetition"]}
+    matched = json.loads((results_dir / "stored_priors.json").read_text())["curves"]
     out = []
     for rep in fits["per_rep"].values():
         frozen = prejob[(DAYS.index(rep["day"]) + 1, rep["placement"])]
@@ -49,13 +50,15 @@ def curves(results_dir: Path) -> list[dict]:
                 at1 = pred["frozen_f1.0"][basis][d]["binomial"]["eps"]
                 assert at1 == frozen[f"{basis} eps{d} frozen_f1.0"]
                 assert obs["binomial"] == frozen[f"{basis} eps{d} observed"]
+                fixed = matched[rep["jobs"][d]][basis][d]["binomial"]
                 out.append(
                     {
                         "basis": basis,
                         "d": d,
-                        "obs": obs["binomial"],
-                        "lo": obs["binomial_lo68_quasi"],
-                        "hi": obs["binomial_hi68_quasi"],
+                        "obs": fixed["eps"],
+                        "lo": fixed["lo68_quasi"],
+                        "hi": fixed["hi68_quasi"],
+                        "obs_measured": obs["binomial"],
                         "stored": at1,
                         "measured": pred["predicted_at_measured_dephasing"][basis][d]["binomial"][
                             "eps"
@@ -69,18 +72,21 @@ def curves(results_dir: Path) -> list[dict]:
 def kingston(path: Path = KINGSTON) -> list[dict]:
     """The four Kingston curves: observed eps (both jobs pooled) and its 68% interval, the
     prediction stored before the jobs (IBM's T2) and the one at each data qubit's T_q."""
-    s = json.loads(path.read_text())["summary"]
+    result = json.loads(path.read_text())
+    s = result["summary"]
     out = []
     for basis in "XZ":
         for d in "35":
-            eps, sigma = s["observed_cap0.1"][basis][f"eps{d}"]
+            fixed = result["observed_prerun_model_decoder"]["0.1"][basis]["eps"][d]
+            eps = fixed["binomial"][0]
             out.append(
                 {
                     "basis": basis,
                     "d": d,
                     "obs": eps,
-                    "lo": eps - sigma,
-                    "hi": eps + sigma,
+                    "lo": fixed["binomial_interval"][0],
+                    "hi": fixed["binomial_interval"][1],
+                    "obs_measured": s["observed_cap0.1"][basis][f"eps{d}"][0],
                     "stored": s["prerun_model_cap0.1"][basis][f"eps{d}"][0],
                     "measured": s["model_measured_tq_cap0.1"][basis][f"eps{d}"][0],
                 }
@@ -89,15 +95,16 @@ def kingston(path: Path = KINGSTON) -> list[dict]:
 
 
 def points(ax, sel: list[dict], colour: str, marker: str, ms: float) -> None:
-    """Observed against stored (filled, with the 68% interval) and against measured (open),
-    joined at the same height."""
+    """Each comparison uses its own matched decoder, joined to show its total change."""
     y = 100 * np.array([r["obs"] for r in sel])
     lo = 100 * np.array([r["lo"] for r in sel])
     hi = 100 * np.array([r["hi"] for r in sel])
     xs = 100 * np.array([r["stored"] for r in sel])
     xm = 100 * np.array([r["measured"] for r in sel])
-    ax.hlines(y, np.minimum(xs, xm), np.maximum(xs, xm), color=colour, lw=0.5, alpha=0.6)
-    ax.plot(xm, y, marker, ms=ms * 0.85, mfc="white", mec=colour, mew=0.6, ls="none", alpha=0.8)
+    ym = 100 * np.array([r["obs_measured"] for r in sel])
+    for x1, x2, y1, y2 in zip(xs, xm, y, ym):
+        ax.plot([x1, x2], [y1, y2], color=colour, lw=0.5, alpha=0.6)
+    ax.plot(xm, ym, marker, ms=ms * 0.85, mfc="white", mec=colour, mew=0.6, ls="none", alpha=0.8)
     ax.errorbar(
         xs,
         y,
