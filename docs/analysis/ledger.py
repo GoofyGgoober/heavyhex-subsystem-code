@@ -2080,6 +2080,7 @@ def main() -> None:
             k: v for k, v in take("stored_priors.json").items() if k not in ("curves", "inputs")
         },
         "stored_priors_day_sensitivity": take("day_sensitivity.json"),
+        "primary_early_depths": take("early_depths.json"),
         "kingston_fixed_decoder": take("kingston_checks.json"),
         **other(),
     }
