@@ -1,5 +1,10 @@
 """Three checks of the decoder's matching graph (App. decoder): Stim's observable-only pieces,
-single faults on a uniform chip, and the shortest logical path in edges.
+single faults on a partially homogenized chip, and the shortest logical path in edges.
+
+The legacy result key "uniform" uses noisy.typical: CZ, readout, T1 and T2 are
+homogenized, but single-gate errors retain per-qubit values. The current paper uses
+the actual-job graph/decomposition checks, not this counterfactual's fault counts
+or its legacy log-linear rate-normalized shares.
 
 Pieces. With decompose_errors=True Stim writes a fault that fires more than two detectors as
 pieces of at most two detectors each. In distance-3 Z memory one fault per round has no split
@@ -21,7 +26,8 @@ and without correlations, against the paper's decoder and corr_matching.py's (pi
 The distance-3 Z-memory single-fault scan of decoder_faults.py is repeated to see which of its
 miscorrections are these faults.
 
-Uniform chip. Every coupler and qubit at the day's median (noisy.typical), f = 1 and decoupled
+Partially homogenized chip. CZ, readout, T1 and T2 at the day's median (noisy.typical),
+single-gate errors still per qubit, f = 1 and decoupled
 idles, as in uniform_scale.py (day 5) and figure3.py (day 1): each single fault of the
 decomposed detector error model decoded alone, in the pre-run simulator (noisy.noisy_circuit,
 one patch) with f = 1, f = 0 and the idle noise removed, and in the per-job model of the day's

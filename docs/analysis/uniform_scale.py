@@ -1,9 +1,14 @@
-"""Where would these circuits reach Λ = 1? Every error rate at Fez's median, scaled together.
+"""Legacy exploratory scaling diagnostic, not used in the current paper.
+
+Despite its historical name, noisy.typical homogenizes CZ, readout, T1 and T2 but
+retains per-qubit single-gate errors. This is not a fully uniform chip. noisy.decay
+also uses the original observed-weight log-linear estimator, not the paper's
+current binomial summary. The numerical crossings below are not threshold claims.
 
 A threshold proper needs d >= 7, which these circuits don't go to. What d = 3 and 5 can
 give is the scale s at which Λ = ε₃/ε₅ crosses 1 when every CZ, readout, reset,
-single-qubit error and idle time on a uniform chip at the 8 October medians is multiplied
-by s (decoupled waits, f = 1, the run's median). s = 1 is today's median chip.
+single-qubit error and idle time is multiplied by s (decoupled waits, f = 1).
+Only CZ, readout, T1 and T2 are set to the 8 October medians at s = 1.
 
 A few minutes (20,000 shots per point).
 
