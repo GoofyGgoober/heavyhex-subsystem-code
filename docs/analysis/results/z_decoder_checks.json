@@ -1,0 +1,3858 @@
+{
+ "method": "Z-memory decoder sensitivity at stored f=1, using only saved shots.\n\nRemove flag/relay DETECTOR declarations, not gates, measurements or observables.\nCompare the original matching decoder, matching on the reduced detector set,\nand exact maximum likelihood for that reduced set under the undecomposed DEM.\nML is model-optimal for these retained bits, not for all hardware information.\nBoth decoders see the very same simulated and device shots. No hardware access.\n\n    OPENBLAS_NUM_THREADS=1 PYTHONPATH=src:docs/analysis         python docs/analysis/z_decoder_checks.py\n\nOne worker; --job restricts to a folder suffix, --shots controls model sampling.\n",
+ "seed": 1701,
+ "model_shots_per_circuit": 20000,
+ "f": 1.0,
+ "rows": [
+  {
+   "job": "2026-10-04-r1",
+   "distance": 3,
+   "rounds": 1,
+   "retained_detectors": 4,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.04874943293214106,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 302,
+     "reduced": 302,
+     "ml": 302
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 0,
+      "spoiled": 0
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 990,
+     "reduced": 990,
+     "ml": 990
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 0,
+      "spoiled": 0
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r1",
+   "distance": 5,
+   "rounds": 1,
+   "retained_detectors": 8,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.14398512683540965,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 842,
+     "reduced": 842,
+     "ml": 804
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 121,
+      "spoiled": 83
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2969,
+     "reduced": 2969,
+     "ml": 2847
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 458,
+      "spoiled": 336
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r1",
+   "distance": 3,
+   "rounds": 2,
+   "retained_detectors": 6,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.10345272949686715,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 549,
+     "reduced": 549,
+     "ml": 547
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 13,
+      "spoiled": 11
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2035,
+     "reduced": 2035,
+     "ml": 2043
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 31,
+      "spoiled": 39
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r1",
+   "distance": 5,
+   "rounds": 2,
+   "retained_detectors": 12,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.251926473187695,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1062,
+     "reduced": 1062,
+     "ml": 1045
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 5,
+      "spoiled": 5
+     },
+     "ml": {
+      "rescued": 173,
+      "spoiled": 156
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 5385,
+     "reduced": 5411,
+     "ml": 5173
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 40,
+      "spoiled": 66
+     },
+     "ml": {
+      "rescued": 985,
+      "spoiled": 773
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r1",
+   "distance": 3,
+   "rounds": 3,
+   "retained_detectors": 8,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.15345306006549958,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 744,
+     "reduced": 744,
+     "ml": 716
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 62,
+      "spoiled": 34
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 3118,
+     "reduced": 3118,
+     "ml": 3089
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 260,
+      "spoiled": 231
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r1",
+   "distance": 5,
+   "rounds": 3,
+   "retained_detectors": 16,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.32938915417672954,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1181,
+     "reduced": 1180,
+     "ml": 1178
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 23,
+      "spoiled": 22
+     },
+     "ml": {
+      "rescued": 223,
+      "spoiled": 220
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 6886,
+     "reduced": 6890,
+     "ml": 6567
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 119,
+      "spoiled": 123
+     },
+     "ml": {
+      "rescued": 1461,
+      "spoiled": 1142
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r1",
+   "distance": 3,
+   "rounds": 4,
+   "retained_detectors": 10,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.196765182996527,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 879,
+     "reduced": 879,
+     "ml": 864
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 86,
+      "spoiled": 71
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 4076,
+     "reduced": 4076,
+     "ml": 4003
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 490,
+      "spoiled": 417
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r1",
+   "distance": 5,
+   "rounds": 4,
+   "retained_detectors": 20,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.3829730294834583,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1230,
+     "reduced": 1228,
+     "ml": 1210
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 33,
+      "spoiled": 31
+     },
+     "ml": {
+      "rescued": 314,
+      "spoiled": 294
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 7957,
+     "reduced": 7998,
+     "ml": 7561
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 169,
+      "spoiled": 210
+     },
+     "ml": {
+      "rescued": 1945,
+      "spoiled": 1549
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r2-d3",
+   "distance": 3,
+   "rounds": 1,
+   "retained_detectors": 4,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.08520435716119365,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 276,
+     "reduced": 275,
+     "ml": 275
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 1,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 1,
+      "spoiled": 0
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 1654,
+     "reduced": 1654,
+     "ml": 1654
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 0,
+      "spoiled": 0
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r2-d3",
+   "distance": 3,
+   "rounds": 2,
+   "retained_detectors": 6,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.15012534063985505,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 550,
+     "reduced": 595,
+     "ml": 546
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 44,
+      "spoiled": 89
+     },
+     "ml": {
+      "rescued": 10,
+      "spoiled": 6
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 3026,
+     "reduced": 3290,
+     "ml": 3006
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 242,
+      "spoiled": 506
+     },
+     "ml": {
+      "rescued": 52,
+      "spoiled": 32
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r2-d3",
+   "distance": 3,
+   "rounds": 3,
+   "retained_detectors": 8,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.20534424146870334,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 722,
+     "reduced": 758,
+     "ml": 710
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 63,
+      "spoiled": 99
+     },
+     "ml": {
+      "rescued": 78,
+      "spoiled": 66
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 4264,
+     "reduced": 4491,
+     "ml": 4064
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 307,
+      "spoiled": 534
+     },
+     "ml": {
+      "rescued": 535,
+      "spoiled": 335
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r2-d3",
+   "distance": 3,
+   "rounds": 4,
+   "retained_detectors": 10,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.25219667167323767,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 887,
+     "reduced": 902,
+     "ml": 870
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 62,
+      "spoiled": 77
+     },
+     "ml": {
+      "rescued": 130,
+      "spoiled": 113
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 5451,
+     "reduced": 5667,
+     "ml": 5086
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 329,
+      "spoiled": 545
+     },
+     "ml": {
+      "rescued": 995,
+      "spoiled": 630
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r2-d5",
+   "distance": 5,
+   "rounds": 1,
+   "retained_detectors": 8,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.13002451033107493,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 732,
+     "reduced": 728,
+     "ml": 739
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 5,
+      "spoiled": 1
+     },
+     "ml": {
+      "rescued": 59,
+      "spoiled": 66
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2745,
+     "reduced": 2751,
+     "ml": 2628
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 10,
+      "spoiled": 16
+     },
+     "ml": {
+      "rescued": 330,
+      "spoiled": 213
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r2-d5",
+   "distance": 5,
+   "rounds": 2,
+   "retained_detectors": 12,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.23212660047760236,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1042,
+     "reduced": 1042,
+     "ml": 1014
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 2,
+      "spoiled": 2
+     },
+     "ml": {
+      "rescued": 153,
+      "spoiled": 125
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 4862,
+     "reduced": 4866,
+     "ml": 4640
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 7,
+      "spoiled": 11
+     },
+     "ml": {
+      "rescued": 877,
+      "spoiled": 655
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r2-d5",
+   "distance": 5,
+   "rounds": 3,
+   "retained_detectors": 16,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.3086905493232961,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1182,
+     "reduced": 1183,
+     "ml": 1167
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 4,
+      "spoiled": 5
+     },
+     "ml": {
+      "rescued": 202,
+      "spoiled": 187
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 6546,
+     "reduced": 6547,
+     "ml": 6219
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 25,
+      "spoiled": 26
+     },
+     "ml": {
+      "rescued": 1386,
+      "spoiled": 1059
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-04-r2-d5",
+   "distance": 5,
+   "rounds": 4,
+   "retained_detectors": 20,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.36381143824739676,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1259,
+     "reduced": 1257,
+     "ml": 1238
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 3,
+      "spoiled": 1
+     },
+     "ml": {
+      "rescued": 243,
+      "spoiled": 222
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 7586,
+     "reduced": 7590,
+     "ml": 7267
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 26,
+      "spoiled": 30
+     },
+     "ml": {
+      "rescued": 1701,
+      "spoiled": 1382
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r1",
+   "distance": 3,
+   "rounds": 1,
+   "retained_detectors": 4,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.057412623144820395,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 265,
+     "reduced": 265,
+     "ml": 291
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 12,
+      "spoiled": 38
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 1167,
+     "reduced": 1167,
+     "ml": 1159
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 136,
+      "spoiled": 128
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r1",
+   "distance": 5,
+   "rounds": 1,
+   "retained_detectors": 8,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.14472071709029735,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 771,
+     "reduced": 771,
+     "ml": 767
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 53,
+      "spoiled": 49
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2908,
+     "reduced": 2908,
+     "ml": 2872
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 286,
+      "spoiled": 250
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r1",
+   "distance": 3,
+   "rounds": 2,
+   "retained_detectors": 6,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.11621061540236957,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 554,
+     "reduced": 554,
+     "ml": 552
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 38,
+      "spoiled": 36
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2365,
+     "reduced": 2365,
+     "ml": 2364
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 186,
+      "spoiled": 185
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r1",
+   "distance": 5,
+   "rounds": 2,
+   "retained_detectors": 12,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.25396402820397296,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1089,
+     "reduced": 1102,
+     "ml": 1057
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 14,
+      "spoiled": 27
+     },
+     "ml": {
+      "rescued": 172,
+      "spoiled": 140
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 5317,
+     "reduced": 5343,
+     "ml": 5082
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 96,
+      "spoiled": 122
+     },
+     "ml": {
+      "rescued": 1039,
+      "spoiled": 804
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r1",
+   "distance": 3,
+   "rounds": 3,
+   "retained_detectors": 8,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.16857751172113344,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 794,
+     "reduced": 795,
+     "ml": 775
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 3,
+      "spoiled": 4
+     },
+     "ml": {
+      "rescued": 55,
+      "spoiled": 36
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 3431,
+     "reduced": 3464,
+     "ml": 3367
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 34,
+      "spoiled": 67
+     },
+     "ml": {
+      "rescued": 292,
+      "spoiled": 228
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r1",
+   "distance": 5,
+   "rounds": 3,
+   "retained_detectors": 16,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.3321572619745593,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1187,
+     "reduced": 1197,
+     "ml": 1192
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 17,
+      "spoiled": 27
+     },
+     "ml": {
+      "rescued": 221,
+      "spoiled": 226
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 6908,
+     "reduced": 6934,
+     "ml": 6684
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 131,
+      "spoiled": 157
+     },
+     "ml": {
+      "rescued": 1472,
+      "spoiled": 1248
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r1",
+   "distance": 3,
+   "rounds": 4,
+   "retained_detectors": 10,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.21412236642202648,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 833,
+     "reduced": 832,
+     "ml": 838
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 11,
+      "spoiled": 10
+     },
+     "ml": {
+      "rescued": 62,
+      "spoiled": 67
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 4446,
+     "reduced": 4475,
+     "ml": 4354
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 36,
+      "spoiled": 65
+     },
+     "ml": {
+      "rescued": 428,
+      "spoiled": 336
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r1",
+   "distance": 5,
+   "rounds": 4,
+   "retained_detectors": 20,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.38592060577574305,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1228,
+     "reduced": 1224,
+     "ml": 1229
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 21,
+      "spoiled": 17
+     },
+     "ml": {
+      "rescued": 287,
+      "spoiled": 288
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 7983,
+     "reduced": 7992,
+     "ml": 7706
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 161,
+      "spoiled": 170
+     },
+     "ml": {
+      "rescued": 1896,
+      "spoiled": 1619
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r2-d3",
+   "distance": 3,
+   "rounds": 1,
+   "retained_detectors": 4,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.07686037268132129,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 537,
+     "reduced": 537,
+     "ml": 537
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 0,
+      "spoiled": 0
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 1623,
+     "reduced": 1623,
+     "ml": 1623
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 0,
+      "spoiled": 0
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r2-d3",
+   "distance": 3,
+   "rounds": 2,
+   "retained_detectors": 6,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.13842136660947169,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 845,
+     "reduced": 850,
+     "ml": 828
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 32,
+      "spoiled": 37
+     },
+     "ml": {
+      "rescued": 80,
+      "spoiled": 63
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2922,
+     "reduced": 3023,
+     "ml": 2742
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 127,
+      "spoiled": 228
+     },
+     "ml": {
+      "rescued": 367,
+      "spoiled": 187
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r2-d3",
+   "distance": 3,
+   "rounds": 3,
+   "retained_detectors": 8,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.19216775509522777,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 985,
+     "reduced": 982,
+     "ml": 973
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 50,
+      "spoiled": 47
+     },
+     "ml": {
+      "rescued": 142,
+      "spoiled": 130
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 4160,
+     "reduced": 4244,
+     "ml": 3837
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 159,
+      "spoiled": 243
+     },
+     "ml": {
+      "rescued": 778,
+      "spoiled": 455
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r2-d3",
+   "distance": 3,
+   "rounds": 4,
+   "retained_detectors": 10,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.23800152201253852,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1090,
+     "reduced": 1090,
+     "ml": 1044
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 51,
+      "spoiled": 51
+     },
+     "ml": {
+      "rescued": 214,
+      "spoiled": 168
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 5153,
+     "reduced": 5197,
+     "ml": 4761
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 170,
+      "spoiled": 214
+     },
+     "ml": {
+      "rescued": 1180,
+      "spoiled": 788
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r2-d5",
+   "distance": 5,
+   "rounds": 1,
+   "retained_detectors": 8,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.1386420501006212,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 784,
+     "reduced": 784,
+     "ml": 793
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 80,
+      "spoiled": 89
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2869,
+     "reduced": 2869,
+     "ml": 2805
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 330,
+      "spoiled": 266
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r2-d5",
+   "distance": 5,
+   "rounds": 2,
+   "retained_detectors": 12,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.24526243167056633,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1132,
+     "reduced": 1135,
+     "ml": 1093
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 21,
+      "spoiled": 24
+     },
+     "ml": {
+      "rescued": 185,
+      "spoiled": 146
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 5150,
+     "reduced": 5216,
+     "ml": 4922
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 132,
+      "spoiled": 198
+     },
+     "ml": {
+      "rescued": 933,
+      "spoiled": 705
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r2-d5",
+   "distance": 5,
+   "rounds": 3,
+   "retained_detectors": 16,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.32250687392553556,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1147,
+     "reduced": 1158,
+     "ml": 1138
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 23,
+      "spoiled": 34
+     },
+     "ml": {
+      "rescued": 197,
+      "spoiled": 188
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 6770,
+     "reduced": 6805,
+     "ml": 6411
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 169,
+      "spoiled": 204
+     },
+     "ml": {
+      "rescued": 1380,
+      "spoiled": 1021
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-05-r2-d5",
+   "distance": 5,
+   "rounds": 4,
+   "retained_detectors": 20,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.37672886600964745,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1235,
+     "reduced": 1245,
+     "ml": 1201
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 31,
+      "spoiled": 41
+     },
+     "ml": {
+      "rescued": 271,
+      "spoiled": 237
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 7833,
+     "reduced": 7932,
+     "ml": 7510
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 198,
+      "spoiled": 297
+     },
+     "ml": {
+      "rescued": 1723,
+      "spoiled": 1400
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r1",
+   "distance": 3,
+   "rounds": 1,
+   "retained_detectors": 4,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.06742634268623521,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 333,
+     "reduced": 333,
+     "ml": 333
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 0,
+      "spoiled": 0
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 1354,
+     "reduced": 1354,
+     "ml": 1354
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 0,
+      "spoiled": 0
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r1",
+   "distance": 5,
+   "rounds": 1,
+   "retained_detectors": 8,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.1345432675326871,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 640,
+     "reduced": 635,
+     "ml": 627
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 11,
+      "spoiled": 6
+     },
+     "ml": {
+      "rescued": 82,
+      "spoiled": 69
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2774,
+     "reduced": 2793,
+     "ml": 2673
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 30,
+      "spoiled": 49
+     },
+     "ml": {
+      "rescued": 366,
+      "spoiled": 265
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r1",
+   "distance": 3,
+   "rounds": 2,
+   "retained_detectors": 6,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.13388039467756302,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 582,
+     "reduced": 597,
+     "ml": 573
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 15,
+      "spoiled": 30
+     },
+     "ml": {
+      "rescued": 24,
+      "spoiled": 15
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2760,
+     "reduced": 2839,
+     "ml": 2731
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 94,
+      "spoiled": 173
+     },
+     "ml": {
+      "rescued": 106,
+      "spoiled": 77
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r1",
+   "distance": 5,
+   "rounds": 2,
+   "retained_detectors": 12,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.24434674880811352,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1025,
+     "reduced": 1023,
+     "ml": 965
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 3,
+      "spoiled": 1
+     },
+     "ml": {
+      "rescued": 186,
+      "spoiled": 126
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 5063,
+     "reduced": 5079,
+     "ml": 4861
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 17,
+      "spoiled": 33
+     },
+     "ml": {
+      "rescued": 924,
+      "spoiled": 722
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r1",
+   "distance": 3,
+   "rounds": 3,
+   "retained_detectors": 8,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.19142810815205388,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 798,
+     "reduced": 804,
+     "ml": 808
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 23,
+      "spoiled": 29
+     },
+     "ml": {
+      "rescued": 57,
+      "spoiled": 67
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 3962,
+     "reduced": 4033,
+     "ml": 3844
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 108,
+      "spoiled": 179
+     },
+     "ml": {
+      "rescued": 467,
+      "spoiled": 349
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r1",
+   "distance": 5,
+   "rounds": 3,
+   "retained_detectors": 16,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.3239505691015665,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1133,
+     "reduced": 1132,
+     "ml": 1089
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 9,
+      "spoiled": 8
+     },
+     "ml": {
+      "rescued": 235,
+      "spoiled": 191
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 6598,
+     "reduced": 6582,
+     "ml": 6452
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 67,
+      "spoiled": 51
+     },
+     "ml": {
+      "rescued": 1405,
+      "spoiled": 1259
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r1",
+   "distance": 3,
+   "rounds": 4,
+   "retained_detectors": 10,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.24001089211745014,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 936,
+     "reduced": 937,
+     "ml": 928
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 30,
+      "spoiled": 31
+     },
+     "ml": {
+      "rescued": 83,
+      "spoiled": 75
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 4815,
+     "reduced": 4898,
+     "ml": 4708
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 119,
+      "spoiled": 202
+     },
+     "ml": {
+      "rescued": 553,
+      "spoiled": 446
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r1",
+   "distance": 5,
+   "rounds": 4,
+   "retained_detectors": 20,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.37916836708581136,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1203,
+     "reduced": 1206,
+     "ml": 1168
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 12,
+      "spoiled": 15
+     },
+     "ml": {
+      "rescued": 277,
+      "spoiled": 242
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 7843,
+     "reduced": 7875,
+     "ml": 7547
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 61,
+      "spoiled": 93
+     },
+     "ml": {
+      "rescued": 1860,
+      "spoiled": 1564
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r2-d3",
+   "distance": 3,
+   "rounds": 1,
+   "retained_detectors": 4,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.0914983399096923,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 370,
+     "reduced": 362,
+     "ml": 346
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 15,
+      "spoiled": 7
+     },
+     "ml": {
+      "rescued": 47,
+      "spoiled": 23
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 1909,
+     "reduced": 1904,
+     "ml": 1820
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 32,
+      "spoiled": 27
+     },
+     "ml": {
+      "rescued": 251,
+      "spoiled": 162
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r2-d3",
+   "distance": 3,
+   "rounds": 2,
+   "retained_detectors": 6,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.15582621355171772,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 679,
+     "reduced": 678,
+     "ml": 608
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 23,
+      "spoiled": 22
+     },
+     "ml": {
+      "rescued": 183,
+      "spoiled": 112
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 3338,
+     "reduced": 3331,
+     "ml": 3181
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 67,
+      "spoiled": 60
+     },
+     "ml": {
+      "rescued": 878,
+      "spoiled": 721
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r2-d3",
+   "distance": 3,
+   "rounds": 3,
+   "retained_detectors": 8,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.20917776985577505,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 856,
+     "reduced": 852,
+     "ml": 753
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 23,
+      "spoiled": 19
+     },
+     "ml": {
+      "rescued": 249,
+      "spoiled": 146
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 4511,
+     "reduced": 4504,
+     "ml": 4223
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 73,
+      "spoiled": 66
+     },
+     "ml": {
+      "rescued": 1328,
+      "spoiled": 1040
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r2-d3",
+   "distance": 3,
+   "rounds": 4,
+   "retained_detectors": 10,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.2546056019632163,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 973,
+     "reduced": 973,
+     "ml": 932
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 21,
+      "spoiled": 21
+     },
+     "ml": {
+      "rescued": 287,
+      "spoiled": 246
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 5511,
+     "reduced": 5514,
+     "ml": 5079
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 68,
+      "spoiled": 71
+     },
+     "ml": {
+      "rescued": 1777,
+      "spoiled": 1345
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r2-d5",
+   "distance": 5,
+   "rounds": 1,
+   "retained_detectors": 8,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.13347376668350985,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 599,
+     "reduced": 599,
+     "ml": 567
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 86,
+      "spoiled": 54
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2715,
+     "reduced": 2715,
+     "ml": 2678
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 394,
+      "spoiled": 357
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r2-d5",
+   "distance": 5,
+   "rounds": 2,
+   "retained_detectors": 12,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.24315069936349687,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 970,
+     "reduced": 972,
+     "ml": 936
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 7,
+      "spoiled": 9
+     },
+     "ml": {
+      "rescued": 148,
+      "spoiled": 114
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 5097,
+     "reduced": 5109,
+     "ml": 4835
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 42,
+      "spoiled": 54
+     },
+     "ml": {
+      "rescued": 943,
+      "spoiled": 681
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r2-d5",
+   "distance": 5,
+   "rounds": 3,
+   "retained_detectors": 16,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.3220617337087278,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1095,
+     "reduced": 1097,
+     "ml": 1065
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 20,
+      "spoiled": 22
+     },
+     "ml": {
+      "rescued": 189,
+      "spoiled": 159
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 6586,
+     "reduced": 6602,
+     "ml": 6367
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 125,
+      "spoiled": 141
+     },
+     "ml": {
+      "rescued": 1237,
+      "spoiled": 1018
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-06-r2-d5",
+   "distance": 5,
+   "rounds": 4,
+   "retained_detectors": 20,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.37718468770576785,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1176,
+     "reduced": 1166,
+     "ml": 1153
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 38,
+      "spoiled": 28
+     },
+     "ml": {
+      "rescued": 219,
+      "spoiled": 196
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 7767,
+     "reduced": 7804,
+     "ml": 7571
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 174,
+      "spoiled": 211
+     },
+     "ml": {
+      "rescued": 1490,
+      "spoiled": 1294
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r1",
+   "distance": 3,
+   "rounds": 1,
+   "retained_detectors": 4,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.06433601597260198,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 329,
+     "reduced": 329,
+     "ml": 318
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 33,
+      "spoiled": 22
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 1317,
+     "reduced": 1317,
+     "ml": 1317
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 112,
+      "spoiled": 112
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r1",
+   "distance": 5,
+   "rounds": 1,
+   "retained_detectors": 8,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.12639559738278996,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 805,
+     "reduced": 806,
+     "ml": 805
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 2,
+      "spoiled": 3
+     },
+     "ml": {
+      "rescued": 66,
+      "spoiled": 66
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2594,
+     "reduced": 2589,
+     "ml": 2533
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 17,
+      "spoiled": 12
+     },
+     "ml": {
+      "rescued": 349,
+      "spoiled": 288
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r1",
+   "distance": 3,
+   "rounds": 2,
+   "retained_detectors": 6,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.12699030854760202,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 595,
+     "reduced": 595,
+     "ml": 592
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 29,
+      "spoiled": 26
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2606,
+     "reduced": 2606,
+     "ml": 2570
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 208,
+      "spoiled": 172
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r1",
+   "distance": 5,
+   "rounds": 2,
+   "retained_detectors": 12,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.22965657746612067,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1047,
+     "reduced": 1059,
+     "ml": 1060
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 4,
+      "spoiled": 16
+     },
+     "ml": {
+      "rescued": 140,
+      "spoiled": 153
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 4799,
+     "reduced": 4810,
+     "ml": 4610
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 74,
+      "spoiled": 85
+     },
+     "ml": {
+      "rescued": 914,
+      "spoiled": 725
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r1",
+   "distance": 3,
+   "rounds": 3,
+   "retained_detectors": 8,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.18183855651999775,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 743,
+     "reduced": 743,
+     "ml": 733
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 59,
+      "spoiled": 49
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 3584,
+     "reduced": 3584,
+     "ml": 3549
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 253,
+      "spoiled": 218
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r1",
+   "distance": 5,
+   "rounds": 3,
+   "retained_detectors": 16,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.3073756587909774,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1187,
+     "reduced": 1198,
+     "ml": 1184
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 13,
+      "spoiled": 24
+     },
+     "ml": {
+      "rescued": 175,
+      "spoiled": 172
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 6486,
+     "reduced": 6539,
+     "ml": 6241
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 101,
+      "spoiled": 154
+     },
+     "ml": {
+      "rescued": 1316,
+      "spoiled": 1071
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r1",
+   "distance": 3,
+   "rounds": 4,
+   "retained_detectors": 10,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.22907555408651367,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 913,
+     "reduced": 914,
+     "ml": 916
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 1
+     },
+     "ml": {
+      "rescued": 54,
+      "spoiled": 57
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 4502,
+     "reduced": 4502,
+     "ml": 4457
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 382,
+      "spoiled": 337
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r1",
+   "distance": 5,
+   "rounds": 4,
+   "retained_detectors": 20,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.36313858698567003,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1216,
+     "reduced": 1211,
+     "ml": 1224
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 32,
+      "spoiled": 27
+     },
+     "ml": {
+      "rescued": 236,
+      "spoiled": 244
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 7483,
+     "reduced": 7523,
+     "ml": 7216
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 208,
+      "spoiled": 248
+     },
+     "ml": {
+      "rescued": 1643,
+      "spoiled": 1376
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r2-d3",
+   "distance": 3,
+   "rounds": 1,
+   "retained_detectors": 4,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.070002021120293,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 442,
+     "reduced": 442,
+     "ml": 442
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 0,
+      "spoiled": 0
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 1387,
+     "reduced": 1395,
+     "ml": 1395
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 4,
+      "spoiled": 12
+     },
+     "ml": {
+      "rescued": 4,
+      "spoiled": 12
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r2-d3",
+   "distance": 3,
+   "rounds": 2,
+   "retained_detectors": 6,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.1271520922036285,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 685,
+     "reduced": 681,
+     "ml": 681
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 7,
+      "spoiled": 3
+     },
+     "ml": {
+      "rescued": 7,
+      "spoiled": 3
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2541,
+     "reduced": 2536,
+     "ml": 2536
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 31,
+      "spoiled": 26
+     },
+     "ml": {
+      "rescued": 31,
+      "spoiled": 26
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r2-d3",
+   "distance": 3,
+   "rounds": 3,
+   "retained_detectors": 8,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.17714493155235905,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 889,
+     "reduced": 901,
+     "ml": 882
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 7,
+      "spoiled": 19
+     },
+     "ml": {
+      "rescued": 81,
+      "spoiled": 74
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 3676,
+     "reduced": 3657,
+     "ml": 3416
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 40,
+      "spoiled": 21
+     },
+     "ml": {
+      "rescued": 496,
+      "spoiled": 236
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r2-d3",
+   "distance": 3,
+   "rounds": 4,
+   "retained_detectors": 10,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.22086840245117884,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1044,
+     "reduced": 1044,
+     "ml": 1033
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 11,
+      "spoiled": 11
+     },
+     "ml": {
+      "rescued": 147,
+      "spoiled": 136
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 4694,
+     "reduced": 4691,
+     "ml": 4430
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 35,
+      "spoiled": 32
+     },
+     "ml": {
+      "rescued": 830,
+      "spoiled": 566
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r2-d5",
+   "distance": 5,
+   "rounds": 1,
+   "retained_detectors": 8,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.14592827492009214,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 783,
+     "reduced": 782,
+     "ml": 774
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 5,
+      "spoiled": 4
+     },
+     "ml": {
+      "rescued": 60,
+      "spoiled": 51
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 3025,
+     "reduced": 3036,
+     "ml": 2988
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 11,
+      "spoiled": 22
+     },
+     "ml": {
+      "rescued": 236,
+      "spoiled": 199
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r2-d5",
+   "distance": 5,
+   "rounds": 2,
+   "retained_detectors": 12,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.2589380228015169,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1081,
+     "reduced": 1085,
+     "ml": 1078
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 5,
+      "spoiled": 9
+     },
+     "ml": {
+      "rescued": 144,
+      "spoiled": 141
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 5362,
+     "reduced": 5337,
+     "ml": 5185
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 67,
+      "spoiled": 42
+     },
+     "ml": {
+      "rescued": 1059,
+      "spoiled": 882
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r2-d5",
+   "distance": 5,
+   "rounds": 3,
+   "retained_detectors": 16,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.3379745542837066,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1157,
+     "reduced": 1153,
+     "ml": 1142
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 13,
+      "spoiled": 9
+     },
+     "ml": {
+      "rescued": 176,
+      "spoiled": 161
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 7268,
+     "reduced": 7218,
+     "ml": 6849
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 105,
+      "spoiled": 55
+     },
+     "ml": {
+      "rescued": 1663,
+      "spoiled": 1244
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-07-r2-d5",
+   "distance": 5,
+   "rounds": 4,
+   "retained_detectors": 20,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.39148938107355524,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1187,
+     "reduced": 1187,
+     "ml": 1220
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 15,
+      "spoiled": 15
+     },
+     "ml": {
+      "rescued": 188,
+      "spoiled": 221
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 8182,
+     "reduced": 8154,
+     "ml": 7795
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 125,
+      "spoiled": 97
+     },
+     "ml": {
+      "rescued": 1986,
+      "spoiled": 1599
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r1",
+   "distance": 3,
+   "rounds": 1,
+   "retained_detectors": 4,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.052543426265969216,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 309,
+     "reduced": 328,
+     "ml": 328
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 16,
+      "spoiled": 35
+     },
+     "ml": {
+      "rescued": 16,
+      "spoiled": 35
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 1125,
+     "reduced": 1088,
+     "ml": 1088
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 111,
+      "spoiled": 74
+     },
+     "ml": {
+      "rescued": 111,
+      "spoiled": 74
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r1",
+   "distance": 5,
+   "rounds": 1,
+   "retained_detectors": 8,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.1597029004584399,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 806,
+     "reduced": 805,
+     "ml": 798
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 7,
+      "spoiled": 6
+     },
+     "ml": {
+      "rescued": 80,
+      "spoiled": 72
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 3328,
+     "reduced": 3331,
+     "ml": 3216
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 31,
+      "spoiled": 34
+     },
+     "ml": {
+      "rescued": 377,
+      "spoiled": 265
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r1",
+   "distance": 3,
+   "rounds": 2,
+   "retained_detectors": 6,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.10413186287706017,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 542,
+     "reduced": 542,
+     "ml": 570
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 49,
+      "spoiled": 77
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2154,
+     "reduced": 2154,
+     "ml": 2066
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 281,
+      "spoiled": 193
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r1",
+   "distance": 5,
+   "rounds": 2,
+   "retained_detectors": 12,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.26891080680820106,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1138,
+     "reduced": 1134,
+     "ml": 1130
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 7,
+      "spoiled": 3
+     },
+     "ml": {
+      "rescued": 155,
+      "spoiled": 147
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 5474,
+     "reduced": 5473,
+     "ml": 5292
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 14,
+      "spoiled": 13
+     },
+     "ml": {
+      "rescued": 1014,
+      "spoiled": 832
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r1",
+   "distance": 3,
+   "rounds": 3,
+   "retained_detectors": 8,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.1506139808560089,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 753,
+     "reduced": 753,
+     "ml": 754
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 93,
+      "spoiled": 94
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 3175,
+     "reduced": 3175,
+     "ml": 3042
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 477,
+      "spoiled": 344
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r1",
+   "distance": 5,
+   "rounds": 3,
+   "retained_detectors": 16,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.34510003649430715,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1188,
+     "reduced": 1193,
+     "ml": 1179
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 6,
+      "spoiled": 11
+     },
+     "ml": {
+      "rescued": 223,
+      "spoiled": 214
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 7178,
+     "reduced": 7186,
+     "ml": 7019
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 51,
+      "spoiled": 59
+     },
+     "ml": {
+      "rescued": 1429,
+      "spoiled": 1270
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r1",
+   "distance": 3,
+   "rounds": 4,
+   "retained_detectors": 10,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.19189687625768034,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 907,
+     "reduced": 907,
+     "ml": 916
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 116,
+      "spoiled": 125
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 4013,
+     "reduced": 4013,
+     "ml": 3931
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 601,
+      "spoiled": 519
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r1",
+   "distance": 5,
+   "rounds": 4,
+   "retained_detectors": 20,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.39645072260596537,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1231,
+     "reduced": 1232,
+     "ml": 1190
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 13,
+      "spoiled": 14
+     },
+     "ml": {
+      "rescued": 290,
+      "spoiled": 249
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 8195,
+     "reduced": 8212,
+     "ml": 8025
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 111,
+      "spoiled": 128
+     },
+     "ml": {
+      "rescued": 1736,
+      "spoiled": 1566
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r2-d3",
+   "distance": 3,
+   "rounds": 1,
+   "retained_detectors": 4,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.10359989361588116,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 840,
+     "reduced": 840,
+     "ml": 745
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 201,
+      "spoiled": 106
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 2069,
+     "reduced": 2069,
+     "ml": 2009
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 528,
+      "spoiled": 468
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r2-d3",
+   "distance": 3,
+   "rounds": 2,
+   "retained_detectors": 6,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.16245302701016046,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1049,
+     "reduced": 1049,
+     "ml": 1012
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 114,
+      "spoiled": 77
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 3256,
+     "reduced": 3256,
+     "ml": 3239
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 325,
+      "spoiled": 308
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r2-d3",
+   "distance": 3,
+   "rounds": 3,
+   "retained_detectors": 8,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.21325062956444507,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1141,
+     "reduced": 1141,
+     "ml": 1099
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 194,
+      "spoiled": 152
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 4378,
+     "reduced": 4378,
+     "ml": 4229
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 772,
+      "spoiled": 623
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r2-d3",
+   "distance": 3,
+   "rounds": 4,
+   "retained_detectors": 10,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.25659211822074834,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 3,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1217,
+     "reduced": 1217,
+     "ml": 1166
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 271,
+      "spoiled": 220
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 5278,
+     "reduced": 5278,
+     "ml": 5122
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 0,
+      "spoiled": 0
+     },
+     "ml": {
+      "rescued": 1096,
+      "spoiled": 940
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r2-d5",
+   "distance": 5,
+   "rounds": 1,
+   "retained_detectors": 8,
+   "seed": 1702,
+   "exact_model_ml_failure": 0.15044552262837557,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 784,
+     "reduced": 784,
+     "ml": 771
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 3,
+      "spoiled": 3
+     },
+     "ml": {
+      "rescued": 71,
+      "spoiled": 58
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 3121,
+     "reduced": 3103,
+     "ml": 3044
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 28,
+      "spoiled": 10
+     },
+     "ml": {
+      "rescued": 341,
+      "spoiled": 264
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r2-d5",
+   "distance": 5,
+   "rounds": 2,
+   "retained_detectors": 12,
+   "seed": 1703,
+   "exact_model_ml_failure": 0.2545980530442171,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1047,
+     "reduced": 1041,
+     "ml": 1026
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 11,
+      "spoiled": 5
+     },
+     "ml": {
+      "rescued": 166,
+      "spoiled": 145
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 5354,
+     "reduced": 5365,
+     "ml": 5101
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 37,
+      "spoiled": 48
+     },
+     "ml": {
+      "rescued": 1018,
+      "spoiled": 765
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r2-d5",
+   "distance": 5,
+   "rounds": 3,
+   "retained_detectors": 16,
+   "seed": 1704,
+   "exact_model_ml_failure": 0.32865473545422286,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1185,
+     "reduced": 1190,
+     "ml": 1195
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 16,
+      "spoiled": 21
+     },
+     "ml": {
+      "rescued": 173,
+      "spoiled": 183
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 6893,
+     "reduced": 6911,
+     "ml": 6605
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 107,
+      "spoiled": 125
+     },
+     "ml": {
+      "rescued": 1417,
+      "spoiled": 1129
+     }
+    }
+   }
+  },
+  {
+   "job": "2026-10-08-r2-d5",
+   "distance": 5,
+   "rounds": 4,
+   "retained_detectors": 20,
+   "seed": 1705,
+   "exact_model_ml_failure": 0.38060741814104104,
+   "original_graph_distance": 3,
+   "reduced_graph_distance": 5,
+   "device": {
+    "shots": 2500,
+    "failures": {
+     "original": 1188,
+     "reduced": 1197,
+     "ml": 1181
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 24,
+      "spoiled": 33
+     },
+     "ml": {
+      "rescued": 227,
+      "spoiled": 220
+     }
+    }
+   },
+   "model": {
+    "shots": 20000,
+    "failures": {
+     "original": 8111,
+     "reduced": 8111,
+     "ml": 7688
+    },
+    "paired_change": {
+     "reduced": {
+      "rescued": 165,
+      "spoiled": 165
+     },
+     "ml": {
+      "rescued": 1855,
+      "spoiled": 1432
+     }
+    }
+   }
+  }
+ ],
+ "summary": [
+  {
+   "distance": 3,
+   "rounds": 1,
+   "patch_jobs": 10,
+   "device": {
+    "shots": 25000,
+    "failure_fraction": {
+     "original": 0.16012,
+     "reduced": 0.16052,
+     "ml": 0.15668
+    }
+   },
+   "model": {
+    "shots": 200000,
+    "failure_fraction": {
+     "original": 0.072975,
+     "reduced": 0.072805,
+     "ml": 0.072045
+    }
+   }
+  },
+  {
+   "distance": 3,
+   "rounds": 2,
+   "patch_jobs": 10,
+   "device": {
+    "shots": 25000,
+    "failure_fraction": {
+     "original": 0.2652,
+     "reduced": 0.2676,
+     "ml": 0.26036
+    }
+   },
+   "model": {
+    "shots": 200000,
+    "failure_fraction": {
+     "original": 0.135015,
+     "reduced": 0.137175,
+     "ml": 0.13239
+    }
+   }
+  },
+  {
+   "distance": 3,
+   "rounds": 3,
+   "patch_jobs": 10,
+   "device": {
+    "shots": 25000,
+    "failure_fraction": {
+     "original": 0.337,
+     "reduced": 0.33892,
+     "ml": 0.32812
+    }
+   },
+   "model": {
+    "shots": 200000,
+    "failure_fraction": {
+     "original": 0.191295,
+     "reduced": 0.19324,
+     "ml": 0.1833
+    }
+   }
+  },
+  {
+   "distance": 3,
+   "rounds": 4,
+   "patch_jobs": 10,
+   "device": {
+    "shots": 25000,
+    "failure_fraction": {
+     "original": 0.38716,
+     "reduced": 0.3878,
+     "ml": 0.38028
+    }
+   },
+   "model": {
+    "shots": 200000,
+    "failure_fraction": {
+     "original": 0.239695,
+     "reduced": 0.241555,
+     "ml": 0.229655
+    }
+   }
+  },
+  {
+   "distance": 5,
+   "rounds": 1,
+   "patch_jobs": 10,
+   "device": {
+    "shots": 25000,
+    "failure_fraction": {
+     "original": 0.30184,
+     "reduced": 0.30144,
+     "ml": 0.2978
+    }
+   },
+   "model": {
+    "shots": 200000,
+    "failure_fraction": {
+     "original": 0.14524,
+     "reduced": 0.14532,
+     "ml": 0.14142
+    }
+   }
+  },
+  {
+   "distance": 5,
+   "rounds": 2,
+   "patch_jobs": 10,
+   "device": {
+    "shots": 25000,
+    "failure_fraction": {
+     "original": 0.42532,
+     "reduced": 0.4262,
+     "ml": 0.41616
+    }
+   },
+   "model": {
+    "shots": 200000,
+    "failure_fraction": {
+     "original": 0.259315,
+     "reduced": 0.260045,
+     "ml": 0.248505
+    }
+   }
+  },
+  {
+   "distance": 5,
+   "rounds": 3,
+   "patch_jobs": 10,
+   "device": {
+    "shots": 25000,
+    "failure_fraction": {
+     "original": 0.46568,
+     "reduced": 0.46724,
+     "ml": 0.46116
+    }
+   },
+   "model": {
+    "shots": 200000,
+    "failure_fraction": {
+     "original": 0.340595,
+     "reduced": 0.34107,
+     "ml": 0.32707
+    }
+   }
+  },
+  {
+   "distance": 5,
+   "rounds": 4,
+   "patch_jobs": 10,
+   "device": {
+    "shots": 25000,
+    "failure_fraction": {
+     "original": 0.48612,
+     "reduced": 0.48612,
+     "ml": 0.48056
+    }
+   },
+   "model": {
+    "shots": 200000,
+    "failure_fraction": {
+     "original": 0.3947,
+     "reduced": 0.395955,
+     "ml": 0.37943
+    }
+   }
+  }
+ ]
+}

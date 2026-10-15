@@ -3,12 +3,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from make_figures import D3, D5, GRID, INK, MUTED, PAGE, ROOT, load
+from make_figures import D3, D5, GRID, INK, MUTED, PAGE, load
 
 
 def make(results, output):
     checks = load(results / "idle_checks.json")["joint_residuals"]
-    raw = load(ROOT / "runs/ibm_kingston-followup/analysis/exp3.json")
+    raw = load(results / "kingston_iq.json")
     fig, axes = plt.subplots(1, 3, figsize=(PAGE, 2.1), layout="constrained")
     ordered = sorted(checks, key=lambda q: checks[q]["chi2_red"])
     axes[0].plot(range(1, 26), [checks[q]["chi2_red"] for q in ordered], "o", color=INK, ms=2.5)
@@ -32,14 +32,15 @@ def make(results, output):
     axes[1].set(xlabel="rounds", ylabel="standardized log residual", xticks=[1, 4, 8, 16])
     axes[1].set_title("(b) Median / largest error", loc="left", fontsize=8)
     axes[1].margins(y=0.15)
-    reference = None
+    references = {"R0": [], "R1": []}
     for arm, color in (("A", D5), ("B", D3)):
-        hist, ref = [], []
-        for row in raw["beside"]["iq_and_stationarity"]["qubits"]:
-            projected = row["arms"][arm]["confident"]
-            edges = np.asarray(projected["along_hist_edges"])
-            hist.append(projected["along_hist"])
-            ref.append(projected["R1_along_hist"])
+        hist = []
+        for row in raw["qubits"]:
+            projected = row["arms"][arm]["confident"]["histogram"]
+            edges = np.asarray(projected["edges"])
+            hist.append(projected["state"])
+            for reference in references:
+                references[reference].append(projected[reference])
         counts = np.sum(hist, axis=0)
         axes[2].stairs(
             counts / counts.sum() / np.diff(edges),
@@ -48,15 +49,16 @@ def make(results, output):
             lw=0.9,
             label=f"state, arm {arm}",
         )
-        reference = np.sum(ref, axis=0) if reference is None else reference + np.sum(ref, axis=0)
-    axes[2].stairs(
-        reference / reference.sum() / np.diff(edges),
-        edges,
-        color=MUTED,
-        lw=0.7,
-        ls="--",
-        label=r"reference $|1\rangle$",
-    )
+    for name, values in references.items():
+        counts = np.sum(values, axis=0)
+        axes[2].stairs(
+            counts / counts.sum() / np.diff(edges),
+            edges,
+            color=MUTED if name == "R1" else INK,
+            lw=0.7,
+            ls="--" if name == "R1" else ":",
+            label=rf"reference $|{name[-1]}\rangle$",
+        )
     axes[2].set(xlabel=r"IQ along $|0\rangle$ to $|1\rangle$", ylabel="density", xlim=(-1, 4))
     axes[2].set_title("(c) Readouts in fitted state", loc="left", fontsize=8)
     axes[2].legend(fontsize=5.5, loc="upper right")

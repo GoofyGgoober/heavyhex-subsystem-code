@@ -75,6 +75,29 @@ def main() -> None:
                 model = np.array(curves[key][name]["P"])
                 curves[key][name]["observed_minus_model_P"] = (obs - model).tolist()
                 curves[key][name]["observed_over_model_P"] = (obs / model).tolist()
+    forecast = read(REPO / "runs/ibm_kingston-2026-10-14-exp1-1/prediction.json")
+    stored = forecast["as_sent"]["decoders"]["0.1"]["logical_error"]
+    stored_curves, job_curves = {}, {}
+    for basis in "XZ":
+        for d in "35":
+            key = basis + d
+            observed = summarize_curve(
+                archive["observed_prerun_model_decoder"]["0.1"][basis]["eps"][d], 8192
+            )
+            prediction = np.array([stored[f"{basis}-{d}-{n}"] for n in range(1, 5)])
+            stored_curves[key] = {
+                "observed": observed,
+                "model_P": prediction.tolist(),
+                "observed_minus_model_P": (observed["P"] - prediction).tolist(),
+            }
+            for job, decoders in archive["observed_by_job"].items():
+                observed = summarize_curve(decoders["0.1"][basis]["eps"][d], 4096)
+                prediction = np.array(curves[key]["measured_tq"]["P"])
+                job_curves.setdefault(job, {})[key] = {
+                    "observed": observed,
+                    "model_P": prediction.tolist(),
+                    "observed_minus_model_P": (observed["P"] - prediction).tolist(),
+                }
     out = {
         "what": "All device and simulated samples use the same capped measured-Tq decoder. "
         "New simulations use 200000 shots per depth and seed0; the measured-Tq baseline "
@@ -82,6 +105,14 @@ def main() -> None:
         "Residuals quantify the exponential compression, not physical stationary rates.",
         "variants": variants,
         "curves": curves,
+        "stored_curves": {
+            "priors": "Original calibration, cap 0.1, on both sides",
+            "curves": stored_curves,
+        },
+        "by_job_curves": {
+            "priors": "Pooled measured-Tq, cap 0.1, on both sides; model inputs pooled across jobs",
+            "jobs": job_curves,
+        },
     }
     write_json("kingston_checks.json", out)
     for name, row in variants.items():
