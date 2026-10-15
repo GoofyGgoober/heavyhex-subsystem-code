@@ -51,12 +51,12 @@ from draw_blueprint import (
 WEAK_BAND = "#C8C8C8"
 WEAK_RING = "#6F6F6F"
 OTHER_REP = "#1B7A3D"  # boxes of the reps after the first
-QUBIT_NUMBER = "#6B6B6B"  # the Fez qubit numbers, darker than the blueprint's grey for print
+QUBIT_NUMBER = "#3F3F3F"  # the Fez qubit numbers, dark enough to remain legible in print
 GAP = 3  # points between a label and anything else
 # The paper prints the figure at its text width, PRINT_WIDTH, so every size here is scaled by
-# PRINT_WIDTH / WIDTH; MIN_PT keeps the smallest label at 7 pt in print.
+# PRINT_WIDTH / WIDTH; MIN_PT keeps the smallest label at 7.5 pt in print.
 WIDTH, HEIGHT, PRINT_WIDTH = 12.0, 7.05, 7.0
-MIN_PT = 7.0 * WIDTH / PRINT_WIDTH
+MIN_PT = 7.5 * WIDTH / PRINT_WIDTH
 LABEL = {"fontsize": MIN_PT, "fontweight": "bold", "color": INK, "zorder": 9, "path_effects": HALO}
 LEADER = {"arrowstyle": "-", "lw": 0.8, "color": INK, "shrinkA": 0, "shrinkB": 3}
 # A white box under each Fez qubit number, so that no coupler line runs through it.
