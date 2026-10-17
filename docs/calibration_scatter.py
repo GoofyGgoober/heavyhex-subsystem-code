@@ -9,8 +9,8 @@ predictions at f = 0, 0.5 and 1, as analyze does. Both directions are run.
 
 The preview used IBM's calibration of 3 October 2026 against the day before's:
 
-    git show 8cc0523:runs/ibm_fez-2026-10-02-offline/calibration.json > before.json
-    git show 5136246:runs/ibm_fez-2026-10-03-offline/calibration.json > after.json
+    git show 0e55f09:runs/ibm_fez-2026-10-02-offline/calibration.json > before.json
+    git show 9f3423a:runs/ibm_fez-2026-10-03-offline/calibration.json > after.json
     python docs/calibration_scatter.py after.json before.json
 
 (The two offline preview folders are no longer in the tree; git keeps them.)
