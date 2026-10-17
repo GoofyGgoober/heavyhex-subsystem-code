@@ -71,8 +71,8 @@ PARTS = CACHE / "input_noise"  # one file per job, so a stopped run resumes
 KINDS = ("readout", "t1", "t2", "cz", "sx")
 SHOTS_PER_STATE = 4096  # IBM's readout calibration (input_resolution.py)
 HOUR_APART = (  # day 1's two readout calibrations, as pulled while the day was prepared
-    "86b4478:runs/ibm_fez-2026-10-03/calibration.json",  # IBM's 16:09 UTC calibration
-    "12826a5:docs/figures/fez_calibration.json",  # 17:05 UTC, still in force at the run
+    "186b8f5:runs/ibm_fez-2026-10-03/calibration.json",  # IBM's 16:09 UTC calibration
+    "9b2993e:docs/figures/fez_calibration.json",  # 17:05 UTC, still in force at the run
 )
 X_TESTS = PT.X_TESTS
 FITS = ("binomial", "wls")

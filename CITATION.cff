@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software or data, please cite it as below."
+type: software
+title: "Code and data for: Calibration-based predictions versus measured logical errors for heavy-hex memories on IBM Fez"
+abstract: >-
+  Code and data for a comparison on IBM Fez of the heavy-hex subsystem code
+  at distances 3 and 5, run side by side, with a noise model built from IBM's
+  published calibration. Predictions were stored before each job. The paper
+  compares these forecasts with measured failure probabilities using the same
+  decoder on device and simulated shots. The forecasts underpredict the early-depth
+  logical errors, and distance 5 performs worse than distance 3 on these
+  implementations. The repository contains the fifteen jobs' calibrations,
+  circuits, predictions, shots and analyses, the paper's post-run comparisons,
+  and the IBM Kingston follow-up experiments.
+authors:
+  - given-names: Nadav
+    family-names: Abramson
+    affiliation: "Independent researcher"
+license: MIT
+repository-code: "https://github.com/GoofyGgoober/heavyhex-subsystem-code"
+url: "https://github.com/GoofyGgoober/heavyhex-subsystem-code"
+keywords:
+  - quantum error correction
+  - heavy-hex
+  - subsystem code
+  - IBM Fez
+  - calibration-based prediction

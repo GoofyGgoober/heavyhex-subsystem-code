@@ -4,9 +4,8 @@ code is still the code in this tree.
 The fifteen jobs ran from tag v0.2.0. Each run.json, job.json and analysis.json stores the
 git hash of src/ and of pyproject.toml (heavyhex.experiment.run.commit), and
 `heavyhex experiment analyze` says so when the code differs from a job's, so src/ and
-pyproject.toml stay byte-identical to v0.2.0. The history was rewritten on 12 October 2026;
-the jobs keep the commit hashes they recorded, and docs/commit-map.tsv gives each one's
-commit now.
+pyproject.toml stay byte-identical to v0.2.0. The jobs retain their recorded commit IDs;
+docs/commit-map.tsv resolves those IDs to this repository's commits.
 """
 
 from __future__ import annotations
