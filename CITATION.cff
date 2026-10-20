@@ -1,17 +1,13 @@
 cff-version: 1.2.0
 message: "If you use this software or data, please cite it as below."
 type: software
-title: "Code and data for: Calibration-based predictions versus measured logical errors for heavy-hex memories on IBM Fez"
+title: "Code and data for: Testing quantum memories on IBM hardware"
 abstract: >-
-  Code and data for a comparison on IBM Fez of the heavy-hex subsystem code
-  at distances 3 and 5, run side by side, with a noise model built from IBM's
-  published calibration. Predictions were stored before each job. The paper
-  compares these forecasts with measured failure probabilities using the same
-  decoder on device and simulated shots. The forecasts underpredict the early-depth
-  logical errors, and distance 5 performs worse than distance 3 on these
-  implementations. The repository contains the fifteen jobs' calibrations,
-  circuits, predictions, shots and analyses, the paper's post-run comparisons,
-  and the IBM Kingston follow-up experiments.
+  Code, hardware records and analysis of a project testing how well IBM's
+  calibration data predict the errors of heavy-hex subsystem-code memories at
+  distances 3 and 5: fifteen jobs over five days on IBM Fez, with predictions
+  stored before each job, and a follow-up on IBM Kingston with a reset-free
+  circuit, lifetime measurements and a raw-readout control.
 authors:
   - given-names: Nadav
     family-names: Abramson

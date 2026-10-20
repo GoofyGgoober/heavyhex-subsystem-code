@@ -1,8 +1,8 @@
-# Paper analyses
+# Analyses
 
 These post-run analyses read the saved experimental records in `runs/`. They use no QPU
-time and do not change `src/` or `runs/`. The table below maps the paper's results to
-their scripts and distinguishes the current comparisons from additional diagnostics.
+time and do not change `src/` or `runs/`. The table below maps each
+result to the script that produces it.
 
 Run from the repository root with the pinned environment (see the main README):
 
