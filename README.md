@@ -1,17 +1,21 @@
-# Heavy-hex subsystem code on IBM Fez
+# Testing quantum memories on IBM hardware
 
-Code and data for *Calibration-based predictions versus measured logical errors for heavy-hex
-memories on IBM Fez* (Nadav Abramson). The heavy-hex subsystem code
-([Chamberland et al. 2020](https://arxiv.org/abs/1907.09528), as run by [Sundaresan et al.
-2023](https://arxiv.org/abs/2203.07205)) ran at distances 3 and 5 side by side on
-`ibm_fez` on five days. The stored calibration-based forecasts underpredict the early-depth
-failure probabilities in all 160 comparisons. Averaging placements within each day and then
-five days gives mean gaps of 3.8–7.6 percentage points in X memory and 8.8–16.6 in Z memory.
-Approximate simultaneous intervals cover sixteen depth/basis/distance cells, conditional on
-fixed forecasts and sampled placements; fifteen exclude zero. These are not 160 independent
-experiments or prediction intervals for future jobs. Secondary binomial rate fits give X
-O/M of 1.27 and 1.19 at distances 3 and 5, and about two in Z memory. Distance 5 is worse than
-3 on these implementations; no threshold is claimed.
+How well do IBM's calibration data predict the errors of a logical quantum memory, and does a
+heavy-hex code get better from distance 3 to 5? This repository holds the code, the raw
+hardware records and the analysis of a project that tested both on IBM's Heron processors.
+
+**Write-up:** [paper/main.pdf](paper/main.pdf) (8 pages). A longer version with every check is
+in [paper/full/main.pdf](paper/full/main.pdf).
+
+- The heavy-hex subsystem code ([Chamberland et al. 2020](https://arxiv.org/abs/1907.09528), as
+  run by [Sundaresan et al. 2023](https://arxiv.org/abs/2203.07205)) at distances 3 and 5, X and
+  Z memory: fifteen jobs over five days on `ibm_fez`, and a follow-up on `ibm_kingston`.
+- A noise model built from IBM's calibration, with its predictions stored before each job,
+  underestimates the logical error: by about 1.2–1.3 in X memory and up to 2 in Z memory on Fez.
+- Distance 5 did worse than distance 3 on both chips.
+- On Kingston, a circuit without mid-circuit resets, with XY4 decoupling and twirling, went with
+  roughly half the error per round (the chip and placement changed too).
+- Flag and relay qubits show a persistent state that the noise model lacks.
 
 ## Data and reproducibility
 
@@ -20,8 +24,8 @@ use the Israel date), and their folders, `runs/ibm_fez-*`, are final. The code t
 and analysed them is tag v0.2.0: every job records the git hash of `src/` (tree `a233d40`) and
 of `pyproject.toml`, and both are unchanged in this release, which a test checks.
 [`docs/commit-map.tsv`](docs/commit-map.tsv) maps the commit IDs recorded by the jobs to
-this repository's history. The paper's post-run analyses and reproduction commands are in
-[`docs/analysis/`](docs/analysis/README.md).
+this repository's history. The post-run analyses and reproduction commands are in
+[`docs/analysis/`](docs/analysis/README.md); its figure and section numbers refer to the full version.
 
 `src/` and `pyproject.toml` are frozen with the run; release tags identify repository
 versions. `runs/combined.json` is the output of `heavyhex experiment combine` from that
@@ -55,9 +59,9 @@ them to within 1e-11, but the predictions, which stim samples with fixed seeds, 
 within their simulator noise: the C math library can change a noise probability in its last
 bit, which reshuffles the samples.
 
-## Reproduce the paper
+## Reproduce the write-up
 
-The paper cites this repository at the tag `paper`.
+The write-up cites this repository at the tag `paper`.
 
 | What | Command | Output |
 | --- | --- | --- |
@@ -65,7 +69,8 @@ The paper cites this repository at the tag `paper`.
 | Main Fez comparison | `python docs/analysis/stored_priors.py`, then `python docs/analysis/early_depths.py` | `docs/analysis/results/stored_priors.json`, `early_depths.json` |
 | Other analyses and Kingston comparisons | Commands and source-to-result map in [`docs/analysis/README.md`](docs/analysis/README.md) | `docs/analysis/results/` |
 | Figures | `python paper/figures/make_figures.py`; Fig. gadget: `latexmk -pdf gadget.tex` in `paper/figures/` | `paper/figures/*.pdf` |
-| The paper | `cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main` | `paper/main.pdf` |
+| The write-up | `cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main` | `paper/main.pdf` |
+| The full version | the same commands in `paper/full/` | `paper/full/main.pdf` |
 | The arXiv upload | `paper/make_arxiv.sh` | `paper/arxiv.tar.gz` |
 
 `heavyhex experiment analyze --run runs/<folder>` and `heavyhex experiment combine` rewrite
@@ -96,32 +101,21 @@ above to analyse the saved data without QPU time.
 
 ## Follow-up on ibm_kingston (14 October 2026)
 
-Eight follow-up jobs were submitted to `ibm_kingston`; seven returned data. IBM's reported
-charges total 86 s, including 10 s for the cancelled job. The budget ledger totals 87 s:
-it counts 6 s for `life-z` by rounding its estimate up, while IBM reported a 5 s charge.
-The code in [`followup/`](followup/README.md) imports `src/` unchanged. Records are in
-`runs/ibm_kingston-2026-10-14-*/`; the ledger and analyses are in `runs/ibm_kingston-followup/`.
+Eight jobs ran on `ibm_kingston` for 86 s of QPU; IBM cancelled one, which returned no data.
+The code is in [`followup/`](followup/README.md) and imports `src/` unchanged. The records are
+in `runs/ibm_kingston-2026-10-14-*/`, the budget ledger and analyses in
+`runs/ibm_kingston-followup/`.
 
-- **Exp 1**, memory circuits with no mid-circuit resets, XY4
-  decoupling and Pauli twirling, the d=3 patch inside the d=5 one, placed by T2; rounds 1–4,
-  8192 shots a circuit. ε per round (binomial fit) is 6.49 ± 0.27% and 9.47 ± 0.32% in X
-  memory, 6.84 ± 0.26% and 11.92 ± 0.40% in Z, 0.40–0.53 of run 1's refitted the same way;
-  Λ_X = 0.686 ± 0.036 and Λ_Z = 0.574 ± 0.029. The model at the T_q measured in the circuit
-  gives Λ central values near the device's (O/M 1.00 ± 0.07 and 1.02 ± 0.06), but these
-  conditional errors omit input uncertainty. A common error cancels in the ratio; ε remains
-  underpredicted (O/M 1.69 in X, 1.22–1.25 in Z).
-- **Lifetimes** (life-z, life-t): T1 measured as IBM measures it agrees with IBM's (median
-  ratio 0.97). In an idle test read in Z the data lose 5.3% a round, 1.12 times the model;
-  a separate basis-specific fit reduces the fitted Z-memory discrepancy and not X memory's.
-  A stationary shared-parameter fit reaches a boundary on 17 of 25 data qubits. The tests
-  ran at different times and the rates are poorly separated, so drift can contribute to
-  its failure to reproduce both decays.
-- **Exp 3**, a leakage control on the flags, relays and X ancillas: the state that persists on
-  them reads as 0 or 1 on the computational clouds, but without a calibrated |2> response
-  this does not exclude leakage of the measured qubit. Readouts outside both reference
-  clouds account for 0.02–0.18%; the separate cluster test accepts a third cluster on one
-  to four qubits per arm. Fitted onset is 0.26% a cycle without CZs and 0.71% with them.
-  Qubits sharing a CZ partner show more strongly correlated inferred state occupancy.
+- **Memory** without mid-circuit resets, with XY4 decoupling and twirling, the d=3 patch inside
+  the d=5 one, rounds 1–4, 8192 shots a circuit: ε per round 6.49 ± 0.27% and 9.47 ± 0.32% in X
+  memory, 6.84 ± 0.26% and 11.92 ± 0.40% in Z, 0.40–0.53 of Fez's fitted the same way;
+  Λ_X = 0.69 ± 0.04 and Λ_Z = 0.57 ± 0.03. With the measured idle decay the model gets Λ about
+  right but still underestimates ε, by 1.69 in X and 1.22–1.25 in Z.
+- **Lifetimes:** T1 measured as IBM measures it agrees with IBM's (median ratio 0.97). In the
+  circuit, the data qubits lose 5.3% a round in Z, 1.12 times the model.
+- **Raw readout signals** on the flags, relays and X ancillas: the persistent state reads mostly
+  as ordinary 0 and 1, with 0.02–0.18% of readouts outside both reference clouds. Its onset
+  rises from 0.26% to 0.71% a cycle when the CZs are added.
 
 ## Layout
 
@@ -135,7 +129,8 @@ followup/            the Kingston follow-up: circuits, model, decoder, submissio
 docs/analysis/       the paper analyses, their results, and reproduction commands
 docs/figures/        the layout drawings and the calibration they were drawn from
 docs/                calibration and power diagnostics, commit-map.tsv
-paper/               the paper (LaTeX), figures/make_figures.py and make_arxiv.sh
+paper/               the write-up (LaTeX), figures/make_figures.py and make_arxiv.sh
+paper/full/          the full-length version
 ```
 
 ## Citation and license

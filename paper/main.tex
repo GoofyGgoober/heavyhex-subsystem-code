@@ -1,5 +1,5 @@
 \pdfoutput=1
-\documentclass[aps,pra,reprint,nofootinbib,longbibliography,floatfix,showkeys]{revtex4-2}
+\documentclass[aps,pra,reprint,nofootinbib,longbibliography,floatfix]{revtex4-2}
 
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -9,11 +9,7 @@
 \usepackage{xcolor}
 \usepackage{xurl}
 \usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
-\hypersetup{
-  pdftitle={Calibration-based predictions versus measured logical errors for heavy-hex memories on IBM Fez},
-  pdfauthor={Nadav Abramson},
-  pdfkeywords={quantum error correction, heavy-hex subsystem code, superconducting qubits, noise modeling, logical quantum memory}
-}
+\hypersetup{pdftitle={Testing quantum memories on IBM hardware},pdfauthor={Nadav Abramson}}
 
 \newcommand{\ket}[1]{\lvert #1\rangle}
 \newcommand{\eps}{\varepsilon}
@@ -21,153 +17,112 @@
 \newcommand{\LX}{\Lambda_{\mathrm{X}}}
 \newcommand{\LZ}{\Lambda_{\mathrm{Z}}}
 \newcommand{\PL}{P_{\mathrm{L}}}
-\newcommand{\fhat}{\hat f}
-\newcommand{\ci}[2]{\ensuremath{(#1,\,#2)}}
-% The repository's address breaks only after a slash or a hyphen.
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thetable}{\arabic{table}}
 \newcommand{\repourl}{\begingroup\def\UrlBreaks{\do\/\do\-}\url{https://github.com/GoofyGgoober/heavyhex-subsystem-code}\endgroup}
-
 \raggedbottom
-\AtBeginDocument{\medmuskip=4mu plus 2mu minus 1mu}
 
 \begin{document}
 
-\title{Calibration-based predictions versus measured logical errors for heavy-hex memories on IBM Fez}
-
+\title{Testing quantum memories on IBM hardware}
 \author{Nadav Abramson}
-\email{nadavabramson@gmail.com}
-\affiliation{Independent researcher}
-
-\date{16 October 2026}
-
-\begin{abstract}
-We compared measured failure probabilities with calibration-derived Pauli-model predictions for heavy-hex subsystem-code memories at distances 3 and 5 on \texttt{ibm\_fez} over five days.
-With a common decoder, observed failure fractions at one to four rounds exceed the stored predictions on every sampled day and placement.
-Mean shortfalls are about 4--8 percentage points in X memory and 9--17 in Z memory. Their uncertainty estimates are based on only five days.
-The Z-memory gap survives removing auxiliary detectors and using exact model-based decoding on the remaining syndrome.
-For these placements, distance~5 performs worse than distance~3, as the model predicted. The measured distance ratio did not track the largest predicted day-to-day change.
-Flag and relay readouts also show persistence absent from the simulated records.
-A follow-up on \texttt{ibm\_kingston} with a modified reset-free circuit gave lower errors but higher fitted decay parameters than its stored prediction.
-Idle-decay measurements and raw readout signals constrain possible explanations without identifying the missing noise.
-\end{abstract}
-
-\keywords{quantum error correction; heavy-hex subsystem code; superconducting qubits; noise modeling; logical quantum memory}
-
 \maketitle
 
-%======================================================================
-\section{Introduction}
-\label{sec:intro}
-%======================================================================
+%----------------------------------------------------------------------
+\section{The experiment}
+%----------------------------------------------------------------------
 
-IBM reports a calibration for every qubit and coupler.
-A noise model built from it could guide code placement and decoder priors.
-Here we ask how closely its stored predictions match measured failure probabilities, for a fixed circuit--model--decoder pipeline.
-A secondary comparison asks whether increasing the distance lowers the fitted decay parameter, that is, whether
+Two questions: how well do IBM's calibration data predict the errors of a logical quantum memory, and does a heavy-hex code get better when its distance goes from 3 to 5?
+
+On \texttt{ibm\_fez} the experiment ran fifteen jobs over five days: two placement pairs, X and Z memory, and 2500 shots per memory circuit at 1, 2, 3, 4, 6 and 8 rounds.
+Before each job, a prediction built from that day's calibration was computed and saved.
+None of its noise rates came from the job's own memory data, and no shot was discarded.
+
+The short answer: the model underestimates the failures in both memories, and distance~5 does worse than distance~3 on these placements, as the model expected.
+The rest of the project looks for the missing error, with decoder checks, a channel-by-channel error budget, persistent readout patterns and a follow-up run with a modified circuit on \texttt{ibm\_kingston}.
+Every result is about these chip regions and these circuits, not about heavy-hex codes in general.
+
+%----------------------------------------------------------------------
+\section{Code and circuits}
+%----------------------------------------------------------------------
+
+On IBM's heavy-hex lattice each qubit has at most three neighbors.
+The heavy-hex subsystem code combines surface-code and Bacon--Shor checks~\cite{chamberland2020topological,bacon2006operator} and is a $[[d^2,1,(d-1)^2/2,d]]$ code (data qubits, logical qubits, gauge qubits, distance).
+In the X/Z convention of Ref.~\cite{sundaresan2023demonstrating}, its gauge group is
+\begin{align}
+\mathcal{G} = \big\langle\, & X_{i,j}X_{i,j+1},\nonumber\\
+& Z_{i,j}Z_{i+1,j}Z_{i,j+1}Z_{i+1,j+1} \quad (i+j \text{ odd}), \label{eq:gauges}\\
+& Z_{i,1}Z_{i+1,1}\ (i \text{ odd}),\quad Z_{i,d}Z_{i+1,d}\ (i \text{ even}) \,\big\rangle ,\nonumber
+\end{align}
+where $i,j$ label data rows and columns, and indices stop at $d-1$ wherever an index plus one appears.
+The stabilizers are generated by
+\begin{align}
+\mathcal{S}_X:\ & X_{i,j}X_{i+1,j}X_{i,j+1}X_{i+1,j+1}\quad (i+j \text{ even}),\nonumber\\
+& X_{d,j}X_{d,j+1}\ (j \text{ odd}),\quad X_{1,j}X_{1,j+1}\ (j \text{ even}), \label{eq:stabilizers}\\
+\mathcal{S}_Z:\ & \textstyle\prod_{j=1}^{d} Z_{i,j}Z_{i+1,j},\quad i=1,\dots,d-1,\nonumber
+\end{align}
+and the logical operators are $X_L=\prod_i X_{i,1}$ and $Z_L=\prod_j Z_{1,j}$.
+Each X stabilizer is one X gauge or a product of two.
+Each Z stabilizer is the product of the Z gauges between two adjacent rows; it has weight $2d$, and this Bacon--Shor half has no threshold~\cite{chamberland2020topological,napp2013optimal}.
+
+In X memory all data qubits start in $\ket{+}$ and are read in X after $n$ rounds of gauge measurements; a shot fails if the decoded $X_L$ differs from its initial value.
+Z memory starts in $\ket{0}$ and reads in Z.
+Z errors fail X memory and X errors fail Z memory.
+
+\textit{Measuring the gauges.}
+Each round measures all gauges of the memory basis, then those of the other basis.
+An X gauge needs one ancilla and two CX gates.
+A bulk Z gauge acts on four data qubits that its ancilla cannot reach directly, so two neighboring X ancillas act as flags: they collect the data parities, pass them to the Z ancilla and are uncomputed (Fig.~\ref{fig:circuit}a).
+Edge Z gauges reach their far data qubit through a relay.
+Without faults, flags and relays read 0.
+The distance-3 patch uses $9+6+4+4=23$ physical qubits and distance~5 uses $25+20+12+8=65$.
+The twelve-CX bulk gadget has four more CX gates than the flag circuits of Refs.~\cite{chamberland2020topological,sundaresan2023demonstrating}.
+Any single fault leaves at most one data error, or two in the same column, up to the measured gauge, so dropping the flag outcomes does not reduce the X-memory circuit distance.
+
+\textit{Detectors and decoding.}
+If $m_{s,t}$ is stabilizer $s$ in round $t$, the XOR of its gauge outcomes, the detector
 \begin{equation}
-  \Lambda = \eps_3 / \eps_5
-  \label{eq:lambda}
+D_{s,t} = m_{s,t} \oplus m_{s,t-1}
+\label{eq:detector}
 \end{equation}
-exceeds one, with $\eps_d$ an effective decay parameter at distance $d$ [Eq.~\eqref{eq:fit}]; $\LX$ and $\LZ$ denote it in X and Z memory.
-Surface codes have reached $\Lambda>1$ on Google's processors~\cite{google2023suppressing,google2025below} and on USTC's Zuchongzhi~3.2~\cite{he2025experimental}.
-On IBM, anisotropic surface-code patches suppressed logical error on Heron~r2 and Nighthawk without post-selection~\cite{vezvaee2026surface,kim2026luci}; a defect-avoiding Nighthawk patch also did so after leakage post-selection~\cite{drouet2026error}.
+fires when the stabilizer changes.
+Memory-basis stabilizers give one detector per round and one at the final data readout; the first compares with the value fixed by preparation.
+Z memory also uses the flag and relay readouts as detectors.
+Before the first round the other-basis gauges are measured once, so every round runs the same gate sequence; those outcomes enter no detector.
+
+Stim builds the detector error model and PyMatching decodes it by minimum-weight perfect matching~\cite{gidney2021stim,higgott2025sparse,stim116}.
+Device and simulated shots are decoded with the same priors, those of the stored prediction.
+The circuit distance, the fewest undetected faults that flip the logical value, is $d$ in both bases; Sec.~\ref{sec:budget} looks at one catch in the distance-5 Z matching graph.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/layout.pdf}
-\caption{The two pairs selected using IBM's calibration of 3 October 2026, 20:05~UTC (day~1).
-(a)~Part of Fez, with pair~1 drawn and its patches boxed (black, dashed) and pair~2's two patches, which ran in separate jobs, boxed in green (dotted).
-(b)~The distance-3 and (c)~the distance-5 patch of pair~1, each in its orientation on the chip.
-$Q$ labels mark data qubits, numbered along each column, upward in (b) and downward in (c) (corners only); $q$ numbers are Fez qubits.
-Gauges are named by their data qubits ($Z_2Z_3Z_5Z_6$ acts on $Q_2$, $Q_3$, $Q_5$ and $Q_6$).
-Shaded couplers have CZ error above 1\%, printed beside them.
-Rings mark the weak qubits (readout error above 5\%, $T_1<50\us$ or $T_2<30\us$), among them q83 and q102 (readout 14\% and 10\%) and q149 and q150 ($T_2$ of 5 and $6\us$).}
+\caption{Fez layouts. (a)~Pair~1 (black boxes) and pair~2 (green boxes, separate jobs). (b,c)~Pair~1's distance-3 and distance-5 patches; $Q$ labels are data qubits and q labels are physical qubits. Shaded couplers have CZ error above 1\%; rings mark readout error above 5\%, $T_1<50\us$ or $T_2<30\us$. The large patch contains weak parts, including q149 and q150 with a reported $T_2$ of only 5--6$\us$.}
 \label{fig:layout}
 \end{figure*}
 
-IBM's Heron processors use the heavy-hex lattice, in which no qubit has more than three neighbors.
-The heavy-hex subsystem code was designed for it~\cite{chamberland2020topological}, with flag qubits~\cite{chao2018quantum} to measure its weight-4 gauges.
-On a Falcon processor its serial, reset-based distance-3 circuit had a logical error of 5.9\% per round in Z memory and 11.3\% in X memory, without post-selection~\cite{sundaresan2023demonstrating}.
-On Heron~r2 the same serial circuit had a logical error above 10\% per round, and a circuit that measures the X and Z gauges in parallel without resets, in a $3.2\us$ round, 4\% or less~\cite{harper2026characterising}.
-Other codes and schedules on this lattice, such as the dynamic compass code, have a threshold or a lower simulated error~\cite{zen2026low,benito2025comparative}.
-Recent hardware experiments include distance-5 heavy-hex and dynamic compass memories on Heron~r3~\cite{lee2026scalable}, and larger dynamic compass memories and logical operations on a 156-qubit processor~\cite{mclauchlan2026error}.
+\textit{Timing and placement.}
+The circuits use CZ, $\sqrt{X}$, $X$ and virtual $R_Z$ gates with explicit waits.
+Waits of $500$\,ns or more after a qubit's first gate get two X pulses, at one quarter and three quarters of the wait; IBM's own decoupling and twirling were off.
+A round takes about $7.9\us$.
+Readout and reset take $6.7\us$ of it on the critical path, so the data qubits sit idle for 94--97\% of the round (Fig.~\ref{fig:circuit}b).
 
-Calibration-based models have often underpredicted device errors, including Floquet and repetition memories on \texttt{ibm\_sherbrooke}~\cite{hesner2025using,hanisch2026soft} and reset-free memories on Nighthawk~\cite{drouet2026error,kim2026luci}.
-A uniform model on Heron~r2 needed error rates multiplied by 1.85--2.5 to match reset-free surface-code data with dynamical decoupling (Table~IV of the arXiv version of Ref.~\cite{vezvaee2026surface}).
-For this code, two studies found the opposite.
-Hall et al.\ found the logical error below a device-informed simulation at distance~3 and close to it at distance~5, using adjusted code boundaries, a neural-network decoder and $d$ rounds; their model omitted relaxation and crosstalk~\cite{hall2024artificial}.
-On Falcon a per-qubit model matched the raw Z-memory error, overestimated X memory, and overestimated the leakage-post-selected error~\cite{sundaresan2023demonstrating}.
-Other work fits the noise, or the decoder's priors, to the device's own data~\cite{hesner2025using,harper2026characterising,hockings2025scalable,lee2026scalable,google2021exponential,chen2022calibrated,takou2026logical,sivak2024optimization}.
-
-We ran the heavy-hex code at distances 3 and 5 on the Heron~r2 processor Fez in fifteen jobs on five days.
-The software stored a calibration-based prediction before each job; no model rate in that forecast was fitted to memory outcomes.
-The stored predictions underpredict failure in both memories (Sec.~\ref{sec:size}).
-The sampled placements are a constrained, adverse operating regime, not a representative sample of heavy-hex memories.
-We report the forecast errors, examine the distance ratio and persistent readout records, and use the Kingston follow-up to test some possible explanations.
-Table~\ref{tab:stages} distinguishes the stored forecasts from input updates made after the jobs.
-
-\begin{table}[tb]
-\caption{Inputs and decoders used in the comparisons. The primary Fez analysis was chosen after the run. $f=1$ uses IBM's reported echo dephasing; $\fhat$ and $T_q$ use idle measurements. $O/M$ means device over model.}
-\label{tab:stages}
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{ruledtabular}
-\begin{tabular}{@{}p{0.19\columnwidth}p{0.44\columnwidth}p{0.31\columnwidth}@{}}
-Comparison & Noise inputs & Decoder on device and model \\
-\hline
-Fez, primary & Stored $f=1$ forecast & Stored $f=1$ priors on both \\
-Fez, in-job & Measured $\fhat$ & In-job $\fhat$ priors on both \\
-Kingston, stored & Original calibration forecast & Original priors on both \\
-Kingston, updated & IBM inputs or measured idle decay & Pooled-$T_q$ priors fixed on both \\
-\end{tabular}
-\end{ruledtabular}
-\end{table}
-
-%======================================================================
-\section{Code and circuits}
-\label{sec:code}
-%======================================================================
-
-The heavy-hex code is a hybrid of a surface code and a Bacon--Shor code~\cite{chamberland2020topological,bacon2006operator}, a $[[d^2,1,(d-1)^2/2,d]]$ code (qubits, logical qubits, gauge qubits, distance).
-We use the labels of Ref.~\cite{sundaresan2023demonstrating}, which exchange X and Z and transpose rows and columns relative to Ref.~\cite{chamberland2020topological}.
-With $X_{i,j}$ and $Z_{i,j}$ the Paulis on the data qubit in row $i$ and column $j$, $i,j = 1,\ldots,d$, labeled $Q_{(j-1)d+i}$ in Fig.~\ref{fig:layout}, the gauge group is
+Placements were ranked by an estimated error per round,
 \begin{equation}
-\begin{aligned}
-\mathcal{G} = \bigl\langle\, & X_{i,j}X_{i,j+1},\\
-& Z_{i,j}Z_{i+1,j}Z_{i,j+1}Z_{i+1,j+1} \quad (i+j \text{ odd}),\\
-& Z_{i,1}Z_{i+1,1} \ (i \text{ odd}),\quad Z_{i,d}Z_{i+1,d} \ (i \text{ even}) \,\bigr\rangle ,
-\end{aligned}
-\label{eq:gauges}
+E = \sum_{\text{CZ}} r_{qq'} + \sum_{\text{meas., reset}} e_q + \sum_{\text{data}} \frac{9\us}{2T_{1,q}},
+\label{eq:score}
 \end{equation}
-with $i, j \le d-1$ wherever $i+1$ or $j+1$ appears, and the stabilizer group is generated by
-\begin{equation}
-\begin{aligned}
-\mathcal{S}_X:\ & X_{i,j}X_{i+1,j}X_{i,j+1}X_{i+1,j+1} \quad (i+j \text{ even}),\\
-& X_{d,j}X_{d,j+1} \ (j \text{ odd}),\quad X_{1,j}X_{1,j+1} \ (j \text{ even}),\\
-\mathcal{S}_Z:\ & \textstyle\prod_{j=1}^{d} Z_{i,j}Z_{i+1,j}, \quad i = 1, \ldots, d-1 .
-\end{aligned}
-\label{eq:stabilizers}
-\end{equation}
-The logical operators are $X_L = \prod_{i} X_{i,1}$ and $Z_L = \prod_{j} Z_{1,j}$.
-The X stabilizers are surface-code checks, each either one X gauge or the product of two.
-The Z stabilizers, the products of the Z gauges between rows $i$ and $i+1$, are Bacon--Shor checks of weight $2d$, and this half of the code has no threshold~\cite{chamberland2020topological,napp2013optimal}.
+with gate and readout errors $r_{qq'}$ and $e_q$, and $9\us$ a pre-compilation estimate of the round time.
+Every day had eighteen usable distance-3 placements but only two usable distance-5 placements, the same two each day, sharing 51 of 65 qubits.
+A 5\% CZ-error cutoff or a 10\% readout-error cutoff would have left no distance-5 placement at all.
+The selected large patches include CZ errors of 3.4--7.0\% and readout errors of 8--14\%, and one relay reached 48.6\% on day~4.
 
-In X memory the data qubits are prepared in $\ket{+}$, the gauges are measured for $n$ rounds, and the data qubits are read out in the X basis.
-A shot fails if the decoded $X_L$ differs from its initial value.
-Z memory is the same with $\ket{0}$ and the Z basis.
-X memory fails through Z errors, which the surface-code half corrects, and Z memory through X errors, which the Bacon--Shor half corrects.
+Pair~1 ran both distances at once on disjoint patches, on the same qubits every day.
+Pair~2's small patch ran about a minute after its large one and overlapped it.
+So the two large layouts and the five days are not independent placements.
+One pair on one day is a \emph{pair-day}: ten pair-days, two memories and two distances give forty error curves.
 
-\paragraph*{Gauge measurement.}
-Each round measures all gauges of the memory basis, then all gauges of the other basis, with the gauges of one type in parallel.
-An X gauge uses one ancilla and two CNOT (CX) gates.
-A bulk Z gauge acts on four data qubits that its ancilla cannot reach.
-As in Refs.~\cite{chamberland2020topological,sundaresan2023demonstrating}, it borrows the two neighboring X ancillas as flag qubits, and each flag copies the parity of its two data qubits to the Z ancilla and is then uncomputed [Fig.~\ref{fig:gadget}(a)].
-An edge Z gauge's ancilla is coupled to neither of its two data qubits and reaches each through an extra qubit of its own (a relay), which copies its data qubit to the ancilla and is then uncomputed.
-Without faults, flags and relays read 0.
-Counting data qubits, X ancillas, Z ancillas and relays, a distance-3 patch takes $9+6+4+4 = 23$ qubits and makes 18 readouts per round, and a distance-5 patch takes $25+20+12+8 = 65$ and makes 56.
-The circuit uses twelve CX gates per bulk Z gauge, four more than the flag circuits of Refs.~\cite{chamberland2020topological,sundaresan2023demonstrating}.
-With this gadget every single fault leaves an error on at most one data qubit, or on two in the same column, up to the gauge being measured, so omitting flag outcomes does not reduce the X-memory circuit distance.
-
-\begin{figure}[!htb]
+\begin{figure}[t]
 \centering
 \begin{minipage}{\columnwidth}
 \textbf{(a)}\\[1pt]
@@ -175,554 +130,145 @@ With this gadget every single fault leaves an error on at most one data qubit, o
 \textbf{(b)}\\[1pt]
 \includegraphics[width=\columnwidth]{figures/timing.pdf}
 \end{minipage}
-\caption{(a)~Measurement of the bulk Z gauge $Z_2Z_3Z_5Z_6$ of Fig.~\ref{fig:layout}(b) through the flags q23 and q3 and the Z ancilla q16, in the order executed (twelve CX gates, left to right).
-Each flag copies one data qubit, passes it to q16, exchanges it for its second data qubit, passes again and is uncomputed, so that without faults it reads 0.
-Each CX is compiled as H$\cdot$CZ$\cdot$H on its target.
-(b)~One round of X memory as compiled (day~1, pair~1, distance~3) for one qubit of each role: data qubit $Q_5$ (q24), the X ancilla and flag q23, the Z ancilla q16 and the relay q21.
-Short ticks are $\sqrt{X}$ and $X$ pulses; white gaps are waits under $0.5\us$, which get no pulses.
-The bars give the round's critical path in this work (each half: reset, gates, readout; $7.9\us$), with zero-duration resets ($4.5\us$), and for the parallel, reset-free round of Ref.~\cite{harper2026characterising} ($3.2\us$).}
-\label{fig:gadget}
+\caption{(a)~A bulk Z-gauge measurement through two flags and the Z ancilla, with twelve CX gates, each compiled as H$\cdot$CZ$\cdot$H. Without faults the flags return to 0. (b)~One compiled Fez round, one qubit per role. Readout and reset dominate the $7.9\us$ round; the bars below show the same round with zero-duration resets and the parallel, reset-free circuit of Ref.~\cite{harper2026characterising}.}
+\label{fig:circuit}
 \end{figure}
 
-\paragraph*{Detectors and decoding.}
-Let $m_{s,t}$ be the value of stabilizer $s$ in round $t$, the XOR of the outcomes of the gauges whose product is $s$.
-The detector
+%----------------------------------------------------------------------
+\section{Noise model and idle tests}
+%----------------------------------------------------------------------
+
+The model follows the submitted circuits gate by gate and wait by wait.
+IBM's average gate infidelities become depolarizing channels,
 \begin{equation}
-  D_{s,t} = m_{s,t} \oplus m_{s,t-1}
-  \label{eq:detector}
+p_1 = \tfrac{3}{2}\,r_q, \qquad p_2 = \tfrac{5}{4}\,r_{qq'},
+\label{eq:depol}
 \end{equation}
-is 0 without faults, and it fires when $D_{s,t}=1$.
-An $n$-round circuit has one detector for each memory-basis stabilizer in every round $t = 1, \ldots, n$ and in a final layer $t = n+1$, where $m_{s,0}$ is fixed by the preparation and $m_{s,n+1}$ is computed from the final data readout.
-In Z memory each flag and relay readout is also a detector.
-Before round~1 the circuit measures the other-basis gauges once, so that every round runs the same gate sequence; no detector uses these outcomes.
-
-Shots are decoded by minimum-weight perfect matching with PyMatching~2.4~\cite{higgott2025sparse}, on the detector error model that Stim~\cite{gidney2021stim,stim116} derives from the circuit and the noise model of Sec.~\ref{sec:modeldef}.
-The primary stored-prediction comparison uses $f=1$ priors on both device and model; other comparisons identify their priors explicitly (Table~\ref{tab:stages}).
-The priors come from the same model as the simulated shots, while the device's shots may come from different noise.
-The circuit distance, the smallest number of faults that flip the logical value without firing a detector, is $d$ in both bases.
-In distance-5 Z memory, the shortest logical path in the matching graph has three edges, as at distance~3.
-Two arise when Stim decomposes data X errors that also trigger flag and relay detectors (App.~\ref{app:budget}).
-Removing the flag and relay detector inputs restores a five-edge path while retaining the physical circuit; the Z-memory shortfall survives this decoder check (App.~\ref{app:budget}).
-With the calibrated priors some single faults are also miscorrected (Sec.~\ref{sec:where}).
-
-\paragraph*{Compilation and timing.}
-The circuits are compiled to Fez's native gates [controlled-Z (CZ), $\sqrt{X}$, $X$ and virtual $R_Z$], with every idle period written as an explicit delay.
-Gates start as soon as their qubits are free, except resets, which are scheduled just before the qubit is next used.
-After a qubit's first gate, every idle period of 500\,ns or more gets two $X$ pulses, at a quarter and three quarters of its length, a two-pulse CPMG sequence~\cite{viola1999dynamical,ezzell2023dynamical}.
-IBM's own decoupling and Pauli twirling were off, so the device ran the simulated gate sequence.
-A round lasts $\tau\approx7.9\us$ (7.90--$7.96\us$ across placements).
-Each half of it is a reset, 0.3--$0.9\us$ of gates and a readout, so readout and reset take $6.7\us$ of the round [Fig.~\ref{fig:gadget}(b)], and the data qubits idle for 94--97\% of it.
-At each job's measured dephasing (Sec.~\ref{sec:pred}), the model gives the median data qubit of a patch a decoupled-idle error per round of 2.6--4.5\% for Z or Y and 3.8--6.4\% for any Pauli.
-
-%======================================================================
-\section{Placement and runs}
-\label{sec:design}
-%======================================================================
-
-Fez, a 156-qubit Heron~r2 processor, has room for both patches side by side.
-The software tries every position of a patch in the two orientations that line up with the lattice, which gives 30 distance-3 and 12 distance-5 placements.
-A placement is usable if, in IBM's latest calibration, none of its qubits or couplers is marked faulty or has a reported error of 50\% or more, and every qubit has a reported $T_1$ and $T_2$.
-The cutoff removes IBM's placeholder error of 1 for undefined benchmarks~\cite{ibmdocs}.
-A cutoff of 5\% on CZ errors or of 10\% on readout errors would have left no distance-5 placement on any day.
-Usable placements are ranked by the score
-\begin{equation}
-  E = \sum_{\mathrm{CZ}} r_{qq'} + \sum_{\mathrm{meas.,\,reset}} e_q + \sum_{\mathrm{data}} \frac{9\us}{2T_{1,q}} ,
-  \label{eq:score}
-\end{equation}
-over one round's CZs, measurements and resets and over the data qubits, with $r_{qq'}$ the reported CZ error of coupler $qq'$, $e_q$ a qubit's reported readout error and $9\us$ a round time estimated before the circuits were final.
-
-On every day 18 distance-3 placements were usable but only 2 distance-5 ones, the same two each day, sharing 51 of their 65 qubits.
-They are numbered 1 and 2 by score.
-On every day placement~1 held two couplers with CZ errors of 3.4--7.0\%, the qubits q83 and q102 with readout errors of 8--14\%, and the corner data qubit q150 and the X ancilla q149, with $T_2$ of 4.6--$5.9\us$ [Fig.~\ref{fig:layout}(c)].
-No $T_2$ cutoff was imposed; a cutoff of $10\us$ would have excluded placement~1 on every day.
-Placement~2 shares all of these but q149 and q150, and on day~4 its relay q51 had 48.6\% readout error.
-
-Each day the software formed one pair of patches per usable distance-5 placement, best first, at most two.
-Pair~$i$ is the distance-5 patch on placement~$i$ and a distance-3 patch on the best usable placement left.
-If one fits beside it, without overlapping or coupling, both run in one job; otherwise the distance-3 patch runs in a second job right after.
-Pair~1 ran in one job on the same qubits every day, and its distance-3 patch shares no qubit with placement~1.
-Pair~2's distance-3 patch had no room beside placement~2 and ran in a second job about a minute later.
-It lay inside placement~1 on every day and used the same qubits on days 1, 2 and~4.
-It shared 15 of its 23 qubits with placement~2, all 23 on day~5.
-
-Each job contains X- and Z-memory circuits at $n = 1$, 2, 3, 4, 6 and 8 rounds, 2500 shots each, and ten idle circuits of 1250 shots (Sec.~\ref{sec:pred}).
-Fifteen jobs ran, three a day on 3, 5, 6, 7 and 8 October 2026 (days 1--5), each taking 15\,s of processor time.
-Each day's three jobs ran within 4\,min (first job 3 October, 21:33~UTC), from the calibration IBM had published 21--88\,min earlier; its values were older still (App.~\ref{app:inputs}).
-The in-job dephasing multiplier (Sec.~\ref{sec:pred}) ranged over 0.72--1.52.
-All fifteen Fez jobs completed, the calibration snapshots before and after each job were unchanged, and no shots were post-selected or discarded.
-We call one pair on one day a pair-day, and $\PL(n)$ for one patch and memory basis a curve: ten pair-days give forty curves.
-
-%======================================================================
-\section{Model, predictions and tests}
-\label{sec:model}
-%======================================================================
-
-\subsection{Model}
-\label{sec:modeldef}
-
-Each prediction is a Stim simulation of the compiled circuits submitted to the device, gate by gate and delay by delay.
-IBM reports for each gate an error $r$, an average gate infidelity from randomized benchmarking~\cite{ibmdocs,mckay2023benchmarking}.
-Each one-qubit gate ($\sqrt{X}$ or $X$) on qubit $q$ is followed by depolarizing noise of total probability $p_1$, and each CZ on coupler $qq'$ by two-qubit depolarizing noise of total probability $p_2$, split equally over the 3 or 15 non-identity Paulis, with~\cite{nielsen2002simple}
-\begin{equation}
-  p_1 = \tfrac{3}{2}\, r_q , \qquad p_2 = \tfrac{5}{4}\, r_{qq'} .
-  \label{eq:depol}
-\end{equation}
-Each measurement and reset flips with probability $e_q$, the qubit's reported readout error.
-A delay of length $t_\mathrm{d}$ is the Pauli-twirled amplitude- and phase-damping channel~\cite{ghosh2012surface},
+spread equally over the 3 or 15 nonidentity Paulis~\cite{nielsen2002simple}.
+Readout and reset both use the reported readout error $e_q$.
+A wait $t$ gets Pauli-twirled relaxation and dephasing~\cite{ghosh2012surface},
 \begin{equation}
 \begin{aligned}
-p_x = p_y &= \tfrac14\bigl(1-e^{-t_\mathrm{d}/T_1}\bigr), \\
-p_z &= \tfrac12\bigl(1-e^{-t_\mathrm{d}/T_2}\bigr) - \tfrac14\bigl(1-e^{-t_\mathrm{d}/T_1}\bigr),
+p_x = p_y &= \tfrac14\big(1-e^{-t/T_1}\big),\\
+p_z &= \tfrac12\big(1-e^{-t/T_2}\big) - \tfrac14\big(1-e^{-t/T_1}\big),
 \end{aligned}
 \label{eq:idle}
 \end{equation}
 with IBM's $T_2$ capped at $2T_1$.
-A qubit whose ideal state is $\ket{0}$, initially or after a reset, gets no idle channel until its next active gate.
-This bookkeeping also applies after a modeled reset-error $X$; it is an approximation to the noisy state, not exact relaxation (App.~\ref{app:inputs}).
-In delays that carry the decoupling pulses, $T_2$ becomes $T_2^{\mathrm{DD}}$,
+During decoupled waits
 \begin{equation}
-\frac{1}{T_2^{\mathrm{DD}}} = \frac{1}{2T_1} + f\,\Gamma_\phi,
-\qquad
-\Gamma_\phi = \frac{1}{T_2}-\frac{1}{2T_1},
+\frac{1}{T_2^{\mathrm{DD}}} = \frac{1}{2T_1} + f\,\Gamma_\phi, \qquad \Gamma_\phi = \frac{1}{T_2} - \frac{1}{2T_1},
 \label{eq:f}
 \end{equation}
-where $\Gamma_\phi$ is the pure-dephasing rate implied by IBM's Hahn-echo $T_2$ and $f$ is a dephasing multiplier, with $f=0$ leaving only $T_1$ decay and $f=1$ giving echo-level dephasing.
-Measured on the device, $f$ also absorbs any idle decay beyond the $f=0$ reference, such as pulse errors or dephasing by neighboring readouts.
-Shorter delays carry no pulses and use the capped $T_2$.
+so $f=0$ removes pure dephasing and $f=1$ keeps IBM's echo value; shorter waits use the capped $T_2$.
+A qubit ideally in $\ket{0}$ gets no idle channel until its next gate, which ignores relaxation after a reset error.
 
-The mapping departs from the device in known ways (App.~\ref{app:inputs}).
-The CZ errors come from isolated benchmarks~\cite{ibmdocs} and miss the crosstalk of parallel layers~\cite{mckay2023benchmarking}.
-Mid-circuit readouts and resets get the end-of-circuit readout error, although on a 27-qubit IBM processor with decoupling the error per mid-circuit measurement, idling of the unmeasured qubits included, reached 16 times the reported readout error~\cite{hothem2025measuring}.
-One $f$ serves every qubit, and leakage, ZZ crosstalk, coherent errors, drift within a job and errors in preparing the data qubits are not modeled.
-These omissions can make the model optimistic.
-The two $\sqrt{X}$ gates around a CZ also carry noise; using chip-wide median gate errors, their combined channel is 26--28\% of the CZ channel's own.
-This can overlap with the single-qubit Clifford layer already included in IBM's two-qubit benchmark~\cite{ibmdocs}; the overlap is not quantified here and can make the model pessimistic.
+The model has no leakage, coherent errors, ZZ crosstalk, drift within a job or state-preparation errors.
+Isolated benchmarks may also miss errors that appear only in parallel operation or in mid-circuit readout and reset, while the single-qubit gates around each CZ may count error that its benchmark already includes.
+The bias can therefore go either way.
 
-\subsection{Predictions}
-\label{sec:pred}
-
-IBM does not report the decoupling multiplier $f$.
-Each job estimates it from ten idle circuits (the idle test): X-memory circuits of 1, 2, 4, 8 and 16 rounds with every CZ replaced by a delay of the same length, read out in X and in Y.
-For each data qubit, $v(n) = \sqrt{\langle X\rangle^2 + \langle Y\rangle^2}$ after $n$ idle rounds does not depend on a frequency offset, and
+Each stored prediction used 200{,}000 simulated shots per circuit at $f=1$; this \emph{stored prediction} is the reference throughout.
+Each job also ran ten idle circuits, with the memory schedule but every CZ replaced by an equal wait, and read X and Y after 1, 2, 4, 8 and 16 rounds.
+The contrast
 \begin{equation}
-  \ln v(n) = \alpha + \ln \bar X_0(n) - f\,[\ln \bar X_0(n) - \ln \bar X_1(n)]
-  \label{eq:ffit}
+v(n) = \sqrt{\langle X\rangle^2 + \langle Y\rangle^2}
+\label{eq:contrast}
 \end{equation}
-is fitted by weighted least squares, where $\bar X_0(n)$ and $\bar X_1(n)$ are $\langle X\rangle$ computed exactly in the model at $f=0$ and $f=1$, and the offset $\alpha$ absorbs a multiplicative contrast mismatch (App.~\ref{app:f}).
-The idle circuits keep the ancilla readouts and resets, but their ancillas stay near $\ket{0}$, so the conditional resets rarely act.
-The idle test measures the decay of $\langle X\rangle$ and $\langle Y\rangle$, set by the Z and Y errors that fail X memory.
-It cannot see the X flips that fail Z memory: Z memory's idle error rests on IBM's $T_1$ alone, and $X$-pulse amplitude errors are not measured.
-The job's measured $f$, $\fhat$, is the median over its data qubits and is applied to every modeled qubit.
-
-Before each job the software stored predictions at $f=0$ and $f=1$, which use no data of the job; the \emph{stored prediction} below is the one at $f=1$.
-Each forecast used 200,000 simulated shots per memory circuit, with the sampler seed set to the round count.
-The primary intervals condition on these archived probabilities, whose Monte Carlo standard errors are at most 0.112 percentage points.
-After each job, the same software computed the \emph{in-job prediction} at $\fhat$ from the stored circuits and calibration.
-In 7 of the 15 jobs $\fhat$ exceeded 1.
-Z-memory predictions depend little on $f$.
-
-\subsection{Fits and inference}
-\label{sec:rules}
-\label{sec:tests}
-
-For each patch and basis the logical error $\PL(n)$ after $n$ rounds is fitted as
+does not see frequency offsets, and each data qubit's $f$ comes from
 \begin{equation}
-1-2\PL(n) = A\,(1-2\eps)^n ,
-\label{eq:fit}
+\ln v(n) = \alpha + \ln \bar X_0(n) - f\big[\ln \bar X_0(n) - \ln \bar X_1(n)\big],
+\label{eq:idlefit}
 \end{equation}
-where $\eps$ is a window-dependent effective decay parameter, conventionally called the logical error per round.
-$A$ is a free amplitude, not necessarily a physical preparation contrast: twelve Z-memory fits have $A>1$.
-The secondary rate comparisons in Table~\ref{tab:pairs} use maximum likelihood for the binomial failure counts at all six round counts.
-Individual-curve errors use profile likelihood; the table's intervals instead use daily log ratios (App.~\ref{app:stats}).
-The primary comparison instead uses fixed-depth probabilities and five daily blocks, conditional on fixed model inputs (Sec.~\ref{sec:size}).
+where $\bar X_0$ and $\bar X_1$ are the exact model curves at $f=0$ and $f=1$ and $\alpha$ absorbs a contrast offset.
+The median $f$ over data qubits gives a second, \emph{in-job} prediction.
+This test sees the Z and Y errors that fail X memory, not the X flips that fail Z memory, and its ancillas stay near $\ket{0}$, unlike in a real memory.
 
-%======================================================================
-\section{Forecast errors}
-\label{sec:posthoc}
-%======================================================================
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/C_idle_dephasing.pdf}
+\caption{Idle decay. (a)~Three data qubits of day~1's distance-3 pair-1 patch, with the $f=0$ and $f=1$ model curves and the fit; the open point is below the 0.05 contrast cutoff. (b)~Fitted $f$ against IBM's reported $T_2$, with per-qubit medians and quartiles.}
+\label{fig:idle}
+\end{figure}
 
-\subsection{Forecast errors at fixed depths}
-\label{sec:size}
+\textit{Qubits do not share one $f$.}
+A common $f$ fails the per-qubit fit in every job ($\chi^2/\nu = 12$--80), and $f$ grows with the reported $T_2$, with rank correlation 0.66 over 36 qubits (Fig.~\ref{fig:idle}b).
+For q150, with a reported $T_2$ of 5--6$\us$, the job's median $f$ predicts a Z/Y error of 32--39\% per round, while that qubit's own fit gives 4--13\% on four days.
+Per-qubit values of $f$ change the comparison between placements but do not close the device--model gap.
+Writing the measured extra dephasing as $\Gamma_{\mathrm{dd}} = f\,\Gamma_\phi$, the qubit medians follow
+\begin{equation}
+\Gamma_{\mathrm{dd}} = 0.11\,\Gamma_\phi + 0.0071\us^{-1},
+\label{eq:floor}
+\end{equation}
+a floor of about 2.5\% phase-flip probability over $7.1\us$ of decoupled idle, or 1.6--1.8\% with other qubit selections or weights.
+Both sides of this fit use the same calibration, so it describes the data rather than separating a physical channel.
 
-The stored prediction at $f=1$ is the reference, with its own decoder applied to both device and model.
-At $n=1$--4, the observed failure fraction exceeds this prediction in all 160 combinations of pair, day, basis, distance and depth.
-These are not 160 independent replications.
-Averaging the two placement differences within each day and then the five days gives mean shortfalls of 3.8--7.6 percentage points in X memory and 8.8--16.6 in Z memory (Fig.~\ref{fig:pn}).
-All five daily means are positive in each of the sixteen basis--distance--depth cells.
-The intervals in Fig.~\ref{fig:pn} assume independent, approximately normal daily differences and fixed archived forecasts; five days cannot establish those assumptions.
-Fifteen intervals exclude zero after a sixteen-cell Bonferroni correction, but seven lose that exclusion on at least one day-omission check (App.~\ref{app:stats}).
-The evidence rests primarily on the size and consistent direction of the daily gaps.
-The intervals describe these sampled patches, not prediction accuracy on new ones.
+\textit{Calibration checks.}
+The calibration snapshots were 21--88 minutes old at the first job, but many values had not changed from earlier snapshots; on day~1 every value matched a snapshot 268 minutes old.
+The reported readout errors come in steps consistent with 4096 shots per prepared state, which means about 11\% relative shot error at the median readout error.
+A recent snapshot is therefore not a fresh or precise measurement of every input.
 
-Removing the flag and relay detector inputs changes the Z-memory failure fractions averaged over pair-days by at most 0.24 percentage points.
-Exact maximum-likelihood decoding on the reduced syndrome also retains the gap at both distances (App.~\ref{app:budget}).
-These checks support the forecast discrepancy, not intrinsic distance scaling or optimal hardware decoding.
+Using IBM's smaller initialization error for the resets lowers the predicted Z-memory decay by 0.6--0.8 percentage points and mostly worsens the detector agreement; the larger reset and readout errors fitted in Ref.~\cite{harper2026characterising} overshoot.
+No single mid-circuit reset error fixes the discrepancy.
 
-As a secondary summary, binomial decay fits give $\eps$ above the stored forecast on 39 of 40 curves.
-The X-memory factors are 1.27 and 1.19 at distances 3 and 5; the Z factors are about two (Table~\ref{tab:pairs}).
-Five fit windows give factors of 1.15--1.28 in X and 1.65--2.10 in Z.
-Dropping round~1 lowers the distance-5 Z factor from 1.84 to 1.65; saturation makes it a poor physical rate estimate.
-The underprediction persists with the original in-job priors and the matched prediction at $\fhat$.
-Appendix~\ref{app:stats} gives rate intervals and day sensitivity.
+%----------------------------------------------------------------------
+\section{Fez results}
+%----------------------------------------------------------------------
+
+At one to four rounds the device fails more often than the stored prediction in all 160 combinations of day, pair, basis, distance and depth (Fig.~\ref{fig:fez}).
+Averaging the pairs within each day and then the five days, the shortfall is 3.8--7.6 percentage points in X memory and 8.8--16.6 in Z memory.
+The 160 cells share qubits and days, so the intervals in Fig.~\ref{fig:fez} come from the five daily means; a few lose their zero exclusion when a day is left out, but every daily mean is positive.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/depth_errors.pdf}
-\caption{Primary forecast comparison, with the stored $f=1$ decoder on device and model.
-Top: absolute $\PL(n)$ averaged over both placements and five days, including the saturated depths; joined model points are not exponential fits.
-Bottom: device minus stored-model $\PL(n)$ in percentage points at depths 1--4. Gray lines are the five daily paired-placement means; colored points are their means, with approximate simultaneous 95\% $t$ intervals over sixteen cells ($\nu=4$; Bonferroni).
-Inputs and sampled patches are fixed; these are not prediction intervals for new jobs or placements.}
-\label{fig:pn}
+\caption{Fez, decoded with the stored $f=1$ priors on device and model. Top: failure probability averaged over days and placements; model points are joined, not fitted. Bottom: device minus model at one to four rounds. Gray lines are daily means; bars are approximate simultaneous 95\% intervals from the five daily means ($t$ with four degrees of freedom, Bonferroni over sixteen cells).}
+\label{fig:fez}
 \end{figure*}
 
-\subsection{Distance 5 against distance 3}
-\label{sec:planned}
-
-Distance~5 fails more often in X memory in 59 of the 60 combinations of day, pair and round count, as the stored predictions expected.
-The pair-days are not independent placements: the two distance-5 patches share 51 of their 65 qubits.
-With the original in-job priors, the two pairs' effective $\LX$ values are 0.67 and 0.49.
-Their pooled mean discrepancy from the in-job model is small, but does not establish placement-wise or day-wise equivalence (App.~\ref{app:stats}).
-
-Pair~1 permits a day-to-day comparison on fixed qubits, with both patches in the same job [Fig.~\ref{fig:diagnostics}(a)].
-Its predicted $\LX$ at $\fhat$ moved between 0.54 and 0.82 (almost the same at $f=1$), while the measured ratio varied much less.
-The largest predicted change occurs on day~2, when the calibration reported four neighboring qubits of the distance-3 patch (q4, q5, q24 and q25) as much worse than usual.
-Setting them to their medians over the other days lowers the predicted $\LX$ by 0.15.
-The device did not follow that large reported change.
-This is one observed forecasting failure, not a general test of temporal accuracy; the selected day-omission calculation is retained in App.~\ref{app:stats}.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/diagnostics.pdf}
-\caption{Two limits of the calibration model.
-(a)~Pair~1's day-resolved $\LX$, with original in-job priors on device and model. Device bars are nominal 68\% profile intervals treating the two distance curves as independent; model inputs are fixed. Day~2's reported calibration change was not followed by the device.
-(b)~Mean flag/relay persistence over 320 readout series per basis (points), with the lag dependence implied by their fitted hidden Markov models (solid). Pauli-model values lie near zero (gray, dashed).
-Both panels are descriptive; repeated qubits and overlapping records do not provide independent replications.}
-\label{fig:diagnostics}
-\end{figure*}
-
-\subsection{Checks on the discrepancy}
-\label{sec:where}
-
-\paragraph*{Error budget and scaling.}
-We split the model into CZ, single-qubit, readout/reset and two idle channels, retaining interactions through Shapley shares~\cite{shapley1953value} (App.~\ref{app:budget}).
-Idling contributes about half of its $\eps$, and CZs about a quarter; these are shares of modeled error, not of the device's excess.
-Rescaling idle dephasing by about 1.5 brings X-memory decay and detection summaries closer to the device, but cannot correct Z memory.
-Joint $T_1$ and dephasing changes align the four decay summaries but leave detection-rate residuals.
-Their covariance was not estimated, so the channel comparison is descriptive.
-
-\paragraph*{Decoder priors.}
-Large idle-error probabilities can make a calibrated decoder prefer the wrong logical value for a single fault.
-Exact maximum likelihood retains most of these choices at distance~3 in X memory; they are not all matching failures.
-Priors learned from detection events~\cite{google2021exponential,takou2026logical} also leave a gap, while uniform priors decode worse.
-These checks use the same model or records and do not exhaust possible decoders (App.~\ref{app:budget}).
-
-\paragraph*{One $f$ for every qubit.}
-The idle data reject one $f$ for a job's data qubits in all 15 jobs ($\chi^2/\nu = 12$--80; App.~\ref{app:f}).
-At the median $f$ the model gives the corner data qubit q150 ($T_2 = 5$--$6\us$) a Z or Y error of 32--39\% per round, while its own $f$ gives 4--13\% on four of the five days.
-Using individual $f$ values does not remove the forecast discrepancy and changes the predicted difference between placements.
-Appendix~\ref{app:f} examines this heterogeneity; the idle test's lack of active neighbors and Z-basis decay measurements limits its interpretation.
-
-%======================================================================
-\section{Flag and relay readouts persist (exploratory)}
-\label{sec:leakage}
-%======================================================================
-
-Without faults every flag and relay reads 0 in every round.
-In Z memory on the device, a flag or relay that read 1 reads 1 again in the next round 23.0\% of the time, against 8.2\% after a 0; in the model both are 6.9\% (App.~\ref{app:flags}).
-A two-state hidden Markov model fits the records far better than models in which a shot's rate is fixed.
-Its implied lag dependence follows the observed persistence [Fig.~\ref{fig:diagnostics}(b)].
-In it a flag or relay enters a hidden, persistent state with probability 2.5\% per round, reads 1 about half the time while in it, and has an effective survival time constant of $31\us$.
-
-The fitted occupation is about 3\% at the first observed readout, below its 10\% steady-state value.
-It grows over the rounds, averaging 6.3\% in these circuits.
-Excess detector firing grows with round count in 19 of 20 X-memory curves but only 6 of 20 Z-memory curves under the slope check in App.~\ref{app:budget}; growth is not a uniform consequence across the measured checks.
-In X memory the nearby stabilizers fire 5.6 percentage points more often two rounds before a streak of two 1s and 8.4 points more two rounds after it, where the model shows no change (App.~\ref{app:flags}).
-The simulated records do not reproduce this persistence; temporal correlations in heavy-hex syndrome measurements have also been reported by Gicev et al.~\cite{gicev2024quantum}.
-Readout reduced to bits cannot tell a leaked flag from a leaked neighbor, a persistent readout or reset fault, or a two-level-system defect~\cite{klimov2018fluctuations}, and the raw readout signals were not kept.
-An experiment on Kingston kept them (Sec.~\ref{sec:kingston}): a persistent state of similar lifetime reads mostly within the reference IQ distributions for $\ket{0}$ and $\ket{1}$ (the reference clouds).
-Its interpretation remains limited by the unmeasured readout response of $\ket{2}$.
-The HMM describes the records; it has not been validated as an explanation of the logical-error excess.
-
-%======================================================================
-\section{A follow-up on \texttt{ibm\_kingston}}
-\label{sec:kingston}
-%======================================================================
-
-On 14 October 2026 we ran two memory jobs on \texttt{ibm\_kingston}, another Heron~r2 processor, together with idle-decay and raw-readout experiments.
-The circuit omitted mid-circuit resets, used XY4 decoupling and CZ twirling, and nested the distance-3 patch inside the distance-5 footprint.
-Placement included $T_2$, and depths were limited to rounds 1--4.
-A round took about $6\us$, against $7.9\us$ on Fez.
-Chip, placement and circuit changed together; the measured improvement cannot be assigned to any one of them.
-Appendix~\ref{app:kingston} gives the implementation, two-job results and input checks.
-
-\paragraph*{Forecasts and idle measurements.}
-The stored prediction again underpredicts the effective decay parameters in both bases, using its original decoder on both device and model (Table~\ref{tab:kingston}).
-The rates are lower than on Fez, but distance~5 still performs worse than distance~3.
-We then replaced the calibration's decoupled $T_2$ by each data qubit's measured idle-decay time $T_q$, holding this updated decoder fixed for all input comparisons.
-The resulting fixed-depth shortfall is 2.7--10.0 percentage points in X memory and 0.2--2.9 in Z memory (Fig.~\ref{fig:kingston}).
-All sixteen estimated gaps are positive.
-With only two jobs and fixed model inputs, the shot-error intervals do not quantify full prediction uncertainty.
-The Z-memory gap is not positive at every depth in each job separately (App.~\ref{app:kingston}).
-
-The updated model gives almost the same fractional rate error at both distances, so its distance ratio agrees more closely:
+To compare depths, each curve is fitted to
 \begin{equation}
-\frac{\Lambda^O}{\Lambda^M}
-=\frac{\eps_3^O/\eps_3^M}{\eps_5^O/\eps_5^M}.
+1 - 2\PL(n) = A\,(1-2\eps)^n
+\label{eq:fit}
 \end{equation}
-This cancellation does not validate the absolute rates.
-Replacing the readout inputs by IBM's later calibration moves the X-memory ratio from about 1.00 to 0.90 with the same decoder.
-Moreover, even the simulated depth curves are not exactly exponential; $\eps$ remains a summary of the chosen depths (Fig.~\ref{fig:kingstoncurves}).
+by binomial maximum likelihood.
+Here $\eps$ is an effective decay per round over the fitted depths and $\Lambda = \eps_3/\eps_5$; $\Lambda>1$ would mean distance~5 helps.
+$A$ is free, with $A(1-2\eps)\le 1$.
+Twelve Z-memory fits have $A>1$, so $A$ is not a preparation contrast, and saturation near $\PL = 1/2$ leaves little rate information at late depths.
 
-The follow-up also measured idle decay in Z, which the Fez test lacked.
-A common relaxation/dephasing fit cannot reproduce both idle tests well; the two rates are weakly separated and the tests ran at different times.
-Separate basis-specific fits reduce Z memory's discrepancy, while X memory's remains.
-They describe the measured decay without identifying a common physical model.
-Data--ancilla gates and active neighbors are absent from these idle tests, so their contribution during memory is still unresolved.
+Measured $\eps$ exceeds the stored prediction on 39 of 40 curves.
+The geometric-mean device/model factors are 1.27 and 1.19 in X memory at distances 3 and 5, and 2.06 and 1.84 in Z memory.
+Other fit windows give 1.15--1.28 in X and 1.65--2.10 in Z, and updated idle inputs do not remove the gap.
 
-\paragraph*{Persistent readouts.}
-Ten flags, relays and X ancillas ran thirty-cycle $H$--wait--$H$ sequences, recording raw readout signals, with arms adding CZ partners or removing resets.
-The persistent state's readouts mostly overlap the reference clouds [Fig.~\ref{fig:idlechecks}(c)].
-Without a calibrated response for $\ket{2}$, this cannot exclude leakage of the measured qubit.
-The CZ-containing arm has a higher fitted onset rate, but it ran about eight minutes after the reference arm, leaving temporal drift confounded with the change.
+\textit{Distance and day.}
+Distance~5 fails more often in X memory in 59 of 60 day--pair--depth combinations.
+With in-job priors, $\LX = 0.67$ and 0.49 for the two pairs, both below one as predicted, although this comparison mixes distance with placement quality.
 
-Qubits sharing a CZ partner have more strongly correlated fitted-state occupations than other pairs.
-Without CZs, the state is present from the first readout and is compatible with a frequency shift during the wait.
-Neither observation identifies the partner's state or the source of a shift.
-Flags also persist in the reset-free memory, whereas relays show no excess persistence.
-The longer raw-readout records support persistence on a tens-of-microseconds scale; a similar fitted lifetime on Fez does not establish a shared cause.
+For pair~1 the predicted $\LX$ swings between 0.54 and 0.82 over the five days, while the measured one hardly moves (Fig.~\ref{fig:diag}a).
+The big swing is day~2, when four neighboring distance-3 qubits were reported as much worse than usual; setting them to their medians on the other days lowers the predicted $\LX$ by 0.15.
+The device did not follow the reported change.
 
-%======================================================================
-\section{Discussion}
-\label{sec:discussion}
-%======================================================================
+%----------------------------------------------------------------------
+\section{Error budget and decoder checks}
+\label{sec:budget}
+%----------------------------------------------------------------------
 
-\paragraph*{Whether a larger code helps.}
-On Fez $\Lambda$ mixes distance scaling with placement, since the distances ran on different qubits.
-Neither layout suppresses logical error from distance 3 to 5 or determines a threshold.
-
-\paragraph*{Where to place a code.}
-With the original in-job priors and one $f$ for every qubit, the model predicts a difference of 0.19 between the two pairs' $\LX$, and the device gives $0.17\pm0.03$ (binomial fit, inverse-variance means over each pair's days; 0.18 with plain means).
-With each data qubit at its own $f$ the prediction is 0.32.
-The first difference is close to the observed one, but depends on an idle assumption rejected by the qubit-level tests.
-
-The same calibration ranks the eighteen usable distance-3 placements and sets their predicted errors.
-Selecting the best score could therefore bias the prediction downward if calibration errors correlate with logical error.
-The placements overlap and their calibration errors were not independently remeasured, so these data do not quantify that bias.
-Both usable distance-5 placements ran, reducing exposure to this selection bias.
-
-\paragraph*{Scope and limitations.}
-These conclusions concern one calibration-to-Pauli mapping on the two chip regions sampled.
-These results do not establish the performance of other schedules: Harper et al.\ reported lower errors with a parallel, reset-free circuit~\cite{harper2026characterising}, which was not simulated here.
-Fez's weak components, overlapping placements and saturated curves limit the distance comparison; no raw readout signals were kept there.
-Kingston changed chip and circuit together and provides only two memory jobs.
-Prediction on new placements is untested; the conditional intervals exclude unknown input bias.
-
-%======================================================================
-\section{Conclusion}
-\label{sec:conclusion}
-%======================================================================
-
-For the circuits and decoder used here, the stored calibration model underpredicts short-depth X-memory failure on the sampled Fez placements by about 4--8 percentage points in the five-day means.
-Z-memory differences are larger and persist under the reduced-syndrome decoder checks.
-A small discrepancy in the pooled distance ratio, or agreement after updating the idle inputs, does not show that individual predictions are accurate.
-Readout persistence is another feature the model misses.
-The Kingston follow-up narrows possible explanations without identifying the noise responsible for the excess logical errors.
-
-\section*{Data availability}
-Calibrations, compiled circuits, stored predictions, shots, analyses and figure scripts are available~\cite{repo}, tag \texttt{paper}.
-\texttt{scripts/reproduce.py} reconstructs the archived results for all fifteen Fez jobs using \texttt{requirements-lock.txt}; \texttt{docs/analysis/README.md} maps the paper's results to analysis scripts.
-The \texttt{followup/} README documents Kingston inputs, commands and decoder policies. \texttt{python -m followup.reproduce} reconstructs the cited variants into \texttt{build/}, leaving archives unchanged.
-Run folders use Israel dates (UTC+3), so Fez day~1 is \texttt{2026-10-04}.
-
-%======================================================================
-% Appendices
-%======================================================================
-\clearpage
-\appendix
-\makeatletter
-\@addtoreset{table}{section}
-\@addtoreset{figure}{section}
-\makeatother
-\renewcommand{\thetable}{\Alph{section}\arabic{table}}
-\renewcommand{\theHtable}{\Alph{section}\arabic{table}}
-\renewcommand{\thefigure}{\Alph{section}\arabic{figure}}
-\renewcommand{\theHfigure}{\Alph{section}\arabic{figure}}
-
-\section{Fits and uncertainty}
-\label{app:stats}
-
-\paragraph*{Fixed-depth differences.}
-For each basis, distance and depth, average the two placement differences within day $j$:
+\textit{Separating the model's channels.}
+The model splits into CZ gates, single-qubit gates, readout and reset, idle relaxation, and idle dephasing; the idle channel factors into relaxation followed by a phase flip, so the last two can be varied separately.
+All 31 nonempty combinations were simulated for all fifteen jobs at 20{,}000 shots per circuit, decoded with the full model's decoder.
+The channels interact, so switching one off does not remove a fixed share of the logical error.
+The Shapley value~\cite{shapley1953value} averages each channel's marginal effect over every order of introducing the five channels,
 \begin{equation}
-\begin{gathered}
-\delta_j=\tfrac12\sum_{p=1}^2\bigl[\PL^O(j,p)-\PL^{M,f=1}(j,p)\bigr],\\
-\bar\delta\ \pm\ t_{4,\,1-0.05/(2\cdot16)}\,s_\delta/\sqrt5 .
-\end{gathered}
-\label{eq:depthci}
+\phi_c = \frac{1}{5!}\sum_{\pi}\big[\eps(P^c_\pi \cup \{c\}) - \eps(P^c_\pi)\big],
+\label{eq:shapley}
 \end{equation}
-The family covers four depths in both bases and distances.
-The forecasts, sampled patches and decoder are held fixed; the intervals assume independent normal daily differences.
-They do not cover unknown calibration bias, future placements or the post-run choice of analysis.
-The file \texttt{early\_depths.json} retains every daily value and day-omission interval.
-Each omission uses four days, $\nu=3$ and the same sixteen-cell correction.
-Seven of the fifteen zero-excluding intervals lose exclusion in at least one omission; for distance-3 X memory at depths 2--4, four of five omissions do.
-Every daily difference and every omitted-day mean remains positive.
-For scale, five positive independent signs alone give a two-sided sign-test $p=2/2^5=0.0625$ before multiplicity; exclusion by the $t$ intervals relies on their distributional assumptions.
+where $P^c_\pi$ holds the channels before $c$ in the order $\pi$; the shares add up to the full model's $\eps$ (Table~\ref{tab:shapley}).
 
-\paragraph*{Effective decay parameters.}
-With $F_n$ failures among $N_n$ shots, the binomial fit maximizes
-\begin{equation}
-\ln \mathcal{L}=\sum_n\bigl[F_n\ln\PL(n)+(N_n-F_n)\ln(1-\PL(n))\bigr],
-\label{eq:binlik}
-\end{equation}
-with $\PL(n)=\tfrac12[1-A(1-2\eps)^n]$.
-Profile intervals are widened when the curve's Pearson dispersion exceeds one; joint fits impose $\eps_3=\Lambda\eps_5$.
-The nominal ratio intervals treat the two distance curves as independent; covariance between simultaneously acquired patch outcomes is not included.
-This accounts for observed scatter, not arbitrary model misspecification.
-The six-depth Fez fits have total deviance 154 on 160 degrees of freedom, with one of forty curves rejecting at 5\%.
-Twelve Z-memory fits have $A>1$, and saturation leaves little information at later depths, so these checks do not establish a stationary logical-error process.
-
-The five reported windows (1--8, 2--8, 1--6, 2--6, 1--4) retain $A\le1/(1-2\eps)$, requiring nonnegative extrapolated $\PL(1)$.
-This constraint is inactive at their best fits.
-It binds on three device Z-memory curves in the late-only 3--8 diagnostic, where distance-5 probabilities are already 0.46--0.52.
-
-\begin{table*}[t]
-\caption{Secondary effective-rate summary: device over model, geometric means over ten pair-days, with approximate simultaneous 95\% intervals for the five columns from daily log means ($\nu=4$; Bonferroni).
-The first row uses stored $f=1$ noise and priors on both sides; the next two check decoder and in-job input changes.
-Intervals condition on fixed inputs and sampled patches. These rate summaries retain the original matching graph.}
-\label{tab:pairs}
-\footnotesize
+\begin{table}[b]
+\caption{Shapley shares of the model's $\eps$, in percent, averaged over the ten pair-days. They split the model's error, not the device's excess.}
+\label{tab:shapley}
 \begin{ruledtabular}
 \begin{tabular}{lccccc}
- & \multicolumn{3}{c}{X memory} & \multicolumn{2}{c}{Z memory} \\
-\cline{2-4}\cline{5-6}
-Prediction; device/model priors & $\eps_3$ & $\eps_5$ & $\LX$ & $\eps_3$ & $\eps_5$ \\
-\hline
-Stored; $1/1$ (reference) & 1.27 \ci{1.10}{1.46} & 1.19 \ci{1.07}{1.34} & 1.06 \ci{0.89}{1.27} & 2.06 \ci{1.47}{2.89} & 1.84 \ci{1.62}{2.09} \\
-Stored; $\fhat/1$ (diagnostic) & 1.26 \ci{1.10}{1.44} & 1.19 \ci{1.06}{1.34} & 1.06 \ci{0.88}{1.27} & 2.06 \ci{1.47}{2.89} & 1.84 \ci{1.62}{2.09} \\
-In-job; $\fhat/\fhat$ & 1.28 \ci{1.16}{1.42} & 1.19 \ci{1.04}{1.37} & 1.07 \ci{0.91}{1.26} & 2.06 \ci{1.46}{2.89} & 1.84 \ci{1.61}{2.10} \\
-\end{tabular}
-\end{ruledtabular}
-\end{table*}
-
-\paragraph*{Rate intervals and day dependence.}
-Table~\ref{tab:pairs} uses
-\begin{equation}
-\begin{gathered}
-y_j=\tfrac12\sum_{p=1}^{2}\ln(O_{jp}/M_{jp}),\qquad R=\exp(\bar y),\\
-\mathrm{CI}_{95,\mathrm{family}}=\exp\bigl(\bar y\pm t_{4,0.995}s_y/\sqrt5\bigr).
-\end{gathered}
-\end{equation}
-The five-outcome correction applies within each fixed treatment, separately from the sixteen depth comparisons.
-For the stored reference, omitting days 2, 3 or 4 makes the distance-5 X interval include one; the other three rate intervals remain above one.
-The matched fits, saved-count provenance and window checks are in \texttt{stored\_priors.json}; omission checks are in \texttt{day\_sensitivity.json}.
-
-The in-job signed $\LX$ discrepancy is $+0.025$ with a 90\% interval of $(-0.103,+0.153)$ for placement~1 and $+0.042$ $(-0.015,+0.100)$ for placement~2.
-Averaging placements within day gives $+0.034$ $(-0.018,+0.085)$; this is a pooled mean, not individual-prediction equivalence.
-Pair~1's measured $\LX$ is compatible with a constant ($\chi^2=2.6$, $\nu=4$), whereas $\LX^O=c\LX^M$ gives 21.1 on 4 degrees of freedom.
-Omitting day~2 gives $c=1.10$ and $\chi^2=4.6$ on 3 degrees of freedom.
-These are exploratory diagnostics with fixed model inputs (\texttt{effect\_sizes.json}), not independent confirmation.
-
-\section{IBM's inputs}
-\label{app:inputs}
-
-\paragraph*{Age and resolution.}
-IBM publishes its calibration as snapshots, each with a time.
-The snapshot in force at each day's first job carried a time 21--88 minutes old, but its values were older.
-On every day $T_1$, $T_2$ and the CZ errors, and on days 1--3 the readout errors too, equal those of the previous snapshot, 57--152 minutes before the first job; IBM measures them in daily benchmarks~\cite{ibmdocscalib}.
-On day~1 every value equals that of a snapshot 268 minutes before the first job.
-Every reported readout error is a whole multiple of 1/8192, and half are odd multiples, consistent with 4096 shots per prepared state.
-At that shot count the relative standard error is 11\% at the patches' median readout error.
-For day~1's two readout calibrations, 56 minutes apart, the root-mean-square log difference on used qubits is 0.408.
-Dividing by $\sqrt2$ gives an inferred per-calibration log scatter of 0.288, if the two snapshots have independent errors of equal variance; drift and calibration noise are not separated.
-
-\paragraph*{Drift and time order.}
-Comparing fitted rates between the first and second halves of each job found no large drift, but this check sees only changes above about 40\% of $\eps$.
-For a finer check we use the job's own layout: the software splits each circuit's 2500 shots into four sub-batches of 625, two in each of two blocks, and each block lists the sub-batches of every circuit in its own shuffled order.
-IBM runs a job shot by shot across its sub-batches, though it does not guarantee the order~\cite{ibmdocsinit}.
-The data support this order: within its day-3 job the firing of relay q51 halved, and it stepped at the same shot, 371, in all 68 sub-batches.
-Binning each sub-batch's shots into ten time slices, the detection-event rate changes by $-0.21\%$ \ci{-0.57}{+0.15} of its value from the start to the end of a job, with no resolved aggregate trend.
-
-\paragraph*{Resets and readouts.}
-The ground-state convention of Sec.~\ref{sec:modeldef} ignores relaxation of a reset-error branch.
-For an isolated reset followed by a wait $t$, low-temperature amplitude damping would give excited-state population $P(1)=e_qe^{-t/T_1}$ before readout, while this convention leaves $P(1)=e_q$.
-It can therefore overestimate a surviving reset error by $e_q(1-e^{-t/T_1})$; this is a local check, not a correction to the memory results.
-IBM's initialization error is the residual $\ket{1}$ population after its default inter-shot delay and initialization procedure, following a prior $\ket{1}$ preparation~\cite{ibmdocs}.
-It is an alternative proxy for the sensitivity check below, with no general inequality relating it to the error of active mid-circuit reset.
-For days 1--3, the initialization metric retrieved after the run is about a fifth of the readout error.
-Using it for each mid-circuit reset, a measurement followed by a conditional $X$~\cite{nation2021measure,qiskitresetpass}, lowers the predicted Z-memory $\eps$ by 0.6--0.8 percentage points and moves the model's detection rates further from the device's in 17 of those 18 combinations of job and basis.
-Giving every reset 7.5\% error and every mid-circuit readout 4.2\%, as Harper et al.\ fitted on \texttt{ibm\_marrakesh}~\cite{harper2026characterising}, overshoots: on day~1 the median $p_e$ of the time-like edges becomes 0.19, against 0.10 on the device.
-
-\section{\texorpdfstring{Measuring $f$}{Measuring f}}
-\label{app:f}
-
-\paragraph*{The fit.}
-Both references in Eq.~\eqref{eq:ffit} contain the model's $T_1$ decay, pulse errors and readout error and differ only in the decoupled dephasing, so $f$ measures the decay beyond the $f=0$ reference in units of the extra decay that echo-level dephasing adds.
-Eq.~\eqref{eq:ffit} is exact in the model and assumes exponential dephasing on the device.
-The fitted scalar offset removes a multiplicative contrast change; it does not generally remove additive offsets in $\langle X\rangle$ or $\langle Y\rangle$ from asymmetric assignment errors.
-That readout-model uncertainty is not propagated by the idle fit.
-For sample means $\bar X,\bar Y$ from $N_\mathrm{X},N_\mathrm{Y}$ separate shots, we subtract the leading squared-mean bias:
-\begin{equation}
-v^2 = \bar X^2 - \frac{1-\bar X^2}{N_\mathrm{X}} + \bar Y^2 - \frac{1-\bar Y^2}{N_\mathrm{Y}} .
-\label{eq:r2}
-\end{equation}
-The exactly unbiased subtraction would use $N-1$ in each denominator; the stored estimator leaves a residual bias $(1-\mu^2)/N^2$ for a true mean $\mu$.
-Points with $v \le 0.05$ are dropped.
-The delta-method variance for the fit is
-\begin{equation}
-\mathrm{Var}(\ln v) \approx \frac{1}{v^4}\Bigl[\frac{\bar X^2(1-\bar X^2)}{N_\mathrm{X}} + \frac{\bar Y^2(1-\bar Y^2)}{N_\mathrm{Y}}\Bigr] .
-\label{eq:varlnr}
-\end{equation}
-The stored in-job fits instead use the variance of a single binomial mean.
-Reweighting with Eq.~\eqref{eq:varlnr} changes point errors by a median factor of 1.026 and day~4's pair-1 $\fhat$ from 1.01 to 1.14, with 12 exclusions rather than 11.
-Qubits whose $f$ is not determined to $\pm0.5$ are excluded (11 of the 340 per-job fits of a data qubit).
-These are long-$T_2$ qubits (median reported $T_2$ of $166\us$, against $85\us$ for the others), the kind whose $f$ tends to be largest [Fig.~\ref{fig:idle}(b)], so this selection can bias the job's median downward.
-Negative estimates are kept.
-
-\begin{figure}[tb]
-\centering
-\includegraphics[width=\columnwidth]{figures/C_idle_dephasing.pdf}
-\caption{(a)~Idle-test decay $v(n)$ of three data qubits of day~1, pair~1, distance~3: the one with the shortest $T_2$, the one whose $f$ is closest to the job's median, and the one whose fit has the patch's median reduced $\chi^2$, with the model's $f=0$ and $f=1$ references (band, each with the qubit's fitted offset $\alpha$) and the qubit's fit; the open marker has $v \le 0.05$ and is not fitted.
-(b)~$f$ against reported $T_2$ for all 329 per-job fits, with each physical qubit's median and quartiles.}
-\label{fig:idle}
-\end{figure}
-
-\paragraph*{One $f$ does not describe the qubits.}
-Beyond the rejection of one $f$ in every job, the per-qubit fits scatter beyond their shot noise (median reduced $\chi^2$ 1.65), and widening each qubit's error by $\sqrt{\max(1, \chi^2_\mathrm{red})}$ still leaves $\chi^2/\nu = 9$--43.
-Per-qubit $f$ rises with the reported $T_2$, with a Spearman rank correlation of 0.66 \ci{0.35}{0.85} over 36 physical qubits [Fig.~\ref{fig:idle}(b)].
-
-\paragraph*{A dephasing floor.}
-With $\Gamma_\mathrm{dd} = f\Gamma_\phi$ the dephasing rate beyond $T_1$ that the idle test measures, a least-squares fit to the medians of the 36 physical qubits gives
-\begin{equation}
-\Gamma_\mathrm{dd} = 0.11\,\Gamma_\phi + \Gamma_0 ,\qquad \Gamma_0 = 0.0071\us^{-1} ,
-\label{eq:floor}
-\end{equation}
-with intervals \ci{0.09}{0.35} and \ci{0.0045}{0.0082}$\us^{-1}$, far better than a multiple of $\Gamma_\phi$ alone ($F = 96$).
-Over a data qubit's $7.1\us$ of decoupled idle per round the floor is a phase flip of 2.5\% \ci{1.6}{2.8}, or 1.6--1.8\% without the three qubits with $T_2 < 20\us$ or with each per-job fit weighted.
-The fit is descriptive: the calibration predictor is uncertain, and the inferred $f$ uses the same calibration, so its slope and intercept do not separate physical channels.
-Neighboring readouts~\cite{govia2023randomized,hothem2025measuring} or errors of the fixed $X$--$X$ pulses are possible sources, not identified ones.
-The inverse-variance mean of the per-qubit $f$, 0.02--0.59 per job, lies far below the median because the qubits with short $T_2$ have the smallest errors.
-
-\paragraph*{$f$ from memory.}
-Matching the X-memory $\eps$ of each job's smallest patch needs $f = 1.45$ (median over the 15 jobs), above $\fhat$ in all 15 (median 0.99).
-From the detection rates, $f$ is above $\fhat$ in 14 of 15.
-This fitted $f$ is the dephasing increase that reproduces one memory summary within the assumed model.
-Other noise and decoder mismatch can also change that summary; it is not a bound on physical dephasing.
-Its disagreement with $\fhat$ restates the underprediction rather than independently testing the idle measurement.
-The idle test also lacks the gates, the ZZ crosstalk and the active neighbors of a running circuit, which affect decoupling on heavy-hex devices~\cite{vezvaee2026surface}.
-
-\section{Error scale, error budget and decoder}
-\label{app:budget}
-
-\begin{table}[tb]
-\caption{Shares of the model's effective decay parameter from Shapley allocation, in percent; means over ten pair-days (20,000 shots per simulated circuit).
-These allocate modeled error, not the device's excess. Rounded shares need not sum to 100.}
-\label{tab:budget}
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\begin{ruledtabular}
-\begin{tabular}{lccccc}
- & CZ & 1-qubit & readout/reset & $T_1$ idle & dephasing \\
+ & CZ & 1-qubit & Readout/reset & $T_1$ idle & Dephasing \\
 \hline
 X, $d=3$ & 22 & 10 & 12 & 22 & 35 \\
 X, $d=5$ & 25 & 7 & 17 & 17 & 34 \\
@@ -732,320 +278,172 @@ Z, $d=5$ & 30 & 9 & 16 & 46 & 0 \\
 \end{ruledtabular}
 \end{table}
 
-\paragraph*{One factor on every error rate.}
-The CZ, single-qubit, readout and reset errors of the model and its idle decay rates $1/T_1$ and $1/T_2^{\mathrm{DD}}$ at $\fhat$ were multiplied by a common factor $k$.
-Every job was simulated at $k = 1$ to 3 with 20,000 shots per circuit and decoded with the $k=1$ priors, as the device's shots were, and for each curve $\ln\eps$ was interpolated in $\ln k$ to the device's value.
-Near $k=1$, $d\ln\eps/d\ln k$ is 1.3--1.4 at both distances, and the model's $\LX$ hardly moves (0.625 to 0.622 for pair~1).
+Idle noise accounts for about half of the modeled decay and the CZ gates for about a quarter.
+Raising the dephasing by about 1.5 fixes the X-memory summaries but cannot fix Z memory.
+A two-channel fit matches all four decay summaries with relaxation scaled by 2.63 and dephasing by 0.60, yet the detector rates still disagree, so the summaries do not identify the missing channel.
 
-\paragraph*{Error budget.}
-Each job's model at $\fhat$ was split into five channels: CZ, single-qubit, readout/reset, relaxation while idle and dephasing while idle.
-The idle channel of Eq.~\eqref{eq:idle} factors exactly into a $T_1$ part followed by a pure phase flip, so the two can be switched off or scaled separately.
-We simulated the 31 nonempty channel combinations for all fifteen jobs at 20,000 shots per circuit, using the full model's matching graph as for the device's shots.
-The remaining, noiseless combination has $\eps(\emptyset)=0$.
-With $\eps(S)$ the model's $\eps$ with only the channels in $S$ switched on, the Shapley share of channel $c$ is
+Scaling every error rate of the model by one factor $k$ changes $\eps$ faster than linearly, with $d\ln\eps/d\ln k = 1.3$--1.4 near $k=1$, while $\Lambda$ hardly moves (0.625 to 0.622 for pair~1).
+A ratio can stay put while the errors behind it change a lot.
+
+\textit{Circuit distance and the matching graph.}
+Fault searches confirm circuit distance 3 and 5.
+The distance-5 Z matching graph still has a logical path of only three edges; two of them appear because Stim decomposes data X errors that also fire flags and relays.
+To see whether this matters, the flag and relay detectors were dropped while every gate, readout and the logical observable stayed.
+The reduced Z graph has distance 3 or 5, and with at most twenty stabilizer detectors at depths 1--4, exact maximum-likelihood (ML) decoding is possible by summing the model probability of every syndrome and logical value.
+On the device shots, reduced matching changes the mean failure by $-0.04$ to $+0.24$ percentage points and exact ML by $-0.92$ to $-0.34$.
+The gap to the model stays at 8.5--16.8 points, positive in every pair-day.
+
+For distance-3 X memory at depths 1--4, exact ML changes the device failure by $-1.64$ to $+1.16$ points and leaves gaps of 2.76--11.06 points.
+At four rounds it makes the same call as matching on 80\% of the single-fault probability that matching ``miscorrects'', so most of those calls are what the assumed model prefers anyway.
+
+\textit{Priors.}
+Calibrated priors beat uniform weights.
+Learning the pair-edge priors from detector correlations~\cite{google2021exponential} changes the X-memory decay only a little, and learning every edge type makes it worse; both are in-sample checks.
+None of the decoders tried closes the gap.
+
+%----------------------------------------------------------------------
+\section{Persistent flag and relay readouts}
+%----------------------------------------------------------------------
+
+Without faults a flag or relay reads 0.
+On Fez in Z memory, a 1 is followed by another 1 in the next round 23.0\% of the time, against 8.2\% after a 0; the model gives 6.9\% in both cases.
+For a binary readout $x_t$ define the persistence
 \begin{equation}
-\phi_c = \frac{1}{5!}\sum_{\pi}\bigl[\eps(P_\pi^c \cup \{c\}) - \eps(P_\pi^c)\bigr] ,
-\label{eq:shapley}
+\Delta(\ell) = \Pr(x_{t+\ell}=1 \mid x_t=1) - \Pr(x_{t+\ell}=1 \mid x_t=0).
+\label{eq:persistence}
 \end{equation}
-where the sum runs over the $5!$ orders $\pi$ in which the channels can be switched on and $P_\pi^c$ is the set switched on before $c$.
-The shares add up to $\eps$, with a shot-noise error of about 1 point, as the zero dephasing share in Z memory shows.
-
-\paragraph*{One and two channels.}
-Individual channels were scaled until the model matched each curve's effective decay or mean stabilizer detection rate.
-Noise inputs changed while the device and model decoder stayed at the job's $\fhat$ reference.
-Combining X-memory targets gives a descriptive dephasing factor of 1.52; this channel cannot flip Z memory.
-A two-channel grid aligns the four decay summaries at a $T_1$-decay factor of 2.63 and a dephasing factor of 0.60, but Z detection rates require larger $T_1$ factors.
-The targets share shots, days and overlapping placements, and their covariance was not estimated.
-The full factors, residuals and nominal intervals remain in \texttt{channels.json}; its diagonal-weight $p$ values are not used as channel-selection tests.
-These input adjustments do not identify the device's missing noise or exclude systematic calibration error.
-
-\paragraph*{Faults.}
-The decoder was audited on every memory circuit that ran, with the noise model at $\fhat$; a fault is one error mechanism of the detector error model.
-Table~\ref{tab:decoder} distinguishes the resulting distances and available decoder checks.
-No single fault, nor at distance~5 any two faults, flips the logical value without firing a detector.
-At distance~3 an exhaustive search and Stim's searches~\cite{stim116} find logical errors of three faults; at distance~5 the exhaustive search finds none of up to four faults, and Stim's searches return five.
-Each matching edge has weight $\ln[(1-p_e)/p_e]$, with $p_e$ its probability in the model, from 0.0014 to 0.50 (relay q51 on day~4).
-Across the scanned circuits, 689 of 5940 single-fault mechanisms in distance-3 X memory and 328 of 11,700 in distance-3 Z memory are miscorrected.
-At distance~5, 13 single faults and 2.3\% of two-fault combinations are miscorrected in X memory (0.8\% of two-fault combinations in Z memory).
-Repeated mechanisms in different circuits are counted separately; these are not fractions of physical fault locations or contributions to logical failure.
-
-\begin{table}[tb]
-\caption{Decoder audit at the in-job noise inputs. Circuit distance counts undetected DEM faults; graph distance counts matching edges.
-Single-fault miscorrections occur in both X configurations and distance-3 Z memory; distance-5 Z memory has two-fault miscorrections.
-The separate Z check uses stored $f=1$ inputs and retains only stabilizer detectors; its graph distances are 3 and 5, and exact ML is feasible at both distances for depths 1--4.}
-\label{tab:decoder}
-\footnotesize
-\setlength{\tabcolsep}{4pt}
-\begin{ruledtabular}
-\begin{tabular}{lccc}
-Memory & Circuit & Graph & Exact-ML comparison \\
-\hline
-X, $d=3$ & 3 & 3 & Depths 1--4 \\
-X, $d=5$ & 5 & 5 & Not checked \\
-Z, $d=3$ & 3 & 3 & Reduced syndrome \\
-Z, $d=5$ & 5 & 3 & Reduced syndrome \\
-\end{tabular}
-\end{ruledtabular}
-\end{table}
-
-\paragraph*{The matching graph.}
-In distance-3 Z memory one fault per round, an X or Y on data qubit $Q_2$ midway through the round, fires one of its stabilizers in that round and the other in the next, with a flag and a relay, and flips no logical value.
-Stim decomposes it into four boundary edges whose logical labels add up to a flip, plus a component that holds only the logical observable, which PyMatching~2.4 ignores.
-The graph is the same without these components and with each folded into a neighboring component, and every device shot, and 10,000 model shots per circuit, decode the same.
-This fault class accounts for 100 of the 328 miscorrected single-fault mechanisms in the distance-3 Z scan.
-Their assigned decomposition has the wrong logical parity after its observable-only component is dropped.
-The isolated-fault count does not bound the change in $\PL(n)$ or fitted $\eps_3$ under a decoder that represents the correlations differently.
-The shortest logical path has 3 edges at distance~3, and at distance~5 has 5 in X memory and 3 in Z memory: two boundary edges that exist only as components of data X errors seen by a flag and a relay, and an edge between neighboring stabilizers in consecutive rounds.
-
-\paragraph*{Reduced-syndrome Z check.}
-We removed only the flag and relay detector declarations, retaining every physical operation, readout and logical observable.
-At stored $f=1$ inputs the reduced matching graph has distance 3 or 5 as intended.
-For depths 1--4 its undecomposed error model has at most twenty stabilizer detectors per patch, permitting exact maximum likelihood by summing the probabilities of each syndrome and logical value.
-The same hardware shots and 20,000 common simulated shots per circuit are decoded by all three methods (\texttt{z\_decoder\_checks.json}).
-Relative to the original decoder, reduced matching changes the mean device $\PL$ by $-0.04$ to $+0.24$ percentage points across the eight distance--depth cells; exact ML changes it by $-0.92$ to $-0.34$ points.
-The exact-ML device--model gaps remain 8.5--16.8 points in these means and positive in every pair-day cell.
-This is ML for the retained syndrome and the specified Pauli model, not for the full readout record or unknown hardware noise.
-
-\paragraph*{Exact maximum likelihood and priors.}
-At distance~3 and $n \le 4$ the X-memory patch has at most 20 detectors, so the maximum-likelihood decoder follows exactly from the undecomposed detector error model at the job's $\fhat$.
-This is an in-job-model diagnostic, separate from the primary stored-$f=1$ comparison.
-Of the single-fault probability mass miscorrected by matching at $n = 4$, 80\% is also miscorrected by exact ML (16--100\% across pair-days).
-At fixed depths it changes the device's $\PL$ by $-1.64$ to $+1.16$ percentage points, while the exact-ML device probability still exceeds its model's by 2.76--11.06 points.
-On the device's shots calibrated weights beat uniform ones at both distances and in both bases.
-Three variants learn edge priors from the excess probability $p_{ij}$ that two detectors fire together~\cite{google2021exponential}.
-Learning pair edges while retaining calibrated boundary edges changes the X-memory $\eps$ by $-1.1$ to $+0.2$ percentage points, none by more than two conditional standard errors.
-Learning all edge types, either directly or by rescaling calibrated edges, instead raises distance-3 X-memory $\eps$ by 2.1--2.6 points and distance-5 $\eps$ by 0.4--1.8 points (\texttt{pij\_decode.json}).
-Training uses the six- and eight-round records, including shots later decoded; the bootstrap holds the learned priors fixed.
-This is a same-data diagnostic, not held-out decoder performance, and does not exhaust temporally informed decoders.
-Correlated matching~\cite{fowler2013optimal} changes no X-memory shot and moves device and model alike in Z memory.
-
-\paragraph*{Detection events.}
-By class, the median ratio of the device's detection-event fraction to the model's is 1.19 for Z stabilizers, 1.55 for flags, 1.16 for relays and 1.15 for weight-4 X stabilizers, and only the weight-2 X stabilizers match (0.98).
-In the eight-round circuits, we fit the slope of observed minus predicted mean stabilizer firing against round count, omitting the boundary rounds and retaining the across-round shot covariance.
-The slope exceeds three standard errors on 25 of 40 curves: 9/10 and 10/10 at distances 3 and 5 in X memory, versus 6/10 and 0/10 in Z memory (job \texttt{analysis.json} files and \texttt{model\_vs\_device.json}).
-The device also shows excess self-correlation of detectors two and three rounds apart relative to the simulated records, consistent with the readout persistence of Sec.~\ref{sec:leakage}.
-
-\section{Flag and relay records}
-\label{app:flags}
-
-\paragraph*{Persistence.}
-Each basis gives 320 readout series, one per flag or relay and pair-day, on 38 physical qubits; X- and Z-memory circuits ran interleaved on the same qubits, so the two bases are not independent.
-With $x_t = 1$ if a given flag or relay reads 1 in round $t$, its lag-$\ell$ persistence is
-\begin{equation}
-\Delta(\ell) = \Pr(x_{t+\ell}{=}1|x_t{=}1) - \Pr(x_{t+\ell}{=}1|x_t{=}0) ,
-\label{eq:refire}
-\end{equation}
-near zero in the simulated records.
-The device's $\Delta(1)$, 14.8 percentage points in Z memory and 15.2 in X memory, exceeds the model's in all but one of the 640 series.
-The fit $\Delta(\ell) = \Delta_0\kappa^\ell + \Delta_\infty$ gives $\kappa = 0.72$ and $\Delta_\infty = 0.2$ percentage points \ci{-0.4}{0.8} in Z memory, and $\kappa = 0.70$ and $\Delta_\infty = 1.1$ \ci{0.4}{1.7} in X memory.
-A stationary mixture of shot-fixed Bernoulli rates gives lag-independent persistence.
-The declining curve argues against that explanation alone; the fitted offset does not bound slow noise in more general, nonstationary models.
-
-\paragraph*{Hidden Markov fits.}
-A hidden state $h_t \in \{0, 1\}$ is entered with probability $a$ per round and left with probability $b$, so it lasts $T_\mathrm{p} = -\tau/\ln(1-b)$, and the qubit reads 1 with probability $u_0$ outside it and $u_1$ in it, as in models that detect leakage from parity records~\cite{bultink2020protecting,varbanov2020leakage}.
-With the state's probability $\pi$ at the first observed readout, the five parameters are fitted to each series by expectation maximization, pooling the job's four-, six- and eight-round circuits.
-The median log-likelihood gain is 89 over a three-parameter two-class mixture and 98 over a two-parameter beta-binomial, both with shot-fixed rates.
-The five-parameter HMM also allows a changing mean occupation; these likelihood gains alone do not isolate temporal dependence.
-In Z memory the median fit has $a = 2.5\%$ \ci{2.2}{3.0}, $b = 22.3\%$ \ci{20.2}{23.7}, so $T_\mathrm{p} = 31\us$ \ci{29}{35}, and $u_1 = 0.51$, with intervals from a bootstrap over the 38 physical qubits and then the shots.
-Over these circuits a flag or relay spends 6.3\% of rounds in the fitted state.
-The median $\pi$ is 3\%; the discrete mean residence time $\tau/b$ is $35\us$, distinct from the $31\us$ survival time constant.
-Increasing the iteration limit and using multiple starts changes the median Z-memory survival time only from 31.24 to $31.22\us$.
-Qubit-cluster, job-cluster and two-stage bootstrap intervals lie within roughly 29--$35\us$; these checks do not cover every shared process (\texttt{hmm\_bootstrap.json}).
-X memory gives the same rates series by series, and outside the state the device reads 1 no more often than the model.
-
-\paragraph*{Physical interpretation.}
-Leakage is a candidate because it can persist and spread through two-qubit gates~\cite{mcewen2021removing,miao2023overcoming}.
-The fitted hidden state is not itself a measurement of a transmon level.
-Neither its onset nor its survival time can be assigned to a particular gate or physical process from these records.
-The raw-readout experiment below adds information about its emission distribution but lacks a calibrated $\ket{2}$ response.
-An exploratory leakage simulator fitted to detector summaries did not jointly reproduce the logical errors in both memories: the fitted variants could overshoot X memory while leaving a Z-memory deficit (\texttt{leakage\_fit.json}).
-Changing the assumed action of a leaked qubit on its CZ partner changed the predictions substantially.
-These unmeasured interactions prevent interpreting the failed fit as a test of leakage in general; the archive documents each variant's model and calibration inputs.
-
-\paragraph*{Streaks.}
-Within each series and round, shots with 1s in rounds $t-1$ and $t$ are compared with shots that read 0 in both, and the differences are averaged with Mantel--Haenszel weights.
-The analysis file retains CR1 errors clustered by physical qubit for detection rates and an analytic Mantel--Haenszel variance for logical failure over job, circuit and patch strata.
-Neither handles all shared-shot, neighboring-qubit and common-job dependence; we therefore report these associations descriptively, without confidence intervals.
-Two rounds after a streak the nearby stabilizers fire 8.4 percentage points more often in X memory and 1.8 in Z memory, while stabilizers elsewhere move by at most 1.2.
-In X memory the nearby stabilizers already fire 5.6 points more often two rounds before the streak.
-For logical failure the difference is $+4.8$ percentage points in X memory, against $+0.8$ in the model, and $+2.3$ in Z memory, against $+2.2$.
-At a fixed number of flag and relay 1s per shot, the remaining streak-association point estimate is $+0.2$ points; its uncertainty is not calibrated here.
-This does not establish what determines failure; the 38 qubits recur over days and pairs.
-
-\section{Kingston methods and input sensitivity}
-\label{app:kingston}
-
-\paragraph*{Circuit and records.}
-Eight follow-up jobs were submitted; one was cancelled by IBM and gave no data.
-The software imports the Fez \texttt{src/} unchanged.
-Without resets, an ancilla starts a gadget in $X^m\ket{0}$, with $m$ its last outcome; the gauge value is reconstructed from the current outcome XOR known earlier ones.
-The round lasts $5.8\us$ at distance~3 and $6.0\us$ at distance~5.
-XY4 replaces the paired $X$ pulses, and CZ twirling motivates a Pauli approximation~\cite{wallman2016noise}; isotropic, independent CZ errors remain a model choice.
-The distance-3 patch lies within the distance-5 footprint, with different qubit roles and schedules.
-Both memory jobs ran rounds 1--4, giving 8192 shots per circuit in total.
+Over 320 series per basis the next-round persistence averages 14.8 percentage points in Z and 15.2 in X, against about zero in the model, and it decays with the lag (Fig.~\ref{fig:diag}b).
+Rates that only differ from shot to shot would give a persistence independent of the lag, so they cannot explain this alone.
 
 \begin{figure*}[t]
 \centering
-\textbf{(a)}\par
-\includegraphics[width=\textwidth]{figures/kingston.pdf}
-\textbf{(b)}\par
-\includegraphics[width=\textwidth]{figures/F_kingston_curves.pdf}
-\caption{Kingston input checks with the same capped, pooled-$T_q$ decoder on device and all simulated samples.
-(a)~Failure probabilities; lines join points, not decay fits. Device bars are conditional binomial shot errors, pooling the two jobs and their sampled randomizations. They do not include input, drift or between-randomization uncertainty.
-(b)~Each simulated probability minus its own exponential fit, in percentage points. The high simulation shot count resolves small departures from an exponential; widening a fitted-rate error does not remove them.
-These updated-input comparisons are distinct from the untouched stored forecast in Table~\ref{tab:kingston}.}
-\label{fig:kingston}
-\label{fig:kingstoncurves}
+\includegraphics[width=\textwidth]{figures/diagnostics.pdf}
+\caption{(a)~Pair~1's $\LX$ by day, with in-job priors on both sides; device bars are 68\% profile intervals. (b)~Mean flag and relay persistence with the fitted hidden-Markov curves; the Pauli model's records sit near zero. Shared qubits and overlapping records make neither panel fully independent.}
+\label{fig:diag}
 \end{figure*}
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/F_idle_checks.pdf}
-\caption{Kingston diagnostic evidence from saved records.
-(a)~Common idle fit: nominal reduced $\chi^2$ for all twenty-five data qubits.
-(b)~Standardized log residuals at the median (blue) and largest (orange) reduced $\chi^2$; solid lines are X/Y, dashed Z. Boundaries and observed-data weights limit the reference distribution.
-(c)~Raw IQ along each qubit's reference 0-to-1 axis, pooled over ten qubits: readouts with fitted-state posterior above 0.9 in arms A and B, against both reference histograms. Densities are normalized within the plotted bins; reference centers are at 0 and 1.
-State association uses the same records. This projection can hide perpendicular separation; the two-dimensional outside-cloud test is reported in the text. No $\ket{2}$ response was calibrated.}
-\label{fig:idlechecks}
-\end{figure*}
+\textit{A hidden state.}
+A two-state hidden Markov model~\cite{bultink2020protecting,varbanov2020leakage} enters a persistent state with probability $a$ per round and leaves it with probability $b$; a readout is 1 with probability $u_0$ outside the state and $u_1$ inside.
+The four-, six- and eight-round Z-memory records give medians $a=2.5\%$, $b=22.3\%$ and $u_1=0.51$.
+With round time $\tau$ the state lives
+\begin{equation}
+T_{\mathrm{p}} = -\frac{\tau}{\ln(1-b)} \simeq 31\us,
+\label{eq:lifetime}
+\end{equation}
+and its mean residence time $\tau/b$ is about $35\us$.
+Its occupation starts near 3\%, grows toward 10\% and averages 6.3\% over these circuits; X memory gives similar rates.
+The state describes the readouts; it is not a measured transmon level.
 
-\paragraph*{Placement and decoder.}
-Each memory circuit used sixteen randomizations of the active CZ layers, with 256 shots per randomization in each of the two jobs.
-The idle circuits used eight randomizations per job.
-Fits pool the binary outcomes; their statistical intervals condition on the sampled randomizations, with no separate estimate of between-randomization variation.
+Leakage could produce such persistence and spread it through CZ partners.
+A simple leakage simulation fitted to the detector statistics, however, did not reproduce the logical errors of both memories: depending on how a leaked qubit acts on its partner, it overshoots X memory or leaves a Z deficit.
 
-The placement search used cutoffs of $T_1\ge80\us$, $T_2\ge50\us$ on every qubit and $80\us$ on data, with readout error at most 3\% and CZ error at most 1\%.
-No distance-5 placement passed; the fallback chose the lowest score with a data-idle term $\tau/(2T_2)$.
-Its two weakest couplers had CZ errors of 6.4\% and 7.1\%.
-The decoder fixed before the jobs used calibrated edge probabilities capped at 0.1, with uniform weights reported beside it.
-Against the measured-decay model, uniform weights give $\LX=0.53\pm0.03$ and $O/M$ for $\eps_3$ and $\eps_5$ of 1.28 and 1.34 in X memory.
-In Z memory the corresponding factors are 1.26 and 1.18, with $O/M$ for $\LZ$ of 1.06.
+\textit{Streaks and failures.}
+After two consecutive flag or relay 1s, nearby X-memory stabilizers fire 8.4 percentage points more often two rounds later, but they already fire 5.6 points more often two rounds before the streak.
+Logical failure is 4.8 points higher in X memory, against 0.8 in the model, and at a fixed total of flag and relay 1s the streak association drops to 0.2 points.
+Streaks go together with failures without clearly causing them.
 
-\paragraph*{Design comparison.}
-The Fez reference uses the same decoder and rounds 1--4: $\eps_3,\eps_5$ are 12.4\%, 22.7\% in X memory and 15.9\%, 29.5\% in Z memory.
-Kingston's effective parameters are 0.40--0.53 of these, with $\LX=0.69\pm0.04$ and $\LZ=0.57\pm0.03$.
-On Kingston's calibration the model gives new-circuit over Fez-circuit factors of 0.71 and 0.61 in X memory and 0.80 and 1.08 in Z memory.
-This holds the calibration fixed in simulation; the hardware comparison changes both chip and circuit.
+%----------------------------------------------------------------------
+\section{Follow-up on Kingston}
+%----------------------------------------------------------------------
 
-\paragraph*{Stored-prior comparison.}
-Table~\ref{tab:kingston}'s first row uses the stored prediction and original calibration priors on both sides; its lower block holds measured-decay priors fixed.
-Using the original priors on the device as well gives stored-prediction $O/M$ of 1.90 and 1.69 in X memory, and 1.43 and 1.12 in Z memory.
-These fitted-rate discrepancies do not imply a positive gap at every depth: the stored distance-5 Z forecast is above the device at rounds 1 and 2.
-The measured-$T_q$ simulation has distance-3 Pearson dispersions of 15.2 in X and 13.6 in Z, with residuals up to 0.34 percentage points [Fig.~\ref{fig:kingstoncurves}(b)].
-The rate summaries depend on the fitted depths, even for the model's own probabilities.
+The follow-up ran on another Heron r2 processor, \texttt{ibm\_kingston}, with three circuit changes: no mid-circuit resets, XY4 decoupling instead of paired X pulses, and randomized (twirled) CZ layers.
+Without a reset, an ancilla starts the next gadget in $X^m\ket{0}$, where $m$ is its last outcome, so each gauge value is the XOR of the current outcome and known earlier ones.
+A round takes $5.8\us$ at distance~3 and $6.0\us$ at distance~5.
+Two memory jobs covered rounds 1--4, with 8192 shots per circuit in total and sixteen randomizations per job.
 
-\begin{table}[tb]
-\caption{Kingston effective-rate $O/M$, rounds 1--4. The stored probabilities are re-fitted binomially with the original decoder on both sides.
-Below the rule, all models and device records use fixed pooled-$T_q$ priors.
-Conditional fit errors are 3--7\%, not full prediction uncertainty; structural fit mismatch and uncertain inputs remain.}
+This time the placement score included $T_2$, but no distance-5 patch passed every cutoff, and the fallback still had CZ errors of 6.4\% and 7.1\%.
+The distance-3 patch sat inside the distance-5 footprint, with different roles and schedules.
+Chip, placement and circuit all changed at once, so the improvement below cannot be credited to any single change.
+
+The fitted decay parameters are 0.40--0.53 of Fez's, fitted over the same depths with the same decoder.
+The distance ratios stay below one, $\LX = 0.69 \pm 0.04$ and $\LZ = 0.57 \pm 0.03$ (fit errors only).
+
+\begin{table}[b]
+\caption{Kingston: fitted decay, device/model. The stored prediction uses its own priors on both sides; the rows below it share one fixed decoder built from the measured decay.}
 \label{tab:kingston}
-\footnotesize
-\setlength{\tabcolsep}{3pt}
 \begin{ruledtabular}
-\begin{tabular}{@{}p{0.36\columnwidth}cccc@{}}
- & \multicolumn{2}{c}{X memory} & \multicolumn{2}{c}{Z memory} \\
-\cline{2-3}\cline{4-5}
-Comparison & $\eps_3$ & $\eps_5$ & $\eps_3$ & $\eps_5$ \\
+\begin{tabular}{lcccc}
+ & \multicolumn{2}{c}{X memory} & \multicolumn{2}{c}{Z memory}\\
+ & $d=3$ & $d=5$ & $d=3$ & $d=5$ \\
 \hline
-Stored forecast, original priors & 1.90 & 1.69 & 1.43 & 1.12 \\
+Stored prediction & 1.90 & 1.69 & 1.43 & 1.12 \\
 \hline
-\multicolumn{5}{l}{\emph{Post-run input diagnostics, fixed decoder}} \\
 IBM inputs & 1.89 & 1.53 & 1.38 & 1.12 \\
 Measured $T_q$ & 1.69 & 1.69 & 1.25 & 1.22 \\
 Joint idle fit & 1.64 & 1.63 & 1.14 & 1.15 \\
-Separate X/Y- and Z-idle fits & 1.69 & 1.69 & 1.02 & 1.08 \\
+Separate X/Y and Z fits & 1.69 & 1.69 & 1.02 & 1.08 \\
 \end{tabular}
 \end{ruledtabular}
 \end{table}
 
-\paragraph*{Measured decay.}
-For each data qubit the idle test fits
+\textit{Measured idle inputs.}
+For each data qubit the X/Y idle test now fits
 \begin{equation}
-\ln v(n)=c+\ln G(n)-t_\mathrm{eq}(n)/T_q,
+\ln v(n) = c + \ln G(n) - t_{\mathrm{eq}}(n)/T_q,
 \label{eq:tq}
 \end{equation}
-where $t_\mathrm{eq}$ is time on the equator and $G$ is the model's remaining contrast from gates, readout and $T_1$ decay along Z.
-The test uses the memory pulses and twirls, replacing CZs by delays; its median $T_q$ is 0.74 of IBM's $T_2$.
-Of the twenty-five data qubits, thirteen have $T_q$ more than three standard errors below IBM's $T_2$ and seven above it.
-The four reported at 16--$24\us$ have $T_q$ of 59--$196\us$ under XY4.
-Eleven fitted rates differ by more than three standard errors between the two memory jobs, separated by 35 minutes.
-The prediction treats the pooled $T_q$ values as fixed, so its fitted error does not propagate this variation.
-Table~\ref{tab:kingstonjobs} shows the memory jobs separately under the same pooled-$T_q$ decoder.
-Against the pooled-$T_q$ prediction, distance-3 Z memory is below the model at the first three depths in the second job; distance-5 Z memory is below it at the first depth in the first job (\texttt{kingston\_checks.json}).
-Their conditional fit errors neither estimate between-job prediction uncertainty nor establish accuracy on a later job.
-The simultaneous Hahn test gives a median $T_2$ ratio of 0.31 to IBM's.
-An IBM-rate exponential times a Gaussian of about $60\us$ fits better on sixty of sixty-five qubits, consistent with ZZ coupling not refocused by simultaneous echoes.
+where $t_{\mathrm{eq}}$ is the time the qubit spends on the equator and $G$ holds the modeled gate, readout and Z-axis relaxation losses.
+The median measured $T_q$ is 0.74 of IBM's $T_2$, but four qubits reported at 16--24$\us$ show 59--196$\us$ under XY4.
+Eleven of the twenty-five rates moved by more than three standard errors between the two jobs, 35 minutes apart.
 
-\begin{table}[!htb]
-\caption{Kingston memory jobs separately, with the pooled-$T_q$ decoder capped at 0.1. Binomial fits; $\pm$ is the Pearson-scaled profile half-width (nominal 68\%), not a calibrated prediction interval. Decay-input, between-randomization and between-job uncertainty are not included.}
-\label{tab:kingstonjobs}
-\footnotesize
-\begin{ruledtabular}
-\begin{tabular}{lccc}
-Job, basis & $\eps_3$ (\%) & $\eps_5$ (\%) & $\Lambda$ \\
-\hline
-First, X & $7.17\pm0.40$ & $9.30\pm0.45$ & $0.77\pm0.06$ \\
-Second, X & $5.86\pm0.36$ & $9.64\pm0.54$ & $0.61\pm0.05$ \\
-First, Z & $7.55\pm0.63$ & $12.27\pm0.48$ & $0.61\pm0.06$ \\
-Second, Z & $6.22\pm0.33$ & $11.59\pm0.90$ & $0.54\pm0.05$ \\
-\end{tabular}
-\end{ruledtabular}
-\end{table}
+With measured $T_q$ and a fixed decoder, the pooled shortfalls are 2.7--10.0 percentage points in X memory and 0.2--2.9 in Z, and a few single-job Z points fall below the model.
+Similar fractional errors at both distances cancel in the distance ratio,
+\begin{equation}
+\frac{\Lambda^{O}}{\Lambda^{M}} = \frac{\eps_3^{O}/\eps_3^{M}}{\eps_5^{O}/\eps_5^{M}},
+\label{eq:ratio}
+\end{equation}
+with $O$ the device and $M$ the model.
+The model can therefore get $\Lambda$ right while the X-memory decay stays about 69\% above it.
 
-\paragraph*{Joint and separate decay fits.}
-The Z-idle test prepares $\ket{0}$ or $\ket{1}$ and reads in Z, giving a median flip probability of 5.3\% per round.
-Each idle test chiefly identifies its decay combination $t_Z/T_1+t_{\mathrm{eq}}/T_q$, not the two rates separately; their median correlation is $-0.977$.
-The joint fit imposes $1/T_1\ge0$ and $1/T_q\ge1/(2T_1)$.
-Seventeen of twenty-five data qubits reach a boundary; without these constraints fourteen have negative pure-dephasing rates, seven beyond two standard errors.
-Its weighted log residuals sum to $\chi^2=369$ for 150 nominal degrees of freedom; the per-qubit $\chi^2/\nu$ has median 1.47 and range 0.43--11.21 (Fig.~\ref{fig:idlechecks}).
-This is a nominal residual summary, not a calibrated physical-model test at rate boundaries.
-The constrained fit underestimates the summed Z-idle decay by 11\% while overestimating the X-idle decay by 3\%.
-The Z-idle job began about 59 and 23 minutes after the two X/Y-idle memory jobs began, respectively.
-The tests were not interleaved, so drift can contribute to this common-fit failure.
-The separate-fit variant instead holds $T_q$ from the X idle test and solves $t_Z/T_1+t_{\mathrm{eq}}/T_q$ for the Z idle test's fitted decay per round, with the physical cap enforced; X memory retains its original measured-decay model.
-It therefore uses different effective noise in the two memories and is not a common physical explanation.
+\textit{One idle model does not fit both bases.}
+A Z idle test prepares 0 or 1 and reads Z; the median flip probability is 5.3\% per round.
+Each idle test mainly fixes the combination $t_Z/T_1 + t_{\mathrm{eq}}/T_q$, so the two rates come out strongly anticorrelated (median correlation $-0.977$).
+A joint fit with non-negative relaxation and pure dephasing puts seventeen of the twenty-five qubits on a constraint boundary; without the constraints, fourteen need negative pure dephasing, seven of them by more than two standard errors.
+The constrained fit underestimates the Z-idle decay by 11\% and overestimates the X-idle decay by 3\%.
+Fitting each basis separately brings Z memory close to the model (Table~\ref{tab:kingston}, last row), but with different effective noise in each basis, so there is no single physical picture.
+The tests were not interleaved, so drift may also play a part.
 
-\paragraph*{Idle-estimator check.}
-All twenty-five qubits retain all five depths in both tests; minimum contrasts are 0.172 in X/Y and 0.061 in Z, against the 0.05 cutoff.
-We planted each fitted contrast at its observed X/Y phase or Z-population midpoint, then drew 2000 independent binomial replicates per qubit and basis (seed 1313; \texttt{idle\_checks.json}).
-Mean rate pulls range from $-0.08$ to $+0.02$ in X/Y and $-0.30$ to 0 in Z; nominal 95\% coverage ranges are 93.8--95.8\% and 93.4--96.0\%.
-No X/Y replicate loses a point; at the weakest Z contrast, 8.4\% do.
-This checks nonlinear transformation and selection only in the planted Kingston regime; it does not calibrate drift, shared shots, randomization or pulse-model errors, nor the discarded low-contrast Fez fits.
-Individual-qubit standard-error comparisons above do not include these sources of variation.
+\textit{Readout calibration.}
+The first calibration listed q72 and q12 at 18--20\% readout error; the idle offsets and the calibration 88 minutes later put them near 5\%.
+Re-predicting with the later values, with the decoder fixed, leaves gaps of 4.6--11.6 percentage points in X and 3.1--5.5 in Z, larger than with the original inputs.
+Single calibration entries move the prediction this much.
 
-\paragraph*{Readout sensitivity.}
-IBM's initial calibration gave q72 and q12 readout errors of 18--20\%; the idle-test offsets and the calibration 88 minutes later put them near 5\%.
-Only readout values changed between the snapshots, on 155 qubits.
-Replacing them with the same decoder on device and simulation gives $O/M$ of 1.63 and 1.82 for X-memory rates, and 1.31 and 1.28 for Z memory.
-For $\LX$, $O/M$ changes from $1.00\pm0.07$ to $0.90\pm0.05$.
-At fixed depths the later-readout inputs give gaps of 4.6--11.6 percentage points in X memory and 3.1--5.5 in Z, compared with 0.2--2.9 in Z using the original readout inputs.
-This observed input change is not a full calibration-uncertainty interval.
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/kingston.pdf}\\[4pt]
+\includegraphics[width=\textwidth]{figures/F_idle_checks.pdf}
+\caption{Kingston. Top: failure probability, decoded for device and models with one capped decoder built from the pooled measured $T_q$; these updated inputs differ from the stored prediction. Bottom: (a)~reduced $\chi^2$ of the joint idle fit for each data qubit; (b)~standardized log residuals for a median and the worst qubit; (c)~raw readout signal in the fitted persistent state, projected on each qubit's 0-to-1 axis. Most of it stays inside the reference clouds; no $\ket{2}$ reference was available.}
+\label{fig:kingston}
+\end{figure*}
 
-\paragraph*{Raw-readout experiment.}
-Ten qubits ran three arms of thirty cycles, with a period of $4.87\us$ and 3000 shots per arm.
-Arm A was $H$, a $0.41\us$ wait, $H$, readout and reset; B added two CZs with each usual partner, and C omitted the reset.
-Their separate jobs began at 18:22:12, 18:30:22 and 18:31:18~UTC, respectively; the arms were not interleaved.
-Reference preparations defined the 0 and 1 clouds.
-Readouts outside both clouds are 0.02--0.18\%, and the cluster test finds a third cluster on one to four qubits per arm.
-In the persistent state most readouts remain within the reference clouds, with about 60\% read as 1.
-Its median lifetime is $40\us$ without CZs and $32\us$ with them, comparable to Fez's $31\us$.
+\textit{Raw readout signals.}
+Ten flag, relay and X-ancilla qubits ran thirty cycles of H, a $0.41\us$ wait, H, readout and reset, with a $4.87\us$ period, 3000 shots and the raw IQ signal recorded.
+One arm added CZs with each qubit's usual partners and another dropped the resets.
+The arms ran as separate jobs, the CZ arm about eight minutes after the reference.
 
-Normalizing the paired-qubit B-minus-A onset difference by the CZ count gives 0.09\% per CZ; A minus C gives 0.04\% per cycle on the six qubits meeting C's contrast rule.
-Both interpretations assume temporal stability and additive arm effects; readout and idle cannot be separated.
-With CZs, correlations of the fitted-state posterior at matched shot and cycle coordinates have median 0.13 for qubits sharing a partner, against 0.009 for other pairs.
-Without CZs the median ratio of initial to steady fitted occupation is 1.07; this summary does not establish stationarity of each qubit.
-The $H$--wait--$H$ response is compatible with a frequency shift, but one fixed delay cannot determine its sign or resolve frequency aliases.
-The raw-cloud counts, HMM fits, posterior histograms and pair correlations are reconstructed from the readout records by \texttt{kingston\_iq.py}.
-These arms identify neither a frequency-shift source nor leakage of an unmeasured partner.
+Only 0.02--0.18\% of the readouts fall outside both reference clouds.
+In the fitted persistent state most signals stay inside the clouds, and about 60\% read 1 (Fig.~\ref{fig:kingston}c).
+The state lives a median $40\us$ without CZs and $32\us$ with them, close to Fez's $31\us$.
+Without a calibrated $\ket{2}$ cloud this does not rule out leakage of the measured qubit, and a similar lifetime does not prove the same cause on both chips.
 
-\begin{acknowledgments}
-We acknowledge the use of IBM Quantum services for this work.
-The views expressed are those of the author and do not reflect the official policy or position of IBM or the IBM Quantum team.
-Claude (Anthropic) and Codex (OpenAI) assisted with code and manuscript preparation.
-\end{acknowledgments}
+With CZs, qubits that share a partner enter the state together (median correlation 0.13, against 0.009 for other pairs), and the onset rises by about 0.09\% per CZ.
+Without CZs the state is there from the first readout, and its response to the fixed wait fits a frequency shift without revealing its source.
+In the reset-free memory, flags still persist while relays show no excess.
 
-\section*{Conflicts of Interest}
-The author declares no conflicts of interest.
+%----------------------------------------------------------------------
+\section{Takeaways}
+%----------------------------------------------------------------------
+
+\begin{itemize}
+\item The calibration-based Pauli model underestimates the logical error on both chips: by about 1.2--1.3 in X memory and up to 2 in Z memory on Fez, and by about 1.7 in X memory on Kingston even with measured idle decay.
+\item Distance~5 lost to distance~3 on both chips, as expected for these circuits and placements. Because similar fractional errors cancel, $\Lambda$ hides most of the model's error.
+\item On Kingston, dropping the resets and adding XY4 and twirling went with roughly halved decay per round, but the chip and placement changed too.
+\item Flags and relays carry a persistent state the model lacks. On Kingston it is mostly not a third readout cloud, and CZ partners raise its onset; its source is still open.
+\end{itemize}
+
+\section*{Code and data}
+
+The circuits, calibrations, stored predictions, shots and analysis scripts, with the full paper version and reproduction instructions, are at \repourl{} (tag \texttt{paper}).
 
 \bibliography{refs}
 
