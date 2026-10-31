@@ -37,11 +37,11 @@ each circuit run N times and t long once scheduled. IBM may load a job of more t
 MAX_EXPERIMENTS circuits (each twirl one) in parts, LOAD_S each, so the caps take that bound.
 A job is refused above JOB_SECONDS (the lifetimes' above their own caps, in SECONDS), if the
 follow-up's jobs so far and it would pass TOTAL_SECONDS (an optional job PLAN_SECONDS), or if
-IBM's usage counter would fall below COUNTER_FLOOR_S; IBM cancels it at its limit, 1.5 times the bound and 2 s, at most its
-cap, and while it is queued it is cancelled if IBM's own estimate is over that. The ledger
-claims a job before it is sent and counts it at its limit until IBM has counted it, so no
-job goes twice and the total holds whatever happens; a send whose outcome is unknown stays
-claimed until --fetch settles it.
+IBM's usage counter would fall below COUNTER_FLOOR_S; IBM cancels it at its limit, 1.5 times
+the bound and 2 s, at most its cap, and while it is queued it is cancelled if IBM's own
+estimate is over that. The ledger claims a job before it is sent and counts it at its limit
+until IBM has counted it, so no job goes twice and the total holds whatever happens; a send
+whose outcome is unknown stays claimed until --fetch settles it.
 Every job carries TAG, and a ledger that misses one of IBM's jobs with it refuses to go on.
 
 If IBM refuses the client-side route, or fails the job, --untwirled sends Exp 1 without
@@ -129,11 +129,11 @@ APPROVED_WEAK: dict[tuple[int | tuple[int, int], str], float] = {
     (54, "readout"): 0.045, (72, "readout"): 0.202, (78, "T2"): 32, (78, "readout"): 0.044,
     (85, "readout"): 0.033, (86, "T2"): 24, (87, "T1"): 54, (87, "T2"): 36, (88, "T2"): 19,
     ((85, 86), "CZ"): 0.047, ((86, 87), "CZ"): 0.057,
-    # Calibration of 14 October 2026, 20:27 (+03:00), approved to run as it stands.
-    # (12 and 72 readout were raised to their values in it, above.)
+    # Weak in the calibration of 14 October 2026, 20:27 (+03:00); 12 and 72 readout, above,
+    # take their values from it.
     (30, "T2"): 76, (31, "readout"): 0.042, (46, "T2"): 79, (65, "readout"): 0.034,
     (92, "readout"): 0.064,
-    # Calibration of 14 October 2026, 21:55 (+03:00), approved for the lifetime jobs.
+    # Weak in the calibration of 14 October 2026, 21:55 (+03:00), for the lifetime jobs.
     (14, "readout"): 0.032, (27, "readout"): 0.033, (46, "readout"): 0.071,
     (51, "readout"): 0.031,
 }  # fmt: skip
@@ -1075,7 +1075,7 @@ def job_limit(job: Job, attempts: Sequence[Mapping], remaining_s: float | None) 
             f"{job.name} is optional: it may need {bound} s and {used:.0f} s are counted "
             f"already, past the plan's {PLAN_SECONDS} s"
         )
-    limit = int(min(cap, TOTAL_SECONDS - used, ceil(1.5 * job.bound) + 2))
+    limit = int(min(_limit(job), TOTAL_SECONDS - used))
     if remaining_s is None or remaining_s < bound + MARGIN_SECONDS:
         raise Refused(
             f"IBM's counter leaves {remaining_s} s, less than the {bound} s the job may "
@@ -1092,6 +1092,12 @@ def job_limit(job: Job, attempts: Sequence[Mapping], remaining_s: float | None) 
 def job_cap(name: str) -> int:
     """The most QPU seconds a job may take: its own cap, else JOB_SECONDS, never more."""
     return min(SECONDS.get(name, JOB_SECONDS), JOB_SECONDS)
+
+
+def _limit(job: Job) -> int:
+    """The job's limit: 1.5 times its bound and 2 s, at most its cap. job_limit also keeps it
+    within what TOTAL_SECONDS has left."""
+    return min(job_cap(job.name), ceil(1.5 * job.bound) + 2)
 
 
 def remaining(service: Any) -> float | None:
@@ -1273,11 +1279,11 @@ def load(folder: Path) -> dict[str, dict[str, np.ndarray]]:
 def inspect(folder: Path) -> dict:
     """The checks a job's data must pass before the next job goes: every circuit's shots and
     bits as planned; IQ points where kerneled, each shot's all distinct in IQ_DISTINCT of the
-    shots; IBM's schedule of every circuit, less the resets it adds before and after, within SCHEDULE_GAP of ours; each memory
-    circuit's detectors firing no more than the model's would with MAX_EXCESS times its
-    errors: a readout that doesn't leave its qubit in |m>, or bits read in the wrong order,
-    make them fire about half the time; and the lifetimes' circuits that should read as
-    prepared doing so READ_AS_PREPARED of the time."""
+    shots; IBM's schedule of every circuit, less the resets it adds before and after, within
+    SCHEDULE_GAP of ours; each memory circuit's detectors firing no more than the model's would
+    with MAX_EXCESS times its errors: a readout that doesn't leave its qubit in |m>, or bits
+    read in the wrong order, make them fire about half the time; and the lifetimes' circuits
+    that should read as prepared doing so READ_AS_PREPARED of the time."""
     run = _read(folder / "run.json")
     data = load(folder)
     failed: list[str] = []
@@ -1550,7 +1556,7 @@ def dry(calibration_path: Path | None = None, *, twirl: bool = True, kerneled: b
             circuits_run = f"{len(dict.fromkeys(job.items))} circuits, " + (
                 "twirled" if job.twirled else "untwirled"
             )
-        limit = int(min(job_cap(job.name), ceil(1.5 * job.bound) + 2))
+        limit = _limit(job)
         lines.append(
             f"{job.name:8} {job.instances:>8} {sum(i.executions for i in job.items):>10,} "
             f"{job.seconds:>6.2f} {job.bound:>6.2f} {limit:>5}  {circuits_run}, "

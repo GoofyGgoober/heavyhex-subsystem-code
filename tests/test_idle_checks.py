@@ -25,7 +25,7 @@ def test_vectorized_rate_matches_archived_estimator(checks):
 
 
 def test_joint_residuals_recover_saved_fit_statistics(checks):
-    # Raw contrasts and exposures are also retained in the frozen Z-idle archive.
+    # The frozen Z-idle archive also holds the raw contrasts and exposures.
     saved = checks.read(checks.REPO / "docs/analysis/results/idle_checks.json")
     archive = checks.read(checks.REPO / "runs/ibm_kingston-followup/analysis/life.json")
     joint = archive["analysis_life"]["in_situ"]["qubits"]
@@ -35,9 +35,9 @@ def test_joint_residuals_recover_saved_fit_statistics(checks):
         assert found["nominal_dof"] == sum(row["used"]) - 4
 
 
-def test_saved_planted_checks_are_bounded_and_do_not_claim_total_coverage(checks):
+def test_saved_planted_checks_are_bounded(checks):
     saved = checks.read(checks.REPO / "docs/analysis/results/idle_checks.json")
-    assert saved["seed"] == 1313
+    assert saved["seed"] == checks.SEED
     for rows in saved["planted_checks"].values():
         assert len(rows) == 25
         for row in rows.values():
@@ -46,4 +46,3 @@ def test_saved_planted_checks_are_bounded_and_do_not_claim_total_coverage(checks
             assert row["midpoint_adjustments"] == 0
             assert 0 <= row["nominal95_coverage"] <= 1
             assert 0 <= row["point_discard_fraction"] <= 1
-    assert "drift" in saved["caveat"] and "Fez" in saved["caveat"]

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# One run day of the Fez experiment, unattended, as agreed on 3-4 October 2026:
+# One run day of the Fez experiment, unattended:
 # wait for IBM's evening calibration, prepare the day, put the prediction on record
 # (commit and push), send the day's jobs in order, then commit the shots, analyze,
 # combine, commit and push. Windows Task Scheduler starts it at 20:00 for days 2-5.
 #
-# It sends nothing without the author's approval file, stops after the prespecified
+# It sends nothing without the QPU approval file, stops after the prespecified
 # five run days, never starts a second day on one date or too late to finish before
 # midnight, stops on any failure, and resumes where it stopped when run again.
 # The QPU caps (50 s a job, 300 s and 20 jobs in all) are enforced by heavyhex itself.

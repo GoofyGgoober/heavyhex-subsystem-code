@@ -66,7 +66,7 @@ def test_saved_depth_cells_reconstruct_from_forecast_and_device_counts(early):
     assert fragile == 7
 
 
-def test_exact_ml_summary_uses_probabilities_not_legacy_rate_estimator(early):
+def test_exact_ml_summary_matches_decoder_ml(early):
     rows = early.result("decoder_ml.json")["patches"]
     change, gap = [], []
     for patch in rows.values():
