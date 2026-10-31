@@ -5,8 +5,8 @@ title: "Code and data for: Testing quantum memories on IBM hardware"
 abstract: >-
   Code, hardware records and analysis of a project testing how well IBM's
   calibration data predict the errors of heavy-hex subsystem-code memories at
-  distances 3 and 5: fifteen jobs over five days on IBM Fez, with predictions
-  stored before each job, and a follow-up on IBM Kingston with a reset-free
+  distances 3 and 5: fifteen jobs over five days on ibm_fez, with predictions
+  stored before each job, and a follow-up on ibm_kingston with a reset-free
   circuit, lifetime measurements and a raw-readout control.
 authors:
   - given-names: Nadav
@@ -20,4 +20,5 @@ keywords:
   - heavy-hex
   - subsystem code
   - IBM Fez
+  - IBM Kingston
   - calibration-based prediction

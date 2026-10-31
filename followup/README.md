@@ -1,23 +1,26 @@
 # Follow-up on ibm_kingston
 
-Memory experiments (Exp 1), flag and relay controls (Exp 3), and qubit-lifetime
-measurements (life-z and life-t) on `ibm_kingston`, 14 October 2026. Eight jobs used
-86 s of QPU time by IBM's count, including 10 s for the cancelled life-1 job; seven
-returned data. See [Results](#results) and the [circuit and analysis checks](READINESS.md).
-The code imports the unchanged Fez package in `src/`. Each job's records are in
+Eight jobs ran on `ibm_kingston` on 14 October 2026: two memory jobs (`exp1-1`, `exp1-2`),
+three raw-readout jobs on flag, relay and X-ancilla qubits (`exp3-1` to `exp3-3`), and three
+lifetime jobs (`life-1`, `life-z`, `life-t`). They used 86 s of QPU time by IBM's count.
+`life-1` ran past its time limit and was cancelled without data, after IBM had charged 10 s;
+`life-z` and `life-t` then ran its two parts separately. "Fez" below means the main
+experiment on `ibm_fez`. See [Results](#results) and [Checks](#checks). The code imports the
+Fez package in `src/` unchanged. Each job's records are in
 `runs/ibm_kingston-<UTC date>-<job>/`.
 
 | Module | What it does |
 | --- | --- |
-| `circuits.py` | run 1's circuits without mid-circuit resets, and their detectors |
-| `placement.py` | the d=5 footprint and the d=3 patch inside it: thresholds, the score S, weak parts |
+| `circuits.py` | the Fez memory circuits without mid-circuit resets, and their detectors |
+| `placement.py` | the d=5 footprint and the d=3 patch inside it: cutoffs, the placement score S (with T2), weak parts |
 | `submit.py` | the circuits as sent, their cost and caps, the ledger, and each job sent and checked |
-| `native.py` | `submit.py`'s circuits with a fix undone, and run 1's design, for the model |
+| `native.py` | the memory circuits for the model: as sent, with one of the three changes from Fez (twirling, XY4, no resets) undone, and as on Fez |
 | `model.py` | the calibration model on the scheduled circuits, and the predictions |
-| `decoder.py` | matching with capped weights, the single-fault rule, correlated matching, distances |
-| `leakage_control.py` | Exp 3: circuits, readout clouds, the two-state model and the split by cause |
+| `decoder.py` | matching with capped edge probabilities, the rule that lowers the cap until every single fault is corrected, correlated matching, distances |
+| `leakage_control.py` | the raw-readout jobs: circuits, readout clouds, the two-state model and the split by cause |
 | `lifetimes.py` | life-z and life-t: T1 and T2 circuits, their fits, the flips per round, the comparison |
 | `analysis.py` | every job from its folder in `runs/` |
+| `reproduce.py` | the model variants rebuilt from the saved records ([below](#reconstructing-the-input-variants)) |
 
 ## Inspecting the circuits
 
@@ -26,116 +29,83 @@ qiskit-ibm-runtime 0.49.0, samplomatic 0.21.0). Only `--submit` uses QPU time.
 
 ```bash
 python -m followup.submit                  # dry run: build, check and estimate job costs
-python -m followup.submit --predict        # simulate Exp 1 using the current calibration
+python -m followup.submit --predict        # the model's prediction for the memory jobs
 ```
 
-These commands may access IBM's current calibration; they do not reproduce the stored
-forecasts. For the paper, use the saved-input commands below. The `--submit` option sends
-new hardware jobs and is not needed for reproduction. Its checks enforce job order,
-placement and code consistency, noiseless circuit behaviour, and QPU-time caps.
-The stored `exp1-1` prediction uses the calibration available before submission, with
-decoder weights capped at 0.1.
+Both commands read IBM's latest calibration, so they do not reproduce the stored predictions;
+the commands [below](#reconstructing-the-input-variants) work from the saved records. The
+stored `exp1-1` prediction used the calibration available before that job, with decoder
+weights capped at 0.1.
 
-The next job goes only once the one before it has passed its checks: shots and bits as
-planned, distinct IQ points in kerneled readouts, IBM's schedule within 1% of ours, each
-memory circuit's mean detection rate r within what the model's r_M gives with its errors
-three times larger, 1 − 2r ≥ (1 − 2r_M)³ (r_M is 9–19%; a readout that doesn't leave its
-qubit in |m>, or bits read in the wrong order, give r near 1/2), and T1 and T2 at their
-shortest waits, and the idle test read in Z after one round, reading as prepared at least
-75% of the time (92–94% in the model). `--despite-checks` overrides that, by hand. If IBM
-refuses or fails a job, or its data fail their checks, it goes again with a fallback it
-hasn't failed with: `--untwirled` (Exp 1), `--classified` (Exp 3) or `--sampler legacy`
-(untwirled only); the experiment's next job then goes the same way, and `exp1-2` and life-z
-go as `exp1-1` went. So life-z has no fallback of its own: none after a twirled `exp1-1`,
-`--sampler legacy` after an untwirled one. life-t, untwirled, goes with `--sampler legacy`,
-the executor its fallback. A job after one that IBM ended, with
-no fallback left or none wanted, goes with `--despite-checks`; never while that one is
-out.
-
-## Caps
-
-The QPU time of a job is IBM's billing rule, 2.1 s + Σ N (t + 253 µs), and its bound adds
-2.1 s for each 300 circuits beyond the first 300 (each twirl a circuit), should IBM load
-the job in parts. A job may need at most 30 s, life-z and life-t at most 7 s each (life-1
-14 s); the follow-up's jobs at most 90 s, and an optional job may not take them past 80 s,
-which keeps 10 s for a job sent again. IBM cancels a job at 1.5 times its bound plus 2 s, at
-most its cap (8 s for Exp 3, 30 s for Exp 1, 7 s for life-z and life-t), and while it is
-queued it is cancelled if IBM's own
-estimate is over that. The ledger, `runs/ibm_kingston-followup/ledger.json`, claims a job
-before it is sent and counts it at its limit until IBM has counted it; a send whose outcome
-is unknown stays counted until `--fetch` finds the job or, 15 minutes on, releases the
-claim. Every job is tagged `heavyhex-followup`, and a ledger that misses one of IBM's jobs
-with that tag refuses to go on. Independently of the ledger, a job is refused if IBM's
-counter could fall below 285 s (375 s when the 90 s were approved, less them).
+`--submit` sends one job, and only after the previous job's data passed their checks: shot
+counts and readout format as planned, IBM's schedule within 1% of ours, detection rates
+consistent with the model, and the idle and lifetime circuits reading as prepared at their
+shortest waits. It also caps each job's QPU time and the follow-up's total, and records every
+job in `runs/ibm_kingston-followup/ledger.json` before sending it.
 
 ## Lifetimes (life-z, life-t)
 
-The lifetime measurements compare IBM's reported T1 and T2 with direct measurements and
-decay inside the memory schedule. life-z measures the idle test in Z, with the same
-twirling as Exp 1. life-t measures T1 and Hahn-echo T2 at 512 shots per circuit,
-untwirled, through the legacy sampler. IBM charged 5 s for each job. The cancelled
-combined job, life-1, returned no data.
+The lifetime jobs compare IBM's reported T1 and T2 with direct measurements and with the decay
+inside the memory schedule. life-z runs the idle test read in Z, twirled like the memory jobs.
+life-t measures T1 and Hahn-echo T2 at 512 shots per circuit, untwirled, through SamplerV2
+(`--sampler legacy`). IBM charged 5 s for each.
 
-- **The idle test read in Z.** Exp 1's idle test, each CZ a wait as long, with the same
-  pulses, XY4 and twirl, its data starting in |0> or |1> instead of |+> and read in Z;
-  rounds 1, 2, 4, 8, 16, 4 twirls × 256 shots. Twirled, its template is the X test's wire
-  for wire, the data's included: the twirl's layers carry the data's first and last pulses,
-  so only the angles its samplex draws differ.
+- **The idle test read in Z.** The memory jobs' idle test (each CZ replaced by a wait as long,
+  with the same pulses, XY4 and twirl), with the data starting in |0> or |1> instead of |+>
+  and read in Z; rounds 1, 2, 4, 8 and 16, 4 twirls × 256 shots. Twirled, its template matches
+  the X test's wire for wire, data qubits included, because the twirl's layers carry the data's
+  first and last pulses; only the random twirl angles differ.
 - **T1 and T2 as IBM measures them**, on all 65 qubits of the footprint at once: X, a wait
   t, readout; and Hahn's echo, SX, t/2, X, t/2, SX†, readout, the T2 IBM reports. Six waits
   each, 20–450 µs and 12–240 µs, from 0.1 to 2 times the footprint's median T1 and T2 on 13
   October (223 and 121 µs); no decoupling but the echo's X; 2 pieces × 256 shots. The echo
   ends in |1> (SX† after the X), where qiskit-experiments' ends in |0>: P(1) =
-  (1 + e^(−t/T2))/2, the same T2, a static detuning refocused. Echoed all at once,
-  neighbours flip together, so the ZZ between them is not refocused: a factor cos(ζt/2) a
-  neighbour, 0.99 at 240 µs for ζ/2π = 200 Hz, 0.73 for 1 kHz. Where IBM measures T2 with
-  its neighbours quiet, ours can read low on the worst pairs; T1 is untouched.
+  (1 + e^(−t/T2))/2, the same T2, with a static detuning refocused. Because all qubits are
+  echoed at once, neighbours flip together and the ZZ between them is not refocused: a factor
+  cos(ζt/2) per neighbour, 0.99 at 240 µs for ζ/2π = 200 Hz and 0.73 for 1 kHz. If IBM
+  measures T2 with the neighbours idle, ours can read low on the worst pairs; T1 is unaffected.
 
-`analysis.life` reads both back from their folders, with Exp 1's for the in-situ values:
+`analysis.life` reads both back from their folders, with the memory jobs' folders for the
+in-situ values:
 
 - **T1 and T2** per qubit from P(1) = A e^(−t/T) + B, weighted by the binomial variance at
-  the fit, σ widened by √(χ²/dof) above 1. At the median T1 and T2, σ is about 13% of T1
-  (P(1) falls from 1 to 0) and 30% of T2 (from 1 to ½), √2 times life-1's at 1024 shots.
-  Beyond the longest wait T's σ is
-  too small on the low side (at T2 of 1–3 times 240 µs, 10–18% of fits land over 2σ low),
-  while the rate's, σ/T², holds (under 5%). So T is compared in its rate: shown with its
-  1σ range 1/(1/T ± σ/T²), and its distance from IBM's as (1/T_IBM − 1/T)/(σ/T²).
-- **Excited share at rest**, π = (B − r)/(1 − 2r) from T1's B, r IBM's readout error; a
+  the fit, with σ widened by √(χ²/dof) where that is above 1. At the median T1 and T2, σ is
+  about 13% of T1 (P(1) falls from 1 to 0) and 30% of T2 (from 1 to ½), √2 times life-1's at
+  1024 shots. For T beyond the longest wait, σ is too small on the low side (at T2 of 1–3
+  times 240 µs, 10–18% of fits land more than 2σ low), while the rate's σ/T² holds (under 5%).
+  So T is compared through its rate: shown with its 1σ range 1/(1/T ± σ/T²), and its distance
+  from IBM's as (1/T_IBM − 1/T)/(σ/T²).
+- **Excited share at rest**, π = (B − r)/(1 − 2r) from T1's B, with r IBM's readout error; a
   readout that errs δ more often from |1> than from |0> reads it about δ/2 low.
 - **Flips per round** of each data qubit: P(1) after n rounds from |s> fitted to
-  M + D_s λ^n, so p↓ + p↑ = 1 − λ, the decay a round Z memory's data see, pulses included.
-  Only the sum is the qubit's: the twirl's Paulis and XY4 hold a qubit prepared in |1> in
-  |0> half of its time along Z (0.45 with XY4 alone), so the memory's frame settles at
-  (M − r)/(1 − 2r) ≈ ½ whatever the qubit's own split; that ½ is a check, not a finding.
-  The flips that go |0> → |1> are taken as π of them, π from T1's B.
-- **In situ**, each data qubit's T1 and T_q from both idle tests at once (`together`):
+  M + D_s λ^n, so p↓ + p↑ = 1 − λ, the decay per round that Z memory's data see, pulses
+  included. Only the sum belongs to the qubit: the twirl's Paulis and XY4 hold a qubit
+  prepared in |1> in |0> for half of its time along Z (0.45 with XY4 alone), so the memory's
+  frame settles at (M − r)/(1 − 2r) ≈ ½ whatever the qubit's own split, and that ½ checks the
+  frame rather than measuring the qubit. A share π of the flips is taken to go |0> → |1>, with
+  π from T1's B.
+- **In situ**, each data qubit's T1 and T_q (its decay time on the equator, item 7 below)
+  from both idle tests at once (`together`):
   ln r = k_X + ln G − t_eq/T_q − t_Z/T1 read in X and Y, ln c = k_Z + ln G − t_Z/T1 −
   t_eq/T_q read in Z, with c = P(1 | 1) − P(1 | 0), G what the model's pulses and readout
   leave, and 1/T1 ≥ 0, 1/T_q ≥ 1/(2 T1) as the model takes them. A data qubit spends about
   2.9 µs of a round on one axis and 2.3 µs on the other, swapped between the tests, so the
-  tests pin down the decay a round each memory's data see, t_Z/T1 + t_eq/T_q with that
-  memory's t_Z and t_eq (to 6% in Z and 5% in X per qubit with both Exp 1 jobs, in
+  tests pin down the decay per round each memory's data see, t_Z/T1 + t_eq/T_q with that
+  memory's t_Z and t_eq (to 6% in Z and 5% in X per qubit with both memory jobs, in
   simulation), but T1 and T_q apart only to about ±50% and ±40%, correlated near −1.
 - **The comparison:** `lifetimes.table` prints each qubit's T1 and T2 against IBM's (the
   calibration in force when life-t ended), and π; then each data qubit in situ: its flips
-  and |0> → |1> flips a round, the decay a round each memory sees, and T1 and T_q apart;
+  and |0> → |1> flips per round, the decay per round each memory sees, and T1 and T_q apart;
   then the medians of the ratios, among them each memory's decay in situ over the one at
   IBM's T1 and T2. Read the decay, not the split: an ∞ in the split is a rate on its bound,
-  its range beside it.
-- **The model again:** `analysis.exp1(folders, life=folder)`, life-z's folder, runs it with
-  the data's in-situ T1 and T_q and gives O/M against it, for Z memory and X.
-
-Simulated from the model at planted lifetimes and read back as sent, at life-1's 1024 shots,
-the fits return them:
-pulls of 1/T1 −0.19 ± 0.73 and 1/T2 −0.07 ± 0.88 over the 65 qubits (in T, two T2 above
-1.5 times the longest wait came out 3.3σ low; in the rate, 1.4σ high), and of the decay a
-round in situ −0.06 ± 0.90 in Z and +0.23 ± 0.88 in X over the 25 data qubits; the job
-passes its checks. With both simulated Exp 1 jobs, the model at the in-situ values is
-within 3% of the model at the planted ones, and O/M is 0.94–1.05 for each ε.
+  with its range beside it.
+- **The model again:** `analysis.exp1(folders, life=folder)`, with life-z's folder, runs the
+  model with the data's in-situ T1 and T_q and gives the device/model ratio (O/M) against it,
+  for Z memory and X.
 
 ## Circuit and decoder details
 
-1. **Twirls.** Each Exp 1 job runs 16 randomizations × 256 shots of each memory circuit and
+1. **Twirls.** Each memory job runs 16 randomizations × 256 shots of each memory circuit and
    8 × 256 of each idle circuit: 336 circuits per job. The estimated cost is 26.0 s in one
    batch, or 28.1 s if loaded in batches of 300.
 2. **Round length.** A twirled round is 5.81 µs at d=3 and 5.96 µs at d=5 (three slower
@@ -148,24 +118,24 @@ within 3% of the model at the planted ones, and O/M is 0.94–1.05 for each ε.
    | --- | --- |
    | X ancilla that is also a flag, X memory | D_t, D_(t+1), F_t |
    | flag, X memory | D_(t+1), D_(t+2), F_t |
-   | flag in the prep half, X memory | D_0, D_1 |
+   | flag in the preparation half-round, X memory | D_0, D_1 |
    | relay, Z memory | F_t, F_(t+1), D_(t+1), D_(t+2) |
    | flag, Z memory | F_t |
    | last round, second to last | D_(T−1) or D_(T−2), and the final detector |
 
-4. **Prep half.** Its gauge values enter no detector, but its readouts are carried into
-   round 0's values, so a misread there fires round-0 detectors.
-5. **Decoder.** Weights capped at 0.1 define the primary decoder (`decoder.PRIMARY`).
-   The alternatives are cap 0.05, uniform weights and correlated matching. Uniform
-   weights correct every single fault; at d=3 caps 0.1 and 0.05 miscorrect a
-   few fault classes, because data qubits 54 and 72 read out with 4.5–5.2% error, and each
-   time the decoder takes a fault set the model makes likelier than the single fault. The
-   model expects uniform weights to cost ε₃,X about 35% and ε₅,X about 58% against cap 0.1
-   (ε₅,X 5.6% → 8.8%). Single-fault correction alone therefore does not determine the
-   decoder with the lowest total error under this model.
-6. **Z at d=5.** The decoding graph has a logical of 3 edges, two of them remnants of relay
-   and flag faults that stim splits into single detectors, as in run 1; the circuit
-   distance is 5. Correlated matching, reported beside, decodes each such fault's parts
+4. **Preparation half-round.** The other-basis gauges measured once before the first round
+   enter no detector, but their readouts are carried into round 0's values, so a misread
+   there fires round-0 detectors.
+5. **Decoder.** The primary decoder (`decoder.PRIMARY`) caps every edge probability at 0.1;
+   cap 0.05, uniform weights and correlated matching are reported alongside. Uniform weights
+   correct every single fault. At d=3, caps 0.1 and 0.05 miscorrect a few single faults: data
+   qubits 54 and 72 read out with 4.5–5.2% error, and for each such fault the decoder picks a
+   fault set that the model makes likelier than the single fault. In the model, uniform weights
+   raise ε₃,X by about 35% and ε₅,X by about 58% over cap 0.1 (ε₅,X from 5.6% to 8.8%), so
+   correcting every single fault does not give the decoder with the lowest total error.
+6. **Z at d=5.** The decoding graph has a logical path of 3 edges, two of them pieces of relay
+   and flag faults that stim splits into single detectors, as on Fez, while the circuit
+   distance is 5. Correlated matching, reported alongside, decodes each such fault's pieces
    together.
 7. **T_q.** Between a waited CX's H gates a data qubit sits on the Z axis, where only T1
    acts, so the idle test is fitted as ln r = c + ln G(n) − t_eq(n)/T_q, with t_eq the
@@ -173,19 +143,49 @@ within 3% of the model at the planted ones, and O/M is 0.94–1.05 for each ε.
    T1 is IBM's, and an error ΔΓ₁ in it moves 1/T_q by about 0.8 ΔΓ₁; with life-z, T_q and
    T1 are fitted together instead (above).
 8. **Flag and relay records.** A flag or relay value is F_t = f_t ⊕ (its previous readout):
-   a misread fires it twice and a state that keeps reading 1 only at its ends. Their
-   re-firing and two-state fits are compared with the model's own shots, not with run 1's
-   or Exp 3's.
-9. **Exp 3 with 0/1 readout.** Arm C counts changes, so it can't see a state that reads a
-   steady 1: for such a qubit only the CZ part separates, and arm C gives bounds on the
-   reset and readout parts.
-10. **Readout in the model.** A readout flips the record, not the qubit, and the carried
-    qubit doesn't decay during it. Adding T1 over the whole readout raises P_L by at most
-    1–5%.
+   a misread fires it twice, and a state that keeps reading 1 fires it only where the state
+   starts and ends. Their persistence and two-state fits are compared with the model's own
+   shots, not with Fez's or the raw-readout jobs'.
+9. **Readout in the model.** A readout flips the record, not the qubit, and the carried
+   qubit does not decay during it. Adding T1 over the whole readout raises P_L by at most
+   1–5%.
 
-## Reconstruct the paper's input comparisons
+## Checks
 
-From the repository root in the pinned environment, run one variant per command:
+Circuits and decoders:
+
+- With two twirls per circuit, Stim's signed flows match the intended logical circuit.
+  Without noise no detector fires, the logical outcome is correct, and the idle-test data
+  return their prepared value in the measured basis.
+- The Z idle test uses the X test's template wire for wire, data qubits included. The T1 and
+  T2 circuits read 1 without noise, and their waits hold no pulse but the Hahn echo's X.
+- The circuit distance is d in both memories at d = 3 and 5, checked at 2 and 4 rounds; the
+  matching graph's logical paths have 3 and 5 edges in X memory but 3 and 3 in Z memory
+  (item 6 above).
+- At d=3, cap 0.1 miscorrects 2, 3, 5 and 7 single-fault classes in X memory at 1–4 rounds,
+  and 1, 1, 2 and 3 in Z memory; cap 0.05 also miscorrects some, and uniform weights none
+  (item 5 above).
+
+Recovery of planted values from data the model itself generated, a test of the analysis code:
+
+- The memory analysis recovers T_q on the 25 data qubits with pulls −0.18 ± 0.95; fitted ε and
+  Λ are within one standard error of the planted values, and O/M is 0.97–1.04.
+- At life-1's 1024 shots, the lifetime fits recover 1/T1 and 1/T2 on the 65 qubits with pulls
+  −0.19 ± 0.73 and −0.07 ± 0.88, with one of the 130 estimates beyond two standard errors.
+  Taken in T instead of the rate, two T2 above 1.5 times the longest wait came out 3.3σ low
+  (1.4σ high in the rate). The in-situ decay per round has pulls −0.06 ± 0.90 in Z and
+  +0.23 ± 0.88 in X over the 25 data qubits, and the simulated job passes its checks.
+- With both simulated memory jobs, the model at the fitted in-situ T1 and T_q is within 3% of
+  the model at the planted values, and O/M is 0.94–1.05.
+
+Twirling and XY4 leave the idle test sensitive only to the sum of the upward and downward
+flip rates. The in-situ T1 and T_q are strongly anticorrelated, so the decay per round is
+better determined than either lifetime.
+
+## Reconstructing the input variants
+
+`followup/reproduce.py` rebuilds the Kingston model variants from the saved records, one
+variant per command, from the repository root in the pinned environment:
 
 ```bash
 python -m followup.reproduce --variant inputs
@@ -197,45 +197,43 @@ python -m followup.reproduce --variant measured_tq_readout
 python -m followup.reproduce --variant own_test_readout
 ```
 
-Outputs go to `build/followup/<variant>.json`, never `runs/`. Existing outputs are not
-overwritten; choose a new `--output build/followup/<name>.json` for a repeat. The driver
-does not initialize an IBM service or submit jobs. It uses one process, 200,000 simulated
-shots per circuit and seed 0 by default. `--shots` and `--seed` are recorded in the output,
-along with SHA256 fingerprints of its source and the input records.
+Each writes `build/followup/<variant>.json` and refuses to overwrite an existing file; pass
+`--output build/followup/<name>.json` for a repeat. It makes no connection to IBM. Defaults
+are one process, 200,000 simulated shots per circuit and seed 0; the output records `--shots`,
+`--seed` and SHA-256 fingerprints of the script and its input records.
 
-| Variant | Inputs and calculation | Archived comparison |
+| Variant | Inputs and calculation | Compared with |
 | --- | --- | --- |
-| `inputs` | Re-read both Exp 1 jobs and life-z, fit X/Y and Z idle decay, bounded joint fit and unconstrained rate check | `life.json`: `z_idle.summary.joint_on_bound`, `unconstrained_negative`, and per-qubit fits |
-| `ibm` | Exp 1's original calibration and IBM T2 | Original-prior archive: `life.json`, `model.variants.ibm` |
-| `measured_tq` | Replace each data qubit's T2 by the pooled X/Y idle-test T_q | `exp1.json`: `predicted_measured_tq` |
-| `joint` | Replace data T1 and T_q by their bounded joint fit | Original-prior archive: `life.json`, `model.variants.in_situ` |
-| `own_test` | X memory stays at measured T_q; Z memory solves its own decay per round for T1 at the baseline model's effective T_q (already capped at twice IBM's T1), respecting the physical cap again after the change | Original-prior archive: `life.json`, `model.variants.matched` |
-| `measured_tq_readout`, `own_test_readout` | The corresponding model with only readout replaced by life-z's 21:55 calibration | App. F; `life.json`: `model.variants.measured_tq_readout_2155` and `matched_readout_2155` |
+| `inputs` | Re-reads both memory jobs and life-z; fits the X/Y and Z idle decay; bounded joint fit and an unconstrained rate check | `life.json`: `z_idle.summary.joint_on_bound`, `unconstrained_negative`, and per-qubit fits |
+| `ibm` | The memory jobs' calibration, with IBM's T2 | `life.json`: `model.variants.ibm` |
+| `measured_tq` | Each data qubit's T2 replaced by its pooled X/Y idle-test T_q | `exp1.json`: `predicted_measured_tq` |
+| `joint` | Data T1 and T_q replaced by their bounded joint fit | `life.json`: `model.variants.in_situ` |
+| `own_test` | X memory at the measured T_q; for Z memory, each data qubit's T1 solved so that the model matches the Z idle test's decay per round, holding the baseline T_q unless that would break T_q ≤ 2T1 | `life.json`: `model.variants.matched` |
+| `measured_tq_readout`, `own_test_readout` | The `measured_tq` and `own_test` models with only the readout errors replaced by those of the 18:55 UTC calibration, the one life-z ran under | `life.json`: `model.variants.measured_tq_readout_2155` and `matched_readout_2155` |
 
-The hardware decoder defaults to original calibration plus measured T_q, with cap 0.1,
-held fixed across the simulated variants. Each simulated sample uses its own variant's
-priors with the same cap. The Appendix F stored-prior check instead uses
-`--variant ibm --hardware-priors calibration --output build/followup/ibm-stored-priors.json`.
-The uniform-weight comparison uses
-`--variant measured_tq --decoder uniform --output build/followup/uniform.json` on both
-hardware and simulated shots. The decoder never learns from the logical outcomes.
+Times here are UTC; the run records give them in Israel time (UTC+3), so the 18:55 UTC
+calibration is `2155` in field names.
 
-The outputs contain fresh fits, O/M and detector rates, not a rewritten copy of the archival
-summary format. The archived summaries include additional exploratory variants not selected
-here. This driver reconstructs the methods and checks numerical agreement; it is not a
-bit-for-bit regenerator of the historical summary files. Representative twirls and Monte
-Carlo samples can change the last digits. Keep the archived inputs and results unchanged,
-and compare both central values and their conditional statistical errors.
+The device's shots are decoded for every variant with priors from the memory jobs'
+calibration with the measured T_q, capped at 0.1. By default (`--simulation-priors variant`)
+each simulated sample is decoded with its own variant's priors and the same cap, as in
+`life.json` and `exp1.json`. `--variant ibm --hardware-priors calibration --output
+build/followup/ibm-stored-priors.json` decodes the device with the stored prediction's priors
+instead (Table 2, first row), and `--variant measured_tq --decoder uniform --output
+build/followup/uniform.json` uses uniform weights on device and simulated shots. No decoder is
+fitted to the logical outcomes.
 
-On this PC the input reconstruction took about 47 s and the tested 200,000-shot variants
-about 71–73 s, with peak RSS below 0.75 GB. These are observed runtimes, not bounds.
+The outputs hold fresh fits, O/M and detection rates in their own format, and `life.json` and
+`exp1.json` also hold variants that this script does not rebuild. Twirl sampling and Monte
+Carlo noise can change the last digits, so compare central values together with their
+statistical errors. `inputs` takes about 47 s and each 200,000-shot variant about 71–73 s,
+under 0.75 GB.
 
-### Fixed-decoder comparisons used in the paper
+### Fixed-decoder comparisons
 
-The paper's Kingston input columns hold the pooled measured-T_q decoder fixed on both
-hardware and every simulated variant. The original pre-job forecast, which used its own
-calibration priors, is a separate archived control. Reconstruct the fixed-decoder columns
-and the readout sensitivity locally with one process:
+Table 2's rows below the stored prediction, Fig. 6 and the readout re-prediction in the
+write-up decode the device and every simulated variant with one decoder, built from the
+pooled measured T_q:
 
 ```bash
 for variant in ibm joint own_test measured_tq_readout; do
@@ -246,33 +244,31 @@ done
 PYTHONPATH=. python docs/analysis/kingston_checks.py
 ```
 
-The output guard refuses existing files; use a fresh checkout or preserve the earlier
-outputs and choose new paths for a repeat. The collector's four `fixed-*.json` inputs are
-the outputs named above. It writes `docs/analysis/results/kingston_checks.json`, including
-fixed-depth probabilities, exponential residuals, fitted rates and source fingerprints.
-Each simulation takes about 80 seconds and 0.75 GB here; the collector takes seconds.
-The measured-T_q baseline and device counts are read from the immutable archive.
-The default `--simulation-priors variant` retains the original archival reconstruction
-policy described above; it must not be confused with this controlled comparison.
+`kingston_checks.py` reads the four `build/followup/fixed-*.json` files, takes the device's
+counts and the measured-T_q baseline from `runs/ibm_kingston-followup/analysis/exp1.json`, and
+writes `docs/analysis/results/kingston_checks.json`: probabilities by depth, exponential
+residuals, fitted rates and source fingerprints. `docs/analysis/idle_checks.py` (Fig. 6,
+bottom) also reads `build/followup/fixed-joint.json`. Each simulation takes about 80 s and
+0.75 GB; the collector takes seconds.
 
 ## Results
 
 The eight jobs went on 14 October between 18:08 and 19:41 UTC: exp3-1 to exp3-3 (4 s each),
-exp1-1 and exp1-2 (27 s each), life-1 (cancelled by IBM, 10 s charged, no shots), life-z and
-life-t (5 s each), 86 s by IBM's count (the ledger, rounding life-z's estimate up, has 87 s).
-Each job's record is in `runs/ibm_kingston-2026-10-14-<job>/` (life-t's ends in
-`-life-t-legacy`); the ledger and the analyses are in `runs/ibm_kingston-followup/`:
+exp1-1 and exp1-2 (27 s each), life-1 (cancelled, 10 s charged, no shots), life-z and life-t
+(5 s each), 86 s by IBM's count (the ledger, rounding life-z's estimate up, has 87 s). Each
+job's record is in `runs/ibm_kingston-2026-10-14-<job>/` (life-t's ends in `-life-t-legacy`);
+the ledger and the analyses are in `runs/ibm_kingston-followup/`.
 
 | File | What it holds |
 | --- | --- |
-| `analysis/exp1.json` | ε and Λ by decoder, the model before the run and at the measured T_q, O/M, detection rates, flag and relay records, run 1 refitted on rounds 1–4 |
+| `analysis/exp1.json` | ε and Λ by decoder, the model before the run and at the measured T_q, O/M, detection rates, flag and relay records, Fez refitted on rounds 1–4 |
 | `analysis/exp3.json`, `exp3_iq_A.png`, `exp3_iq_B.png` | readout clouds, two- and three-state fits, onsets by cause, the hypotheses |
-| `analysis/life.json` | T1 and Hahn T2 against IBM's, the Z idle test's flips per round, the data's in-situ T1 and T_q, Exp 1's model at them |
+| `analysis/life.json` | T1 and Hahn T2 against IBM's, the Z idle test's flips per round, the data's in-situ T1 and T_q, the memory jobs' model at them |
 
 `life.json` holds seven T1 values written as `Infinity` (Python's json, not strict JSON):
 in-situ fits on the bound 1/T1 = 0. Strict parsers need them mapped to null.
 
-**Exp 1.** Binomial fits over rounds 1–4, cap 0.1, both jobs pooled (8192 shots a circuit),
+**Memory.** Binomial fits over rounds 1–4, cap 0.1, both jobs pooled (8192 shots a circuit),
 Λ = ε₃/ε₅:
 
 | | ε₃ | ε₅ | Λ |
@@ -282,58 +278,64 @@ in-situ fits on the bound 1/T1 = 0. Strict parsers need them mapped to null.
 | O/M, prediction before the run (X; Z) | 1.98; 1.51 | 1.62; 1.12 | 1.22; 1.35 |
 | O/M, model at the measured T_q (X; Z) | 1.69; 1.25 | 1.69; 1.22 | 1.00; 1.02 |
 
-- Run 1 refitted the same way gives 12.4% and 22.7% (X), 15.9% and 29.5% (Z): ε here is
-  0.40–0.53 of run 1's. On Kingston's calibration the model puts the design change alone at
-  0.71 and 0.61 (X), 0.80 and 1.08 (Z). Chip and circuit changed together, so the hardware
-  reduction cannot be assigned to individual changes.
-- The model at the measured T_q puts Λ's central value near the device's and misses ε by
-  1.2–1.7 (1.18–1.34 with uniform weights). These are diagnostics using measured decay,
-  distinct from the stored calibration prediction. IBM's 20:27 readout errors for
-  data 72 and 12 (20.2% and 18.5%) did not hold
-  during the jobs (21:55: 5.1% and 4.4%, and the idle tests put them near 5%); the model with
-  21:55's readout is in `readout_sensitivity`. With it, Λ_X's O/M changes from
-  1.00 ± 0.07 to 0.92 ± 0.05: a shift of 0.08 from changed inputs, separate from the
-  conditional statistical errors. The fitted T_q also moves between jobs.
+Here the device is decoded with the measured-T_q priors in both O/M rows; Table 2's first row
+decodes it with the stored prediction's own priors.
+
+- Fez fitted the same way gives 12.4% and 22.7% in X memory and 15.9% and 29.5% in Z, so ε
+  here is 0.40–0.53 times Fez's. On Kingston's calibration the model puts the effect of the
+  circuit changes alone at 0.71 and 0.61 (X) and 0.80 and 1.08 (Z). The chip and the circuit
+  changed together, so the measured reduction cannot be split between them.
+- With the measured T_q the model's Λ is close to the device's, but its ε is low by factors
+  of 1.2–1.7 (1.18–1.34 with uniform weights). IBM's 17:27 UTC calibration gave data qubits
+  72 and 12 readout errors of 20.2% and 18.5%; the 18:55 UTC calibration gave 5.1% and 4.4%,
+  and the idle tests put both near 5%. With the later readout errors (`readout_sensitivity`
+  in `exp1.json`), Λ_X's O/M moves from 1.00 ± 0.07 to 0.92 ± 0.05, a change of 0.08 from the
+  inputs alone that the quoted statistical errors do not include. The fitted T_q also moves
+  between the jobs.
 - T_q in the circuit (XY4, twirled) is 0.74 of IBM's T2 (median); qubits 86, 88, 48 and 10,
   weak by IBM's T2, are not weak in the circuit.
-- Flags still persist without resets: lag-1 re-firing 0.12 against the model's 0, onset
-  1.3–1.5% a round, lifetime 24–30 µs (T_p = −τ/ln(1 − b), as for run 1).
+- Flags still persist without resets: lag-1 persistence 0.12 against the model's 0, onset
+  1.3–1.5% per round, lifetime 24–30 µs (T_p = −τ/ln(1 − b), as on Fez).
 
-**Lifetimes.** T1 agrees with IBM's: median ratio 0.97 (quartiles 0.75–1.23), 14 of 65 beyond
-3σ. Hahn T2, echoed on all 65 qubits at once, is 0.31 of IBM's, with an added Gaussian
-decay consistent with unrefocused ZZ coupling. No model uses it. The Z idle test's data lose 5.3% a
-round (median), 1.12 times the model. A common physical fit to both idle tests puts 17 of
-25 data qubits on a boundary; unconstrained, 14 have negative pure-dephasing rates, seven
-beyond two standard errors. The constrained fit cannot reproduce both decays. Its Z-memory
-O/M is 1.13 and 1.15. Each memory at its own test's decay per round
-(`matched`) brings Z memory's O/M to 1.00 and 1.08; X memory's own test is the one T_q comes
-from, so that measured idle decay does not account for its excess. `matched` holds the
-X-memory model fixed and solves a separate Z-memory effective decay, not one physical
-model that fits both tests. Stabilizer detectors fire
-1.2–1.5 times the
-model's in both memories and final detectors about as often (X: 1.07 and 1.10 with 21:55's
-readout). This is consistent with errors during the rounds, including ancilla-side
-processes, but the idle test lacks active neighbours and data–ancilla gates. In Z memory
-the extra detections cost little ε, so the detection rates alone do not locate X's excess.
+**Lifetimes.** T1 agrees with IBM's: median ratio 0.97 (quartiles 0.75–1.23), with 14 of 65
+qubits beyond 3σ. The Hahn T2, echoed on all 65 qubits at once, is 0.31 of IBM's, with an added
+Gaussian decay consistent with unrefocused ZZ coupling; no model uses it. In the Z idle test
+the data qubits flip with probability 5.3% per round (median), 1.12 times the memory jobs'
+model. One physical fit to both idle tests puts 17 of the 25 data qubits on a constraint
+boundary; without the constraints, 14 need negative pure-dephasing rates, seven of them by more
+than two standard errors. The constrained fit cannot reproduce both decays, and with it the
+Z-memory O/M is 1.13 and 1.15. Giving each memory its own idle test's decay per round
+(`matched`) brings Z memory's O/M to 1.00 and 1.08; this holds the X-memory model fixed and fits
+a separate effective decay for Z memory, so it is not one physical model of both tests. X
+memory's own test is the one T_q comes from, so the measured idle decay does not explain X
+memory's excess. These O/M use each variant's own decoder priors; Table 2 holds one decoder
+fixed. Stabilizer detectors fire 1.2–1.5 times as often as in the model in both memories, and
+final detectors about as often as in the model (X memory: 1.07 and 1.10 with the 18:55 UTC
+readout errors). The excess is consistent with errors during the rounds, including on the
+ancillas, that the idle test cannot see, since it has no active neighbours and no data–ancilla
+gates. In Z memory the extra detections cost little ε, so detection rates alone cannot locate X
+memory's excess.
 
-**Exp 3.** Readouts outside the 0 and 1 clouds are 0.02–0.18%, and the cluster test finds a
-third cluster on one to four of the ten qubits per arm. The persistent state
-reads as 1 about 60% and 0 about 30% of the time, on the computational clouds. There is no
-calibrated |2> reference, so this does not exclude leakage of the measured qubit.
-Onset a cycle: 0.26% without CZs, 0.71% with them (0.09%
-per CZ), 0.11% without reset; a reset adds about 0.04%. Lifetime 32–40 µs (run 1: 31 µs).
-Qubits that share a CZ partner have correlated fitted occupations (0.13 against 0.009), which
-is consistent with a partner's state or a frequency shift, including a TLS. The source
-remains unresolved. The historical three-state estimates are not used in the paper.
+**Raw readout.** Ten flag, relay and X-ancilla qubits ran 30 cycles of H, a wait, H, readout and
+reset, with the raw IQ signal recorded. Arm A is the reference, arm B adds CZs with each qubit's
+usual partners, and arm C drops the resets. Readouts outside the 0 and 1 clouds are
+0.02–0.18%, and a cluster test finds a third cluster on one to four of the ten qubits per arm.
+In the persistent state the signal reads as 1 about 60% of the time and as 0 about 30%, inside
+the 0 and 1 clouds; without a calibrated |2> reference this does not rule out leakage of the
+measured qubit. The state starts in 0.26% of cycles without CZs and 0.71% with them (0.09% per
+CZ), and in 0.11% without resets; a reset adds about 0.04%. It lives 32–40 µs (Fez: 31 µs).
+Qubits that share a CZ partner have correlated fitted occupations (0.13, against 0.009 for
+other pairs), consistent with the partner's state or with a frequency shift, for example from a
+two-level-system (TLS) defect. The source is still open. `exp3.json` also holds three-state
+fits that the write-up does not use.
 
-Reconstruct the paper's retained raw-IQ summaries directly from the three NPZ archives:
+The write-up's raw-readout numbers come from `docs/analysis/kingston_iq.py`, which refits the
+two-state hidden Markov models from the three jobs' `results.npz` files:
 
 ```bash
 PYTHONPATH=.:src:docs/analysis OPENBLAS_NUM_THREADS=1 python docs/analysis/kingston_iq.py
 ```
 
-This refits the two-state HMMs and writes `docs/analysis/results/kingston_iq.json`, including
-both reference histograms and same-shot/cycle posterior correlations. It does not read
-the extended `exp3.json` summaries, which `exp3_analysis` did not itself generate.
-The legacy archive is preserved unchanged. Neither a two-state fit nor a one-dimensional
-IQ projection identifies a physical transmon level.
+It writes `docs/analysis/results/kingston_iq.json`, with both reference histograms and the
+same-shot and same-cycle correlations between qubits. It does not read `exp3.json`, part of
+which `exp3_analysis` does not write.
