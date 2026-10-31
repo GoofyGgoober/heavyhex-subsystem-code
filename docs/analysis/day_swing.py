@@ -1,4 +1,4 @@
-"""Where the day-to-day swing of placement 1's predicted Λ_X comes from (Sec. days).
+"""Where the day-to-day swing of placement 1's predicted Λ_X comes from.
 
 Pair 1 ran on the same qubits every day, and its predicted Λ_X moved between 0.54 (day 1)
 and 0.82 (day 2) while the measured value stayed constant. Here the frozen run.predict is run

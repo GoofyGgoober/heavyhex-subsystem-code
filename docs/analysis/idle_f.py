@@ -379,7 +379,7 @@ def correction(jobs: dict, per: list, ratios: list, combined: dict) -> dict:
             "median_of_job_medians": float(np.median(meds)),
             "chi2_per_dof_range": span([r[f"chi2_per_dof_{ver}"] for r in job_rows.values()]),
             "weighted_mean_range": span([r[f"weighted_mean_{ver}"] for r in job_rows.values()]),
-            "f_range_by_day (Table days)": {d: span(v) for d, v in sorted(by_day.items())},
+            "f_range_by_day": {d: span(v) for d, v in sorted(by_day.items())},
         }
 
     per_qubit_out = {

@@ -1,11 +1,11 @@
-"""The leakage-aware simulation's numbers (Sec. leakage, Table rerun), from the committed runs.
+"""The leakage-aware simulation's numbers, from the committed runs.
 
 exact (the leakage model simulated exactly, exact_sim.py):
   grids        every point's loss (leakage_grid_<channel>.json), the best point, which of its
                parameters sit on an edge of the points run, the loss profile (minimum over the
                other two parameters) and the slices through the best point, the Monte Carlo
                spread of the loss (seed replicates), the round-conditioned (per-slot) loss
-  reruns       Table rerun (device, calibration model, leakage model; means over the ten
+  reruns       the rerun table (device, calibration model, leakage model; means over the ten
                repetitions) and the Z-memory gap closure and X-memory overshoot over all ten
                repetitions, the three of the grid fit and the seven others, with the
                prespecified weighted-log fit of eps and with the binomial fit, and where the
@@ -20,7 +20,7 @@ exact (the leakage model simulated exactly, exact_sim.py):
                tableau_ref.py (leakage_frame_grid_bitflip_exact-identity_paper.json) and exact_sim.py
 
 frame (the frame simulator, as first run):
-  frame_binomial  Table rerun under both estimators, from leakage_frame_counts.json
+  frame_binomial  the rerun table under both estimators, from leakage_frame_counts.json
   frame_heldout   the closures on the grid fit's three repetitions and the seven others, and
                   the 120 three/seven splits
 
@@ -83,7 +83,7 @@ def load_wls(path: Path, variant: str) -> dict:
 
 @cache
 def frame_binomial() -> dict:
-    """Table rerun (device, calibration model, frame-simulated leakage model fit-bitflip) under
+    """The rerun table (device, calibration model, frame-simulated leakage model fit-bitflip) under
     the weighted-log and the binomial fit, from the regenerated counts."""
     rr = result("leakage_frame_counts.json")
     ref = result("fits.json")
@@ -455,7 +455,7 @@ def print_rerun(name: str, est: str, r: dict) -> None:
     a = r["all"]
     print(f"\n-- {name}, {est} eps (means over 10 repetitions) --")
     print(
-        "   Table rerun: "
+        "   rerun table: "
         + "; ".join(
             f"{b} eps{p} dev {100 * a[f'{b} d{p}']['device']:.1f} model {100 * a[f'{b} d{p}']['model']:.1f} "
             f"leak {100 * a[f'{b} d{p}']['leak']:.1f}"

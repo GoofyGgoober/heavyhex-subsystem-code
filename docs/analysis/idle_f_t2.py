@@ -1,4 +1,4 @@
-"""What the idle test's f looks like, and how it depends on T2 (App. f figure, Sec. agreement).
+"""What the idle test's f looks like, and how it depends on T2.
 
 Reads only committed inputs: runs/*/analysis.json and calibration.json, results/idle_f_inputs.json
 (idle_f.py's cache of <X>, <Y> and the exact references) and results/perqubit_f_decode.json.
@@ -461,7 +461,7 @@ def decode() -> dict:
 def main() -> None:
     inputs = read(RESULTS / "idle_f_inputs.json")
     out = {
-        "what": "App. f figure and Sec. agreement: the idle-test decay against its f = 0 and f = 1 "
+        "what": "The idle-test decay against its f = 0 and f = 1 "
         "references; f against reported T2 per physical qubit; f from memory against the idle "
         "test; per-qubit-f priors in decoding. f is the prespecified per-qubit estimate.",
         "decay": decay(inputs),

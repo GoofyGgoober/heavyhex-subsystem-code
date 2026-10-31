@@ -1,5 +1,5 @@
 {
- "what": "observed over predicted (binomial fit) under each treatment of f: geometric mean over the ten pair-days, Student t 95% interval on five daily log means (4 dof), pointwise and Bonferroni simultaneous intervals over the five quantities within each fixed input treatment; conditional on sampled patches and fixed model inputs; earlier pair-day and placement-specific intervals retained; each pair's means; every curve",
+ "what": "observed over predicted (binomial fit) under each treatment of f: geometric mean over the ten pair-days, Student t 95% interval on five daily log means (4 dof), pointwise and Bonferroni simultaneous intervals over the five quantities within each fixed input treatment; conditional on sampled patches and fixed model inputs; also the pair-day and placement-specific intervals, each pair's means and every curve",
  "table": {
   "f = 1, stored before the job": {
    "X eps3": {

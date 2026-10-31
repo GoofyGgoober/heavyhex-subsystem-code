@@ -1,4 +1,4 @@
-"""What the errors of IBM's reported inputs add to sigma_M of the X tests (Sec. tests, App. robust).
+"""What the errors of IBM's reported inputs add to sigma_M of the X tests.
 
 The prespecified sigma_M (Eq. z) takes the reported calibration as exact. If the model is right
 with the device's true inputs, the reported ones are estimates, and their errors move each
@@ -21,8 +21,8 @@ distance-3 patch lies inside placement 1, pair 1's distance-5 patch, every day).
              mechanisms rebuilt from their faults match stim's to 1e-9). Only the mechanisms of
              the patch whose failure is counted enter. Two independent halves of the shots, A
              and B, so that a sum of squares is estimated as sum e^A e^B, without its noise.
-             e_i then follows through the fit of Eq. (fit) linearised at the predicted curve
-             (weights of Eq. wlvar; the binomial fit has the same first order).
+             e_i then follows through the weighted-log fit, linearised at the predicted curve
+             (the binomial fit has the same first order).
   check      sum_i e_i with every rate times k (T1 and T2 divided by k) against error_scale.py's
              d ln eps / d ln k at k = 1, curve by curve
   inputs     sigma_i = sd of ln x_i, three cases: (shot) the readout errors' binomial error from

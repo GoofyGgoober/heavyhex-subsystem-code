@@ -1,6 +1,5 @@
 """The tests fixed before the run, under both choices of sigma_f, with the pooled verdict, the
-pairs' table and what the tests could detect (Sec. tests, Sec. results, the tables of rules and
-of pairs, Fig. lambda (b), App. stats).
+pairs' table and what the tests could detect.
 
 A pair-day is one pair on one day (the software's "rep"). Pair 1 ran both patches in one job,
 pair 2 in two. Nothing is simulated or refitted: everything comes from runs/combined.json, the

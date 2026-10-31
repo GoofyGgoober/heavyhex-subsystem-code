@@ -8,7 +8,7 @@ The base odds behind the excess are written too: the fraction of rounds in which
 or relay fires, and P(fires at r + L | quiet at r) and P(fires at r + L | fired at r)
 themselves, each averaged over series in the same way. Chip numbers repeat exactly; the
 model's come from stim-sampled shots (seed 6), which repeat only with the same stim build.
-Z memory is the paper's Fig. leak (a); X memory (common.readout_model) is its replication.
+Z memory is the main case; X memory (common.readout_model) is its replication.
 A few minutes.
 
     python docs/analysis/refiring.py              # Z memory: results/refiring.json

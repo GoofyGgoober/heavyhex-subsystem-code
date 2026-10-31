@@ -1,4 +1,4 @@
-"""Fig. observed against predicted: the logical error per round of all 40 Fez curves and of
+"""Observed against predicted: the logical error per round of all 40 Fez curves and of
 the four Kingston ones.
 
 One point per curve: the device's eps from the binomial fit, with its 68% interval, against the

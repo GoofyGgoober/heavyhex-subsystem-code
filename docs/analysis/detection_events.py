@@ -1,4 +1,4 @@
-"""Detection-event fractions, device against model, by detector class and round (Fig. detfrac, Sec. agreement).
+"""Detection-event fractions, device against model, by detector class and round.
 
 The detection-event fraction of a detector is the share of shots in which it fires. For every
 job and memory circuit it is read from analysis.json: the device's ("observed") and the
@@ -9,7 +9,7 @@ that t = 1 compares with the prepared value; t = n + 1 is the final layer from t
 
   rounds     per placement (or both), basis, distance and class, the 8-round circuits: the
              mean fraction over the class's detectors in each round t, device and model, mean
-             over the days (plus or minus the SE over the days) (Fig. detfrac)
+             over the days (plus or minus the SE over the days)
   bulk       the same over rounds t = 2..n of the 8-round circuits: device / model per class
   detectors  every detector of every memory circuit of the 15 jobs (14,280): device / model per
              detector by class, basis and distance: median, quartiles, share above one, and

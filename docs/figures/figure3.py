@@ -1,7 +1,7 @@
 """The pre-run planning figure: simulated Λ on Fez as placed, and with parts made better.
 
 Simulated before the run (figure3.json, which the paper's pre-run section quotes). Its
-code.commit, 1c86fce, is the commit before the history was rewritten (now 375462e).
+code.commit, 1c86fce, predates the history rewrite; docs/commit-map.tsv maps it to 227a892.
 
 Every row runs what the run runs: the patches where fez_qubits puts them on the
 given calibration, both in one circuit, translated by for_fez with the

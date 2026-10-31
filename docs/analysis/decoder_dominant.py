@@ -1,4 +1,4 @@
-"""Which single faults the calibrated decoder miscorrects most, by probability (App. decoder).
+"""Which single faults the calibrated decoder miscorrects most, by probability.
 
 decoder_faults.py counts the single faults that calibrated matching gets wrong; here they are
 weighted by their probability and traced to the circuit. For the X-memory distance-3 patch of

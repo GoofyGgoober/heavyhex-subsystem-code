@@ -1,4 +1,4 @@
-"""Two few-fault patterns the calibrated decoder gets wrong, opened up (App. decoder).
+"""Two few-fault patterns the calibrated decoder gets wrong, opened up.
 
 Day 5 (runs/ibm_fez-2026-10-08-r1), two-round memory circuits, the model built by
 Job.model, decoded by run._decode. The faults are forced into a noiseless copy of the

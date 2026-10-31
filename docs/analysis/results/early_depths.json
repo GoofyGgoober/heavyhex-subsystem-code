@@ -1,5 +1,5 @@
 {
- "what": "Primary fixed-depth comparison; paired placements averaged within each day; five-day mean probability differences and approximate simultaneous 95% t4 intervals over 16 cells. Leave-one-day-out uses t3 on four days, a precision sensitivity diagnostic, not independent tests. Fixed archived forecast, inputs and placements; no future prediction coverage.",
+ "what": "Primary fixed-depth comparison; paired placements averaged within each day; five-day mean probability differences and approximate simultaneous 95% t4 intervals over 16 cells. Leave-one-day-out uses t3 on four days, a precision sensitivity diagnostic, not independent tests. The forecast, inputs and placements are those stored before the run; the intervals are not prediction intervals for new runs.",
  "cells": {
   "X3": {
    "1": {
@@ -845,6 +845,6 @@
    0.027584311065132205,
    0.11062684215464952
   ],
-  "note": "Uses archived depth probabilities, not the old unweighted log-slope rates"
+  "note": "Uses the stored failure probabilities at each depth, not log-slope rates"
  }
 }

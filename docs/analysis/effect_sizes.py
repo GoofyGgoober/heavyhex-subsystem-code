@@ -1,6 +1,5 @@
 """How far the model is from the device, and what the agreement test could see, from stored
-results only (Sec. agreement, the model-versus-device table and its ratios; Table placement;
-App. stats).
+results only.
 
 The prespecified test, chi2 = sum_i z_i^2 with z = (O - M) / sqrt(sigma_O^2 + sigma_M^2), answers
 pass or fail. This script measures the misses and what the test could have seen. O/M is observed
@@ -23,7 +22,7 @@ over predicted; a repetition is one day and placement (repetition 1 is placement
              constant, sigma_O only, against O_i = c M_i with sigma_i^2 = sigma_O,i^2 + c^2
              sigma_M,i^2 (4 dof each); Pearson r with a Fisher interval; each day left out
   prejob     the observations against the predictions stored before each job at f = 0 and f = 1
-  table      Table placement under one convention: every cell the plain mean over the five days,
+  table      the placement table under one convention: every cell the plain mean over the five days,
              error sqrt(sum sigma_i^2) / 5, times sqrt(chi2/nu) when chi2/nu > 1 (nu = 4), sigma_i
              each estimator's own (the WL bootstrap sd in Z memory); the inverse-variance means
              beside it
@@ -33,7 +32,7 @@ over predicted; a repetition is one day and placement (repetition 1 is placement
              stored counts on other windows of rounds
   selection  the excess per round in percentage points at d = 3 and d = 5, and the fixed
              (placement 1) against the re-selected (placement 2) d = 3 patch
-  pool       the prespecified ten-repetition pool and its prediction (App. stats record)
+  pool       the prespecified ten-repetition pool and its prediction
 
 Reads runs/combined.json, results/fits.json, results/fits_counts.json, results/power.json and the
 jobs' analysis.json; no simulation; a few seconds in one process.

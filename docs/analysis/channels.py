@@ -1,5 +1,5 @@
 """Each error channel's factor with widened intervals, one factor for both bases, and two
-channels fitted together (Sec. where, Table budget, App. budget).
+channels fitted together.
 
 error_budget.py gives, per basis, distance and channel, the factor k on that channel alone that
 gives the device's eps (one least-squares k over the ten curves) and its mean bulk stabilizer
@@ -15,7 +15,7 @@ detection rate (one k per curve). Here:
               (T - 1 dof), and z of ln k_Z - ln k_X. The eps and detection-rate targets of one
               basis and distance come from the same shots; placements also share days/qubits.
               No joint covariance is estimated, so these p values are nominal diagnostic
-              scores, not calibrated channel-selection tests in the current paper.
+              scores, not calibrated channel-selection tests.
   two         two channels fitted together to both bases at both distances (four eps targets,
               two factors): dephasing while idle with CZ, and with T1 decay while idle.
               Dephasing cannot flip Z memory's logical value (switching it off moves Z eps by

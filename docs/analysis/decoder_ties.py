@@ -1,4 +1,4 @@
-"""How many of the uniform-weight miscorrections are ties (App. decoder).
+"""How many of the uniform-weight miscorrections are ties.
 
 The fault patterns of decoder_faults.py, decoded on the same matching graph with every
 weight 1 and with weights 1 + 1e-3 U(-1, 1) (twelve jitter seeds). A pattern that some

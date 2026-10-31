@@ -1,4 +1,4 @@
-"""Medians and ages of IBM's calibration that the paper quotes (Sec. model, Sec. leakage).
+"""Medians and ages of IBM's calibration that the paper quotes.
 
   single_qubit   by day, the median single-qubit (SX) error over the chip's working qubits, its
                  ratio to the median CZ error (runs/*-r1/calibration.json), and the model's noise

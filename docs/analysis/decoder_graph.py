@@ -1,13 +1,10 @@
-"""Three checks of the decoder's matching graph (App. decoder): Stim's observable-only pieces,
+"""Three checks of the decoder's matching graph: Stim's observable-only pieces,
 single faults on a partially homogenized chip, and the shortest logical path in edges.
 
-The legacy result key "uniform" uses noisy.typical: CZ, readout, T1 and T2 are
-homogenized, but single-gate errors retain per-qubit values. The current paper uses
-the actual-job graph/decomposition checks, not this counterfactual's fault counts
-or its legacy log-linear rate-normalized shares.
-The actual-job `share_of_predicted_Z_eps3` fields are also only isolated-fault
-probability mass divided by eight rounds and the legacy fitted rate. They are
-neither rate contributions nor upper bounds and are not used in the current paper.
+The result key "uniform" holds the partially homogenized chip below. Each job's
+`share_of_predicted_Z_eps3` is the probability of the pieced faults that matching miscorrects
+alone, per round of Z memory, over the job's predicted Z eps3 (runs/combined.json): a
+first-order scale, neither a part of that rate nor a bound on it.
 
 Pieces. With decompose_errors=True Stim writes a fault that fires more than two detectors as
 pieces of at most two detectors each. In distance-3 Z memory one fault per round has no split
@@ -30,14 +27,14 @@ The distance-3 Z-memory single-fault scan of decoder_faults.py is repeated to se
 miscorrections are these faults.
 
 Partially homogenized chip. CZ, readout, T1 and T2 at the day's median (noisy.typical),
-single-gate errors still per qubit, f = 1 and decoupled
-idles, as in uniform_scale.py (day 5) and figure3.py (day 1): each single fault of the
-decomposed detector error model decoded alone, in the pre-run simulator (noisy.noisy_circuit,
-one patch) with f = 1, f = 0 and the idle noise removed, and in the per-job model of the day's
-first job (common.Job.model with the uniform calibration). Mechanisms are counted as
-decoder_faults.py counts them, lines of the decomposed model, and also by distinct symptom.
-The legacy rate-normalized diagnostic divides isolated miscorrected probability by rounds
-and simulated eps3 (noisy.decay, 20,000 shots, as uniform_scale.py); it is not a rate share.
+single-gate errors still per qubit, f = 1 and decoupled idles, as in uniform_scale.py (day 5)
+and figure3.py (day 1): each single fault of the decomposed detector error model decoded alone,
+in the pre-run simulator (noisy.noisy_circuit, one patch) with f = 1, f = 0 and the idle noise
+removed, and in the per-job model of the day's first job (common.Job.model with the uniform
+calibration). Mechanisms are counted as decoder_faults.py counts them, lines of the decomposed
+model, and also by distinct symptom. Their miscorrected probability per round is also given
+over the simulated eps3 (noisy.decay, 20,000 shots, as uniform_scale.py), again a scale, not a
+part of that rate.
 
 Path. The fewest edges of the matching graph that flip the logical value without a detection
 event (breadth-first over node and parity, as decoder_weights.py's hops), every circuit, with
@@ -556,7 +553,7 @@ def summary(per_job: list[dict], uniform: dict) -> dict:
                 examples[j["name"]] = row["example_faults"]
             if setting == "Z8":
                 job = names[j["name"]]
-                # Historical first-order scale only, not a bound on fitted eps3.
+                # Miscorrected mass per round over the predicted eps3: a scale, not a bound.
                 mass = sum(f["p"] for f in row["faults"] if f["calibrated_wrong"])
                 eps3 = combined[(job.day, job.rep)]["tests"]["Z eps3"]["predicted"]
                 share.append(

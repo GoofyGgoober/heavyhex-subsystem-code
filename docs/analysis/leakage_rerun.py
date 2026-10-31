@@ -1,4 +1,4 @@
-"""Table rerun's leakage column with an exact simulation of the leakage channel.
+"""The rerun table's leakage column with an exact simulation of the leakage channel.
 
 Simulates every job's memory circuits (both bases, every round count) at the given leakage
 parameters with exact_sim.py, decodes them as leakage_frame_rerun.py does (R._decode, the

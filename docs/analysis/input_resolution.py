@@ -1,4 +1,4 @@
-"""How precisely IBM's reported readout errors pin the model's inputs (Sec. model).
+"""How precisely IBM's reported readout errors pin the model's inputs.
 
 Every reported readout error in runs/*/calibration.json is a whole number of 1/8192, and every
 P(1|0) and P(0|1) in results/properties.json a whole number of 1/4096: each comes from 4096

@@ -1,4 +1,4 @@
-"""The calibration model with Harper et al.'s mid-circuit reset and readout errors, on day 1 (Sec. leakage, resets and readout).
+"""The calibration model with Harper et al.'s mid-circuit reset and readout errors, on day 1.
 
 The model gives each reset and each readout the qubit's reported readout error. Ref. harper2026
 fitted a noise model to Heron r2 data and found a reset error of 7.5% and a classical readout

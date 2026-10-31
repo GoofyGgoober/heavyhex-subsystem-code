@@ -1,4 +1,4 @@
-"""What the idle test sees of the memory circuits' idle noise (Sec. pred, App. f).
+"""What the idle test sees of the memory circuits' idle noise.
 
 * How often the ancilla, flag and relay readouts read 1, per job, in the idle circuits and in
   the memory circuits. In the idle circuits every CX is a wait, so the ancillas stay near |0>

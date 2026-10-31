@@ -1,4 +1,4 @@
-"""Edge probabilities learned from the detection events, against the model's (Sec. agreement, App. decoder).
+"""Edge probabilities learned from the detection events, against the model's.
 
 For every job and both bases, the 6- and 8-round circuits: each edge of the decoder's matching
 graph (the calibration model at the job's measured f) gets p_ij from the device's detection
@@ -31,7 +31,7 @@ detectors are counted the same way on both sides.
              rounds hold every edge type of the shorter circuits except, in the one-round
              circuit, those from round 1 to the final layer.
   matrix     the device's and the model's p_ij for every pair of detectors of placement 1's
-             distance-3 patch, eight rounds, both bases, mean over the five days (Fig. pij)
+             distance-3 patch, eight rounds, both bases, mean over the five days
 
 Edges that touch the distance-5 Z-memory stabilizers are not estimated (detectors.saturated).
 

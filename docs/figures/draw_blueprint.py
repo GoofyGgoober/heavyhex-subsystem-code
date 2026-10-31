@@ -330,7 +330,7 @@ def draw_d3_device(ax: Axes, device: DeviceMap, d3: HeavyHexLayout, roles: dict)
         )
     ax.set_xlim(left, right)
     ax.set_ylim(top, bottom)
-    ax.set_title("(b) d=3 coupling layout — every link is a real fez bond", fontsize=10)
+    ax.set_title("(b) d=3 coupling layout on Fez's couplers", fontsize=10)
 
 
 def draw_d3_operator_table(ax: Axes, d3: HeavyHexLayout) -> None:
@@ -779,7 +779,7 @@ def draw_legend(fig: Figure) -> None:
                 label="dashed = stabilizer (red X, blue Z)",
             ),
             Line2D([], [], color=GREEN, lw=3, label="$X_L$ (solid), $Z_L$ (dotted)"),
-            dot("#CFCFCF", "unused fez qubit", markeredgecolor=GREY, markersize=7),
+            dot("#CFCFCF", "unused Fez qubit", markeredgecolor=GREY, markersize=7),
         ],
         loc="lower center",
         ncol=5,

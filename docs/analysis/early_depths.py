@@ -2,9 +2,9 @@
 
 Device and forecast both use f=1 priors. Average the two placement differences
 within each day, then the five days. The primary family comprises sixteen cells:
-two bases, two distances, four depths. This is a post-run, approximate conditional
-analysis, not a joint confidence statement with fitted-rate or diagnostic families.
-Also collect exact-ML depth changes without the archived log-slope rate estimator.
+two bases, two distances, four depths. Its Bonferroni t4 intervals, set after the run,
+cover these cells only. Also the range of exact ML's change to each depth's logical
+error, device and model (decoder_ml.json, n = 1-4).
 
     python docs/analysis/early_depths.py
 """
@@ -20,7 +20,7 @@ from common import day_number, result, write_json
 def interval(daily: np.ndarray) -> dict:
     daily = np.asarray(daily, float)
     if daily.shape != (5,) or not np.isfinite(daily).all():
-        raise ValueError("Five finite daily differences are required")
+        raise ValueError("five finite daily differences are required")
     se = daily.std(ddof=1) / np.sqrt(5)
     mean = float(daily.mean())
     half = t.ppf(1 - 0.05 / (2 * 16), 4) * se
@@ -43,7 +43,7 @@ def interval(daily: np.ndarray) -> dict:
 
 def main() -> None:
     matched = result("stored_priors.json")["curves"]
-    original = result("fits_counts.json")["jobs"]
+    stored = result("fits_counts.json")["jobs"]
     reps = result("fits.json")["per_rep"]
     cells = {}
     for basis in "XZ":
@@ -54,10 +54,10 @@ def main() -> None:
                 for rep in reps.values():
                     job = rep["jobs"][d]
                     observed = matched[job][basis][d]["P"][depth - 1]
-                    predicted = original[job]["predicted"]["frozen_f1.0"]["P"][basis][d][depth - 1]
+                    predicted = stored[job]["predicted"]["frozen_f1.0"]["P"][basis][d][depth - 1]
                     by_day.setdefault(day_number(rep["day"]), []).append(observed - predicted)
                 if sorted(by_day) != [1, 2, 3, 4, 5] or any(len(v) != 2 for v in by_day.values()):
-                    raise ValueError("Every day must contain both placements")
+                    raise ValueError("every day must contain both placements")
                 daily = np.array([np.mean(by_day[day]) for day in sorted(by_day)])
                 cells[basis + d][str(depth)] = interval(daily)
     ml = result("decoder_ml.json")
@@ -71,15 +71,15 @@ def main() -> None:
         "what": "Primary fixed-depth comparison; paired placements averaged within each day; "
         "five-day mean probability differences and approximate simultaneous 95% t4 intervals "
         "over 16 cells. Leave-one-day-out uses t3 on four days, a precision sensitivity "
-        "diagnostic, not independent tests. Fixed archived forecast, inputs and placements; "
-        "no future prediction coverage.",
+        "diagnostic, not independent tests. The forecast, inputs and placements are those stored before "
+        "the run; the intervals are not prediction intervals for new runs.",
         "cells": cells,
         "exact_ml_depth_diagnostic": {
             "window": [1, 2, 3, 4],
             "device_probability_change_range": [min(device), max(device)],
             "model_probability_change_range": [min(model), max(model)],
             "device_minus_model_after_ml_range": [min(gap), max(gap)],
-            "note": "Uses archived depth probabilities, not the old unweighted log-slope rates",
+            "note": "Uses the stored failure probabilities at each depth, not log-slope rates",
         },
     }
     write_json("early_depths.json", out)

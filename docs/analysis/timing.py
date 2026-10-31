@@ -1,4 +1,4 @@
-"""One round of X memory as it ran: what each qubit does, and when (Fig. timing).
+"""One round of X memory as it ran: what each qubit does, and when.
 
 The compiled circuits write every wait as a delay, so each qubit's timeline follows from the
 circuit alone: an instruction starts when its qubits are free, a barrier waits for all of them,

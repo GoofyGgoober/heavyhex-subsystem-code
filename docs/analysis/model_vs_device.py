@@ -1,6 +1,6 @@
-"""The prediction against the device, beyond the prespecified tests (Sec. agreement, Table days).
+"""The prediction against the device, beyond the prespecified tests.
 
-  days         Table days: when each day's jobs ran, the calibration they were prepared from,
+  days         when each day's jobs ran, the calibration they were prepared from,
                its chip medians over working parts (heavyhex.simulation.noisy.typical), and the
                range of the measured f over the day's three jobs
   scatter      an exploratory second agreement test: the day-to-day scatter of placement 1's

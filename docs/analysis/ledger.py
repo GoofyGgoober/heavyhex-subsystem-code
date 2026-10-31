@@ -1,8 +1,10 @@
-"""Every number the paper quotes, collected from the results files, each section with its source.
+"""The numbers the paper quotes and the checks behind them, collected from the results files,
+each section with its source.
 
 No computation: this only selects from results/*.json (and runs/combined.json, the stored
-predictions in runs/*/prediction.json, docs/figures/figure3.json) and writes results/paper_numbers.json and a readable digest,
-results/paper_numbers.txt. Run it after the scripts whose results it reads; it takes a second.
+predictions in runs/*/prediction.json, docs/figures/figure3.json) and writes
+results/paper_numbers.json and a readable digest, results/paper_numbers.txt. Run it after the
+scripts whose results it reads; it takes a second.
 
     python docs/analysis/ledger.py
 """
@@ -36,7 +38,7 @@ def model_vs_device() -> dict:
     m = take("model_vs_device.json")
     d, f = m["detectors"], m["f"]
     return {
-        "days (Table days)": m["days"],
+        "days": m["days"],
         "calibration_scatter_check_exploratory": {
             "label": "exploratory; the added spread comes from the predictions only (calibrations and idle-test f)",
             **m["scatter"],
@@ -1165,7 +1167,7 @@ def channels_digest(c: dict) -> list[str]:
 
 
 def stored_pl8() -> dict:
-    """P_L(8) of each patch as stored before its job at f = 0 and f = 1 (Sec. discussion)."""
+    """P_L(8) of each patch as stored before its job at f = 0 and f = 1."""
     out = {}
     for job in jobs():
         INPUTS.add(f"runs/{job.folder.name}/prediction.json")
@@ -1186,7 +1188,7 @@ def stored_pl8() -> dict:
 
 
 def timing() -> dict:
-    """One round as compiled (Fig. timing), without the drawn qubits' segment lists."""
+    """One round as compiled, without the drawn qubits' segment lists."""
     t = take("timing.json")
     return {k: v for k, v in t.items() if k != "patches"} | {
         "patches": {
@@ -1203,8 +1205,8 @@ def timing() -> dict:
 
 
 def decoder_graph() -> dict:
-    """Stim's observable-only pieces, legacy partially homogenized faults and the shortest logical
-    in edges (decoder_graph.py)."""
+    """Stim's observable-only pieces, single faults on a partially homogenized chip and the
+    shortest logical in edges (decoder_graph.py)."""
     g = take("decoder_graph.json")
     s = g["summary"]
     return {
@@ -1274,7 +1276,7 @@ def digest(res: dict) -> str:
     cells = res["effect_sizes"]["table_one_convention"]["cells"]
     for b in BASES:
         L.append(
-            f"   Table placement, predicted mean +- sigma_M (WL), {b}: "
+            f"   placement table, predicted mean +- sigma_M (WL), {b}: "
             + "; ".join(
                 f"P{pl} "
                 + ", ".join(
@@ -1589,7 +1591,7 @@ def digest(res: dict) -> str:
     tm = res["timing"]
     roles = tm["patches"]["3"]["by_role"]
     L.append(
-        f"   Fig. timing (day 1, pair 1, d3): round {tm['round_us']:.3f} us, readout and reset "
+        f"   Fig. 2(b) (day 1, pair 1, d3): round {tm['round_us']:.3f} us, readout and reset "
         f"{tm['readout_and_reset_us']:.3f} us ({100 * tm['readout_and_reset_share_of_round']:.0f}%)"
         f"; path "
         + " ".join(f"{k} {v:.3f}" for k, v in tm["critical_path_us"])
@@ -1624,8 +1626,8 @@ def digest(res: dict) -> str:
     ms = dg["miscorrected_single_faults_X_d3"]["share_of_predicted_eps3_range"]
     q44 = dg["miscorrected_single_faults_X_d3"]["largest_by_patch"]["2026-10-04-r1"]
     L.append(
-        f"   historical isolated-fault mass/(rounds*legacy eps3): {100 * ms[0]:.0f}-{100 * ms[1]:.0f}% "
-        "(not a rate contribution or bound; not used in the paper); "
+        f"   isolated-fault mass/(rounds*eps3, unweighted log fit): {100 * ms[0]:.0f}-{100 * ms[1]:.0f}% "
+        "(a side diagnostic, not a rate contribution or bound); "
         f"day 1 pair 1: {q44['fault']} {100 * q44['p_per_round']:.1f}% per round over "
         f"{q44['mechanisms']} mechanisms, largest single {q44['largest_single_mechanism_p']:.4f}, "
         f"{100 * q44['share_of_miscorrected']:.0f}% of the miscorrected; its own edge "
@@ -1641,7 +1643,7 @@ def digest(res: dict) -> str:
         ml["n4_miscorrected_single_fault_p"],
     )
     L.append(
-        "   archived exact-ML rate diagnostic (legacy unweighted log slope, not used in the paper; "
+        "   exact-ML side diagnostic (unweighted log slope; "
         f"d = 3 X memory, n = 1-4): model eps3 {100 * drop[0]:.1f}-"
         f"{100 * drop[1]:.1f}% lower than with matching; device eps3 {shift[0]:+.2f} to "
         f"{shift[1]:+.2f} pp (mean {ml['device_eps3_change_pp_mean']:+.2f}); of the single-fault "
@@ -1662,19 +1664,19 @@ def digest(res: dict) -> str:
         f"{sh['device shots']} device, {sh['model matching_folded_vs_paper'] + sh['model correlated_folded_vs_dropped']}"
         f" of {sh['model shots']} model; alone, calibrated wrong on {alone['calibrated_wrong']} "
         f"({scan['calibrated_wrong_with_observable_only_piece']} of the {scan['calibrated_wrong']} Z d3 "
-        f"single miscorrections), uniform on {alone['uniform_wrong']}; historical isolated-fault "
-        f"mass/(8*legacy eps3), maximum {100 * pc['share_of_predicted_Z_eps3_range'][1]:.1f}% "
-        "(not a rate contribution or bound; not used in the paper)"
+        f"single miscorrections), uniform on {alone['uniform_wrong']}; isolated-fault "
+        f"mass/(8*eps3, unweighted log fit), maximum {100 * pc['share_of_predicted_Z_eps3_range'][1]:.1f}% "
+        "(a side diagnostic, not a rate contribution or bound)"
     )
     for day, u in gr["uniform_chip"].items():
         x3 = u["X d3 per-job model"]
         L.append(
-            f"   legacy partially homogenized chip {day} (f = 1): X d3 single faults miscorrected {x3['n=2'][0]} of "
+            f"   partially homogenized chip {day} (f = 1): X d3 single faults miscorrected {x3['n=2'][0]} of "
             f"{x3['n=2'][1]} at n = 2 ({x3['n=2 by symptom'][0]} of {x3['n=2 by symptom'][1]} "
             f"symptoms), {x3['n=8'][0]} of {x3['n=8'][1]} at n = 8 (f = 0: "
             f"{u['X d3 pre-run simulator f=0']['n=8'][0]}, no idle decay: "
             f"{u['X d3 pre-run simulator f=1 no idle']['n=8'][0]}), "
-            f"isolated-mass/(rounds*legacy eps3) {100 * x3['share_of_eps3']:.0f}% "
+            f"isolated-mass/(rounds*eps3, unweighted log fit) {100 * x3['share_of_eps3']:.0f}% "
             f"(not a rate contribution or bound); boundary p up to {x3['boundary_p'][1]:.3f}; "
             f"d = 5: {u['X d5 per-job model']['n=8'][0]}"
         )
@@ -2033,7 +2035,7 @@ def main() -> None:
             "script": "docs/analysis/ledger.py",
             "fits": {
                 "wls": "prespecified weighted-log fit of ln[1 - 2P(n)], primary for the X-memory decision",
-                "binomial": "binomial maximum-likelihood refit of all round counts (App. stats)",
+                "binomial": "binomial maximum-likelihood refit of all round counts",
             },
             "chip_level_inference": "none: results are per placement",
         },

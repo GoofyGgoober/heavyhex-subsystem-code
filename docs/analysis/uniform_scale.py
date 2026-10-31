@@ -1,14 +1,10 @@
-"""Legacy exploratory scaling diagnostic, not used in the current paper.
-
-Despite its historical name, noisy.typical homogenizes CZ, readout, T1 and T2 but
-retains per-qubit single-gate errors. This is not a fully uniform chip. noisy.decay
-also uses the original observed-weight log-linear estimator, not the paper's
-current binomial summary. The numerical crossings below are not threshold claims.
+"""The error scale at which Λ = ε₃/ε₅ crosses 1 on a partially homogenized Fez.
 
 A threshold proper needs d >= 7, which these circuits don't go to. What d = 3 and 5 can
-give is the scale s at which Λ = ε₃/ε₅ crosses 1 when every CZ, readout, reset,
-single-qubit error and idle time is multiplied by s (decoupled waits, f = 1).
-Only CZ, readout, T1 and T2 are set to the 8 October medians at s = 1.
+give is the scale s at which Λ crosses 1 when every CZ, readout, reset, single-qubit error
+and idle time is multiplied by s (decoupled waits, f = 1). At s = 1, CZ, readout, T1 and T2
+are the 8 October medians (noisy.typical) and single-qubit errors are each qubit's own.
+ε is noisy.decay's weighted log-linear fit, not the binomial fit the paper reports.
 
 A few minutes (20,000 shots per point).
 

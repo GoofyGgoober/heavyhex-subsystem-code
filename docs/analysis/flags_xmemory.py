@@ -25,8 +25,7 @@ circuit (X memory's preparation half is left out). This script puts the bases si
     of its 8-round Z-memory record, with the posterior probability of the persistent state.
 
 Intervals are 95%, from a bootstrap over the 38 physical qubits (the same draws for both
-bases where they are compared). Paper: Sec. VII (persistence, the replication in X memory, the
-alternatives, the co-streaks), Fig. leak and App. Fig. hmm_trace.
+bases where they are compared).
 
 Inputs: results/hmm.json, hmm_x.json, refiring.json, refiring_x.json, hmm_bootstrap.json,
 hmm_causes_summary.json, costreak.json. The device series are cached in

@@ -1,4 +1,4 @@
-"""How many placements Fez has, and how the chosen distance-3 patches rank (Sec. design).
+"""How many placements Fez has, and how the chosen distance-3 patches rank.
 
 The prespecified rule (src/heavyhex/patches/placement.py) searches the patch in the two
 orientations that line up with the chip's lattice: `spots()` tries four directions, two per
@@ -122,7 +122,7 @@ def relay_q51() -> dict:
     return out
 
 
-# The parts of placement 1 that were weak on every day (Sec. III).
+# The parts of placement 1 that were weak on every day.
 RECURRING = {
     "cz": ["63-64", "102-103", "148-149", "149-150"],
     "readout": [83, 102],

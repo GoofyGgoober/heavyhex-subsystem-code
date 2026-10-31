@@ -11,8 +11,8 @@
    observed/predicted eps3, eps5 range, Z wls: 1.55-2.14
    observed/predicted eps3, eps5 range, X binomial: 1.19-1.30
    observed/predicted eps3, eps5 range, Z binomial: 1.81-2.20
-   Table placement, predicted mean +- sigma_M (WL), X: P1 eps3 10.2 +- 0.4, eps5 16.1 +- 0.7, lambda 0.642 +- 0.004; P2 eps3 8.6 +- 0.6, eps5 19.2 +- 0.9, lambda 0.448 +- 0.036
-   Table placement, predicted mean +- sigma_M (WL), Z: P1 eps3 7.1 +- 0.0, eps5 16.6 +- 0.1, lambda 0.428 +- 0.002; P2 eps3 8.4 +- 0.1, eps5 16.5 +- 0.1, lambda 0.511 +- 0.004
+   placement table, predicted mean +- sigma_M (WL), X: P1 eps3 10.2 +- 0.4, eps5 16.1 +- 0.7, lambda 0.642 +- 0.004; P2 eps3 8.6 +- 0.6, eps5 19.2 +- 0.9, lambda 0.448 +- 0.036
+   placement table, predicted mean +- sigma_M (WL), Z: P1 eps3 7.1 +- 0.0, eps5 16.6 +- 0.1, lambda 0.428 +- 0.002; P2 eps3 8.4 +- 0.1, eps5 16.5 +- 0.1, lambda 0.511 +- 0.004
 2. Placements compared
    Lambda_X wls: P1 - P2 = 0.182 +- 0.033
    Lambda_X binomial: P1 - P2 = 0.171 +- 0.031
@@ -74,15 +74,15 @@
    SX pair noise / CZ noise by day 0.275, 0.276, 0.267, 0.269, 0.257; snapshot in force / previous, minutes old at the first job 88.2/152.1, 22.9/75.2, 23.2/107.5, 22.5/86.3, 21.3/57.1; equal to previous (T1, T2, CZ, readout) 156of156/155of155/176of176/156of156, 156of156/155of155/176of176/156of156, 156of156/155of155/176of176/156of156, 156of156/155of155/176of176/1of156, 156of156/155of155/176of176/1of156
    weak parts by day (placement.weak), placement 1 / placement 2: 26/25, 20/21, 22/20, 20/21, 19/21; placement 1 every day: CZ 63-64 4.8-7.0%, 102-103 3.4-6.0%; readout q83 11.3-13.6%, q102 8.4-11.3%; T2 q149 4.6-5.1 us, q150 5.1-5.9 us; round 7.896-7.956 us
    pair 2's d3 patch by day: inside placement 1 True, True, True, True, True; shares with placement 2 15/23, 15/23, 15/23, 15/23, 23/23; day 1's qubits True, True, False, True, False
-   Fig. timing (day 1, pair 1, d3): round 7.896 us, readout and reset 6.688 us (85%); path reset 1.684 gates 0.280 readout 1.660 reset 1.684 gates 0.928 readout 1.660; zero-duration resets 4.528 us; data idle (any, decoupled) 93.6-96.8%, 86.8-94.1%; flags in readout or reset 84.7%
+   Fig. 2(b) (day 1, pair 1, d3): round 7.896 us, readout and reset 6.688 us (85%); path reset 1.684 gates 0.280 readout 1.660 reset 1.684 gates 0.928 readout 1.660; zero-duration resets 4.528 us; data idle (any, decoupled) 93.6-96.8%, 86.8-94.1%; flags in readout or reset 84.7%
 17. Diagnostics added after the run
    detection-event fraction device/model, median (share above 1): all 1.20 (76%), X weight 4 1.15 (78%), X weight 2 0.98 (47%), Z 1.19 (99%), flag 1.55 (82%), relay 1.16 (66%)
    f vs T2: rho 0.66 [0.35, 0.85]; f_mem > f_idle in 15/15 (medians 1.45, 0.99); beyond the simulated f in 14/15, at the search edge 2.0 in 1
-   historical isolated-fault mass/(rounds*legacy eps3): 5-61% (not a rate contribution or bound; not used in the paper); day 1 pair 1: Z on q44 (DEPOLARIZE1) 3.3% per round over 15 mechanisms, largest single 0.0355, 85% of the miscorrected; its own edge 0.0355 (weight 3.30); matching chose edges 0.1344, 0.2042 (weight 3.22)
-   archived exact-ML rate diagnostic (legacy unweighted log slope, not used in the paper; d = 3 X memory, n = 1-4): model eps3 2.3-7.3% lower than with matching; device eps3 -0.87 to +1.16 pp (mean -0.05); of the single-fault probability matching miscorrects at n = 4 (0.854), ML also misassigns 0.680 (80%)
-   observable-only pieces: {'Z d3': 240} (one per round, p 0.0015-0.0020); graph unchanged without them True and folded into any piece True; shots decoded differently 0 of 150000 device, 0 of 600000 model; alone, calibrated wrong on 100 (100 of the 328 Z d3 single miscorrections), uniform on 240; historical isolated-fault mass/(8*legacy eps3), maximum 2.3% (not a rate contribution or bound; not used in the paper)
-   legacy partially homogenized chip 2026-10-04 (f = 1): X d3 single faults miscorrected 6 of 55 at n = 2 (6 of 41 symptoms), 24 of 187 at n = 8 (f = 0: 9, no idle decay: 0), isolated-mass/(rounds*legacy eps3) 11% (not a rate contribution or bound); boundary p up to 0.104; d = 5: 0
-   legacy partially homogenized chip 2026-10-08 (f = 1): X d3 single faults miscorrected 6 of 55 at n = 2 (6 of 41 symptoms), 24 of 187 at n = 8 (f = 0: 9, no idle decay: 0), isolated-mass/(rounds*legacy eps3) 10% (not a rate contribution or bound); boundary p up to 0.117; d = 5: 0
+   isolated-fault mass/(rounds*eps3, unweighted log fit): 5-61% (a side diagnostic, not a rate contribution or bound); day 1 pair 1: Z on q44 (DEPOLARIZE1) 3.3% per round over 15 mechanisms, largest single 0.0355, 85% of the miscorrected; its own edge 0.0355 (weight 3.30); matching chose edges 0.1344, 0.2042 (weight 3.22)
+   exact-ML side diagnostic (unweighted log slope; d = 3 X memory, n = 1-4): model eps3 2.3-7.3% lower than with matching; device eps3 -0.87 to +1.16 pp (mean -0.05); of the single-fault probability matching miscorrects at n = 4 (0.854), ML also misassigns 0.680 (80%)
+   observable-only pieces: {'Z d3': 240} (one per round, p 0.0015-0.0020); graph unchanged without them True and folded into any piece True; shots decoded differently 0 of 150000 device, 0 of 600000 model; alone, calibrated wrong on 100 (100 of the 328 Z d3 single miscorrections), uniform on 240; isolated-fault mass/(8*eps3, unweighted log fit), maximum 2.3% (a side diagnostic, not a rate contribution or bound)
+   partially homogenized chip 2026-10-04 (f = 1): X d3 single faults miscorrected 6 of 55 at n = 2 (6 of 41 symptoms), 24 of 187 at n = 8 (f = 0: 9, no idle decay: 0), isolated-mass/(rounds*eps3, unweighted log fit) 11% (not a rate contribution or bound); boundary p up to 0.104; d = 5: 0
+   partially homogenized chip 2026-10-08 (f = 1): X d3 single faults miscorrected 6 of 55 at n = 2 (6 of 41 symptoms), 24 of 187 at n = 8 (f = 0: 9, no idle decay: 0), isolated-mass/(rounds*eps3, unweighted log fit) 10% (not a rate contribution or bound); boundary p up to 0.117; d = 5: 0
    shortest logical in edges: X d3 [3], X d5 [5], Z d3 [3], Z d5 [3]
    idle test: ancillas read 1 in 1.7-5.7% (memory 28.5-32.6%); 11 qubit-jobs left out of the median f, median T2 166 us (used: 85 us)
    log-linear bias of eps, X d3: planned weights -0.14 pp, weights at the true P +0.06 pp

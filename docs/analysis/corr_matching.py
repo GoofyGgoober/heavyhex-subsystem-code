@@ -1,4 +1,4 @@
-"""The device's and the model's shots decoded with correlated matching (Sec. code, App. decoder).
+"""The device's and the model's shots decoded with correlated matching.
 
 Stim splits each fault that fires more than two detectors into edges for matching; at distance
 5 in Z memory, pieces of flag and relay faults form logical paths of only three edges. PyMatching

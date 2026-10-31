@@ -1,4 +1,4 @@
-"""eps and Lambda of re-decoded shots, as in Table placement, for pij_decode.py and corr_matching.py.
+"""eps and Lambda of re-decoded shots, as in the placement table, for pij_decode.py and corr_matching.py.
 
 Each curve (job, decoder, basis, patch) is fitted with the prespecified weighted-log fit and the
 binomial refit (fitting.py, without points dropped; the model's shots get the point estimate

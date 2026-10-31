@@ -1,4 +1,4 @@
-"""Where the log-linear fit's bias comes from (App. stats).
+"""Where the log-linear fit's bias comes from.
 
 fits.py's parametric bootstrap shows that the planned weighted-log fit underestimates the
 device's eps at distance 5. Here the same bootstrap (binomial draws of N = 2500 shots from

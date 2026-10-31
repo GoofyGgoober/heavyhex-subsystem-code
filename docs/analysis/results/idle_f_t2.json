@@ -1,5 +1,5 @@
 {
- "what": "App. f figure and Sec. agreement: the idle-test decay against its f = 0 and f = 1 references; f against reported T2 per physical qubit; f from memory against the idle test; per-qubit-f priors in decoding. f is the prespecified per-qubit estimate.",
+ "what": "The idle-test decay against its f = 0 and f = 1 references; f against reported T2 per physical qubit; f from memory against the idle test; per-qubit-f priors in decoding. f is the prespecified per-qubit estimate.",
  "decay": {
   "job": "ibm_fez-2026-10-04-r1",
   "day": 1,

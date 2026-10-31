@@ -1,5 +1,5 @@
 """One factor on every error of the model: the k that gives the device's logical error per round,
-and the k that gives its stabilizer detection rate (Sec. agreement, App. stats).
+and the k that gives its stabilizer detection rate.
 
 Each job's model (common.Job.model: the scheduled circuit at the job's measured f) with every
 error channel multiplied by k: CZ and single-qubit depolarizing, readout and reset flips, and

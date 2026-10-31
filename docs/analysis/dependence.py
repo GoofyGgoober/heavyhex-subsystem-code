@@ -1,6 +1,6 @@
 """The X-memory agreement tests when the ten repetitions are not counted as ten independent ones;
 every raw count against the model; and what the data say about Lambda_X within a practical
-margin (Sec. agreement, App. stats).
+margin.
 
 A repetition is one day and placement. The ten share more than independent replications would:
 the three jobs of a day ran within four minutes on one calibration snapshot, the two distance-5

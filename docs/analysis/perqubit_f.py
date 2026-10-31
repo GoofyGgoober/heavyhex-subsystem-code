@@ -421,9 +421,7 @@ def report(results: dict, versions: list[str]) -> None:
         )
     print()
 
-    print(
-        "Idle-test f per job (Appendix C): data qubits, excluded (f not pinned to +-0.5 -> median used),"
-    )
+    print("Idle-test f per job: data qubits, excluded (f not pinned to +-0.5 -> median used),")
     print(
         "negative estimates set to zero; median f +- SE; mean of the per-qubit f actually used, by patch"
     )

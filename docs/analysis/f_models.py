@@ -1,5 +1,5 @@
 """The q150 artefact: pair 1's prediction under five ways of giving the data qubits their f, and
-what each does to the placement result (Sec. results, Sec. discussion, App. f, App. robust).
+what each does to the placement result.
 
 Pair 1's distance-5 patch held q150 (Q25), a corner data qubit with T2 = 5.1-5.9 us on all five
 days. The prespecified model gives it the job's median f; the idle test measured its own f as

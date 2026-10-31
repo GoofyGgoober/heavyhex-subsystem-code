@@ -1,8 +1,8 @@
 """Leave-one-day-out sensitivity of the matched stored-prior Fez comparison.
 
-The five daily means are already saved by stored_priors.py. Each omission recomputes
-the same family-of-five t interval on the four remaining days. These overlapping
-subsets are diagnostics, not five new confirmatory tests or independent experiments.
+stored_priors.py saves the five daily means. Each omission recomputes the same
+family-of-five t interval on the four remaining days; the five subsets overlap. Also,
+for each fit window, the curves whose best fit sits on the P(1) >= 0 bound.
 
     python docs/analysis/day_sensitivity.py
 """
@@ -19,7 +19,7 @@ from fitting import mle_batch
 def leave_one_out(daily) -> dict:
     y = np.asarray(daily, float)
     if y.shape != (5,) or not np.isfinite(y).all():
-        raise ValueError("Five finite daily log means are required")
+        raise ValueError("five finite daily log means are required")
     out = {}
     for day in range(5):
         subset = np.delete(y, day)
@@ -49,17 +49,18 @@ def main() -> None:
 
 
 def window_boundaries(source: dict) -> dict:
-    """Check the retained P(1)>=0 constraint at each best fit, not its profile interval."""
+    """The curves whose best fit sits on the fit's P(1) >= 0 bound, in each window (best fits
+    only, not profile intervals)."""
     from stored_priors import WINDOWS
 
-    original = result("fits_counts.json")["jobs"]
+    stored = result("fits_counts.json")["jobs"]
     hardware, simulated, labels = [], [], []
     for job, bases in source["curves"].items():
         for basis, patches in bases.items():
             for patch, curve in patches.items():
                 hardware.append(curve["k"])
                 labels.append([job, basis, patch])
-                pred = original[job]["predicted"]["frozen_f1.0"]
+                pred = stored[job]["predicted"]["frozen_f1.0"]
                 simulated.append(np.round(np.array(pred["P"][basis][patch]) * pred["shots"]))
     out = {}
     for name, counts, shots in (("device", hardware, 2500), ("model", simulated, 200000)):

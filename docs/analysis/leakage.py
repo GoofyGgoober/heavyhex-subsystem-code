@@ -1,7 +1,7 @@
 """What the leakage scripts share: the fit's jobs and statistics, its inputs, and a cache of
 exact simulations.
 
-The leakage model (Sec. leakage): every qubit leaks with probability `leak` per CZ; the
+The leakage model: every qubit leaks with probability `leak` per CZ; the
 partner of a leaked qubit's CZ gets an X error with probability `strength` and leaks with
 probability `spread`; a leaked qubit returns after an exponential lifetime and reads 1 with
 probability `read` (the hidden Markov fits, hmm.py); each reset and readout has IBM's
@@ -428,7 +428,7 @@ def _leakage(name, pt: Point):
 
 
 def path_of(kind, name, basis, rounds, pt: Point, shots, seed, sim: str | None = None) -> Path:
-    # inforce/: resets and readouts as ibm_errors gives them; older caches used the snapshot before
+    # inforce/: resets and readouts as ibm_errors gives them, from the calibration in force
     sim = SIM if sim is None else sim
     folder = CACHE / (f"exact_{kind}" if sim == "t" else f"exact_{kind}_{sim}") / "inforce"
     return folder / f"{name}_{basis}{rounds}_{pt.tag()}_n{shots}_s{seed}.npz"

@@ -1,5 +1,4 @@
-"""Lambda and eps per placement, per repetition and under both fits (Sec. results, Table
-placement, Table reps, App. stats).
+"""Lambda and eps per placement, per repetition and under both fits.
 
 The two repetitions of each day ran on the same two distance-5 placements every day, and
 repetition 2's d = 5 patch shares 51 of its 65 qubits with repetition 1's, so the results are

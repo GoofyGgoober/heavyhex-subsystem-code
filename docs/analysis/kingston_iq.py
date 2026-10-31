@@ -10,13 +10,11 @@ They are not onset correlations and no independent-pair uncertainty is claimed.
     OPENBLAS_NUM_THREADS=1 PYTHONPATH=.:src:docs/analysis \
         python docs/analysis/kingston_iq.py
 
-One process, no bootstrap or hardware access. The legacy three-state exploratory
-fits are not reconstructed here and are not used by the paper.
+One process, no bootstrap or hardware access.
 """
 
 from __future__ import annotations
 
-import hashlib
 from itertools import combinations
 
 import numpy as np
@@ -24,6 +22,7 @@ import numpy as np
 from followup import analysis
 from followup import leakage_control as lc
 from followup.placement import place
+from followup.reproduce import fingerprint
 from heavyhex.patches.placement import Calibration
 
 from common import REPO, RUNS, write_json
@@ -79,7 +78,7 @@ def reconstruct():
     folders = [RUNS / f"ibm_kingston-2026-10-14-exp3-{i}" for i in (1, 2, 3)]
     jobs, period, kerneled = analysis.exp3_jobs(folders)
     if not kerneled:
-        raise ValueError("Raw IQ records are required")
+        raise ValueError("raw IQ records are required")
     selection = lc.select(place(Calibration.load(folders[0] / "calibration.json"))[3].layout)
     partners = dict(zip(selection.qubits, selection.partners, strict=True))
     n = len(selection.qubits)
@@ -175,14 +174,8 @@ def reconstruct():
     pooled["paired_reset_median"] = float(
         np.median([onset(row, "A") - onset(row, "C") for row in nonsteady])
     )
-    inputs = {}
-    for folder in folders:
-        for name in ("run.json", "results.npz", "calibration.json"):
-            path = folder / name
-            with path.open("rb") as stream:
-                inputs[str(path.relative_to(REPO))] = hashlib.file_digest(
-                    stream, "sha256"
-                ).hexdigest()
+    paths = [f / name for f in folders for name in ("run.json", "results.npz", "calibration.json")]
+    inputs = {str(path.relative_to(REPO)): fingerprint(path) for path in paths}
     return {
         "method": __doc__,
         "input_sha256": inputs,

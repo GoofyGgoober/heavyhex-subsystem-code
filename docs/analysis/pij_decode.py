@@ -1,4 +1,4 @@
-"""The device's shots decoded with priors learned from its own detection events (Sec. agreement, App. decoder).
+"""The device's shots decoded with priors learned from its own detection events.
 
 How much of the underprediction is the decoder's? The decoder's priors come from the
 calibration model, which the device does not follow; simulated shots are decoded with priors

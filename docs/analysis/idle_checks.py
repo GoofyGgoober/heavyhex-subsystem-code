@@ -17,6 +17,8 @@ from followup import analysis as a
 
 from common import REPO, read, write_json
 
+SEED = 1313  # the planted checks' binomial draws
+
 
 def contrasts(row, basis):
     keys = ("x", "y", "shots_x", "shots_y") if basis == "XY" else ("p0", "p1", "shots_0", "shots_1")
@@ -47,7 +49,7 @@ def joint_residuals(xy, z, fitted):
 
 
 def rate_batch(t, value, variance, g):
-    """Vectorized form of the archived weighted log slope and unscaled covariance."""
+    """The weighted log slope and unscaled standard error of a.log_decay, many rows at once."""
     keep = value > a.MIN_R
     w = np.where(keep, 1 / np.maximum(variance, 1e-15), 0)
     y = np.log(np.maximum(value, a.MIN_R) / g)
@@ -70,7 +72,7 @@ def planted_check(row, basis, rng, repetitions=2000):
     fitted = a.log_decay(t, value, var, g)
     truth = fitted["offset"] * g * np.exp(-fitted["rate"][0] * t)
     if np.any((truth <= 0) | (truth >= 1)):
-        raise ValueError("Planted contrasts must be physical without clipping")
+        raise ValueError("planted contrasts must be physical without clipping")
     if basis == "XY":
         phase = np.arctan2(row["y"], row["x"])
         n0, n1 = (np.asarray(row[k], int) for k in ("shots_x", "shots_y"))
@@ -115,7 +117,7 @@ def main():
     inputs = source["inputs"]
     xy, z = ({r["qubit"]: r for r in inputs[k]["qubits"]} for k in ("xy", "z"))
     joint = {r["qubit"]: r for r in inputs["joint"]["qubits"]}
-    rng = np.random.default_rng(1313)
+    rng = np.random.default_rng(SEED)
     residuals, planted = {}, {"XY": {}, "Z": {}}
     for q in sorted(joint):
         residuals[str(q)] = joint_residuals(xy[q], z[q], joint[q])
@@ -151,7 +153,7 @@ def main():
         }
     out = {
         "what": __doc__,
-        "seed": 1313,
+        "seed": SEED,
         "source_sha256": source["input_sha256"],
         "joint_residuals": residuals,
         "planted_checks": planted,

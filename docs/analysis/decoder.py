@@ -1,4 +1,4 @@
-"""The decoder checks, gathered for the paper (Sec. code and circuits, App. decoder).
+"""The decoder checks, gathered for the paper.
 
 Reads the outputs of decoder_faults.py, decoder_weights.py, decoder_mass.py,
 decoder_examples.py, decoder_shots.py (with and without --simulate) and decoder_ties.py,

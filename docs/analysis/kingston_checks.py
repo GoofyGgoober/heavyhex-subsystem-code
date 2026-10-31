@@ -40,7 +40,7 @@ def main() -> None:
     for name in ("ibm", "joint", "own_test", "measured_tq_readout"):
         source = read(REPO / "build" / "followup" / f"fixed-{name}.json")
         if source["simulation_priors"] != "hardware" or source["hardware_priors"] != "measured":
-            raise ValueError("The comparison must use the measured-Tq decoder on both sides")
+            raise ValueError("the comparison must use the measured-Tq decoder on both sides")
         variants[name] = {
             "input_sha256": source["input_sha256"],
             "hardware_priors": source["hardware_priors"],

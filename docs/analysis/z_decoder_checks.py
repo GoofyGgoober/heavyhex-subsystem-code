@@ -19,16 +19,16 @@ from collections import defaultdict
 
 import numpy as np
 import stim
-from decoder_graph import shortest_logical
 
 from common import jobs, memory_index, write_json
+from decoder_graph import shortest_logical
 from matching import calibrated_matching, patch_of_observable
 
 
 def stabilizers_only(model, labels):
-    """Drop auxiliary detector declarations, retaining their physical readouts."""
+    """Drop the flag and relay DETECTOR declarations; every measurement stays."""
     if len(labels) != model.num_detectors:
-        raise ValueError("One label is required for every detector")
+        raise ValueError("one label is required for every detector")
     keep = np.array([" " not in label[2] for label in labels])
     out, col = stim.Circuit(), 0
     for instruction in model.flattened():
@@ -46,7 +46,7 @@ def walsh(values):
     values = np.array(values, dtype=float, copy=True)
     n = len(values)
     if n == 0 or n & (n - 1):
-        raise ValueError("The transform length must be a positive power of two")
+        raise ValueError("the transform length must be a positive power of two")
     width = 1
     while width < n:
         blocks = values.reshape(-1, 2 * width)
@@ -64,12 +64,12 @@ def xor_distribution(bits, mechanisms):
     Half-probability and >half-probability errors are handled explicitly.
     """
     if not 0 <= bits <= 21:
-        raise ValueError("Exact tables are limited to 21 bits (20 detectors plus logical)")
+        raise ValueError("exact tables are limited to 21 bits (20 detectors plus logical)")
     weights = np.zeros(1 << bits)
     offset, halves = 0, []
     for mask, probability in mechanisms:
         if not 0 <= mask < len(weights) or not 0 <= probability <= 1:
-            raise ValueError("Invalid error mask or probability")
+            raise ValueError("invalid error mask or probability")
         if not mask:
             continue
         if probability > 0.5:
@@ -82,7 +82,7 @@ def xor_distribution(bits, mechanisms):
     characters = np.exp(0.5 * (weights.sum() - walsh(weights)))
     probability = walsh(characters) / len(weights)
     if probability.min() < -1e-12:
-        raise ArithmeticError("Negative probability beyond transform roundoff")
+        raise ArithmeticError("negative probability beyond transform roundoff")
     probability = np.maximum(probability, 0)
     indices = np.arange(len(weights))
     for mask in halves:
@@ -96,7 +96,7 @@ def ml_table(dem, detectors, observable):
     """P[syndrome, logical], marginalizing any other patch's variables."""
     positions = {detector: bit for bit, detector in enumerate(detectors)}
     if len(positions) != len(detectors):
-        raise ValueError("Detector columns must be unique")
+        raise ValueError("detector columns must be unique")
     mechanisms = []
     for instruction in dem.flattened():
         if instruction.type != "error":
@@ -204,7 +204,7 @@ def main():
     rows = []
     selected = [job for job in jobs() if args.job is None or job.name in args.job]
     if not selected or (args.job and set(args.job) != {job.name for job in selected}):
-        parser.error("Unknown job selection")
+        parser.error("unknown job selection")
     for job in selected:
         for rounds in (1, 2, 3, 4):
             rows.extend(compare(job, rounds, args.shots, args.seed + rounds))

@@ -1,5 +1,5 @@
 """How the prespecified agreement test depends on choices fixed before the run, and what its
-tests could detect (Sec. agreement, Sec. days, App. stats).
+tests could detect.
 
   sigma_f      the standard error of the job's median f from the idle test's noise alone: a
                parametric bootstrap of each job's idle test (every data qubit's <X> and <Y> at

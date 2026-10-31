@@ -1,4 +1,4 @@
-"""Fig. timing: one round of X memory on Fez, qubit by qubit, and what sets its length.
+"""Fig. 2(b): one round of X memory on Fez, qubit by qubit, and what sets its length.
 
 Top: the middle round of day 1's 3-round X-memory circuit on pair 1's distance-3 patch, as the
 compiled circuit ran it, for one qubit of each role (the gadget figure's q24, q23 and q16, and

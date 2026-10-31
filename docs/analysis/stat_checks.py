@@ -1,5 +1,4 @@
-"""Checks of the statistics behind the X-memory tests, from stored results only (Sec. results,
-Sec. days, App. stats, the table of rules).
+"""Checks of the statistics behind the X-memory tests, from stored results only.
 
   binomial_primary  each pair's eps3, eps5 and Lambda_X with the binomial fit first and the
                     log-linear (prespecified) fit beside it: plain five-day means as in the
@@ -17,7 +16,7 @@ Sec. days, App. stats, the table of rules).
   lambda_offset     observed over predicted Lambda_X over the ten pair-days (DerSimonian-Laird,
                     Hartung-Knapp; the paper quotes the interval floored at the inverse-variance
                     one) without day 2 of pair 1, without days 1 and 2 of pair 1, and with day 2's
-                    prediction lowered as App. where does (day_swing.py); t test on the z values
+                    prediction lowered as day_swing.py does; t test on the z values
   tracking          pair 1, Lambda_X = c M with one c over the days (effect_sizes.track): c and
                     chi2 with all five days and without day 2, chi2 at c = 1, and c = 1 against
                     the fitted c (Delta chi2, 1 dof)

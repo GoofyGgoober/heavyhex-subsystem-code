@@ -5,8 +5,8 @@ The per-qubit prediction has no such term in the repo. This script estimates one
 Monte Carlo, for X memory only (Z memory does not depend on the data qubits' f):
 
   each draw, every measured data qubit gets max(share_q + sigma_q z_q, 0) (share_q the
-  raw idle-test estimate, sigma_q its standard error, Appendix C's clip at zero), and the
-  ancillas, flags and the data qubits the idle test could not pin (Appendix C exclusion)
+  raw idle-test estimate, sigma_q its standard error), and the
+  ancillas, flags and the data qubits the idle test could not pin
   get max(median + sigma_median z_0, 0); the X-memory circuits are then simulated with
   the repo's own simulated()/_decode() at SIDE_SHOTS (50,000) shots and the same seeds
   as the prespecified side prediction (common random numbers, so the spread over draws is

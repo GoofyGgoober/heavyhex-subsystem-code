@@ -1,6 +1,6 @@
 """All 40 hardware logical-error curves, and the stored model predictions, fitted with the
 prespecified weighted-log fit and with a binomial maximum-likelihood fit at every round count
-(fitting.py): Table reps, Table refit, App. stats.
+(fitting.py).
 
 The curve P(n) = (1 - A (1 - 2 eps)^n) / 2 at n = 1, 2, 3, 4, 6, 8 rounds. The weighted-log
 fit is the prespecified one (it reproduces the stored fits to 1e-12); the binomial fit keeps

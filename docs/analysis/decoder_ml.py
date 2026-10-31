@@ -1,4 +1,4 @@
-"""Exact maximum-likelihood decoding of the distance-3 X memory, against matching (App. decoder).
+"""Exact maximum-likelihood decoding of the distance-3 X memory, against matching.
 
 For the X-memory distance-3 patch of every job at n = 1-4 rounds, the joint probability of
 each syndrome and logical value is computed exactly from the model's detector error model

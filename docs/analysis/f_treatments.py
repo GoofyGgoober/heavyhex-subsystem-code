@@ -1,21 +1,18 @@
-"""Observed over predicted under each treatment of f, by pair, and the value of every curve
-(Original adaptive-decoder diagnostics; the matched primary comparison is stored_priors.py.)
+"""Observed over predicted under each treatment of f, by pair, and the value of every curve,
+the device decoded at the job's measured f (stored_priors.py decodes both sides at f = 1).
 
 The model needs one number the calibration does not give, the dephasing multiplier f. The
 predictions exist under five treatments of it: f = 1 and f = 0, stored before each job; the
 job's median f (the planned tests); each data qubit at its own f; and the inverse-variance mean
 of the per-qubit f, whose priors also decode the device's shots again (f_weighted_mean.py).
-For each treatment and each quantity, O/M is the geometric mean over the ten pair-days with a
-Student t intervals (4 dof) from the five daily means of ln(O/M). The sensitivity table uses
-Bonferroni simultaneous 95% intervals over its five quantities within each input treatment;
-pointwise 95% intervals remain recorded. The two placements
-within a day form one block. This treats days as independent, conditional on the sampled
-patches and model inputs, not as a sample of hardware placements. The earlier ten-pair-day
-interval and separate placement intervals remain available as sensitivity results.
-The binomial fit is used throughout. Also how many curves lie above the prediction.
-The device uses the original measured-f priors except in the weighted-mean treatment;
-the simulated samples use each variant's priors. These are input/decoder diagnostics,
-not matched-decoder validation of every noise treatment.
+For each treatment and each quantity, O/M is the geometric mean over the ten pair-days with
+Student t intervals (4 dof) from the five daily means of ln(O/M): pointwise 95%, and Bonferroni
+95% over the five quantities of a treatment. The two placements within a day form one block,
+and days are taken as independent given the sampled patches and model inputs, not as a sample
+of hardware placements. The ten-pair-day interval and each placement's interval are given
+beside it. The binomial fit is used throughout. Also how many curves lie above the prediction.
+The device's shots are decoded with the job's measured-f priors, except under the weighted
+mean; each simulated sample is decoded with its own treatment's priors.
 
   table      O/M of X eps3, eps5, Lambda_X, Z eps3, eps5 under each treatment, and the range of f
   pairs      each pair's mean over the five days: the device, the prediction at f = 1 and at the
@@ -66,15 +63,15 @@ def predicted(pred: dict, rep: dict, source: str, q: str) -> float:
 
 
 def summary(y: np.ndarray, above: int, days: np.ndarray, placements: np.ndarray) -> dict:
-    """Day-block interval, with earlier and placement-specific intervals beside it."""
+    """Day-block interval, with the pair-day and per-placement intervals beside it."""
     y, days, placements = np.asarray(y, float), np.asarray(days), np.asarray(placements)
     if y.ndim != 1 or days.shape != y.shape or placements.shape != y.shape:
-        raise ValueError("Ratios, days and placements must be aligned one-dimensional arrays")
+        raise ValueError("ratios, days and placements must be aligned one-dimensional arrays")
     if not np.isfinite(y).all() or len(np.unique(days)) < 2:
-        raise ValueError("Finite ratios from at least two days are required")
+        raise ValueError("finite ratios from at least two days are required")
     for d in np.unique(days):
         if sorted(placements[days == d].tolist()) != [1, 2]:
-            raise ValueError("Each day must contain exactly one result from each placement")
+            raise ValueError("each day must contain exactly one result from each placement")
     by_day = np.array([y[days == d].mean() for d in np.unique(days)])
     family_critical = stats.t.ppf(1 - 0.05 / (2 * len(QUANTITIES)), len(by_day) - 1)
     half = family_critical * by_day.std(ddof=1) / np.sqrt(len(by_day))
@@ -188,8 +185,8 @@ def main() -> None:
         "what": "observed over predicted (binomial fit) under each treatment of f: geometric mean "
         "over the ten pair-days, Student t 95% interval on five daily log means (4 dof), "
         "pointwise and Bonferroni simultaneous intervals over the five quantities within "
-        "each fixed input treatment; conditional on sampled patches and fixed model inputs; earlier pair-day and "
-        "placement-specific intervals retained; each pair's means; every curve",
+        "each fixed input treatment; conditional on sampled patches and fixed model inputs; also the "
+        "pair-day and placement-specific intervals, each pair's means and every curve",
         "table": table,
         "f_range": f_range,
         "pairs": pairs,
